@@ -1,62 +1,37 @@
-const navLinks = [
-  { name: 'Home', href: '/' },
-  { name: 'Features', href: '/features' },
-  { name: 'Pricing', href: '/pricing' },
-  { name: 'About', href: '/about' },
-  { name: 'Terms', href: '/terms' },
-  { name: 'Privacy Policy', href: '/privacy-policy' }
-]
+const BRAND_NAME = 'PlanScaler Mindmap Tools';
+const CURRENT_YEAR = new Date().getFullYear();
+const FOOTER_LINKS = [
+  { label: 'GitHub', href: 'https://github.com/your-org/plan-scaler-mindmap-tools', external: true },
+  { label: 'Terms of Service', href: '/terms', external: false },
+  { label: 'Privacy Policy', href: '/privacy', external: false },
+  { label: 'Hosted on Netlify', href: 'https://www.netlify.com', external: true },
+];
 
-const socialLinks = [
-  { name: 'GitHub', href: 'https://github.com/your-username/your-repo' },
-  { name: 'Twitter', href: 'https://twitter.com/your-username' }
-]
-
-export default function Footer(): JSX.Element {
-  const year = new Date().getFullYear()
-
+function Footer(): JSX.Element {
   return (
-    <footer className="footer" aria-labelledby="footer-heading">
-      <h2 id="footer-heading" className="sr-only">
-        Footer
-      </h2>
-      <div className="footer__container">
-        <div className="footer__brand">
-          <a href="/" className="footer__logo">
-            Mindmap ? Todo
-          </a>
-        </div>
-        <nav className="footer__nav" aria-label="Footer Navigation">
-          <ul className="footer__nav-list">
-            {navLinks.map(link => (
-              <li key={link.href} className="footer__nav-item">
-                <a href={link.href} className="footer__nav-link">
-                  {link.name}
-                </a>
+    <footer className="footer" role="contentinfo">
+      <div className="footer__content">
+        <p>? {CURRENT_YEAR} {BRAND_NAME}. All rights reserved.</p>
+        <nav aria-label="Footer navigation">
+          <ul className="footer__links">
+            {FOOTER_LINKS.map(({ label, href, external }) => (
+              <li key={label}>
+                {external ? (
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {label}
+                  </a>
+                ) : (
+                  <Link to={href}>
+                    {label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
         </nav>
-        <nav className="footer__social" aria-label="Social Media">
-          <ul className="footer__social-list">
-            {socialLinks.map(link => (
-              <li key={link.href} className="footer__social-item">
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer__social-link"
-                >
-                  {link.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="footer__copy">
-          &copy; {year} Mindmap ? Todo. All rights reserved.
-        </div>
       </div>
     </footer>
-  )
+  );
 }
+
+export default Footer;
