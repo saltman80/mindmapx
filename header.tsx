@@ -1,72 +1,169 @@
-function createDefaultMap() {
-  return {
-    id: null as string | null,
-    title: 'Untitled Map',
-    nodes: [] as unknown[],
-    edges: [] as unknown[],
+const Header = (): JSX.Element => {
+  const [isProfileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [isMobileNavOpen, setMobileNavOpen] = useState(false)
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<HTMLElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user, logout } = useAuth()
+
+  const navItems: NavItem[] = user
+    ? [
+        { label: 'Dashboard', route: '/dashboard' },
+        { label: 'Mindmaps', route: '/mindmaps' },
+        { label: 'Todos', route: '/todos' },
+        ...(user.role === 'admin'
+          ? [
+              { label: 'Users', route: '/admin/users' },
+              { label: 'Payments', route: '/admin/payments' },
+              { label: 'Analytics', route: '/admin/analytics' },
+            ]
+          : []),
+      ]
+    : [{ label: 'Home', route: '/' }]
+
+  const handleAvatarClick = (): void => {
+    setProfileMenuOpen(prev => !prev)
   }
-}
 
-const Header: React.FC = () => {
-  const { map, setMap } = useContext(MindmapContext)
-  const [isSaving, setIsSaving] = useState(false)
-  const toast = useToast()
-
-  const handleNewMap = () => {
-    if (window.confirm('Start a new map? Unsaved changes will be lost.')) {
-      setMap(createDefaultMap())
-    }
+  const handleNavSelect = (route: string): void => {
+    setProfileMenuOpen(false)
+    setMobileNavOpen(false)
+    navigate(route)
   }
 
-  const handleSaveMap = async () => {
-    setIsSaving(true)
-    try {
-      const response = await fetch('/.netlify/functions/saveMap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(map),
-      })
-
-      if (!response.ok) {
-        let errorMsg = 'Failed to save map'
-        try {
-          const errorData = await response.json()
-          errorMsg = errorData.error || errorMsg
-        } catch {}
-        throw new Error(errorMsg)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (avatarRef.current && !avatarRef.current.contains(target)) {
+        setProfileMenuOpen(false)
       }
-
-      let data: any = {}
-      const contentType = response.headers.get('Content-Type') || ''
-      if (contentType.includes('application/json')) {
-        data = await response.json()
+      if (
+        navRef.current &&
+        toggleRef.current &&
+        !navRef.current.contains(target) &&
+        !toggleRef.current.contains(target)
+      ) {
+        setMobileNavOpen(false)
       }
-
-      setMap(prev => ({ ...prev, id: data.id }))
-      toast.success('Map saved successfully')
-    } catch (error) {
-      console.error(error)
-      toast.error(error instanceof Error ? error.message : 'Error saving map')
-    } finally {
-      setIsSaving(false)
     }
-  }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  useEffect(() => {
+    setProfileMenuOpen(false)
+    setMobileNavOpen(false)
+  }, [location.pathname])
+
+  const initials = user?.name
+    ?.split(' ')
+    .map(n => n.charAt(0))
+    .join('')
+    .toUpperCase()
 
   return (
     <header className="header">
-      <Link to="/" className="header__logo">
-        PlanScaler
-      </Link>
-      <div className="header__actions">
-        <button className="header__button" onClick={handleNewMap}>
-          New Map
+      <div className="header__container">
+        <div className="header__logo">
+          <Link to="/">PlanScaler</Link>
+        </div>
+        <button
+          ref={toggleRef}
+          className="header__toggle"
+          type="button"
+          onClick={() => setMobileNavOpen(prev => !prev)}
+          aria-label="Toggle navigation"
+          aria-expanded={isMobileNavOpen}
+          aria-controls="primary-navigation"
+        >
+          <span className="header__toggle-bar" />
+          <span className="header__toggle-bar" />
+          <span className="header__toggle-bar" />
         </button>
-        <button className="header__button" onClick={handleSaveMap} disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save Map'}
-        </button>
-        <Link to="/gallery" className="header__button">
-          Gallery
-        </Link>
+        <nav
+          id="primary-navigation"
+          ref={navRef}
+          className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
+          aria-label="Main navigation"
+        >
+          <ul className="header__nav-list">
+            {navItems.map(item => (
+              <li key={item.route} className="header__nav-item">
+                <NavLink
+                  to={item.route}
+                  className={({ isActive }) =>
+                    `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
+                  }
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  {item.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="header__actions">
+          {user ? (
+            <div className="header__avatar-container" ref={avatarRef}>
+              <button
+                id="profile-menu-button"
+                className="header__avatar"
+                type="button"
+                onClick={handleAvatarClick}
+                aria-haspopup="menu"
+                aria-expanded={isProfileMenuOpen}
+                aria-controls="profile-menu"
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={`${user.name}'s avatar`}
+                    className="header__avatar-image"
+                  />
+                ) : (
+                  <span className="header__avatar-initials">{initials}</span>
+                )}
+              </button>
+              {isProfileMenuOpen && (
+                <div
+                  id="profile-menu"
+                  className="header__dropdown"
+                  role="menu"
+                  aria-labelledby="profile-menu-button"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="header__dropdown-item"
+                    onClick={() => handleNavSelect('/profile')}
+                  >
+                    Profile
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="header__dropdown-item"
+                    onClick={() => {
+                      logout()
+                      handleNavSelect('/login')
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="header__login-link">
+              Login
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   )
