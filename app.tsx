@@ -1,41 +1,59 @@
-const HomePage = lazy(() => import('./pages/HomePage'))
-const DemoPage = lazy(() => import('./pages/DemoPage'))
-const PricingPage = lazy(() => import('./pages/PricingPage'))
-const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
-const SuccessPage = lazy(() => import('./pages/SuccessPage'))
-const CancelPage = lazy(() => import('./pages/CancelPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 300_000,
+      cacheTime: 600_000,
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-if (!stripeKey) {
-  throw new Error('Missing environment variable: VITE_STRIPE_PUBLISHABLE_KEY')
-}
-const stripePromise: Promise<Stripe | null> = loadStripe(stripeKey)
+const MindmapCanvas = lazy(() => import('./mindmapcanvas'))
+const TodoDashboard = lazy(() => import('./tododashboard'))
+const AboutModulePage = lazy(() => import('./aboutmodulepage'))
 
-function App(): JSX.Element {
+function ErrorFallback({ error, resetErrorBoundary }) {
   return (
-    <React.StrictMode>
-      <Elements stripe={stripePromise}>
-        <Router>
-          <ScrollToTop />
-          <Navbar />
-          <ErrorBoundary>
-            <Suspense fallback={<div className="loading">Loading...</div>}>
+    <div role="alert" style={{ padding: 20 }}>
+      <h2>Something went wrong</h2>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  )
+}
+
+function ReactQueryDevtoolsLoader() {
+  const [Devtools, setDevtools] = useState(null)
+  useEffect(() => {
+    import('@tanstack/react-query-devtools').then(mod => {
+      setDevtools(() => mod.ReactQueryDevtools)
+    })
+  }, [])
+  if (!Devtools) return null
+  return <Devtools initialIsOpen={false} />
+}
+
+function App() {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<LoadingSpinner />}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/demo" element={<DemoPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/success" element={<SuccessPage />} />
-                <Route path="/cancel" element={<CancelPage />} />
-                <Route path="*" element={<NotFoundPage />} />
+                <Route path="/" element={<Navigate to="/mindmap" replace />} />
+                <Route path="/mindmap" element={<MindmapCanvas />} />
+                <Route path="/todos" element={<TodoDashboard />} />
+                <Route path="/about-module" element={<AboutModulePage />} />
+                <Route path="*" element={<Navigate to="/mindmap" replace />} />
               </Routes>
             </Suspense>
-          </ErrorBoundary>
-          <Footer />
-        </Router>
-      </Elements>
-    </React.StrictMode>
+          </Layout>
+        </BrowserRouter>
+        {import.meta.env.DEV && <ReactQueryDevtoolsLoader />}
+      </QueryClientProvider>
+    </ErrorBoundary>
   )
 }
 
