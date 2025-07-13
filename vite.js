@@ -1,47 +1,90 @@
-const root = process.cwd()
-  const env = loadEnv(mode, root, '')
-  const baseRaw = env.VITE_BASE_URL || '/'
-  const base = baseRaw.endsWith('/') ? baseRaw : `${baseRaw}/`
-  const devPort = Number(env.VITE_DEV_PORT) || 5173
-  const functionsPort = Number(env.VITE_NETLIFY_FUNCTIONS_PORT) || 8888
-  const previewPort = Number(env.VITE_PREVIEW_PORT) || 4173
-  const sourcemap = env.VITE_SOURCEMAP === 'true'
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  return {
-    root,
-    base,
-    plugins: [tsconfigPaths(), svgr(), react()],
-    resolve: {
-      alias: {
-        '@': resolve(root, 'src'),
-      },
-    },
-    server: {
-      host: true,
-      port: devPort,
-      strictPort: true,
-      open: true,
-      fs: { strict: true },
-      proxy: {
-        [ /^\/(?:api|\.netlify\/functions)/ ]: {
-          target: `http://localhost:${functionsPort}`,
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, '/.netlify/functions'),
-        },
-      },
-    },
-    preview: {
-      port: previewPort,
-      open: true,
-    },
+function configureServer(server) {
+  server.httpServer?.on('error', console.error);
+  server.middlewares.use(
+    history({
+      index: '/index.html',
+      rewrites: [
+        { from: /^\/api\/.*$/, to: (context) => context.parsedUrl.path }
+      ]
+    })
+  );
+}
+
+async function buildProject() {
+  const mode = 'production';
+  const env = loadEnv(mode, __dirname, '');
+  const clientEnv = Object.fromEntries(
+    Object.entries(env).filter(([key]) => key.startsWith('VITE_'))
+  );
+  const defineEnv = {
+    'process.env.NODE_ENV': JSON.stringify(mode),
+    ...Object.entries(clientEnv).reduce((acc, [key, val]) => {
+      acc[`process.env.${key}`] = JSON.stringify(val);
+      return acc;
+    }, {})
+  };
+  await build({
+    root: __dirname,
+    base: env.VITE_BASE_URL || './',
+    publicDir: path.resolve(__dirname, 'public'),
+    resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+    define: defineEnv,
     build: {
       outDir: 'dist',
-      sourcemap,
-      rollupOptions: {
-        input: {
-          main: resolve(root, 'index.html'),
-        },
+      sourcemap: env.VITE_SOURCEMAP === 'true',
+      target: env.VITE_BUILD_TARGET || 'es2020',
+      rollupOptions: { input: path.resolve(__dirname, 'index.html') }
+    }
+  });
+}
+
+async function main() {
+  const mode = process.env.NODE_ENV || 'development';
+  const env = loadEnv(mode, __dirname, '');
+  const clientEnv = Object.fromEntries(
+    Object.entries(env).filter(([key]) => key.startsWith('VITE_'))
+  );
+  const defineEnv = {
+    'process.env.NODE_ENV': JSON.stringify(mode),
+    ...Object.entries(clientEnv).reduce((acc, [key, val]) => {
+      acc[`process.env.${key}`] = JSON.stringify(val);
+      return acc;
+    }, {})
+  };
+  if (mode === 'production') {
+    await buildProject();
+  } else {
+    const server = await createServer({
+      root: __dirname,
+      base: env.VITE_BASE_URL || '/',
+      publicDir: path.resolve(__dirname, 'public'),
+      resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+      define: defineEnv,
+      server: {
+        port: Number(env.PORT) || 3000,
+        strictPort: true,
+        open: true,
+        fs: { strict: true },
+        proxy: {
+          '/api': {
+            target: env.VITE_API_PROXY_TARGET || 'http://localhost:8888',
+            changeOrigin: true,
+            rewrite: (p) => p.replace(/^\/api/, '')
+          }
+        }
       },
-    },
+      build: { sourcemap: env.VITE_SOURCEMAP === 'true' }
+    });
+    configureServer(server);
+    await server.listen();
+    server.printUrls();
   }
-})
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
