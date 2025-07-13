@@ -3,6 +3,10 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [dev]
   framework = "vite"
   command = "npm run dev"
@@ -11,12 +15,14 @@
   publish = "dist"
   functions = "netlify/functions"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-
 [context.production.environment]
-  NEON_DATABASE_URL = "${NEON_DATABASE_URL}"
+  DATABASE_URL = "${NEON_DATABASE_URL}"
+  STRIPE_SECRET_KEY = "${STRIPE_SECRET_KEY}"
+  JWT_SECRET = "${JWT_SECRET}"
+  # Add additional secrets in Netlify UI as needed
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
 
 [[redirects]]
   from = "/api/*"
@@ -27,3 +33,34 @@
   from = "/*"
   to = "/index.html"
   status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.neon.tech ws://localhost:8888; object-src 'none'; base-uri 'self';"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
