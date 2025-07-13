@@ -1,0 +1,47 @@
+{
+  "name": "mindmap-todo-marketing-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A React & Vite based marketing site for the Mindmap ? Todo app with Stripe checkout, Netlify Functions, and Neon Postgres.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "netlify-dev": "netlify dev",
+    "functions:build": "netlify functions:build",
+    "start": "npm run netlify-dev",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@netlify/functions": "^3.0.1",
+    "@stripe/stripe-js": "^1.43.0",
+    "dotenv": "^16.0.3",
+    "framer-motion": "^7.6.8",
+    "pg": "^8.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "stripe": "^12.15.0"
+  },
+  "devDependencies": {
+    "@netlify/cli": "^15.0.0",
+    "@types/node": "^18.16.19",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react": "^3.1.0",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-react": "^7.33.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "node-pg-migrate": "^7.5.1",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9"
+  }
+}
