@@ -1,53 +1,96 @@
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const rawEnv = loadEnv(mode, process.cwd(), 'VITE_')
+  const VITE_BASE_URL = rawEnv.VITE_BASE_URL
+  const VITE_APP_ENV = rawEnv.VITE_APP_ENV
+  const rawPort = rawEnv.VITE_PORT
+  const rawPreviewPort = rawEnv.VITE_PREVIEW_PORT
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), 'VITE_')
-  Object.assign(process.env, env)
-
-  const {
-    VITE_BASE_URL = '/',
-    VITE_PORT,
-    VITE_PREVIEW_PORT
-  } = env
-
-  const port = parseInt(VITE_PORT || '', 10)
-  const previewPort = parseInt(VITE_PREVIEW_PORT || '', 10)
-
-  const normalizeBase = (url: string) => {
-    let str = url.trim()
-    if (!str.startsWith('/')) str = `/${str}`
-    if (!str.endsWith('/')) str = `${str}/`
-    return str
+  if (!VITE_APP_ENV) {
+    throw new Error('Missing required environment variable: VITE_APP_ENV')
   }
 
-  const base = VITE_BASE_URL === '/' ? '/' : normalizeBase(VITE_BASE_URL)
+  const port = rawPort !== undefined
+    ? (() => {
+        const p = parseInt(rawPort, 10)
+        if (isNaN(p)) throw new Error(`Invalid VITE_PORT: ${rawPort}`)
+        return p
+      })()
+    : 5173
+
+  const previewPort = rawPreviewPort !== undefined
+    ? (() => {
+        const p = parseInt(rawPreviewPort, 10)
+        if (isNaN(p)) throw new Error(`Invalid VITE_PREVIEW_PORT: ${rawPreviewPort}`)
+        return p
+      })()
+    : 4173
+
+  const functionsTarget = 'http://localhost:8888'
 
   return {
-    base,
-    plugins: [react()],
+    base: VITE_BASE_URL || '/',
+    plugins: [
+      react(),
+      tsconfigPaths(),
+      svgr()
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src')
-      }
+      },
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    },
+    define: {
+      __APP_ENV__: JSON.stringify(VITE_APP_ENV)
     },
     server: {
-      port: Number.isNaN(port) ? 3000 : port,
+      host: 'localhost',
+      port,
+      strictPort: true,
       open: true,
-      strictPort: true
+      proxy: {
+        '/.netlify/functions': {
+          target: functionsTarget,
+          changeOrigin: true,
+          rewrite: p => p.replace(/^\/\.netlify\/functions/, '')
+        }
+      }
     },
     preview: {
-      port: Number.isNaN(previewPort) ? 4173 : previewPort,
-      strictPort: true
+      host: 'localhost',
+      port: previewPort,
+      strictPort: true,
+      open: true,
+      proxy: {
+        '/.netlify/functions': {
+          target: functionsTarget,
+          changeOrigin: true,
+          rewrite: p => p.replace(/^\/\.netlify\/functions/, '')
+        }
+      }
     },
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
       sourcemap: mode !== 'production',
+      target: 'es2020',
+      minify: 'esbuild',
       rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, 'index.html')
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (
+                id.includes('node_modules/react/') ||
+                id.includes('node_modules/react-dom/')
+              ) {
+                return 'react-vendor'
+              }
+              return 'vendor'
+            }
+          }
         }
       }
-    }
+    },
+    envDir: process.cwd(),
+    envPrefix: 'VITE_'
   }
 })
