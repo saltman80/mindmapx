@@ -1,159 +1,140 @@
-const DATABASE_URL = process.env.DATABASE_URL
-const JWT_SECRET = process.env.JWT_SECRET
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
-
-if (!DATABASE_URL) {
-  console.error('Environment variable DATABASE_URL must be defined')
-  throw new Error('Environment variable DATABASE_URL must be defined')
-}
-if (!JWT_SECRET) {
-  console.error('Environment variable JWT_SECRET must be defined')
-  throw new Error('Environment variable JWT_SECRET must be defined')
+const { DATABASE_URL, JWT_SECRET } = process.env
+if (!DATABASE_URL || !JWT_SECRET) {
+  throw new Error('Missing required environment variables')
 }
 
-const pool = new Pool({ connectionString: DATABASE_URL })
+const pool = createPool({ connectionString: DATABASE_URL })
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email().transform(s => s.trim().toLowerCase()),
+  password: z.string().min(8),
 })
 
-interface User {
-  id: string
-  email: string
-  role: string
-}
-
-class AuthError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'AuthError'
-  }
-}
-
-async function validateCredentials(email: string, password: string): Promise<User> {
-  const client = await pool.connect()
-  try {
-    const result = await client.query<{
-      id: string
-      email: string
-      password_hash: string
-      role: string
-    }>(
-      'SELECT id, email, password_hash, role FROM users WHERE email = $1 AND is_active = TRUE',
-      [email.toLowerCase()]
-    )
-    if (result.rowCount === 0) {
-      throw new AuthError('Invalid email or password')
-    }
-    const row = result.rows[0]
-    const validPassword = await bcrypt.compare(password, row.password_hash)
-    if (!validPassword) {
-      throw new AuthError('Invalid email or password')
-    }
-    return { id: row.id, email: row.email, role: row.role }
-  } finally {
-    client.release()
-  }
-}
-
-function generateJWT(user: User): string {
-  return jwt.sign(
-    { sub: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  )
-}
-
-type AttemptInfo = { count: number; firstAttempt: number }
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
 const MAX_ATTEMPTS = 5
-const attemptsMap = new Map<string, AttemptInfo>()
+const WINDOW_MS = 15 * 60 * 1000
+const failedLoginAttempts = new Map<string, number[]>()
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
 
 export const handler: Handler = async (event) => {
-  const headers = { 'Content-Type': 'application/json' }
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: corsHeaders,
+      body: '',
+    }
+  }
 
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers: { ...headers, Allow: 'POST' },
+      headers: { ...corsHeaders, Allow: 'POST', 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Method Not Allowed' }),
+    }
+  }
+
+  const contentType = event.headers['content-type'] || event.headers['Content-Type'] || ''
+  if (!contentType.toLowerCase().startsWith('application/json')) {
+    return {
+      statusCode: 415,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Unsupported Media Type, expected application/json' }),
     }
   }
 
   if (!event.body) {
     return {
       statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Request body is required' }),
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Missing request body' }),
     }
   }
 
-  let parsed: unknown
+  let parsedBody: any
   try {
-    parsed = JSON.parse(event.body)
+    parsedBody = JSON.parse(event.body)
   } catch {
     return {
       statusCode: 400,
-      headers,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Invalid JSON' }),
     }
   }
 
-  const result = loginSchema.safeParse(parsed)
-  if (!result.success) {
-    const details = result.error.errors.map((e) => e.message)
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Invalid request', details }),
+  let email: string, password: string
+  try {
+    ({ email, password } = loginSchema.parse(parsedBody))
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return {
+        statusCode: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.errors }),
+      }
     }
+    throw error
   }
 
-  const { email, password } = result.data
   const ip =
-    event.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-    event.headers['client-ip'] ||
+    event.headers['x-nf-client-connection-ip'] ||
+    event.headers['x-forwarded-for']?.split(',')[0] ||
     'unknown'
   const now = Date.now()
-  const record = attemptsMap.get(ip)
-  if (record && now - record.firstAttempt < RATE_LIMIT_WINDOW && record.count >= MAX_ATTEMPTS) {
+  const attempts = failedLoginAttempts.get(ip) || []
+  const recent = attempts.filter(ts => now - ts < WINDOW_MS)
+  if (recent.length >= MAX_ATTEMPTS) {
     return {
       statusCode: 429,
-      headers,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Too many login attempts. Please try again later.' }),
     }
   }
+  failedLoginAttempts.set(ip, recent)
 
   try {
-    const user = await validateCredentials(email, password)
-    const token = generateJWT(user)
-    attemptsMap.delete(ip)
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ token, user }),
-    }
-  } catch (error: any) {
-    if (error instanceof AuthError) {
-      const info = attemptsMap.get(ip) || { count: 0, firstAttempt: now }
-      if (now - info.firstAttempt < RATE_LIMIT_WINDOW) {
-        info.count += 1
-      } else {
-        info.count = 1
-        info.firstAttempt = now
-      }
-      attemptsMap.set(ip, info)
+    const result = await pool.query(
+      'SELECT id, password_hash FROM users WHERE email = $1',
+      [email]
+    )
+    if (result.rowCount === 0) {
+      recent.push(now)
+      failedLoginAttempts.set(ip, recent)
       return {
         statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: error.message }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Invalid email or password' }),
       }
     }
-    console.error('Authentication error:', error)
+
+    const user = result.rows[0] as { id: string; password_hash: string }
+    const isValid = await bcrypt.compare(password, user.password_hash)
+    if (!isValid) {
+      recent.push(now)
+      failedLoginAttempts.set(ip, recent)
+      return {
+        statusCode: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Invalid email or password' }),
+      }
+    }
+
+    failedLoginAttempts.delete(ip)
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' })
+
+    return {
+      statusCode: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }
+  } catch (error) {
+    console.error('Login error:', error)
     return {
       statusCode: 500,
-      headers,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Internal server error' }),
     }
   }
