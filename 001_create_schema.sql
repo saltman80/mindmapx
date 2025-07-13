@@ -1,71 +1,72 @@
 BEGIN;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE OR REPLACE FUNCTION update_updated_at() RETURNS TRIGGER AS $$
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE TYPE IF NOT EXISTS user_role AS ENUM('user','admin');
+CREATE TYPE IF NOT EXISTS todo_status AS ENUM('pending','in_progress','completed','archived');
+CREATE TYPE IF NOT EXISTS payment_status AS ENUM('pending','completed','failed','refunded');
+CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$
 BEGIN
-  NEW.updated_at = now();
+  NEW.updated_at = NOW();
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
   name TEXT,
-  avatar_url TEXT,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+  role user_role NOT NULL DEFAULT 'user',
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE TRIGGER trigger_update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
-CREATE TABLE sessions (
+CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TABLE IF NOT EXISTS mindmaps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token TEXT NOT NULL UNIQUE,
-  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
-);
-CREATE TRIGGER trigger_update_sessions_updated_at BEFORE UPDATE ON sessions FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
-CREATE TABLE mindmaps (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL DEFAULT 'Untitled Mindmap',
+  title TEXT NOT NULL,
   description TEXT,
-  is_public BOOLEAN NOT NULL DEFAULT false,
-  settings JSONB NOT NULL DEFAULT '{}'::JSONB,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+  data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  is_private BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE TRIGGER trigger_update_mindmaps_updated_at BEFORE UPDATE ON mindmaps FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
-CREATE TABLE mindmap_collaborators (
+CREATE INDEX IF NOT EXISTS idx_mindmaps_user_id ON mindmaps(user_id);
+CREATE TRIGGER trg_mindmaps_updated_at BEFORE UPDATE ON mindmaps FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TABLE IF NOT EXISTS todos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  status todo_status NOT NULL DEFAULT 'pending',
+  priority SMALLINT NOT NULL DEFAULT 0,
+  due_date TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
+CREATE INDEX IF NOT EXISTS idx_todos_status ON todos(status);
+CREATE TRIGGER trg_todos_updated_at BEFORE UPDATE ON todos FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TABLE IF NOT EXISTS payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'viewer',
-  added_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  PRIMARY KEY (mindmap_id, user_id)
+  amount NUMERIC(12,2) NOT NULL,
+  currency CHAR(3) NOT NULL DEFAULT 'USD',
+  payment_method TEXT,
+  status payment_status NOT NULL DEFAULT 'pending',
+  transaction_id TEXT UNIQUE,
+  metadata JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX idx_mindmap_collaborators_user_id ON mindmap_collaborators(user_id);
-CREATE TABLE nodes (
+CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
+CREATE TRIGGER trg_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TABLE IF NOT EXISTS usage_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
-  parent_id UUID REFERENCES nodes(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  position_x DOUBLE PRECISION NOT NULL DEFAULT 0,
-  position_y DOUBLE PRECISION NOT NULL DEFAULT 0,
-  style JSONB NOT NULL DEFAULT '{}'::JSONB,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  metadata JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE TRIGGER trigger_update_nodes_updated_at BEFORE UPDATE ON nodes FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
-CREATE INDEX idx_nodes_mindmap_id ON nodes(mindmap_id);
-CREATE TABLE edges (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
-  from_node_id UUID NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-  to_node_id UUID NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
-  label TEXT,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  CONSTRAINT edges_from_to_diff CHECK (from_node_id <> to_node_id)
-);
-CREATE TRIGGER trigger_update_edges_updated_at BEFORE UPDATE ON edges FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
-CREATE INDEX idx_edges_mindmap_id ON edges(mindmap_id);
+CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_usage_events_event_type ON usage_events(event_type);
 COMMIT;
