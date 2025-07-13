@@ -1,47 +1,44 @@
 {
-  "name": "planscaler-mindmap-tools",
-  "version": "0.1.0",
+  "name": "planscaler-mindmap",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "netlify dev",
+    "start": "npm run dev",
     "build": "vite build",
     "preview": "vite preview",
-    "netlify:dev": "netlify dev",
-    "format": "prettier --write \"{src,functions}/**/*.{js,ts,jsx,tsx,json,css,scss,md}\"",
-    "lint": "eslint \"{src,functions}/**/*.{js,ts,jsx,tsx}\"",
-    "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "lint": "eslint . --ext .js,.ts,.tsx",
+    "format": "prettier --write .",
+    "db:migrate": "dbmate -u $DATABASE_URL up",
+    "db:rollback": "dbmate -u $DATABASE_URL down 1",
+    "deploy": "npm run build && netlify deploy --prod --dir=dist"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@neondatabase/serverless": "^1.4.2",
-    "dotenv": "^16.1.0"
+    "axios": "^1.5.0",
+    "clsx": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.5.1",
-    "@types/react": "^18.2.7",
-    "@types/react-dom": "^18.2.4",
+    "vite": "^4.4.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "netlify-cli": "^17.12.0",
     "typescript": "^5.1.6",
-    "vite": "^5.1.0",
-    "eslint": "^8.44.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.8.0",
+    "@types/node": "^20.4.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-react": "^7.33.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-jsx-a11y": "^6.8.1",
-    "eslint-config-prettier": "^9.0.0",
-    "prettier": "^3.1.0",
-    "vitest": "^1.6.2",
-    "@testing-library/react": "^15.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "netlify-cli": "^19.22.0"
+    "prettier": "^2.8.8",
+    "dbmate": "^1.25.0",
+    "concurrently": "^8.2.0"
   },
   "engines": {
-    "node": ">=18.0.0"
-  },
-  "browserslist": [
-    "defaults"
-  ]
+    "node": ">=18"
+  }
 }
