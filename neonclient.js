@@ -1,27 +1,28 @@
-let pool
-
-export function connect(connectionString) {
-  if (!globalThis.__pgPool) {
-    globalThis.__pgPool = new Pool({
-      connectionString,
-      ssl: { rejectUnauthorized: false }
-    })
-  }
-  pool = globalThis.__pgPool
-  return pool
+const getConnectionString = () => {
+  const conn = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL
+  if (!conn) throw new Error('Database connection string is missing')
+  return conn
 }
 
-export async function query(text, params = []) {
-  if (!pool) {
-    throw new Error('Database not connected. Call connect(connectionString) first.')
-  }
-  return pool.query(text, params)
+const globalRef = globalThis
+if (!globalRef.__neonPool) {
+  globalRef.__neonPool = new Pool({
+    connectionString: getConnectionString(),
+    ssl: { rejectUnauthorized: false },
+  })
+}
+
+const pool = globalRef.__neonPool
+
+export async function connect() {
+  return pool.connect()
+}
+
+export async function query(sql, params = []) {
+  return pool.query(sql, params)
 }
 
 export async function close() {
-  if (globalThis.__pgPool) {
-    await globalThis.__pgPool.end()
-    globalThis.__pgPool = null
-    pool = null
-  }
+  await pool.end()
+  delete globalRef.__neonPool
 }
