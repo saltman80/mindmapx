@@ -1,28 +1,20 @@
-const getConnectionString = () => {
-  const conn = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL
-  if (!conn) throw new Error('Database connection string is missing')
-  return conn
+let pool
+
+export function initClient(connectionString) {
+  if (!connectionString) throw new Error('initClient requires a connection string')
+  if (!pool) pool = createPool({ connectionString })
+  return pool
 }
 
-const globalRef = globalThis
-if (!globalRef.__neonPool) {
-  globalRef.__neonPool = new Pool({
-    connectionString: getConnectionString(),
-    ssl: { rejectUnauthorized: false },
-  })
+export function getClient() {
+  if (!pool) {
+    const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL
+    if (!connectionString) throw new Error('Database client not initialized and no connection string provided')
+    pool = createPool({ connectionString })
+  }
+  return pool
 }
 
-const pool = globalRef.__neonPool
-
-export async function connect() {
-  return pool.connect()
-}
-
-export async function query(sql, params = []) {
-  return pool.query(sql, params)
-}
-
-export async function close() {
-  await pool.end()
-  delete globalRef.__neonPool
+export async function query(text, params = []) {
+  return getClient().query(text, params)
 }
