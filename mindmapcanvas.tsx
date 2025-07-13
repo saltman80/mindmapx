@@ -1,220 +1,253 @@
-const MindmapCanvas: React.FC<MindmapCanvasProps> = ({
-  nodes,
-  edges = [],
-  onNodeDrag,
-  onCreateNode,
-  onNodeSelect,
-  initialScale = 1,
-  minScale = 0.2,
-  maxScale = 4,
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
+  ({ nodes: propNodes, edges: propEdges, width, height }, ref) => {
+    const [nodes, setNodes] = useState<NodeData[]>(() => propNodes)
+    const [edges, setEdges] = useState<EdgeData[]>(() => propEdges)
+    const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
+    const svgRef = useRef<SVGSVGElement | null>(null)
+    const draggingRef = useRef(false)
+    const lastMousePos = useRef({ x: 0, y: 0 })
+    const pinchRef = useRef<{
+      initialDistance: number
+      initialCenter: { x: number; y: number }
+      initialTransform: { x: number; y: number; k: number }
+    } | null>(null)
 
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const panRef = useRef(pan);
-  useEffect(() => {
-    panRef.current = pan;
-  }, [pan]);
+    const pan = useCallback((dx: number, dy: number) => {
+      setTransform(prev => ({ x: prev.x + dx, y: prev.y + dy, k: prev.k }))
+    }, [])
 
-  const [scale, setScale] = useState(initialScale);
-  const scaleRef = useRef(scale);
-  useEffect(() => {
-    scaleRef.current = scale;
-  }, [scale]);
+    const zoom = useCallback(
+      (scale: number, centerX = 0, centerY = 0) => {
+        setTransform(prev => {
+          const newK = prev.k * scale
+          const x = (prev.x - centerX) * scale + centerX
+          const y = (prev.y - centerY) * scale + centerY
+          return { x, y, k: newK }
+        })
+      },
+      []
+    )
 
-  const isPanning = useRef(false);
-  const isDragging = useRef(false);
-  const panStart = useRef({ x: 0, y: 0 });
-  const dragStart = useRef({ x: 0, y: 0 });
-  const dragNodeStartPos = useRef({ x: 0, y: 0 });
-  const dragNodeId = useRef<string | null>(null);
+    const addNode = useCallback((node: NodeData) => {
+      setNodes(prev => [...prev, node])
+    }, [])
 
-  const frameRequested = useRef(false);
-  const lastEvent = useRef<PointerEvent | null>(null);
+    const updateNode = useCallback((node: NodeData) => {
+      setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
+    }, [])
 
-  const pointerMoveHandlerRef = useRef<(e: PointerEvent) => void>(() => {});
-  const pointerUpHandlerRef = useRef<() => void>(() => {});
+    const removeNode = useCallback((nodeId: string) => {
+      setNodes(prev => prev.filter(n => n.id !== nodeId))
+      setEdges(prev => prev.filter(e => e.from !== nodeId && e.to !== nodeId))
+    }, [])
 
-  const pointerMoveListener = useRef<(e: PointerEvent) => void>((e) => {
-    pointerMoveHandlerRef.current(e);
-  });
-  const pointerUpListener = useRef<(e: PointerEvent) => void>(() => {
-    pointerUpHandlerRef.current();
-  });
-  const pointerCancelListener = useRef<(e: PointerEvent) => void>(() => {
-    pointerUpHandlerRef.current();
-  });
+    useImperativeHandle(
+      ref,
+      () => ({ pan, zoom, addNode, updateNode, removeNode }),
+      [pan, zoom, addNode, updateNode, removeNode]
+    )
 
-  pointerMoveHandlerRef.current = (event: PointerEvent) => {
-    lastEvent.current = event;
-    if (!frameRequested.current) {
-      frameRequested.current = true;
-      requestAnimationFrame(() => {
-        const e = lastEvent.current!;
-        if (isPanning.current) {
-          const newX = e.clientX - panStart.current.x;
-          const newY = e.clientY - panStart.current.y;
-          setPan({ x: newX, y: newY });
-        } else if (isDragging.current && dragNodeId.current) {
-          const dx = (e.clientX - dragStart.current.x) / scaleRef.current;
-          const dy = (e.clientY - dragStart.current.y) / scaleRef.current;
-          const newX = dragNodeStartPos.current.x + dx;
-          const newY = dragNodeStartPos.current.y + dy;
-          onNodeDrag(dragNodeId.current, newX, newY);
+    const nodeMap = useMemo(() => {
+      const map = new Map<string, NodeData>()
+      nodes.forEach(n => map.set(n.id, n))
+      return map
+    }, [nodes])
+
+    const handleMouseMove = useCallback(
+      (e: MouseEvent) => {
+        if (!draggingRef.current) return
+        e.preventDefault()
+        const dx = e.clientX - lastMousePos.current.x
+        const dy = e.clientY - lastMousePos.current.y
+        lastMousePos.current = { x: e.clientX, y: e.clientY }
+        pan(dx, dy)
+      },
+      [pan]
+    )
+
+    const handleMouseUp = useCallback(() => {
+      draggingRef.current = false
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }, [handleMouseMove])
+
+    const handleMouseDown = useCallback(
+      (e: React.MouseEvent) => {
+        e.preventDefault()
+        draggingRef.current = true
+        lastMousePos.current = { x: e.clientX, y: e.clientY }
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseup', handleMouseUp)
+      },
+      [handleMouseMove, handleMouseUp]
+    )
+
+    useEffect(() => {
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
+    }, [handleMouseMove, handleMouseUp])
+
+    const handleWheel = useCallback(
+      (e: React.WheelEvent<SVGSVGElement>) => {
+        e.preventDefault()
+        if (!svgRef.current) return
+        const rect = svgRef.current.getBoundingClientRect()
+        const cx = e.clientX - rect.left
+        const cy = e.clientY - rect.top
+        const scale = e.deltaY < 0 ? 1.1 : 0.9
+        zoom(scale, cx, cy)
+      },
+      [zoom]
+    )
+
+    const handleTouchStart = useCallback(
+      (e: React.TouchEvent<SVGSVGElement>) => {
+        if (!svgRef.current) return
+        if (e.touches.length === 1) {
+          e.preventDefault()
+          draggingRef.current = true
+          lastMousePos.current = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+          }
+        } else if (e.touches.length === 2) {
+          e.preventDefault()
+          const rect = svgRef.current.getBoundingClientRect()
+          const t1 = e.touches[0]
+          const t2 = e.touches[1]
+          const x1 = t1.clientX - rect.left
+          const y1 = t1.clientY - rect.top
+          const x2 = t2.clientX - rect.left
+          const y2 = t2.clientY - rect.top
+          const dx = x2 - x1
+          const dy = y2 - y1
+          const initialDistance = Math.hypot(dx, dy)
+          const centerX = (x1 + x2) / 2
+          const centerY = (y1 + y2) / 2
+          pinchRef.current = {
+            initialDistance,
+            initialCenter: { x: centerX, y: centerY },
+            initialTransform: { ...transform }
+          }
         }
-        frameRequested.current = false;
-      });
-    }
-  };
+      },
+      [transform]
+    )
 
-  pointerUpHandlerRef.current = () => {
-    isPanning.current = false;
-    isDragging.current = false;
-    dragNodeId.current = null;
-    window.removeEventListener('pointermove', pointerMoveListener.current);
-    window.removeEventListener('pointerup', pointerUpListener.current);
-    window.removeEventListener('pointercancel', pointerCancelListener.current);
-  };
+    const handleTouchMove = useCallback(
+      (e: React.TouchEvent<SVGSVGElement>) => {
+        if (!svgRef.current) return
+        if (e.touches.length === 1 && draggingRef.current) {
+          e.preventDefault()
+          const touch = e.touches[0]
+          const dx = touch.clientX - lastMousePos.current.x
+          const dy = touch.clientY - lastMousePos.current.y
+          lastMousePos.current = {
+            x: touch.clientX,
+            y: touch.clientY
+          }
+          pan(dx, dy)
+        } else if (e.touches.length === 2 && pinchRef.current) {
+          e.preventDefault()
+          const rect = svgRef.current.getBoundingClientRect()
+          const t1 = e.touches[0]
+          const t2 = e.touches[1]
+          const x1 = t1.clientX - rect.left
+          const y1 = t1.clientY - rect.top
+          const x2 = t2.clientX - rect.left
+          const y2 = t2.clientY - rect.top
+          const dx = x2 - x1
+          const dy = y2 - y1
+          const distance = Math.hypot(dx, dy)
+          const { initialDistance, initialCenter, initialTransform } = pinchRef.current
+          const scaleFactor = distance / initialDistance
+          const cx = initialCenter.x
+          const cy = initialCenter.y
+          const { x: ix, y: iy, k: ik } = initialTransform
+          const newK = ik * scaleFactor
+          const newX = (ix - cx) * scaleFactor + cx
+          const newY = (iy - cy) * scaleFactor + cy
+          setTransform({ x: newX, y: newY, k: newK })
+        }
+      },
+      [pan]
+    )
 
-  useEffect(() => {
-    return () => {
-      window.removeEventListener('pointermove', pointerMoveListener.current);
-      window.removeEventListener('pointerup', pointerUpListener.current);
-      window.removeEventListener('pointercancel', pointerCancelListener.current);
-    };
-  }, []);
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+      if (e.touches.length < 1) {
+        draggingRef.current = false
+      }
+      if (e.touches.length < 2) {
+        pinchRef.current = null
+      }
+    }, [])
 
-  const handleContainerPointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    isPanning.current = true;
-    panStart.current = {
-      x: event.clientX - panRef.current.x,
-      y: event.clientY - panRef.current.y,
-    };
-    window.addEventListener('pointermove', pointerMoveListener.current);
-    window.addEventListener('pointerup', pointerUpListener.current);
-    window.addEventListener('pointercancel', pointerCancelListener.current);
-  }, []);
-
-  const handleNodePointerDown = useCallback((id: string, x: number, y: number) => {
-    return (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.button !== 0) return;
-      event.stopPropagation();
-      event.preventDefault();
-      isDragging.current = true;
-      dragStart.current = { x: event.clientX, y: event.clientY };
-      dragNodeId.current = id;
-      dragNodeStartPos.current = { x, y };
-      window.addEventListener('pointermove', pointerMoveListener.current);
-      window.addEventListener('pointerup', pointerUpListener.current);
-      window.addEventListener('pointercancel', pointerCancelListener.current);
-    };
-  }, []);
-
-  const handleWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left;
-    const offsetY = event.clientY - rect.top;
-    const prevScale = scaleRef.current;
-    const delta = -event.deltaY * 0.001;
-    let newScale = prevScale * (1 + delta);
-    newScale = Math.max(minScale, Math.min(maxScale, newScale));
-    const worldX = (offsetX - panRef.current.x) / prevScale;
-    const worldY = (offsetY - panRef.current.y) / prevScale;
-    const newPanX = offsetX - worldX * newScale;
-    const newPanY = offsetY - worldY * newScale;
-    setScale(newScale);
-    setPan({ x: newPanX, y: newPanY });
-  }, [minScale, maxScale]);
-
-  const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (event.clientX - rect.left - panRef.current.x) / scaleRef.current;
-    const y = (event.clientY - rect.top - panRef.current.y) / scaleRef.current;
-    onCreateNode(x, y);
-  }, [onCreateNode]);
-
-  const nodesMap = useMemo(() => {
-    const map = new Map<string, { x: number; y: number }>();
-    nodes.forEach(n => map.set(n.id, { x: n.x, y: n.y }));
-    return map;
-  }, [nodes]);
-
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        overflow: 'hidden',
-        touchAction: 'none',
-        userSelect: 'none',
-      }}
-      onPointerDown={handleContainerPointerDown}
-      onDoubleClick={handleDoubleClick}
-      onWheel={handleWheel}
-    >
+    return (
       <div
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
-          transformOrigin: '0 0',
+          width: width ?? '100%',
+          height: height ?? '100%',
+          touchAction: 'none'
         }}
       >
         <svg
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-          }}
+          ref={svgRef}
+          width="100%"
+          height="100%"
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          {edges.map(edge => {
-            const source = nodesMap.get(edge.source);
-            const target = nodesMap.get(edge.target);
-            if (!source || !target) return null;
-            return (
-              <line
-                key={edge.id}
-                x1={source.x}
-                y1={source.y}
-                x2={target.x}
-                y2={target.y}
-                stroke="#000"
-                strokeWidth={1}
-              />
-            );
-          })}
-        </svg>
-        {nodes.map(node => (
-          <div
-            key={node.id}
-            style={{ position: 'absolute', left: node.x, top: node.y, cursor: 'move' }}
-            onPointerDown={handleNodePointerDown(node.id, node.x, node.y)}
-            onDoubleClick={e => e.stopPropagation()}
-            onClick={e => {
-              e.stopPropagation();
-              onNodeSelect?.(node.id);
-            }}
+          <g
+            transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
-            {node.label}
-          </div>
-        ))}
+            {edges.map(edge => {
+              const from = nodeMap.get(edge.from)
+              const to = nodeMap.get(edge.to)
+              if (!from || !to) return null
+              return (
+                <line
+                  key={edge.id}
+                  x1={from.x}
+                  y1={from.y}
+                  x2={to.x}
+                  y2={to.y}
+                  stroke="#888"
+                  strokeWidth={2 / transform.k}
+                />
+              )
+            })}
+            {nodes.map(node => (
+              <g key={node.id} transform={`translate(${node.x},${node.y})`}>
+                <circle
+                  r={20 / transform.k}
+                  fill="#fff"
+                  stroke="#000"
+                  strokeWidth={2 / transform.k}
+                />
+                {node.label && (
+                  <text
+                    textAnchor="middle"
+                    dy=".35em"
+                    fontSize={14 / transform.k}
+                    pointerEvents="none"
+                  >
+                    {node.label}
+                  </text>
+                )}
+              </g>
+            ))}
+          </g>
+        </svg>
       </div>
-    </div>
-  );
-};
+    )
+  }
+)
 
-export default MindmapCanvas;
+MindmapCanvas.displayName = 'MindmapCanvas'
+
+export default MindmapCanvas
