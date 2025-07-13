@@ -1,0 +1,146 @@
+const LoginPage = (): JSX.Element => {
+  const [values, setValues] = useState<LoginFormValues>({ email: '', password: '' })
+  const [errors, setErrors] = useState<Partial<LoginFormValues>>({})
+  const [submitError, setSubmitError] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const navigate = useNavigate()
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
+  }, [])
+
+  const validateForm = (vals: LoginFormValues): boolean => {
+    const validationErrors: Partial<LoginFormValues> = {}
+    if (!vals.email) {
+      validationErrors.email = 'Email is required'
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(vals.email)) {
+        validationErrors.email = 'Invalid email address'
+      }
+    }
+    if (!vals.password) {
+      validationErrors.password = 'Password is required'
+    } else if (vals.password.length < 6) {
+      validationErrors.password = 'Password must be at least 6 characters'
+    }
+    setErrors(validationErrors)
+    return Object.keys(validationErrors).length === 0
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target
+    setValues(prev => ({ ...prev, [name]: value }))
+    if (errors[name as keyof LoginFormValues]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }))
+    }
+  }
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    setSubmitError('')
+    if (!validateForm(values)) return
+    setIsLoading(true)
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(values),
+      signal: controller.signal,
+    })
+      .then(async response => {
+        if (!response.ok) {
+          let errorMsg = 'Login failed'
+          const contentType = response.headers.get('Content-Type') || ''
+          if (contentType.includes('application/json')) {
+            try {
+              const errorData = await response.json()
+              errorMsg = errorData.error || errorMsg
+            } catch {
+              // ignore parse error
+            }
+          }
+          throw new Error(errorMsg)
+        }
+        const contentType = response.headers.get('Content-Type') || ''
+        if (!contentType.includes('application/json')) {
+          throw new Error('Invalid response from server')
+        }
+        try {
+          return await response.json()
+        } catch {
+          throw new Error('Failed to parse server response')
+        }
+      })
+      .then(() => {
+        navigate('/dashboard')
+      })
+      .catch(err => {
+        if ((err as any).name !== 'AbortError') {
+          setSubmitError(err instanceof Error ? err.message : 'An unexpected error occurred')
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
+  return (
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      {submitError && (
+        <div role="alert" aria-live="assertive" className="text-red-600 mb-4">
+          {submitError}
+        </div>
+      )}
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={values.email}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
+            required
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+        <div className="mb-6">
+          <label htmlFor="password" className="block text-sm font-medium mb-1">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={values.password}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
+            required
+            minLength={6}
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+export default LoginPage
