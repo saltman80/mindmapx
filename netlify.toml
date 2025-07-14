@@ -1,67 +1,15 @@
 [build]
-  command = "npm run build"
-  publish = "public"
+  command   = "npm run build"
+  publish   = "dist"
   functions = "netlify/functions"
 
 [dev]
-  command = "npm run dev"
-  functions = "netlify/functions"
-  port = 8888
-
-[functions]
-  node_bundler = "esbuild"
-  included_files = ["neonClient.js", ".env"]
-
-[build.environment]
-  NODE_ENV = "production"
-  DATABASE_URL = "$DATABASE_URL"
-  NEON_DB_URL = "$NEON_DB_URL"
-  STRIPE_SECRET_KEY = "$STRIPE_SECRET_KEY"
-  STRIPE_WEBHOOK_SECRET = "$STRIPE_WEBHOOK_SECRET"
-  OPENAI_API_KEY = "$OPENAI_API_KEY"
-
-[functions.environment]
-  NODE_ENV = "production"
-  DATABASE_URL = "$DATABASE_URL"
-  NEON_DB_URL = "$NEON_DB_URL"
-  STRIPE_SECRET_KEY = "$STRIPE_SECRET_KEY"
-  STRIPE_WEBHOOK_SECRET = "$STRIPE_WEBHOOK_SECRET"
-  OPENAI_API_KEY = "$OPENAI_API_KEY"
-
-[[plugins]]
-  package = "@netlify/plugin-functions-core"
+  framework   = "vite"
+  publish     = "dist"
+  functions   = "netlify/functions"
+  targetPort  = 5173
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from   = "/*"
+  to     = "/index.html"
   status = 200
-  force = true
-
-[[redirects]]
-  from = "/health"
-  to = "/.netlify/functions/health"
-  status = 200
-  force = true
-
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
-    Access-Control-Allow-Methods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-
-[build.processing]
-  skip_processing = [
-    "**/*.sql",
-    "**/*.md",
-    "**/*.txt",
-    "**/*.png",
-    "**/*.jpg",
-    "**/*.jpeg",
-    "**/*.svg",
-    "**/*.gif",
-    "**/*.lock",
-    "**/*.map",
-    "**/*.yml",
-    "**/*.yaml"
-  ]
