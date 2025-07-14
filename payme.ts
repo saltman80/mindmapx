@@ -1,219 +1,88 @@
-const connectionString = process.env.DATABASE_URL ?? process.env.NEON_DATABASE_URL ?? process.env.NEON_URL
-if (!connectionString) {
-  throw new Error('Database connection string is not set in environment variables')
+const stripeSecret = process.env.STRIPE_SECRET_KEY
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+if (!stripeSecret || !stripeWebhookSecret) {
+  throw new Error('Missing Stripe environment variables')
 }
+const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' })
 
-const ssl = process.env.NODE_ENV === 'production'
-  ? { rejectUnauthorized: true }
-  : { rejectUnauthorized: false }
-
-const globalWithPG = globalThis as typeof globalThis & { pgPool?: Pool }
-const pool = globalWithPG.pgPool ?? new Pool({ connectionString, ssl })
-if (!globalWithPG.pgPool) globalWithPG.pgPool = pool
-
-type Payment = {
-  id: string
-  userId: string
-  amount: number
-  currency: string
-  status: string
-  createdAt: string
-  updatedAt: string
-}
-
-type QueryParams = {
-  page: number
-  pageSize: number
-  status?: string
-  userId?: string
-  startDate?: string
-  endDate?: string
-  sortBy: string
-  sortOrder: 'asc' | 'desc'
-}
-
-const validSortFields = ['created_at', 'amount', 'status', 'updated_at']
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-}
-
-export const handler: Handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers: CORS_HEADERS }
+export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers: { Allow: 'POST' }, body: 'Method Not Allowed' }
   }
-  const headers = { ...CORS_HEADERS, 'Content-Type': 'application/json' }
-
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers: { ...headers, Allow: 'GET' },
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    }
+  const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
+  if (!signature) {
+    return { statusCode: 400, body: 'Bad Request' }
   }
-
+  let stripeEvent: Stripe.Event
   try {
-    const qs = event.queryStringParameters ?? {}
-    const paymentId = qs.id ?? qs.paymentId
-    if (paymentId) {
-      if (!/^[0-9a-fA-F\-]+$/.test(paymentId)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid paymentId' }) }
-      }
-      const payment = await getPaymentDetails(paymentId)
-      if (!payment) {
-        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Payment Not Found' }) }
-      }
-      return { statusCode: 200, headers, body: JSON.stringify(payment) }
-    }
-
-    const rawPage = qs.page
-    const rawPageSize = qs.pageSize
-    let page = 1
-    let pageSize = 20
-    if (rawPage !== undefined) {
-      const p = parseInt(rawPage, 10)
-      if (isNaN(p) || p < 1) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid page parameter' }) }
-      }
-      page = p
-    }
-    if (rawPageSize !== undefined) {
-      const ps = parseInt(rawPageSize, 10)
-      if (isNaN(ps) || ps < 1 || ps > 100) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid pageSize parameter' }) }
-      }
-      pageSize = ps
-    }
-
-    const { status, userId, startDate: rawStartDate, endDate: rawEndDate, sortBy: rawSortBy, sortOrder: rawSortOrder } = qs
-    let startDate: string | undefined
-    let endDate: string | undefined
-    if (rawStartDate !== undefined) {
-      if (isNaN(Date.parse(rawStartDate))) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid startDate parameter' }) }
-      }
-      startDate = rawStartDate
-    }
-    if (rawEndDate !== undefined) {
-      if (isNaN(Date.parse(rawEndDate))) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid endDate parameter' }) }
-      }
-      endDate = rawEndDate
-    }
-
-    let sortBy = rawSortBy ?? 'created_at'
-    if (!validSortFields.includes(sortBy)) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid sortBy parameter' }) }
-    }
-    let sortOrder: 'asc' | 'desc' = 'desc'
-    if (rawSortOrder !== undefined) {
-      if (rawSortOrder !== 'asc' && rawSortOrder !== 'desc') {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bad Request', message: 'Invalid sortOrder parameter' }) }
-      }
-      sortOrder = rawSortOrder
-    }
-
-    const params: QueryParams = { page, pageSize, status, userId, startDate, endDate, sortBy, sortOrder }
-    const { items, totalCount } = await getPayments(params)
-    const totalPages = Math.ceil(totalCount / pageSize)
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ items, pagination: { totalCount, totalPages, currentPage: page, pageSize } }),
-    }
-  } catch (error) {
-    console.error('Error in payments handler:', error)
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Internal Server Error' }),
-    }
+    const buf = Buffer.from(event.body || '', 'utf8')
+    stripeEvent = stripe.webhooks.constructEvent(buf, signature, stripeWebhookSecret)
+  } catch (err: any) {
+    console.error('Stripe webhook signature verification failed', err)
+    return { statusCode: 400, body: 'Webhook Error' }
   }
-}
-
-async function getPayments(params: QueryParams): Promise<{ items: Payment[]; totalCount: number }> {
-  const { page, pageSize, status, userId, startDate, endDate, sortBy, sortOrder } = params
-  const conditions: string[] = []
-  const values: any[] = []
-
-  if (status) {
-    values.push(status)
-    conditions.push(`status = $${values.length}`)
+  const obj = stripeEvent.data.object as Record<string, any>
+  try {
+    switch (stripeEvent.type) {
+      case 'checkout.session.completed': {
+        const session = obj as Stripe.Checkout.Session
+        const userId = session.client_reference_id
+        if (userId) {
+          const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
+          const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
+          await sql.begin(async (tx) => {
+            await tx`
+              UPDATE users
+              SET stripe_customer_id = ${customerId},
+                  stripe_subscription_id = ${subscriptionId},
+                  subscription_status = 'active'
+              WHERE id = ${userId}
+            `
+            await tx`
+              INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, status)
+              VALUES (${userId}, ${session.payment_intent}, ${session.amount_total}, ${session.currency}, ${session.payment_status})
+              ON CONFLICT (stripe_payment_intent_id) DO NOTHING
+            `
+          })
+        }
+        break
+      }
+      case 'invoice.payment_succeeded': {
+        const invoice = obj as Stripe.Invoice
+        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
+        let userId: string | undefined
+        if (subscriptionId) {
+          const res = await sql`SELECT id FROM users WHERE stripe_subscription_id = ${subscriptionId}`
+          userId = res?.[0]?.id
+        }
+        if (!userId && invoice.customer) {
+          const res2 = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`
+          userId = res2?.[0]?.id
+        }
+        if (userId) {
+          await sql`
+            INSERT INTO payments (user_id, stripe_invoice_id, amount, currency, status)
+            VALUES (${userId}, ${invoice.id}, ${invoice.amount_paid}, ${invoice.currency}, 'paid')
+            ON CONFLICT (stripe_invoice_id) DO NOTHING
+          `
+        }
+        break
+      }
+      case 'customer.subscription.deleted': {
+        const subscription = obj as Stripe.Subscription
+        await sql`
+          UPDATE users
+          SET subscription_status = 'canceled'
+          WHERE stripe_subscription_id = ${subscription.id}
+        `
+        break
+      }
+      default:
+        console.log(`Unhandled Stripe event: ${stripeEvent.type}`)
+    }
+  } catch (err: any) {
+    console.error('Error handling Stripe event', err)
+    return { statusCode: 500, body: 'Internal Server Error' }
   }
-  if (userId) {
-    values.push(userId)
-    conditions.push(`user_id = $${values.length}`)
-  }
-  if (startDate) {
-    values.push(startDate)
-    conditions.push(`created_at >= $${values.length}`)
-  }
-  if (endDate) {
-    values.push(endDate)
-    conditions.push(`created_at <= $${values.length}`)
-  }
-
-  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
-  const countQuery = `SELECT COUNT(*) AS count FROM payments ${whereClause}`
-  const countResult = await pool.query(countQuery, values)
-  const totalCount = parseInt(countResult.rows[0].count, 10)
-
-  const offset = (page - 1) * pageSize
-  const dataValues = [...values, pageSize, offset]
-  const dataQuery = `
-    SELECT
-      id,
-      user_id AS "userId",
-      amount,
-      currency,
-      status,
-      created_at AS "createdAt",
-      updated_at AS "updatedAt"
-    FROM payments
-    ${whereClause}
-    ORDER BY ${sortBy} ${sortOrder.toUpperCase()}
-    LIMIT $${dataValues.length - 1}
-    OFFSET $${dataValues.length}
-  `
-  const result = await pool.query(dataQuery, dataValues)
-  const items = result.rows.map((row: any) => ({
-    id: row.id,
-    userId: row.userId,
-    amount: typeof row.amount === 'string' ? parseFloat(row.amount) : row.amount,
-    currency: row.currency,
-    status: row.status,
-    createdAt: new Date(row.createdAt).toISOString(),
-    updatedAt: new Date(row.updatedAt).toISOString(),
-  }))
-  return { items, totalCount }
-}
-
-async function getPaymentDetails(paymentId: string): Promise<Payment | null> {
-  const query = `
-    SELECT
-      id,
-      user_id AS "userId",
-      amount,
-      currency,
-      status,
-      created_at AS "createdAt",
-      updated_at AS "updatedAt"
-    FROM payments
-    WHERE id = $1
-    LIMIT 1
-  `
-  const result = await pool.query(query, [paymentId])
-  const row = result.rows[0]
-  if (!row) return null
-  return {
-    id: row.id,
-    userId: row.userId,
-    amount: typeof row.amount === 'string' ? parseFloat(row.amount) : row.amount,
-    currency: row.currency,
-    status: row.status,
-    createdAt: new Date(row.createdAt).toISOString(),
-    updatedAt: new Date(row.updatedAt).toISOString(),
-  }
+  return { statusCode: 200, body: JSON.stringify({ received: true }) }
 }
