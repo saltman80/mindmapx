@@ -1,135 +1,188 @@
-const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL
-if (!connectionString) throw new Error('Database connection string not provided')
-const pool = new Pool({ connectionString, max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000 })
+const querySchema = z.object({
+  id: z.string().uuid().optional(),
+  skip: z.preprocess(val => val ? parseInt(val as string, 10) : undefined, z.number().int().nonnegative().optional()),
+  limit: z.preprocess(val => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().max(100).optional()),
+})
 
-type QueryParams = { [key: string]: string | undefined; search?: string; status?: string; limit?: string; offset?: string }
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  role: z.enum(['user', 'admin']).optional(),
+})
 
-interface User { id: string; email: string; name: string; role: string; is_active: boolean; created_at: string; updated_at: string }
+export const handler: Handler = async (event) => {
+  const headers = { 'Content-Type': 'application/json' }
 
-async function getUsers(params: QueryParams): Promise<User[]> {
-  const filters: string[] = []
-  const values: any[] = []
-  let idx = 1
-  if (params.search) {
-    filters.push(`(email ILIKE $${idx} OR name ILIKE $${idx + 1})`)
-    values.push(`%${params.search}%`, `%${params.search}%`)
-    idx += 2
-  }
-  if (params.status === 'active') {
-    filters.push('is_active = true')
-  } else if (params.status === 'inactive') {
-    filters.push('is_active = false')
-  }
-  const rawLimit = parseInt(params.limit || '50', 10)
-  const limit = isNaN(rawLimit) ? 50 : Math.min(100, Math.max(1, rawLimit))
-  const rawOffset = parseInt(params.offset || '0', 10)
-  const offset = isNaN(rawOffset) ? 0 : Math.max(0, rawOffset)
-  let query = 'SELECT id, email, name, role, is_active, created_at, updated_at FROM users'
-  if (filters.length) query += ' WHERE ' + filters.join(' AND ')
-  query += ' ORDER BY created_at DESC'
-  query += ` LIMIT $${idx} OFFSET $${idx + 1}`
-  values.push(limit, offset)
-  const result = await pool.query(query, values)
-  return result.rows
-}
-
-async function updateUser(userId: string, data: Partial<User>): Promise<User> {
-  const allowed: (keyof User)[] = ['email', 'name', 'role', 'is_active']
-  const sets: string[] = []
-  const values: any[] = []
-  let idx = 1
-  for (const field of allowed) {
-    if ((data as any)[field] !== undefined) {
-      sets.push(`${field} = $${idx}`)
-      values.push((data as any)[field])
-      idx++
+  const authHeaderRaw = event.headers.authorization || event.headers.Authorization || ''
+  const authHeader = authHeaderRaw.trim()
+  const [scheme, token] = authHeader.split(' ')
+  if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
+    return {
+      statusCode: 401,
+      headers,
+      body: JSON.stringify({ error: 'Unauthorized' }),
     }
   }
-  if (!sets.length) {
-    const err = new Error('No valid fields to update')
-    ;(err as any).statusCode = 400
-    throw err
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET not set')
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Server configuration error' }),
+    }
   }
-  sets.push('updated_at = NOW()')
-  const query = `UPDATE users SET ${sets.join(', ')} WHERE id = $${idx} RETURNING id, email, name, role, is_active, created_at, updated_at`
-  values.push(userId)
-  const result = await pool.query(query, values)
-  if (!result.rowCount) {
-    const err = new Error('User not found')
-    ;(err as any).statusCode = 404
-    throw err
-  }
-  return result.rows[0]
-}
-
-async function deactivateUsers(userIds: string[]): Promise<void> {
-  if (!userIds.length) return
-  const placeholders = userIds.map((_, i) => `$${i + 1}`).join(', ')
-  const query = `UPDATE users SET is_active = false, updated_at = NOW() WHERE id IN (${placeholders})`
-  await pool.query(query, userIds)
-}
-
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-    'Access-Control-Allow-Methods': 'GET,PATCH,DELETE,OPTIONS'
-  }
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers }
-  }
+  let user: any
   try {
-    switch (event.httpMethod) {
-      case 'GET': {
-        const params = event.queryStringParameters || {}
-        if (params.status && !['active', 'inactive'].includes(params.status)) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid status parameter' }) }
-        }
-        const users = await getUsers(params)
-        return { statusCode: 200, headers, body: JSON.stringify(users) }
-      }
-      case 'PATCH': {
-        if (!event.body) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Request body is required' }) }
-        }
-        let parsed: any
-        try {
-          parsed = JSON.parse(event.body)
-        } catch {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
-        }
-        const { userId, data } = parsed
-        if (typeof userId !== 'string' || typeof data !== 'object' || data === null) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid request payload' }) }
-        }
-        const updated = await updateUser(userId, data)
-        return { statusCode: 200, headers, body: JSON.stringify(updated) }
-      }
-      case 'DELETE': {
-        if (!event.body) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Request body is required' }) }
-        }
-        let parsed: any
-        try {
-          parsed = JSON.parse(event.body)
-        } catch {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
-        }
-        const { userIds } = parsed
-        if (!Array.isArray(userIds) || userIds.some(id => typeof id !== 'string')) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid userIds array' }) }
-        }
-        await deactivateUsers(userIds)
-        return { statusCode: 204, headers }
-      }
-      default:
-        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) }
+    user = jwt.verify(token, process.env.JWT_SECRET) as { role: string }
+  } catch {
+    return {
+      statusCode: 401,
+      headers,
+      body: JSON.stringify({ error: 'Invalid token' }),
     }
-  } catch (error: any) {
-    console.error(error)
-    const statusCode = error.statusCode || 500
-    const message = error.message || 'Internal Server Error'
-    return { statusCode, headers, body: JSON.stringify({ error: message }) }
+  }
+  if (user.role !== 'admin') {
+    return {
+      statusCode: 403,
+      headers,
+      body: JSON.stringify({ error: 'Forbidden' }),
+    }
+  }
+
+  try {
+    const method = event.httpMethod
+    if (method === 'GET') {
+      const params = querySchema.parse(event.queryStringParameters || {})
+      if (params.id) {
+        const { rows } = await db.query(
+          'SELECT id, email, name, role, created_at FROM users WHERE id = $1',
+          [params.id]
+        )
+        if (rows.length === 0) {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: 'User not found' }),
+          }
+        }
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ data: rows[0] }),
+        }
+      } else {
+        const skip = params.skip ?? 0
+        const limit = params.limit ?? 100
+        const { rows } = await db.query(
+          'SELECT id, email, name, role, created_at FROM users ORDER BY created_at DESC OFFSET $1 LIMIT $2',
+          [skip, limit]
+        )
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ data: rows }),
+        }
+      }
+    } else if (method === 'PUT') {
+      if (!event.body) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing request body' }),
+        }
+      }
+      let payload: unknown
+      try {
+        payload = JSON.parse(event.body)
+      } catch {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Malformed JSON' }),
+        }
+      }
+      const data = updateSchema.parse(payload)
+      const fields: string[] = []
+      const values: any[] = []
+      let idx = 1
+      if (data.email) {
+        fields.push(`email = $${idx++}`)
+        values.push(data.email)
+      }
+      if (data.name) {
+        fields.push(`name = $${idx++}`)
+        values.push(data.name)
+      }
+      if (data.role) {
+        fields.push(`role = $${idx++}`)
+        values.push(data.role)
+      }
+      if (fields.length === 0) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'No fields to update' }),
+        }
+      }
+      values.push(data.id)
+      const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, email, name, role, created_at`
+      const { rows } = await db.query(query, values)
+      if (rows.length === 0) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'User not found' }),
+        }
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ data: rows[0] }),
+      }
+    } else if (method === 'DELETE') {
+      const schema = z.object({ id: z.string().uuid() })
+      const params = schema.parse(event.queryStringParameters || {})
+      const { rows } = await db.query(
+        'DELETE FROM users WHERE id = $1 RETURNING id',
+        [params.id]
+      )
+      if (rows.length === 0) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'User not found' }),
+        }
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ data: { id: rows[0].id } }),
+      }
+    } else {
+      return {
+        statusCode: 405,
+        headers,
+        body: JSON.stringify({ error: 'Method Not Allowed' }),
+      }
+    }
+  } catch (err) {
+    if (err instanceof ZodError) {
+      const issues = err.issues.map(issue => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      }))
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid request', issues }),
+      }
+    }
+    console.error(err)
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    }
   }
 }
