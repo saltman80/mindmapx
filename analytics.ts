@@ -1,99 +1,99 @@
-export const handler: Handler = async (event: HandlerEvent) => {
-  try {
-    const params = (event.queryStringParameters || {}) as Partial<QueryParams>
-    const { startDate, endDate, format } = params
-    if (!startDate || !endDate) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'startDate and endDate are required' })
-      }
-    }
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-    if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Dates must be in YYYY-MM-DD format' })
-      }
-    }
-    const start = parseISO(startDate)
-    const end = parseISO(endDate)
-    if (!isValid(start) || !isValid(end)) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid date value' })
-      }
-    }
-    if (start.getTime() > end.getTime()) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'startDate must be before or equal to endDate' })
-      }
-    }
-    const isoStart = start.toISOString()
-    const isoEnd = end.toISOString()
-    if (format === 'csv') {
-      const csv = await exportAnalyticsCSV(isoStart, isoEnd)
-      return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="analytics_${startDate}_${endDate}.csv"`
-        },
-        body: csv
-      }
-    }
-    const data = await getAnalytics(isoStart, isoEnd)
+const { DATABASE_URL, JWT_SECRET } = process.env
+if (!DATABASE_URL) {
+  throw new Error('Missing environment variable: DATABASE_URL')
+}
+if (!JWT_SECRET) {
+  throw new Error('Missing environment variable: JWT_SECRET')
+}
+
+declare global {
+  var __dbPool: Pool | undefined
+}
+
+const pool: Pool = global.__dbPool ?? new Pool({
+  connectionString: DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+})
+global.__dbPool = pool
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Access-Control-Allow-Headers': 'Authorization,Content-Type'
+}
+
+export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+  if (event.httpMethod === 'OPTIONS') {
     return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }
-  } catch (error) {
-    console.error('Analytics handler error:', error)
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal Server Error' })
+      statusCode: 204,
+      headers: CORS_HEADERS,
+      body: ''
     }
   }
-}
 
-export async function getAnalytics(startDate: string, endDate: string): Promise<AnalyticsData> {
-  const userRes = await client.query(
-    'SELECT COUNT(*) AS count FROM users WHERE created_at BETWEEN $1 AND $2',
-    [startDate, endDate]
-  )
-  const mapsRes = await client.query(
-    'SELECT COUNT(*) AS count FROM mindmaps WHERE created_at BETWEEN $1 AND $2',
-    [startDate, endDate]
-  )
-  const todosRes = await client.query(
-    'SELECT COUNT(*) AS count FROM todos WHERE created_at BETWEEN $1 AND $2',
-    [startDate, endDate]
-  )
-  const paymentsRes = await client.query(
-    'SELECT COALESCE(SUM(amount), 0) AS total_revenue FROM payments WHERE status = $3 AND created_at BETWEEN $1 AND $2',
-    [startDate, endDate, 'completed']
-  )
-  const newUsers = parseInt((userRes.rows[0] as any).count, 10)
-  const mapsCreated = parseInt((mapsRes.rows[0] as any).count, 10)
-  const todosCreated = parseInt((todosRes.rows[0] as any).count, 10)
-  const totalRevenue = parseFloat((paymentsRes.rows[0] as any).total_revenue)
-  return { newUsers, mapsCreated, todosCreated, totalRevenue }
-}
+  if (event.httpMethod !== 'GET') {
+    return {
+      statusCode: 405,
+      headers: { ...CORS_HEADERS, Allow: 'GET' },
+      body: JSON.stringify({ success: false, error: 'Method Not Allowed' })
+    }
+  }
 
-export async function exportAnalyticsCSV(startDate: string, endDate: string): Promise<string> {
-  const data = await getAnalytics(startDate, endDate)
-  const headers = ['metric', 'value']
-  const rows = [
-    ['newUsers', data.newUsers.toString()],
-    ['mapsCreated', data.mapsCreated.toString()],
-    ['todosCreated', data.todosCreated.toString()],
-    ['totalRevenue', data.totalRevenue.toFixed(2)]
-  ]
-  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const authHeader = event.headers.authorization || event.headers.Authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      statusCode: 401,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ success: false, error: 'Unauthorized' })
+    }
+  }
+
+  const token = authHeader.split(' ')[1]
+  let payload: any
+  try {
+    payload = verify(token, JWT_SECRET)
+  } catch {
+    return {
+      statusCode: 401,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ success: false, error: 'Invalid token' })
+    }
+  }
+
+  if (!payload || (payload as any).role !== 'admin') {
+    return {
+      statusCode: 403,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ success: false, error: 'Forbidden' })
+    }
+  }
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users)        AS total_users,
+        (SELECT COUNT(*) FROM mind_maps)    AS total_mind_maps,
+        (SELECT COUNT(*) FROM nodes)        AS total_nodes,
+        (SELECT COUNT(*) FROM todos)        AS total_todos
+    `)
+    const row = rows[0]
+    const data = {
+      totalUsers:    Number(row.total_users),
+      totalMindMaps: Number(row.total_mind_maps),
+      totalNodes:    Number(row.total_nodes),
+      totalTodos:    Number(row.total_todos)
+    }
+    return {
+      statusCode: 200,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ success: true, data })
+    }
+  } catch (error: any) {
+    console.error('Analytics query error:', error)
+    return {
+      statusCode: 500,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ success: false, error: 'Internal Server Error' })
+    }
+  }
 }
