@@ -1,66 +1,67 @@
 [build]
   command = "npm run build"
-  publish = "dist"
+  publish = "public"
   functions = "netlify/functions"
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
 
 [dev]
-  framework = "vite"
   command = "npm run dev"
-  port = 8888
-  targetPort = 5173
-  publish = "dist"
   functions = "netlify/functions"
+  port = 8888
 
-[context.production.environment]
-  DATABASE_URL = "${NEON_DATABASE_URL}"
-  STRIPE_SECRET_KEY = "${STRIPE_SECRET_KEY}"
-  JWT_SECRET = "${JWT_SECRET}"
-  # Add additional secrets in Netlify UI as needed
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["neonClient.js", ".env"]
 
-[context.deploy-preview.environment]
-  NODE_ENV = "development"
+[build.environment]
+  NODE_ENV = "production"
+  DATABASE_URL = "$DATABASE_URL"
+  NEON_DB_URL = "$NEON_DB_URL"
+  STRIPE_SECRET_KEY = "$STRIPE_SECRET_KEY"
+  STRIPE_WEBHOOK_SECRET = "$STRIPE_WEBHOOK_SECRET"
+  OPENAI_API_KEY = "$OPENAI_API_KEY"
+
+[functions.environment]
+  NODE_ENV = "production"
+  DATABASE_URL = "$DATABASE_URL"
+  NEON_DB_URL = "$NEON_DB_URL"
+  STRIPE_SECRET_KEY = "$STRIPE_SECRET_KEY"
+  STRIPE_WEBHOOK_SECRET = "$STRIPE_WEBHOOK_SECRET"
+  OPENAI_API_KEY = "$OPENAI_API_KEY"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-core"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+  force = true
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/health"
+  to = "/.netlify/functions/health"
   status = 200
   force = true
 
 [[headers]]
-  for = "/*"
+  for = "/api/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.neon.tech ws://localhost:8888; object-src 'none'; base-uri 'self';"
-    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
 
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+[build.processing]
+  skip_processing = [
+    "**/*.sql",
+    "**/*.md",
+    "**/*.txt",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.svg",
+    "**/*.gif",
+    "**/*.lock",
+    "**/*.map",
+    "**/*.yml",
+    "**/*.yaml"
+  ]
