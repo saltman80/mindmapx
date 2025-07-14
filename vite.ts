@@ -1,35 +1,42 @@
-const functionFiles = fg.sync('src/functions/**/*.ts')
-  const input = functionFiles.reduce<Record<string, string>>((entries, file) => {
-    const entryName = file
-      .replace(/^src\/functions\//, '')
-      .replace(/\.ts$/, '')
-    entries[entryName] = path.resolve(__dirname, file)
-    return entries
-  }, {})
+const root = process.cwd()
+  const env = loadEnv(mode, root, '')
+  const base = env.VITE_BASE_URL || '/'
+
+  let devPort = parseInt(env.PORT, 10)
+  if (Number.isNaN(devPort)) devPort = 5173
+
+  let functionsPort = parseInt(env.NETLIFY_DEV_PORT, 10)
+  if (Number.isNaN(functionsPort)) functionsPort = 8888
+
+  let previewPort = parseInt(env.VITE_PREVIEW_PORT, 10)
+  if (Number.isNaN(previewPort)) previewPort = 4173
 
   return {
-    plugins: [
-      tsconfigPaths()
-    ],
-    build: {
-      target: 'node18',
-      rollupOptions: {
-        input,
-        external: [...builtinModules],
-        plugins: [
-          nodeResolve({ preferBuiltins: true }),
-          commonjs()
-        ],
-        output: {
-          format: 'cjs',
-          entryFileNames: '[dir]/[name].js',
-          exports: 'auto'
-        }
+    base,
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@': resolve(root, 'src'),
       },
-      outDir: 'netlify/functions',
-      emptyOutDir: true,
-      sourcemap: true,
-      minify: false
-    }
+    },
+    build: {
+      outDir: 'dist',
+      sourcemap: mode === 'development',
+    },
+    server: {
+      host: '0.0.0.0',
+      port: devPort,
+      strictPort: true,
+      proxy: {
+        '/api': {
+          target: `http://localhost:${functionsPort}`,
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/api/, '/.netlify/functions'),
+        },
+      },
+    },
+    preview: {
+      port: previewPort,
+    },
   }
 })
