@@ -1,49 +1,27 @@
 {
-  "name": "netlify-functions-backend",
-  "version": "1.0.0",
-  "description": "Standalone Netlify Functions backend with Neon-hosted PostgreSQL",
+  "name": "netlify-vite-neon-app",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "netlify:dev": "netlify dev",
-    "migrate:create": "cross-env NODE_ENV=development node-pg-migrate create -m ./migrations",
-    "migrate:up": "cross-env NODE_ENV=development node-pg-migrate up -m ./migrations",
-    "migrate:down": "cross-env NODE_ENV=development node-pg-migrate down -m ./migrations",
-    "lint": "eslint . --ext .ts,.js",
-    "lint:fix": "eslint . --ext .ts,.js --fix",
-    "format": "prettier --write ."
-  },
-  "dependencies": {
-    "neon-serverless": "^1.7.0",
-    "pg": "^8.11.0",
-    "zod": "^3.23.2",
-    "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
-    "stripe": "^12.12.0",
-    "openai": "^4.12.0",
-    "dotenv": "^16.1.4"
-  },
-  "devDependencies": {
-    "typescript": "^5.3.0",
-    "@types/node": "^20.5.2",
-    "@types/jsonwebtoken": "^9.0.1",
-    "@types/bcryptjs": "^2.4.2",
-    "eslint": "^8.55.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-plugin-import": "^2.30.5",
-    "eslint-plugin-jsx-a11y": "^6.7.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.8.0",
-    "prettier": "^3.3.0",
-    "vite": "^5.4.0",
-    "vite-plugin-netlify-functions": "^2.0.0",
-    "netlify-cli": "^20.22.0",
-    "node-pg-migrate": "^9.0.0",
-    "cross-env": "^7.0.3"
-  },
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "dev:web": "vite",
+    "dev:api": "netlify functions:serve --port=8888",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "build": "npm run migrate && vite build",
+    "preview": "vite preview",
+    "migrate": "node ./scripts/migrate.js",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.4.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "netlify-cli": "^18.7.0",
+    "vite": "^4.4.9"
   }
 }
