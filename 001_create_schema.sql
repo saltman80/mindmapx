@@ -1,72 +1,92 @@
 BEGIN;
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-CREATE TYPE IF NOT EXISTS user_role AS ENUM('user','admin');
-CREATE TYPE IF NOT EXISTS todo_status AS ENUM('pending','in_progress','completed','archived');
-CREATE TYPE IF NOT EXISTS payment_status AS ENUM('pending','completed','failed','refunded');
-CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE TYPE user_role AS ENUM ('user', 'admin');
+CREATE TYPE todo_status AS ENUM ('pending', 'in_progress', 'completed', 'cancelled');
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   name TEXT,
   role user_role NOT NULL DEFAULT 'user',
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  stripe_customer_id TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TABLE IF NOT EXISTS mindmaps (
+CREATE TRIGGER trig_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE mind_maps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
-  data JSONB NOT NULL DEFAULT '{}'::jsonb,
-  is_private BOOLEAN NOT NULL DEFAULT TRUE,
+  is_public BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_mindmaps_user_id ON mindmaps(user_id);
-CREATE TRIGGER trg_mindmaps_updated_at BEFORE UPDATE ON mindmaps FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TABLE IF NOT EXISTS todos (
+CREATE TRIGGER trig_mind_maps_updated_at BEFORE UPDATE ON mind_maps FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE nodes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
+  mind_map_id UUID NOT NULL REFERENCES mind_maps(id) ON DELETE CASCADE,
+  parent_id UUID REFERENCES nodes(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TRIGGER trig_nodes_updated_at BEFORE UPDATE ON nodes FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE todos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  node_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   description TEXT,
   status todo_status NOT NULL DEFAULT 'pending',
-  priority SMALLINT NOT NULL DEFAULT 0,
-  due_date TIMESTAMPTZ,
+  due_at TIMESTAMPTZ,
+  priority INTEGER,
+  ai_generated BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
-CREATE INDEX IF NOT EXISTS idx_todos_status ON todos(status);
-CREATE TRIGGER trg_todos_updated_at BEFORE UPDATE ON todos FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TABLE IF NOT EXISTS payments (
+CREATE TRIGGER trig_todos_updated_at BEFORE UPDATE ON todos FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE todos_ai (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  amount NUMERIC(12,2) NOT NULL,
-  currency CHAR(3) NOT NULL DEFAULT 'USD',
-  payment_method TEXT,
-  status payment_status NOT NULL DEFAULT 'pending',
-  transaction_id TEXT UNIQUE,
-  metadata JSONB,
+  todo_id UUID NOT NULL REFERENCES todos(id) ON DELETE CASCADE,
+  prompt TEXT NOT NULL,
+  response JSONB NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
-CREATE TRIGGER trg_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TABLE IF NOT EXISTS usage_events (
+CREATE TRIGGER trig_todos_ai_updated_at BEFORE UPDATE ON todos_ai FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE stripe_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  stripe_event_id TEXT NOT NULL UNIQUE,
+  type TEXT NOT NULL,
+  payload JSONB NOT NULL,
+  processed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TRIGGER trig_stripe_events_updated_at BEFORE UPDATE ON stripe_events FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TABLE analytics_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   event_type TEXT NOT NULL,
-  metadata JSONB,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  metadata JSONB NOT NULL DEFAULT '{}'::JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
-CREATE INDEX IF NOT EXISTS idx_usage_events_event_type ON usage_events(event_type);
+CREATE TRIGGER trig_analytics_events_updated_at BEFORE UPDATE ON analytics_events FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE INDEX idx_mind_maps_user_id ON mind_maps(user_id);
+CREATE INDEX idx_nodes_mind_map_id ON nodes(mind_map_id);
+CREATE INDEX idx_nodes_parent_id ON nodes(parent_id);
+CREATE INDEX idx_todos_user_id ON todos(user_id);
+CREATE INDEX idx_todos_node_id ON todos(node_id);
+CREATE INDEX idx_todos_status ON todos(status);
+CREATE INDEX idx_stripe_events_type ON stripe_events(type);
+CREATE INDEX idx_analytics_events_event_type ON analytics_events(event_type);
 COMMIT;
