@@ -1,90 +1,53 @@
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const pkg = JSON.parse(fs.readFileSync(resolve(__dirname, 'package.json'), 'utf-8'))
 
-function configureServer(server) {
-  server.httpServer?.on('error', console.error);
-  server.middlewares.use(
-    history({
-      index: '/index.html',
-      rewrites: [
-        { from: /^\/api\/.*$/, to: (context) => context.parsedUrl.path }
-      ]
-    })
-  );
-}
-
-async function buildProject() {
-  const mode = 'production';
-  const env = loadEnv(mode, __dirname, '');
-  const clientEnv = Object.fromEntries(
-    Object.entries(env).filter(([key]) => key.startsWith('VITE_'))
-  );
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   const defineEnv = {
-    'process.env.NODE_ENV': JSON.stringify(mode),
-    ...Object.entries(clientEnv).reduce((acc, [key, val]) => {
-      acc[`process.env.${key}`] = JSON.stringify(val);
-      return acc;
-    }, {})
-  };
-  await build({
-    root: __dirname,
-    base: env.VITE_BASE_URL || './',
-    publicDir: path.resolve(__dirname, 'public'),
-    resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+    'process.env.DATABASE_URL': JSON.stringify(env.DATABASE_URL),
+    'process.env.JWT_SECRET': JSON.stringify(env.JWT_SECRET),
+    'process.env.OPENAI_API_KEY': JSON.stringify(env.OPENAI_API_KEY),
+    'process.env.STRIPE_SECRET_KEY': JSON.stringify(env.STRIPE_SECRET_KEY),
+    'process.env.STRIPE_WEBHOOK_SECRET': JSON.stringify(env.STRIPE_WEBHOOK_SECRET),
+  }
+
+  return {
+    plugins: [tsconfigPaths()],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        '@lib': resolve(__dirname, 'src/lib'),
+        '@db': resolve(__dirname, 'db'),
+        '@migrations': resolve(__dirname, 'db/migrations'),
+        '@functions': resolve(__dirname, 'src/functions'),
+      },
+      extensions: ['.js', '.ts', '.json'],
+    },
     define: defineEnv,
     build: {
-      outDir: 'dist',
-      sourcemap: env.VITE_SOURCEMAP === 'true',
-      target: env.VITE_BUILD_TARGET || 'es2020',
-      rollupOptions: { input: path.resolve(__dirname, 'index.html') }
-    }
-  });
-}
-
-async function main() {
-  const mode = process.env.NODE_ENV || 'development';
-  const env = loadEnv(mode, __dirname, '');
-  const clientEnv = Object.fromEntries(
-    Object.entries(env).filter(([key]) => key.startsWith('VITE_'))
-  );
-  const defineEnv = {
-    'process.env.NODE_ENV': JSON.stringify(mode),
-    ...Object.entries(clientEnv).reduce((acc, [key, val]) => {
-      acc[`process.env.${key}`] = JSON.stringify(val);
-      return acc;
-    }, {})
-  };
-  if (mode === 'production') {
-    await buildProject();
-  } else {
-    const server = await createServer({
-      root: __dirname,
-      base: env.VITE_BASE_URL || '/',
-      publicDir: path.resolve(__dirname, 'public'),
-      resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
-      define: defineEnv,
-      server: {
-        port: Number(env.PORT) || 3000,
-        strictPort: true,
-        open: true,
-        fs: { strict: true },
-        proxy: {
-          '/api': {
-            target: env.VITE_API_PROXY_TARGET || 'http://localhost:8888',
-            changeOrigin: true,
-            rewrite: (p) => p.replace(/^\/api/, '')
-          }
-        }
+      target: 'node18',
+      outDir: 'netlify/functions',
+      emptyOutDir: true,
+      sourcemap: true,
+      minify: false,
+      rollupOptions: {
+        external: [...Object.keys(pkg.dependencies || {}), 'path', 'url'],
+        input: {
+          health: resolve(__dirname, 'src/functions/health.ts'),
+          auth: resolve(__dirname, 'src/functions/auth.ts'),
+          mindmaps: resolve(__dirname, 'src/functions/mindmaps.ts'),
+          nodes: resolve(__dirname, 'src/functions/nodes.ts'),
+          todos: resolve(__dirname, 'src/functions/todos.ts'),
+          stripeWebhook: resolve(__dirname, 'src/functions/stripeWebhook.ts'),
+          analytics: resolve(__dirname, 'src/functions/admin/analytics.ts'),
+        },
+        output: {
+          format: 'cjs',
+          entryFileNames: '[name].js',
+          exports: 'auto',
+        },
       },
-      build: { sourcemap: env.VITE_SOURCEMAP === 'true' }
-    });
-    configureServer(server);
-    await server.listen();
-    server.printUrls();
+    },
   }
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+})
