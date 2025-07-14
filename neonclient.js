@@ -1,14 +1,10 @@
-let pool;
-
-export function init(connectionString) {
-  if (!pool) {
-    pool = createPool({ connectionString });
-  }
+let client
+export function initNeonClient(connectionString) {
+  if (!connectionString) throw new Error('Missing connection string for Neon client initialization')
+  if (!client) client = createClient({ connectionString })
 }
-
-export function query(queryText, params = []) {
-  if (!pool) {
-    throw new Error("Database not initialized. Call init(connectionString) first.");
-  }
-  return pool.query(queryText, params);
+export async function query(sql, params = []) {
+  if (!client) throw new Error('Neon client not initialized. Call initNeonClient first.')
+  const { rows } = await client.query(sql, params)
+  return rows
 }
