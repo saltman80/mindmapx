@@ -1,53 +1,35 @@
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), 'VITE_')
-  Object.assign(process.env, env)
-
-  const {
-    VITE_BASE_URL = '/',
-    VITE_PORT,
-    VITE_PREVIEW_PORT
-  } = env
-
-  const port = parseInt(VITE_PORT || '', 10)
-  const previewPort = parseInt(VITE_PREVIEW_PORT || '', 10)
-
-  const normalizeBase = (url: string) => {
-    let str = url.trim()
-    if (!str.startsWith('/')) str = `/${str}`
-    if (!str.endsWith('/')) str = `${str}/`
-    return str
-  }
-
-  const base = VITE_BASE_URL === '/' ? '/' : normalizeBase(VITE_BASE_URL)
+const functionFiles = fg.sync('src/functions/**/*.ts')
+  const input = functionFiles.reduce<Record<string, string>>((entries, file) => {
+    const entryName = file
+      .replace(/^src\/functions\//, '')
+      .replace(/\.ts$/, '')
+    entries[entryName] = path.resolve(__dirname, file)
+    return entries
+  }, {})
 
   return {
-    base,
-    plugins: [react()],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src')
-      }
-    },
-    server: {
-      port: Number.isNaN(port) ? 3000 : port,
-      open: true,
-      strictPort: true
-    },
-    preview: {
-      port: Number.isNaN(previewPort) ? 4173 : previewPort,
-      strictPort: true
-    },
+    plugins: [
+      tsconfigPaths()
+    ],
     build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
-      sourcemap: mode !== 'production',
+      target: 'node18',
       rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, 'index.html')
+        input,
+        external: [...builtinModules],
+        plugins: [
+          nodeResolve({ preferBuiltins: true }),
+          commonjs()
+        ],
+        output: {
+          format: 'cjs',
+          entryFileNames: '[dir]/[name].js',
+          exports: 'auto'
         }
-      }
+      },
+      outDir: 'netlify/functions',
+      emptyOutDir: true,
+      sourcemap: true,
+      minify: false
     }
   }
 })
