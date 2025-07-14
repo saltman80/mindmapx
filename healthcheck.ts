@@ -1,53 +1,38 @@
-const databaseUrl = process.env.DATABASE_URL
-if (!databaseUrl) {
-  throw new Error('Environment variable DATABASE_URL must be defined')
+let pool: Pool | undefined = undefined
+
+function getPool(): Pool {
+  if (!pool) {
+    const connectionString = process.env.NEON_DATABASE_URL
+    if (!connectionString) {
+      throw new Error('NEON_DATABASE_URL environment variable is not set')
+    }
+    pool = new Pool({
+      connectionString,
+      max: 5,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000
+    })
+  }
+  return pool
 }
 
-const pool: Pool = createPool({ connectionString: databaseUrl })
-
-const allowedOrigin = process.env.ALLOWED_ORIGIN
-if (!allowedOrigin) {
-  throw new Error('Environment variable ALLOWED_ORIGIN must be defined')
-}
-
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+export const handler: Handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false
-
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS'
-  }
-
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 204,
-      headers
-    }
-  }
-
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers: { ...headers, Allow: 'GET, OPTIONS' },
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    }
-  }
-
+  let dbHealthy = false
   try {
-    await pool.query('SELECT 1')
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ status: 'ok', db: 'ok' })
-    }
+    await getPool().query('SELECT 1')
+    dbHealthy = true
   } catch (error) {
     console.error('Healthcheck DB error:', error)
-    return {
-      statusCode: 503,
-      headers,
-      body: JSON.stringify({ status: 'error', db: 'unavailable' })
-    }
+  }
+  const statusCode = dbHealthy ? 200 : 500
+  const payload = { status: dbHealthy ? 'ok' : 'error', db: dbHealthy }
+  return {
+    statusCode,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate'
+    },
+    body: JSON.stringify(payload)
   }
 }
