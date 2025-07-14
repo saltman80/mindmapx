@@ -50,25 +50,35 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
           >
             <ul className="layout-nav-list">
               <li>
-                <NavLink to="/" className="layout-nav-link" onClick={handleLinkClick}>
-                  Home
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/mindmaps" className="layout-nav-link" onClick={handleLinkClick}>
-                  Mindmaps
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/todos" className="layout-nav-link" onClick={handleLinkClick}>
-                  Todos
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/admin" className="layout-nav-link" onClick={handleLinkClick}>
-                  Admin
-                </NavLink>
-              </li>
+              <NavLink to="/" className="layout-nav-link" onClick={handleLinkClick}>
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/mindmap" className="layout-nav-link" onClick={handleLinkClick}>
+                Mindmap
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/todos" className="layout-nav-link" onClick={handleLinkClick}>
+                Todos
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin" className="layout-nav-link" onClick={handleLinkClick}>
+                Admin
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/payment" className="layout-nav-link" onClick={handleLinkClick}>
+                Upgrade
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/login" className="layout-nav-link" onClick={handleLinkClick}>
+                Login
+              </NavLink>
+            </li>
             </ul>
           </nav>
         </div>
