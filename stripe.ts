@@ -1,132 +1,140 @@
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY
-const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-if (!stripeSecretKey) throw new Error('Missing STRIPE_SECRET_KEY environment variable')
-if (!stripeWebhookSecret) throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable')
+const stripeSecret = process.env.STRIPE_SECRET_KEY
+if (!stripeSecret) {
+  throw new Error('Missing STRIPE_SECRET_KEY environment variable.')
+}
+const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' })
 
-const stripe = new Stripe(stripeSecretKey, { apiVersion: '2022-11-15' })
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+if (!webhookSecret) {
+  throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable.')
+}
+
+const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL
+if (!connectionString) {
+  throw new Error('Missing DATABASE_URL or NEON_DATABASE_URL environment variable.')
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var _dbClient: Client | undefined
+}
+
+const db: Client = global._dbClient ?? createClient({ connectionString })
+global._dbClient = db
 
 export const handler: Handler = async (event) => {
-  const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
-  if (!signature) {
-    return { statusCode: 400, body: 'Stripe signature missing' }
+  const sig = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
+  if (!sig) {
+    return { statusCode: 400, body: 'Missing Stripe signature header.' }
   }
-
-  let rawBody: Buffer | string = ''
-  if (event.isBase64Encoded) {
-    rawBody = Buffer.from(event.body || '', 'base64')
-  } else {
-    rawBody = event.body || ''
+  if (!event.body) {
+    return { statusCode: 400, body: 'Missing request body.' }
   }
 
   let stripeEvent: Stripe.Event
   try {
-    stripeEvent = stripe.webhooks.constructEvent(rawBody, signature, stripeWebhookSecret)
+    const payload = event.isBase64Encoded
+      ? Buffer.from(event.body, 'base64')
+      : Buffer.from(event.body, 'utf8')
+    stripeEvent = stripe.webhooks.constructEvent(payload, sig, webhookSecret)
   } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message)
+    console.error('Webhook signature verification failed.', err.message)
     return { statusCode: 400, body: `Webhook Error: ${err.message}` }
   }
 
   try {
-    switch (stripeEvent.type) {
-      case 'charge.succeeded':
-        await handleChargeSucceeded(stripeEvent as Stripe.Event<Stripe.Charge>)
-        break
-      case 'charge.failed':
-        await handleChargeFailed(stripeEvent as Stripe.Event<Stripe.Charge>)
-        break
-      default:
-        console.log(`Unhandled Stripe event type: ${stripeEvent.type}`)
+    const insertResult = await db.query(
+      'INSERT INTO stripe_events(id, type, created_at) VALUES($1, $2, to_timestamp($3)) ON CONFLICT(id) DO NOTHING',
+      [stripeEvent.id, stripeEvent.type, stripeEvent.created]
+    )
+    if (insertResult.rowCount === 0) {
+      console.log(`Duplicate event ${stripeEvent.id} of type ${stripeEvent.type} skipped.`)
+      return { statusCode: 200, body: 'OK' }
     }
   } catch (err) {
-    console.error('Error processing Stripe webhook:', err)
+    console.error('Error during idempotency check', err)
     return { statusCode: 500, body: 'Internal Server Error' }
   }
 
-  return { statusCode: 200, body: 'Success' }
-}
-
-async function handleChargeSucceeded(event: Stripe.Event<Stripe.Charge>): Promise<void> {
-  const charge = event.data.object
-  const customerId = typeof charge.customer === 'string' ? charge.customer : charge.customer?.id
-  if (!customerId) {
-    console.warn('Charge succeeded event missing customer ID')
-    return
-  }
-
-  const connection = await client.connect()
   try {
-    await connection.query('BEGIN')
-
-    const { rows } = await connection.query(
-      'SELECT id FROM users WHERE stripe_customer_id = $1',
-      [customerId]
-    )
-    if (rows.length === 0) {
-      console.warn(`No user found for Stripe customer ${customerId}`)
-      await connection.query('ROLLBACK')
-      return
+    switch (stripeEvent.type) {
+      case 'checkout.session.completed': {
+        const session = stripeEvent.data.object as Stripe.Checkout.Session
+        const customerId = typeof session.customer === 'string'
+          ? session.customer
+          : session.customer?.id
+        const subscriptionId = typeof session.subscription === 'string'
+          ? session.subscription
+          : undefined
+        const userId = session.metadata?.userId || session.client_reference_id
+        if (customerId && userId) {
+          if (subscriptionId) {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+            await db.query(
+              `UPDATE users
+               SET stripe_customer_id = $1,
+                   stripe_subscription_id = $2,
+                   subscription_status = $3,
+                   subscription_current_period_end = to_timestamp($4)
+               WHERE id = $5`,
+              [
+                customerId,
+                subscription.id,
+                subscription.status,
+                subscription.current_period_end,
+                userId
+              ]
+            )
+          } else {
+            await db.query(
+              `UPDATE users
+               SET stripe_customer_id = $1
+               WHERE id = $2`,
+              [customerId, userId]
+            )
+          }
+        }
+        break
+      }
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted':
+      case 'invoice.paid':
+      case 'invoice.payment_failed': {
+        let subscription: Stripe.Subscription
+        if (stripeEvent.type.startsWith('invoice')) {
+          const invoice = stripeEvent.data.object as Stripe.Invoice
+          if (!invoice.subscription) break
+          subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
+        } else {
+          subscription = stripeEvent.data.object as Stripe.Subscription
+        }
+        const customerId = typeof subscription.customer === 'string'
+          ? subscription.customer
+          : subscription.customer?.id
+        if (!customerId) break
+        await db.query(
+          `UPDATE users
+           SET stripe_subscription_id = $1,
+               subscription_status = $2,
+               subscription_current_period_end = CASE WHEN $3 IS NOT NULL THEN to_timestamp($3) ELSE NULL END
+           WHERE stripe_customer_id = $4`,
+          [
+            subscription.id,
+            subscription.status,
+            subscription.current_period_end,
+            customerId
+          ]
+        )
+        break
+      }
+      default:
+        console.log(`Unhandled Stripe event type ${stripeEvent.type}`)
     }
-
-    const userId = rows[0].id
-    await connection.query(
-      `INSERT INTO payments (stripe_charge_id, user_id, amount, currency, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, to_timestamp($6))
-       ON CONFLICT (stripe_charge_id) DO UPDATE SET status = EXCLUDED.status`,
-      [charge.id, userId, charge.amount, charge.currency, charge.status, charge.created]
-    )
-    await connection.query(
-      'UPDATE users SET subscription_status = $1 WHERE id = $2',
-      ['active', userId]
-    )
-
-    await connection.query('COMMIT')
-  } catch (error) {
-    await connection.query('ROLLBACK')
-    throw error
-  } finally {
-    connection.release()
-  }
-}
-
-async function handleChargeFailed(event: Stripe.Event<Stripe.Charge>): Promise<void> {
-  const charge = event.data.object
-  const customerId = typeof charge.customer === 'string' ? charge.customer : charge.customer?.id
-  if (!customerId) {
-    console.warn('Charge failed event missing customer ID')
-    return
+  } catch (err) {
+    console.error('Error handling Stripe event', err)
+    return { statusCode: 500, body: 'Internal Server Error' }
   }
 
-  const connection = await client.connect()
-  try {
-    await connection.query('BEGIN')
-
-    const { rows } = await connection.query(
-      'SELECT id FROM users WHERE stripe_customer_id = $1',
-      [customerId]
-    )
-    if (rows.length === 0) {
-      console.warn(`No user found for Stripe customer ${customerId}`)
-      await connection.query('ROLLBACK')
-      return
-    }
-
-    const userId = rows[0].id
-    await connection.query(
-      `INSERT INTO payments (stripe_charge_id, user_id, amount, currency, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, to_timestamp($6))
-       ON CONFLICT (stripe_charge_id) DO UPDATE SET status = EXCLUDED.status`,
-      [charge.id, userId, charge.amount, charge.currency, charge.status, charge.created]
-    )
-    await connection.query(
-      'UPDATE users SET subscription_status = $1 WHERE id = $2',
-      ['past_due', userId]
-    )
-
-    await connection.query('COMMIT')
-  } catch (error) {
-    await connection.query('ROLLBACK')
-    throw error
-  } finally {
-    connection.release()
-  }
+  return { statusCode: 200, body: 'OK' }
 }
