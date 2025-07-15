@@ -2,9 +2,9 @@
 
 This project uses Netlify Functions and a Neon database. SQL migration files are located in the `migrations` folder and serverless functions live in `netlify/functions`.
 
-## Getting Started
+## Deploying
 
-1. Install dependencies:
+1. Install dependencies (optional if the build only runs in CI):
    ```bash
    npm install
    ```
@@ -12,13 +12,5 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```bash
    npm run migrate
    ```
-3. Start the dev server with Netlify:
-   ```bash
-   npm run dev
-   ```
-4. Build for production:
-   ```bash
-   npm run build
-   ```
 
-Netlify will automatically deploy the contents of the `dist` directory and any functions in `netlify/functions`.
+Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
