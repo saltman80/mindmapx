@@ -319,3 +319,39 @@ hr {
     padding: var(--spacing-md);
   }
 }
+
+.header__logo-img {
+  height: 40px;
+}
+
+.banner-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  align-items: center;
+  margin: var(--spacing-2xl) 0;
+}
+
+.three-column {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin: var(--spacing-2xl) 0;
+  text-align: center;
+}
+
+.bold-marketing-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
