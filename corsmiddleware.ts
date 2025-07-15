@@ -59,3 +59,6 @@ export function cors(handler: Handler): Handler {
     }
   }
 }
+
+// Alias withCors for compatibility with older code
+export const withCors = cors
