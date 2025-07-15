@@ -1,3 +1,4 @@
+import { verifySignature } from '../stripeclient.js'
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 if (!stripeSecret) {
   throw new Error('Missing STRIPE_SECRET_KEY environment variable.')
@@ -34,9 +35,9 @@ export const handler: Handler = async (event) => {
   let stripeEvent: Stripe.Event
   try {
     const payload = event.isBase64Encoded
-      ? Buffer.from(event.body, 'base64')
-      : Buffer.from(event.body, 'utf8')
-    stripeEvent = stripe.webhooks.constructEvent(payload, sig, webhookSecret)
+      ? Buffer.from(event.body, 'base64').toString('utf8')
+      : event.body
+    stripeEvent = verifySignature(payload, sig)
   } catch (err: any) {
     console.error('Webhook signature verification failed.', err.message)
     return { statusCode: 400, body: `Webhook Error: ${err.message}` }

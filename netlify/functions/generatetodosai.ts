@@ -1,13 +1,8 @@
-const { OPENAI_API_KEY, DATABASE_URL } = process.env
-
-if (!OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY')
-}
+import { generateCompletion } from '../openaiclient.js'
+const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {
   throw new Error('Missing DATABASE_URL')
 }
-
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY })
 const pool = new Pool({
   connectionString: DATABASE_URL,
   ssl: { rejectUnauthorized: true }
@@ -32,16 +27,11 @@ export const handler: Handler = async (event) => {
 
   let todosInput: any
   try {
-    const aiResponse = await openai.chat.completions.create({
+    const aiMessage = await generateCompletion(prompt, {
       model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: 'You are a task generation assistant. Generate a JSON array of todo items based on the user prompt. Each item should have a content field.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7
+      temperature: 0.7,
+      max_tokens: 256
     })
-    const aiMessage = aiResponse.choices?.[0]?.message?.content
-    if (!aiMessage) throw new Error('Empty AI response')
     todosInput = JSON.parse(aiMessage)
     if (!Array.isArray(todosInput)) throw new Error('AI response is not an array')
   } catch (err) {
