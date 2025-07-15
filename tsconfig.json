@@ -14,6 +14,7 @@
   "include": [
     "stubs-node.d.ts",
     "runmigrations.ts",
+    "netlify/functions/**/*.ts",
     "src/**/*.ts"
   ],
   "exclude": ["node_modules"]
