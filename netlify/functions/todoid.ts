@@ -7,6 +7,9 @@ type Todo = {
   title: string
   description: string | null
   completed: boolean
+  assignee_id: string | null
+  assignee_name?: string | null
+  assignee_email?: string | null
   created_at: string
   updated_at: string
 }
@@ -15,6 +18,7 @@ type TodoInput = {
   title?: string
   description?: string | null
   completed?: boolean
+  assignee_id?: string | null
 }
 
 const updateTodoSchema = z
@@ -22,6 +26,7 @@ const updateTodoSchema = z
     title: z.string().min(1).max(255).optional(),
     description: z.string().max(1000).nullable().optional(),
     completed: z.boolean().optional(),
+    assignee_id: z.string().uuid().nullable().optional(),
   })
   .refine(data => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
@@ -29,7 +34,12 @@ const updateTodoSchema = z
 
 async function getTodo(todoId: string, userId: string): Promise<Todo> {
   const result = await client.query(
-    'SELECT id, user_id, title, description, completed, created_at, updated_at FROM todos WHERE id = $1 AND user_id = $2',
+    `SELECT t.id, t.user_id, t.title, t.description, t.completed,
+            t.assignee_id, t.created_at, t.updated_at,
+            u.name AS assignee_name, u.email AS assignee_email
+       FROM todos t
+       LEFT JOIN users u ON t.assignee_id = u.id
+      WHERE t.id = $1 AND t.user_id = $2`,
     [todoId, userId]
   )
   if (result.rowCount === 0) {
@@ -58,6 +68,10 @@ async function updateTodo(
     fields.push(`completed = $${idx++}`)
     values.push(data.completed)
   }
+  if (data.assignee_id !== undefined) {
+    fields.push(`assignee_id = $${idx++}`)
+    values.push(data.assignee_id)
+  }
   values.push(todoId, userId)
   const idPos = idx++
   const userPos = idx
@@ -65,7 +79,7 @@ async function updateTodo(
     UPDATE todos
     SET ${fields.join(', ')}, updated_at = NOW()
     WHERE id = $${idPos} AND user_id = $${userPos}
-    RETURNING id, user_id, title, description, completed, created_at, updated_at
+    RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at
   `
   const result = await client.query(query, values)
   if (result.rowCount === 0) {

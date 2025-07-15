@@ -8,7 +8,7 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
   const [newTitle, setNewTitle] = useState<string>('')
   const [newDescription, setNewDescription] = useState<string>('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editValues, setEditValues] = useState<{ title: string; description?: string }>({ title: '', description: '' })
+  const [editValues, setEditValues] = useState<{ title: string; description?: string; assigneeId?: string | null }>({ title: '', description: '', assigneeId: null })
   const isMounted = useRef(true)
   const abortControllers = useRef<AbortController[]>([])
 
@@ -129,12 +129,16 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
 
   const startEdit = (todo: Todo) => {
     setEditingId(todo.id)
-    setEditValues({ title: todo.title, description: todo.description || '' })
+    setEditValues({
+      title: todo.title,
+      description: todo.description || '',
+      assigneeId: todo.assignee_id || null,
+    })
   }
 
   const cancelEdit = () => {
     setEditingId(null)
-    setEditValues({ title: '', description: '' })
+    setEditValues({ title: '', description: '', assigneeId: null })
   }
 
   const saveEdit = async (id: string) => {
@@ -142,8 +146,11 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     const controller = new AbortController()
     abortControllers.current.push(controller)
     if (isMounted.current) { setLoading(true); setError(null) }
-    const payload: { title: string; description?: string } = { title: editValues.title.trim() }
+    const payload: { title: string; description?: string; assignee_id?: string | null } = {
+      title: editValues.title.trim(),
+    }
     if (editValues.description.trim()) payload.description = editValues.description.trim()
+    if (editValues.assigneeId !== undefined) payload.assignee_id = editValues.assigneeId
     try {
       const res = await fetch(`/.netlify/functions/todos/${id}`, {
         method: 'PUT',
@@ -260,6 +267,7 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
             <th>Title</th>
             <th>Description</th>
             <th>Status</th>
+            <th>Assignee</th>
             <th>Created</th>
             <th>Actions</th>
           </tr>
@@ -298,6 +306,16 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
                     />
                   </td>
                   <td>{todo.completed ? 'Completed' : 'Pending'}</td>
+                  <td>
+                    <input
+                      type="text"
+                      value={editValues.assigneeId || ''}
+                      onChange={e =>
+                        setEditValues(v => ({ ...v, assigneeId: e.target.value }))
+                      }
+                      disabled={loading}
+                    />
+                  </td>
                   <td>{new Date(todo.created_at).toLocaleString()}</td>
                   <td>
                     <button onClick={() => saveEdit(todo.id)} disabled={loading}>
@@ -310,17 +328,18 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
                 </>
               ) : (
                 <>
-                  <td>{todo.title}</td>
-                  <td>{todo.description}</td>
-                  <td>
-                    <button
-                      onClick={() => handleToggleComplete(todo)}
-                      disabled={loading}
-                    >
-                      {todo.completed ? 'Undo' : 'Complete'}
-                    </button>
-                  </td>
-                  <td>{new Date(todo.created_at).toLocaleString()}</td>
+                <td>{todo.title}</td>
+                <td>{todo.description}</td>
+                <td>
+                  <button
+                    onClick={() => handleToggleComplete(todo)}
+                    disabled={loading}
+                  >
+                    {todo.completed ? 'Undo' : 'Complete'}
+                  </button>
+                </td>
+                <td>{todo.assignee_name || todo.assignee_email || 'Unassigned'}</td>
+                <td>{new Date(todo.created_at).toLocaleString()}</td>
                   <td>
                     <button onClick={() => startEdit(todo)} disabled={loading}>
                       Edit

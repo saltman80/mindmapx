@@ -99,7 +99,9 @@ export const handler: Handler = async event => {
   const { page, limit, completed } = params
   const offset = (page - 1) * limit
 
-  const whereClauses = ['user_id = $1']
+  const whereClauses = [
+    '(user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1))'
+  ]
   const values: (string | number | boolean)[] = [userId]
 
   if (typeof completed === 'boolean') {
@@ -112,12 +114,14 @@ export const handler: Handler = async event => {
   const offsetParam = values.length
 
   const sql = `
-    SELECT id, title, description, completed, created_at, updated_at
-    FROM todos
-    WHERE ${whereClauses.join(' AND ')}
-    ORDER BY created_at DESC
-    LIMIT $${limitParam}
-    OFFSET $${offsetParam}
+    SELECT t.id, t.title, t.description, t.completed, t.created_at, t.updated_at,
+           t.assignee_id, a.name AS assignee_name, a.email AS assignee_email
+      FROM todos t
+      LEFT JOIN users a ON t.assignee_id = a.id
+     WHERE ${whereClauses.join(' AND ')}
+     ORDER BY t.created_at DESC
+     LIMIT $${limitParam}
+     OFFSET $${offsetParam}
   `
 
   try {
