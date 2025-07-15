@@ -50,3 +50,10 @@ export async function runMigrations(): Promise<void> {
     client.release()
   }
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runMigrations().catch(err => {
+    console.error('Migration failed:', err)
+    process.exit(1)
+  })
+}

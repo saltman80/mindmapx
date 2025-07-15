@@ -1,4 +1,4 @@
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2022-11-15" })
+import { createCheckoutSession } from '../stripeclient.js'
 const db = createClient({ connectionString: process.env.DATABASE_URL! })
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -90,9 +90,9 @@ export const handler: Handler = async (event) => {
     return { statusCode: 500, headers: corsHeaders, body: "Server configuration error" }
   }
 
-  let session: Stripe.Checkout.Session
+  let session
   try {
-    session = await stripe.checkout.sessions.create({
+    session = await createCheckoutSession({
       payment_method_types: ["card"],
       mode: "payment",
       line_items,
