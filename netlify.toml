@@ -1,5 +1,10 @@
 [build]
-  command   = "npm install ts-node typescript && npm run migrate && npm run build"
+  command = """
+    npm ci &&
+    npm run compile:migrations &&
+    npm run migrate &&
+    npm run build
+  """
   publish   = "dist"
   functions = "netlify/functions"
 
