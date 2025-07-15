@@ -70,7 +70,13 @@ const Header = (): JSX.Element => {
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          <Link to="/">PlanScaler</Link>
+          <Link to="/" aria-label="Home">
+            <img
+              src="/images/logo-placeholder.png"
+              alt="PlanScaler logo"
+              className="header__logo-img"
+            />
+          </Link>
         </div>
         <button
           ref={toggleRef}

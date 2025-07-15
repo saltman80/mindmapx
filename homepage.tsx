@@ -3,30 +3,43 @@ const features = [
     title: 'Mind Mapping',
     description:
       'Visualize your ideas with dynamic, draggable mind maps that expand as you think.',
-    icon: '/icons/mindmap.svg',
+    icon: '/images/icon-mindmap.png',
   },
   {
     title: 'Integrated To-Do Lists',
     description:
       'Link tasks to your mind map nodes and track progress effortlessly in one place.',
-    icon: '/icons/todo.svg',
+    icon: '/images/icon-todo.png',
   },
   {
     title: 'Real-Time Collaboration',
     description:
       'Work together with your team on interactive maps and task lists in real time.',
-    icon: '/icons/collaboration.svg',
+    icon: '/images/icon-collaboration.png',
   },
   {
     title: 'Cross-Platform Sync',
     description:
       'Access your projects on any device with instant syncing and offline support.',
-    icon: '/icons/sync.svg',
+    icon: '/images/icon-sync.png',
   },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(false)
+  const heroImages = [
+    '/images/banner1.png',
+    '/images/banner2.png',
+    '/images/banner3.png',
+  ]
+  const [currentHero, setCurrentHero] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentHero(i => (i + 1) % heroImages.length)
+    }, 4000)
+    return () => clearInterval(id)
+  }, [])
 
   const handleCheckout = async () => {
     if (loading) return
@@ -76,14 +89,20 @@ const Homepage: React.FC = (): JSX.Element => {
             {loading ? 'Processing...' : 'Get Started'}
           </button>
         </motion.div>
-        <motion.img
-          src="/images/hero-mockup.png"
-          alt="App mockup"
-          className="hero-image"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-        />
+        <div className="banner-slider">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentHero}
+              src={heroImages[currentHero]}
+              alt="Hero banner"
+              className="banner-image"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+            />
+          </AnimatePresence>
+        </div>
       </section>
 
       <section className="features">
@@ -112,6 +131,23 @@ const Homepage: React.FC = (): JSX.Element => {
         <h2>Try It Live</h2>
         <p>Interactive demo of Mindmap ? Todo?no signup required.</p>
         <Demo />
+      </section>
+
+      <section className="two-column">
+        <div className="bold-marketing-text">
+          Map your ideas visually while keeping tasks in focus.
+        </div>
+        <img
+          src="/images/marketing-two-col.png"
+          alt="Two column placeholder"
+          className="banner-image"
+        />
+      </section>
+
+      <section className="three-column">
+        <div className="bold-marketing-text">Plan</div>
+        <div className="bold-marketing-text">Track</div>
+        <div className="bold-marketing-text">Launch</div>
       </section>
 
       <section className="pricing">

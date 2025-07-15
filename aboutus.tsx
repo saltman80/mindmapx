@@ -31,6 +31,11 @@ export function AboutUs(): JSX.Element {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
       }`}
     >
+      <img
+        src="/images/about-banner.png"
+        alt="About us banner"
+        className="about-banner mb-6"
+      />
       <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 text-center">
         About Mindmap ? Todo
       </h2>
@@ -46,6 +51,23 @@ export function AboutUs(): JSX.Element {
         Join thousands of users who have transformed their ideas into actionable plans
         with Mindmap ? Todo.
       </p>
+
+      <section className="two-column">
+        <div className="bold-marketing-text">
+          Seamlessly bridge brainstorming and execution with our intuitive tools.
+        </div>
+        <img
+          src="/images/about-section.png"
+          alt="Product screenshot"
+          className="banner-image"
+        />
+      </section>
+
+      <section className="three-column">
+        <div className="bold-marketing-text">Collaborate</div>
+        <div className="bold-marketing-text">Organize</div>
+        <div className="bold-marketing-text">Succeed</div>
+      </section>
       <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
         <a
           href="#features"
