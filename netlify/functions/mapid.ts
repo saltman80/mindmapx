@@ -1,3 +1,6 @@
+import { getClient } from './db-client.js'
+const pool = getClient()
+
 const MapDataSchema = z.record(z.unknown())
 type MapData = z.infer<typeof MapDataSchema>
 

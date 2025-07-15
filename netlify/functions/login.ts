@@ -3,7 +3,8 @@ if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
 }
 
-const pool = createPool({ connectionString: DATABASE_URL })
+import { getClient } from './db-client.js'
+const pool = { query: (...args) => getClient().query(...args) }
 
 const loginSchema = z.object({
   email: z.string().email().transform(s => s.trim().toLowerCase()),

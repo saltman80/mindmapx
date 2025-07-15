@@ -1,6 +1,5 @@
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
-})
+import { getClient } from './db-client.js'
+const pool = { query: (...args) => getClient().query(...args) }
 
 const mapInputSchema = z.object({
   data: z.record(z.any()),

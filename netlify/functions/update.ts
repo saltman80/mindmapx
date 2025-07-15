@@ -1,8 +1,5 @@
-var __db: ReturnType<typeof createClient> | undefined
-}
-
-const db = globalThis.__db ?? createClient()
-if (!globalThis.__db) globalThis.__db = db
+import { getClient } from './db-client.js'
+const db = getClient()
 
 const headers = {
   'Content-Type': 'application/json',

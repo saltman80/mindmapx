@@ -1,23 +1,11 @@
-const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL
-if (!connectionString) {
-  throw new Error('Database connection string is not set')
-}
+import { getClient } from './db-client.js'
 
 const jwtSecret = process.env.JWT_SECRET
 if (!jwtSecret) {
   throw new Error('JWT_SECRET environment variable is not set')
 }
 
-let client: ReturnType<typeof createClient>
-function getClient() {
-  if (!client) {
-    client = createClient({
-      connectionString,
-      ssl: { rejectUnauthorized: true }
-    })
-  }
-  return client
-}
+const db = getClient()
 
 const QuerySchema = z.object({
   mapId: z.string().uuid().optional(),
@@ -90,7 +78,7 @@ export const handler: Handler = async (event, context) => {
     }
     sql += ` ORDER BY created_at DESC`
 
-    const { rows } = await getClient().query(sql, values)
+    const { rows } = await db.query(sql, values)
 
     return {
       statusCode: 200,

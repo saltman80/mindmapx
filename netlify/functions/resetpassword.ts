@@ -1,4 +1,5 @@
-const db = createClient({ connectionString: process.env.DATABASE_URL })
+import { getClient } from './db-client.js'
+const db = getClient()
 
 const MAX_TOKEN_ATTEMPTS = 5
 const TOKEN_WINDOW_MS = 15 * 60 * 1000

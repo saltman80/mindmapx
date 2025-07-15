@@ -1,7 +1,5 @@
-const client = createClient({
-  connectionString: process.env.DATABASE_URL!,
-  ssl: { rejectUnauthorized: false },
-})
+import { getClient } from './db-client.js'
+const client = getClient()
 
 type Todo = {
   id: string
