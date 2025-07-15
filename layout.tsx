@@ -55,6 +55,11 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/dashboard" className="layout-nav-link" onClick={handleLinkClick}>
+                Dashboard
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/mindmap" className="layout-nav-link" onClick={handleLinkClick}>
                 Mindmap
               </NavLink>
@@ -65,8 +70,13 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/admin" className="layout-nav-link" onClick={handleLinkClick}>
-                Admin
+              <NavLink to="/billing" className="layout-nav-link" onClick={handleLinkClick}>
+                Billing
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/profile" className="layout-nav-link" onClick={handleLinkClick}>
+                Profile
               </NavLink>
             </li>
             <li>

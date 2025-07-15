@@ -1,3 +1,6 @@
+import { useState, useEffect, useRef, useCallback, ChangeEvent, FormEvent } from 'react'
+import { Link } from 'react-router-dom'
+
 export default function DashboardPage(): JSX.Element {
   const [summary, setSummary] = useState<Summary | null>(null)
   const [summaryLoading, setSummaryLoading] = useState<boolean>(true)
@@ -185,6 +188,21 @@ export default function DashboardPage(): JSX.Element {
     }
   }
 
+  async function handleDelete(id: string): Promise<void> {
+    try {
+      const endpoint =
+        activeTab === 'maps'
+          ? `/.netlify/functions/delete-map?id=${encodeURIComponent(id)}`
+          : `/.netlify/functions/delete-todo?id=${encodeURIComponent(id)}`
+      const res = await fetch(endpoint, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+      fetchItems(activeTab)
+      fetchSummary()
+    } catch (err: any) {
+      alert(err.message || 'Error deleting item')
+    }
+  }
+
   return (
     <div className="dashboard-page">
       <h1 className="dashboard-title">Dashboard</h1>
@@ -255,8 +273,30 @@ export default function DashboardPage(): JSX.Element {
             <ul className="item-list">
               {items.map(item => (
                 <li key={item.id} className="item">
-                  <strong>{item.title}</strong>
-                  {item.description && <p>{item.description}</p>}
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <strong>
+                        <Link
+                          to={
+                            activeTab === 'maps'
+                              ? `/maps/${item.id}`
+                              : `/todos/${item.id}`
+                          }
+                          className="text-blue-600 hover:underline"
+                        >
+                          {item.title}
+                        </Link>
+                      </strong>
+                      {item.description && <p>{item.description}</p>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

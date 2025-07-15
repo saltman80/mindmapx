@@ -1,3 +1,16 @@
+import { lazy, Suspense, useState, useEffect } from 'react'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useParams,
+} from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ErrorBoundary from './errorboundary'
+import Layout from './layout'
+import LoadingSpinner from './loadingspinner'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -11,10 +24,27 @@ const queryClient = new QueryClient({
 
 const MindmapCanvas = lazy(() => import('./mindmapcanvas'))
 const TodoDashboard = lazy(() => import('./tododashboard'))
+const DashboardPage = lazy(() => import('./dashboard'))
+const BillingPage = lazy(() => import('./billing'))
+const ProfilePage = lazy(() => import('./profile'))
 const AboutModulePage = lazy(() => import('./aboutmodulepage'))
 const Homepage = lazy(() => import('./homepage'))
 const PaymentPage = lazy(() => import('./paymentpage'))
 const LoginPage = lazy(() => import('./login'))
+const MapPage = lazy(() => import('./mapid'))
+const TodoPage = lazy(() => import('./todoid'))
+
+function MapPageWrapper() {
+  const { mapId } = useParams()
+  if (!mapId) return <Navigate to="/dashboard" replace />
+  return <MapPage mapId={mapId} />
+}
+
+function TodoPageWrapper() {
+  const { mindmapId } = useParams()
+  if (!mindmapId) return <Navigate to="/dashboard" replace />
+  return <TodoPage mindmapId={mindmapId} />
+}
 
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
@@ -46,8 +76,13 @@ function App() {
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
                 <Route path="/" element={<Homepage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/billing" element={<BillingPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/mindmap" element={<MindmapCanvas />} />
                 <Route path="/todos" element={<TodoDashboard />} />
+                <Route path="/maps/:mapId" element={<MapPageWrapper />} />
+                <Route path="/todos/:mindmapId" element={<TodoPageWrapper />} />
                 <Route path="/payment" element={<PaymentPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/about-module" element={<AboutModulePage />} />
