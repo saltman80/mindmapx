@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, ChangeEvent, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import LoadingSkeleton from './loadingskeleton'
 
 export default function DashboardPage(): JSX.Element {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -207,7 +208,7 @@ export default function DashboardPage(): JSX.Element {
     <div className="dashboard-page">
       <h1 className="dashboard-title">Dashboard</h1>
       {summaryLoading ? (
-        <p>Loading summary...</p>
+        <LoadingSkeleton count={3} />
       ) : summaryError ? (
         <p className="error">{summaryError}</p>
       ) : summary ? (
@@ -265,7 +266,7 @@ export default function DashboardPage(): JSX.Element {
       </div>
       <div className="tab-content">
         {itemsLoading ? (
-          <p>Loading {activeTab}...</p>
+          <LoadingSkeleton />
         ) : itemsError ? (
           <p className="error">{itemsError}</p>
         ) : activeTab === 'maps' || activeTab === 'todos' ? (

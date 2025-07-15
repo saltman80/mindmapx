@@ -1,3 +1,12 @@
+import React from 'react'
+
+interface LoadingSpinnerProps {
+  size?: number | string
+  color?: string
+  className?: string
+  ariaLabel?: string
+}
+
 function LoadingSpinner({
   size = 24,
   color = 'currentColor',

@@ -1,3 +1,9 @@
+import React from 'react'
+
+interface LoadingSkeletonProps {
+  count?: number
+}
+
 export default function LoadingSkeleton({ count = 6 }: LoadingSkeletonProps): JSX.Element {
   return (
     <div
