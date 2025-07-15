@@ -72,7 +72,7 @@ const Header = (): JSX.Element => {
         <div className="header__logo">
           <Link to="/" aria-label="Home">
             <img
-              src="https://placehold.co/120x40/png"
+              src="./assets/placeholder.svg"
               alt="Mindxdo logo"
               className="header__logo-img"
             />
