@@ -1,3 +1,8 @@
+import { createPool } from '@vercel/postgres'
+import { Configuration, OpenAIApi } from 'openai'
+import { z } from 'zod'
+import { v4 as uuidv4 } from 'uuid'
+
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('Missing DATABASE_URL')
 const pool = createPool(databaseUrl)

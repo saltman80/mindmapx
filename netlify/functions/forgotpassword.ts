@@ -1,3 +1,7 @@
+import type { Handler } from '@netlify/functions'
+import sgMail from '@sendgrid/mail'
+import { randomBytes, createHmac } from 'crypto'
+import { getClient } from './db-client.js'
 const {
   DATABASE_URL,
   SENDGRID_API_KEY,
@@ -14,7 +18,6 @@ if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
 
 sgMail.setApiKey(SENDGRID_API_KEY)
 
-import { getClient } from './db-client.js'
 const pool = { query: (...args) => getClient().query(...args) }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

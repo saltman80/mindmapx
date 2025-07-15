@@ -1,4 +1,6 @@
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { z } from 'zod'
 const pool = getClient()
 
 const MapDataSchema = z.record(z.unknown())

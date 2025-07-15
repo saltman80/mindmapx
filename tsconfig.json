@@ -6,6 +6,8 @@
     "outDir": "dist",
     "rootDir": ".",
     "esModuleInterop": true,
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node", "netlify-functions", "jsonwebtoken", "stripe", "zod", "bcrypt", "uuid"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

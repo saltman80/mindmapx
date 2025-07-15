@@ -1,3 +1,4 @@
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
 
 const db = getClient()

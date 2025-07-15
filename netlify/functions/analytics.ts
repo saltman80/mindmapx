@@ -10,6 +10,9 @@ declare global {
   var __dbPool: Pool | undefined
 }
 
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { Pool } from 'pg'
+import { verify } from 'jsonwebtoken'
 import { getClient } from './db-client.js'
 const pool = getClient()
 

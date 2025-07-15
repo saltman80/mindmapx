@@ -1,3 +1,7 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import { z } from 'zod'
+import { verify, JwtPayload } from 'jsonwebtoken'
+import { sql } from '@vercel/postgres'
 const DeleteRequest = z.object({
   id: z.string().uuid(),
 })

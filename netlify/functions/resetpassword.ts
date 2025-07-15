@@ -1,4 +1,7 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { createHash } from 'crypto'
+import bcrypt from 'bcrypt'
 const db = getClient()
 
 const MAX_TOKEN_ATTEMPTS = 5

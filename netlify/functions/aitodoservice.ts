@@ -89,3 +89,7 @@ export const handler: Handler = withCors(async (event) => {
     }
   }
 })
+import type { Handler } from '@netlify/functions'
+import { Configuration, OpenAIApi } from 'openai'
+import { randomUUID } from 'crypto'
+import { withCors } from '../corsmiddleware.js'
