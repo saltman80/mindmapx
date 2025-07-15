@@ -3,34 +3,40 @@ const features = [
     title: 'Mind Mapping',
     description:
       'Visualize your ideas with dynamic, draggable mind maps that expand as you think.',
-    icon: '/images/icon-mindmap.png',
+    icon: 'https://placehold.co/80x80/png',
   },
   {
     title: 'Integrated To-Do Lists',
     description:
       'Link tasks to your mind map nodes and track progress effortlessly in one place.',
-    icon: '/images/icon-todo.png',
+    icon: 'https://placehold.co/80x80/png',
   },
   {
     title: 'Real-Time Collaboration',
     description:
       'Work together with your team on interactive maps and task lists in real time.',
-    icon: '/images/icon-collaboration.png',
+    icon: 'https://placehold.co/80x80/png',
   },
   {
     title: 'Cross-Platform Sync',
     description:
       'Access your projects on any device with instant syncing and offline support.',
-    icon: '/images/icon-sync.png',
+    icon: 'https://placehold.co/80x80/png',
+  },
+  {
+    title: 'AI Automation',
+    description:
+      'Let Mindxdo suggest tasks and connections so you can focus on the experience.',
+    icon: 'https://placehold.co/80x80/png',
   },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(false)
   const heroImages = [
-    '/images/banner1.png',
-    '/images/banner2.png',
-    '/images/banner3.png',
+    'https://placehold.co/1200x600/png?text=Banner+1',
+    'https://placehold.co/1200x600/png?text=Banner+2',
+    'https://placehold.co/1200x600/png?text=Banner+3',
   ]
   const [currentHero, setCurrentHero] = useState(0)
 
@@ -68,18 +74,20 @@ const Homepage: React.FC = (): JSX.Element => {
 
   return (
     <div className="homepage">
-      <section className="hero">
+      <section className="hero relative">
+        <div className="shape shape-circle hero-shape1" />
+        <div className="shape shape-circle hero-shape2" />
         <motion.div
           className="hero-content"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>Mindmap ? Todo: Organize Ideas, Get Things Done</h1>
+          <h1>Mindxdo: Mindmaps Meet Todos with AI</h1>
           <p>
-            The ultimate productivity tool that combines visual brainstorming
-            with task management. Plan, prioritize, and execute?all in one
-            place.
+            Experience the power of AI as your ideas become actionable plans.
+            Mindxdo weaves mindmaps and todos together so you can strategize
+            and execute without friction.
           </p>
           <button
             className="btn-primary"
@@ -105,6 +113,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
+
+
       <section className="features">
         <h2>Features</h2>
         <div className="feature-grid">
@@ -129,7 +139,7 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="demo">
         <h2>Try It Live</h2>
-        <p>Interactive demo of Mindmap ? Todo?no signup required.</p>
+        <p>Interactive demo of Mindxdo ? no signup required.</p>
         <Demo />
       </section>
 
@@ -138,7 +148,7 @@ const Homepage: React.FC = (): JSX.Element => {
           Map your ideas visually while keeping tasks in focus.
         </div>
         <img
-          src="/images/marketing-two-col.png"
+          src="https://placehold.co/600x400/png"
           alt="Two column placeholder"
           className="banner-image"
         />
@@ -148,6 +158,27 @@ const Homepage: React.FC = (): JSX.Element => {
         <div className="bold-marketing-text">Plan</div>
         <div className="bold-marketing-text">Track</div>
         <div className="bold-marketing-text">Launch</div>
+      </section>
+
+      <section className="ai-power relative">
+        <div className="shape shape-circle ai-power-shape" />
+        <motion.h2
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          AI Superpowers
+        </motion.h2>
+        <p className="ai-copy">
+          Harness automation to turn complex mindmaps into actionable workflows.
+          Mindxdo helps you execute ambitious plans with ease.
+        </p>
+        <img
+          src="https://placehold.co/800x400/png?text=AI+Showcase"
+          alt="AI showcase"
+          className="banner-image"
+        />
       </section>
 
       <section className="pricing">
@@ -176,8 +207,24 @@ const Homepage: React.FC = (): JSX.Element => {
         </motion.div>
       </section>
 
+      <section className="faq">
+        <h2>Frequently Asked Questions</h2>
+        {[
+          { q: 'What is Mindxdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
+          { q: 'How does the AI help?', a: 'It automates task creation and finds connections between ideas.' },
+          { q: 'Can I collaborate with my team?', a: 'Yes, share maps and task boards in real time.' },
+        ].map(item => (
+          <motion.div key={item.q} className="faq-item" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <details>
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          </motion.div>
+        ))}
+      </section>
+
       <footer className="site-footer">
-        <p>&copy; {new Date().getFullYear()} Mindmap ? Todo. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Mindxdo. All rights reserved.</p>
       </footer>
     </div>
   )

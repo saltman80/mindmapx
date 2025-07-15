@@ -79,13 +79,15 @@ const Hero: React.FC = () => {
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+      <div className="shape shape-circle hero-shape1" />
+      <div className="shape shape-circle hero-shape2" />
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
         <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-          Mindmap ? Todo
+          Mindxdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-          Organize your thoughts and tasks seamlessly with built-in
-          mindmaps, intuitive todos, and powerful integrations.
+          Organize your mindmaps and todos with AI-driven automations for a
+          seamless experience.
         </p>
         <a
           href="#get-started"
