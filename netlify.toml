@@ -1,5 +1,5 @@
 [build]
-  command   = "npm install ts-node && npm run build"
+  command   = "npm install ts-node && ts-node runmigrations.ts && npm run build"
   publish   = "dist"
   functions = "netlify/functions"
 
