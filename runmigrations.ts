@@ -1,14 +1,14 @@
 import fs from 'fs'
 import path from 'path'
-import { getClient } from './netlify/functions/db-client'
+import { getClient } from './netlify/functions/db-client.js'
 
 const pool = getClient()
 
 function splitSql(sql: string): string[] {
   return sql
     .split(/;\s*(?:\r?\n|$)/)
-    .map(stmt => stmt.trim())
-    .filter(stmt => stmt.length)
+    .map((stmt: string) => stmt.trim())
+    .filter((stmt: string) => stmt.length)
 }
 
 export async function runMigrations(): Promise<void> {
@@ -25,15 +25,15 @@ export async function runMigrations(): Promise<void> {
       );
     `)
     const files = (await fs.readdir(migrationsDir))
-      .filter(file => file.endsWith('.sql'))
-      .sort((a, b) => {
+      .filter((file: string) => file.endsWith('.sql'))
+      .sort((a: string, b: string) => {
         const pa = parseInt(a.split('_')[0], 10)
         const pb = parseInt(b.split('_')[0], 10)
         if (!isNaN(pa) && !isNaN(pb) && pa !== pb) return pa - pb
         return a.localeCompare(b)
       })
     const { rows } = await client.query<{ name: string }>('SELECT name FROM migrations')
-    const applied = new Set(rows.map(r => r.name))
+    const applied = new Set(rows.map((r: any) => r.name))
     for (const file of files) {
       if (applied.has(file)) continue
       const filePath = path.join(migrationsDir, file)
@@ -58,7 +58,7 @@ export async function runMigrations(): Promise<void> {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runMigrations().catch(err => {
+  runMigrations().catch((err: any) => {
     console.error('Migration failed:', err)
     process.exit(1)
   })
