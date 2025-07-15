@@ -12,7 +12,7 @@
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
     "build": "vite build",
     "preview": "vite preview",
-    "compile:migrations": "tsc runmigrations.ts --outDir dist",
+    "compile:migrations": "tsc -p tsconfig.json",
     "migrate": "node dist/runmigrations.js",
     "start": "npm run dev"
   },
