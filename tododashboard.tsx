@@ -1,3 +1,6 @@
+import React, { useState, useRef, useCallback, useEffect } from 'react'
+import LoadingSkeleton from './loadingskeleton'
+
 export default function TodoDashboard() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [filter, setFilter] = useState<Filter>('all')
@@ -108,7 +111,7 @@ export default function TodoDashboard() {
       </div>
       {error && <p className="error">{error}</p>}
       {isLoadingList ? (
-        <p>Loading todos...</p>
+        <LoadingSkeleton />
       ) : (
         <ul className="todo-list">
           {filteredTodos.map(todo => (
