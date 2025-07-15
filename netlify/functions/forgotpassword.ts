@@ -14,7 +14,8 @@ if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
 
 sgMail.setApiKey(SENDGRID_API_KEY)
 
-const pool = new Pool({ connectionString: DATABASE_URL })
+import { getClient } from './db-client.js'
+const pool = { query: (...args) => getClient().query(...args) }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -55,7 +56,7 @@ export const handler: Handler = async (event) => {
   }
 
   const normalizedEmail = email.toLowerCase().trim()
-  const client = await pool.connect()
+  const client = getClient()
 
   try {
     const userRes = await client.query('SELECT id FROM users WHERE email = $1', [normalizedEmail])
@@ -89,7 +90,7 @@ export const handler: Handler = async (event) => {
     console.error(err)
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) }
   } finally {
-    client.release()
+    // no release needed for serverless client
   }
 
   return {

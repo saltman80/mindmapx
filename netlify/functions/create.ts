@@ -1,3 +1,6 @@
+import { getClient } from './db-client.js'
+
+const db = getClient()
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET']
 REQUIRED_ENV.forEach((name) => {
   if (!process.env[name]) {
@@ -77,7 +80,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const result = await query(
+    const result = await db.query(
       `
         INSERT INTO mind_maps (user_id, title, description, created_at)
         VALUES ($1, $2, $3, NOW())

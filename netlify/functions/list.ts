@@ -1,4 +1,5 @@
-const db = createClient({ connectionString: process.env.DATABASE_URL })
+import { getClient } from './db-client.js'
+const db = getClient()
 
 const MAX_PAGE = 100
 

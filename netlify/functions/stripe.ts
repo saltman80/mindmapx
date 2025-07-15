@@ -20,8 +20,8 @@ declare global {
   var _dbClient: Client | undefined
 }
 
-const db: Client = global._dbClient ?? createClient({ connectionString })
-global._dbClient = db
+import { getClient } from './db-client.js'
+const db: Client = getClient()
 
 export const handler: Handler = async (event) => {
   const sig = event.headers['stripe-signature'] || event.headers['Stripe-Signature']

@@ -14,7 +14,8 @@ if (!global.resetRateLimitMap) {
   global.resetRateLimitMap = new Map()
 }
 
-const db = createClient()
+import { getClient } from './db-client.js'
+const db = getClient()
 
 const headers = {
   "Access-Control-Allow-Origin": "*",

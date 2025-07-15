@@ -10,11 +10,8 @@ declare global {
   var __dbPool: Pool | undefined
 }
 
-const pool: Pool = global.__dbPool ?? new Pool({
-  connectionString: DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-})
-global.__dbPool = pool
+import { getClient } from './db-client.js'
+const pool = getClient()
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
