@@ -3,40 +3,40 @@ const features = [
     title: 'Mind Mapping',
     description:
       'Visualize your ideas with dynamic, draggable mind maps that expand as you think.',
-    icon: 'https://placehold.co/80x80/png',
+    icon: './assets/placeholder.svg',
   },
   {
     title: 'Integrated To-Do Lists',
     description:
       'Link tasks to your mind map nodes and track progress effortlessly in one place.',
-    icon: 'https://placehold.co/80x80/png',
+    icon: './assets/placeholder.svg',
   },
   {
     title: 'Real-Time Collaboration',
     description:
       'Work together with your team on interactive maps and task lists in real time.',
-    icon: 'https://placehold.co/80x80/png',
+    icon: './assets/placeholder.svg',
   },
   {
     title: 'Cross-Platform Sync',
     description:
       'Access your projects on any device with instant syncing and offline support.',
-    icon: 'https://placehold.co/80x80/png',
+    icon: './assets/placeholder.svg',
   },
   {
     title: 'AI Automation',
     description:
       'Let Mindxdo suggest tasks and connections so you can focus on the experience.',
-    icon: 'https://placehold.co/80x80/png',
+    icon: './assets/placeholder.svg',
   },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(false)
   const heroImages = [
-    'https://placehold.co/1200x600/png?text=Banner+1',
-    'https://placehold.co/1200x600/png?text=Banner+2',
-    'https://placehold.co/1200x600/png?text=Banner+3',
+    './assets/placeholder.svg',
+    './assets/placeholder.svg',
+    './assets/placeholder.svg',
   ]
   const [currentHero, setCurrentHero] = useState(0)
 
@@ -148,7 +148,7 @@ const Homepage: React.FC = (): JSX.Element => {
           Map your ideas visually while keeping tasks in focus.
         </div>
         <img
-          src="https://placehold.co/600x400/png"
+          src="./assets/placeholder.svg"
           alt="Two column placeholder"
           className="banner-image"
         />
@@ -175,7 +175,7 @@ const Homepage: React.FC = (): JSX.Element => {
           Mindxdo helps you execute ambitious plans with ease.
         </p>
         <img
-          src="https://placehold.co/800x400/png?text=AI+Showcase"
+          src="./assets/placeholder.svg"
           alt="AI showcase"
           className="banner-image"
         />
