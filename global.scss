@@ -355,3 +355,17 @@ hr {
   font-size: 1.5rem;
   font-weight: 700;
 }
+
+.ai-button {
+  background: linear-gradient(90deg, #10b981, #a855f7);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ai-button::after {
+  content: '✨';
+}

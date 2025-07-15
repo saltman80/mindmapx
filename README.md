@@ -14,3 +14,14 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```
 
 Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
+
+## OpenAI Configuration
+
+Set the following variables in your Netlify environment to enable AI powered features:
+
+```
+OPENAI_API_KEY=your-openai-key
+OPENAI_DEFAULT_MODEL=gpt-4o-mini
+```
+
+These are used by serverless functions to generate mind maps and todo lists.
