@@ -1,3 +1,41 @@
+// Utility debounce function with cancel support
+function debounce<T extends (...args: any[]) => void>(fn: T, wait: number) {
+  let timer: ReturnType<typeof setTimeout> | null = null
+  const debounced = (...args: Parameters<T>) => {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), wait)
+  }
+  debounced.cancel = () => {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+  return debounced as typeof fn & { cancel: () => void }
+}
+
+interface Column<T> {
+  key: keyof T
+  header: string
+  width?: string | number
+  sortable?: boolean
+  filterable?: boolean
+  render?: (row: T) => React.ReactNode
+}
+
+type SortDirection = 'asc' | 'desc' | null
+
+interface Filter {
+  columnKey: string
+  value: string
+}
+
+interface DataTableProps<T extends Record<string, any>> {
+  columns: Column<T>[]
+  data: T[]
+  pageSizeOptions?: number[]
+  defaultPageSize?: number
+  rowKey?: keyof T | ((row: T) => string | number)
+}
+
 export function DataTable<T extends Record<string, any>>({
   columns,
   data,
