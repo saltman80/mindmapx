@@ -28,6 +28,7 @@ async function getMaps(userId: string) {
     `SELECT id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"
      FROM maps
      WHERE user_id = $1
+        OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1)
      ORDER BY created_at DESC`,
     [userId]
   )

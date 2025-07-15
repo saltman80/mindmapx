@@ -91,7 +91,7 @@ async function createTodo(event, user) {
       body: JSON.stringify({ error: 'Invalid JSON body' })
     }
   }
-  const { nodeId, content, completed = false } = data
+  const { nodeId, content, completed = false, assigneeId = null } = data
   if (!nodeId || typeof nodeId !== 'string' || typeof content !== 'string' || typeof completed !== 'boolean') {
     return {
       statusCode: 400,
@@ -100,16 +100,17 @@ async function createTodo(event, user) {
     }
   }
   const res = await client.query(
-    `INSERT INTO todos (node_id, content, completed, user_id)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO todos (node_id, content, completed, user_id, assignee_id)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING
        id,
        node_id AS "nodeId",
        content,
        completed,
+       assignee_id AS "assigneeId",
        created_at AS "createdAt",
        updated_at AS "updatedAt"`,
-    [nodeId, content, completed, user.id]
+    [nodeId, content, completed, user.id, assigneeId]
   )
   return {
     statusCode: 201,
@@ -137,7 +138,7 @@ async function updateTodo(event, user) {
       body: JSON.stringify({ error: 'Missing or invalid id/updates' })
     }
   }
-  const allowed = ['content', 'completed']
+  const allowed = ['content', 'completed', 'assigneeId']
   const setClauses = []
   const values = []
   for (const field of allowed) {
@@ -157,8 +158,10 @@ async function updateTodo(event, user) {
           body: JSON.stringify({ error: 'Invalid type for completed' })
         }
       }
+      let column = field
+      if (field === 'assigneeId') column = 'assignee_id'
       values.push(value)
-      setClauses.push(`${field} = $${values.length}`)
+      setClauses.push(`${column} = $${values.length}`)
     }
   }
   if (setClauses.length === 0) {
@@ -179,6 +182,7 @@ async function updateTodo(event, user) {
       node_id AS "nodeId",
       content,
       completed,
+      assignee_id AS "assigneeId",
       created_at AS "createdAt",
       updated_at AS "updatedAt"
   `

@@ -33,6 +33,7 @@ const PaymentPage = lazy(() => import('./paymentpage'))
 const LoginPage = lazy(() => import('./login'))
 const MapPage = lazy(() => import('./mapid'))
 const TodoPage = lazy(() => import('./todoid'))
+const TeamMembersPage = lazy(() => import('./teammembers'))
 
 function MapPageWrapper() {
   const { mapId } = useParams()
@@ -79,6 +80,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/billing" element={<BillingPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/team" element={<TeamMembersPage />} />
                 <Route path="/mindmap" element={<MindmapCanvas />} />
                 <Route path="/todos" element={<TodoDashboard />} />
                 <Route path="/maps/:mapId" element={<MapPageWrapper />} />
