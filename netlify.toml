@@ -1,13 +1,7 @@
 [build]
   command   = "npm run build"
-  publish   = "build"
+  publish   = "dist"
   functions = "netlify/functions"
-
-[dev]
-  framework   = "vite"
-  publish     = "dist"
-  functions   = "netlify/functions"
-  targetPort  = 5173
 
 [[redirects]]
   from   = "/*"
