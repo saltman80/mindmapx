@@ -3,40 +3,40 @@ const features = [
     title: 'Mind Mapping',
     description:
       'Visualize your ideas with dynamic, draggable mind maps that expand as you think.',
-    icon: './assets/placeholder.svg',
+    icon: './assets/placeholder.png',
   },
   {
     title: 'Integrated To-Do Lists',
     description:
       'Link tasks to your mind map nodes and track progress effortlessly in one place.',
-    icon: './assets/placeholder.svg',
+    icon: './assets/placeholder.png',
   },
   {
     title: 'Real-Time Collaboration',
     description:
       'Work together with your team on interactive maps and task lists in real time.',
-    icon: './assets/placeholder.svg',
+    icon: './assets/placeholder.png',
   },
   {
     title: 'Cross-Platform Sync',
     description:
       'Access your projects on any device with instant syncing and offline support.',
-    icon: './assets/placeholder.svg',
+    icon: './assets/placeholder.png',
   },
   {
     title: 'AI Automation',
     description:
       'Let Mindxdo suggest tasks and connections so you can focus on the experience.',
-    icon: './assets/placeholder.svg',
+    icon: './assets/placeholder.png',
   },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(false)
   const heroImages = [
-    './assets/placeholder.svg',
-    './assets/placeholder.svg',
-    './assets/placeholder.svg',
+    './assets/placeholder.png',
+    './assets/placeholder.png',
+    './assets/placeholder.png',
   ]
   const [currentHero, setCurrentHero] = useState(0)
 
@@ -148,7 +148,7 @@ const Homepage: React.FC = (): JSX.Element => {
           Map your ideas visually while keeping tasks in focus.
         </div>
         <img
-          src="./assets/placeholder.svg"
+          src="./assets/placeholder.png"
           alt="Two column placeholder"
           className="banner-image"
         />
@@ -175,7 +175,7 @@ const Homepage: React.FC = (): JSX.Element => {
           Mindxdo helps you execute ambitious plans with ease.
         </p>
         <img
-          src="./assets/placeholder.svg"
+          src="./assets/placeholder.png"
           alt="AI showcase"
           className="banner-image"
         />
