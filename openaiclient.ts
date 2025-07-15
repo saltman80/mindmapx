@@ -1,4 +1,6 @@
-const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-3.5-turbo'
+import { Configuration, OpenAIApi, type CreateChatCompletionRequest } from 'openai'
+
+const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
 const DEFAULT_TEMPERATURE = parseFloat(process.env.OPENAI_DEFAULT_TEMPERATURE ?? '0.7')
 const DEFAULT_MAX_TOKENS = parseInt(process.env.OPENAI_DEFAULT_MAX_TOKENS ?? '256', 10)
 

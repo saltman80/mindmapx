@@ -33,12 +33,14 @@ export default function DashboardPage(): JSX.Element {
     title: '',
     description: '',
   })
+  const [aiPrompt, setAiPrompt] = useState<string>('')
 
   const modalRef = useRef<HTMLDivElement | null>(null)
 
   const openCreateModal = useCallback((type: 'map' | 'todo') => {
     setCreateType(type)
     setFormData({ title: '', description: '' })
+    setAiPrompt('')
     setShowModal(true)
   }, [])
 
@@ -179,6 +181,30 @@ export default function DashboardPage(): JSX.Element {
         body: JSON.stringify(formData),
       })
       if (!res.ok) throw new Error('Failed to create ' + createType)
+      closeCreateModal()
+      await fetchSummary()
+      if (activeTab === (createType === 'map' ? 'maps' : 'todos')) {
+        fetchItems(activeTab)
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error')
+    }
+  }
+
+  async function handleAICreate(): Promise<void> {
+    if (!aiPrompt.trim()) return
+    try {
+      const endpoint =
+        createType === 'map'
+          ? '/.netlify/functions/ai-create-mindmap'
+          : '/.netlify/functions/ai-create-todo'
+      const body = { ...formData, prompt: aiPrompt }
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error('Failed to generate ' + createType)
       closeCreateModal()
       await fetchSummary()
       if (activeTab === (createType === 'map' ? 'maps' : 'todos')) {
@@ -342,11 +368,28 @@ export default function DashboardPage(): JSX.Element {
                   rows={3}
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="aiPrompt">AI Prompt (optional)</label>
+                <textarea
+                  id="aiPrompt"
+                  name="aiPrompt"
+                  value={aiPrompt}
+                  onChange={e => setAiPrompt(e.target.value)}
+                  rows={2}
+                />
+              </div>
               <div className="form-actions">
                 <button type="button" onClick={closeCreateModal}>
                   Cancel
                 </button>
                 <button type="submit">Create</button>
+                <button
+                  type="button"
+                  onClick={handleAICreate}
+                  className="ai-button"
+                >
+                  Create with AI
+                </button>
               </div>
             </form>
           </div>
