@@ -12,9 +12,8 @@
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
     "build": "npm run migrate && vite build",
     "preview": "vite preview",
-    "migrate": "node --loader ts-node/esm runmigrations.ts",
-    "start": "npm run dev",
-    "test": "jest"
+    "migrate": "ts-node runmigrations.ts",
+    "start": "npm run dev"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
