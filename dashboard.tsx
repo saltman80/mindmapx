@@ -233,6 +233,11 @@ export default function DashboardPage(): JSX.Element {
   return (
     <div className="dashboard-page">
       <h1 className="dashboard-title">Dashboard</h1>
+      <img
+        src="./assets/dashboard.png"
+        alt="Dashboard banner"
+        className="dashboard-banner mb-4"
+      />
       {summaryLoading ? (
         <LoadingSkeleton count={3} />
       ) : summaryError ? (
