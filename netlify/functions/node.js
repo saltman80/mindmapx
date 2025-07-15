@@ -1,10 +1,5 @@
-const { Pool } = require('pg')
-const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL || process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production'
-    ? { rejectUnauthorized: true, ca: process.env.NEON_DATABASE_CA }
-    : { rejectUnauthorized: false }
-})
+import { getClient } from './db-client.js'
+const client = getClient()
 
 const buildResponse = (statusCode, payload) => {
   const headers = {
@@ -17,7 +12,7 @@ const buildResponse = (statusCode, payload) => {
 }
 
 async function createNode(data) {
-  const res = await pool.query(
+  const res = await client.query(
     'INSERT INTO nodes(data) VALUES($1) RETURNING *',
     [data]
   )
@@ -25,7 +20,7 @@ async function createNode(data) {
 }
 
 async function updateNode(id, updates) {
-  const res = await pool.query(
+  const res = await client.query(
     'UPDATE nodes SET data = data || $2 WHERE id = $1 RETURNING *',
     [id, updates]
   )
@@ -33,14 +28,14 @@ async function updateNode(id, updates) {
 }
 
 async function deleteNode(id) {
-  const res = await pool.query(
+  const res = await client.query(
     'DELETE FROM nodes WHERE id = $1 RETURNING *',
     [id]
   )
   return res.rows[0]
 }
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return buildResponse(204, {})
   }
@@ -62,7 +57,7 @@ exports.handler = async (event) => {
 
     switch (method) {
       case 'GET': {
-        const res = await pool.query('SELECT id, data FROM nodes')
+        const res = await client.query('SELECT id, data FROM nodes')
         return buildResponse(200, { nodes: res.rows })
       }
       case 'POST': {
