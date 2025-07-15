@@ -1,3 +1,9 @@
+import fs from 'fs'
+import path from 'path'
+import { getClient } from './netlify/functions/db-client'
+
+const pool = getClient()
+
 function splitSql(sql: string): string[] {
   return sql
     .split(/;\s*(?:\r?\n|$)/)
