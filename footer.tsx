@@ -1,4 +1,4 @@
-const BRAND_NAME = 'PlanScaler Mindmap Tools';
+const BRAND_NAME = 'Mindxdo';
 const CURRENT_YEAR = new Date().getFullYear();
 const FOOTER_LINKS = [
   { label: 'GitHub', href: 'https://github.com/your-org/plan-scaler-mindmap-tools', external: true },

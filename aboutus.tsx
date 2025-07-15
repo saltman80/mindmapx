@@ -32,24 +32,23 @@ export function AboutUs(): JSX.Element {
       }`}
     >
       <img
-        src="/images/about-banner.png"
+        src="https://placehold.co/1200x400/png"
         alt="About us banner"
         className="about-banner mb-6"
       />
       <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 text-center">
-        About Mindmap ? Todo
+        About Mindxdo
       </h2>
       <p className="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto">
-        Mindmap ? Todo is the ultimate productivity suite that merges visual brainstorming
-        with robust task management. Whether you're planning a project, mapping out ideas,
-        or keeping track of daily tasks, our platform adapts to your workflow and helps you
-        stay organized.
+        Mindxdo is the ultimate productivity suite that merges visual mindmapping with
+        intelligent todo automation. Whether you're sketching a grand vision or tracking
+        daily tasks, Mindxdo adapts to your workflow so you stay organized with ease.
       </p>
       <p className="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto">
         Founded by productivity enthusiasts, our mission is to empower individuals and teams
         to bring clarity to their work, foster collaboration, and achieve goals with confidence.
         Join thousands of users who have transformed their ideas into actionable plans
-        with Mindmap ? Todo.
+        with Mindxdo ? the X stands for experience.
       </p>
 
       <section className="two-column">
@@ -57,7 +56,7 @@ export function AboutUs(): JSX.Element {
           Seamlessly bridge brainstorming and execution with our intuitive tools.
         </div>
         <img
-          src="/images/about-section.png"
+          src="https://placehold.co/800x600/png"
           alt="Product screenshot"
           className="banner-image"
         />

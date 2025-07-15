@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
       </a>
       <header className="layout-header">
         <div className="layout-header-inner">
-          <h1 className="layout-logo">PlanScaler MindMap</h1>
+          <h1 className="layout-logo">Mindxdo</h1>
           <button
             type="button"
             ref={buttonRef}
@@ -98,7 +98,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
       </main>
       <footer className="layout-footer">
         <div className="layout-footer-inner">
-          &copy; {new Date().getFullYear()} PlanScaler MindMap. All rights reserved.
+          &copy; {new Date().getFullYear()} Mindxdo. All rights reserved.
         </div>
       </footer>
     </div>
