@@ -1,4 +1,6 @@
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { z } from 'zod'
 const client = getClient()
 
 type Todo = {

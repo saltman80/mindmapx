@@ -1,3 +1,7 @@
+import type { Handler } from '@netlify/functions'
+import { getClient } from './db-client.js'
+import { z, ZodError } from 'zod'
+import jwt from 'jsonwebtoken'
 const querySchema = z.object({
   id: z.string().uuid().optional(),
   skip: z.preprocess(val => val ? parseInt(val as string, 10) : undefined, z.number().int().nonnegative().optional()),
@@ -10,6 +14,8 @@ const updateSchema = z.object({
   name: z.string().optional(),
   role: z.enum(['user', 'admin']).optional(),
 })
+
+const db = getClient()
 
 export const handler: Handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' }

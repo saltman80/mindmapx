@@ -1,4 +1,7 @@
+import type { Handler } from '@netlify/functions'
 import { verifySignature } from '../stripeclient.js'
+import Stripe from 'stripe'
+import type { Client } from 'pg'
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 if (!stripeSecret) {
   throw new Error('Missing STRIPE_SECRET_KEY environment variable.')

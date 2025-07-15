@@ -14,8 +14,18 @@ if (!global.resetRateLimitMap) {
   global.resetRateLimitMap = new Map()
 }
 
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { sql } from '@vercel/postgres'
+import { randomBytes } from 'crypto'
+import bcrypt from 'bcrypt'
+import { z } from 'zod'
 const db = getClient()
+
+async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }): Promise<void> {
+  // Placeholder for email sending implementation
+  console.log('Send email to', to)
+}
 
 const headers = {
   "Access-Control-Allow-Origin": "*",

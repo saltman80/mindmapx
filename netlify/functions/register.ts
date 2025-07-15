@@ -1,3 +1,8 @@
+import type { Handler } from '@netlify/functions'
+import { getClient } from './db-client.js'
+import { hash } from 'bcrypt'
+import { sign } from 'jsonwebtoken'
+import { z } from 'zod'
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) {
   throw new Error('Missing JWT_SECRET environment variable')
@@ -11,6 +16,8 @@ const SALT_ROUNDS = Number.parseInt(SALT_ROUNDS_RAW, 10)
 if (Number.isNaN(SALT_ROUNDS) || SALT_ROUNDS < 4 || SALT_ROUNDS > 20) {
   throw new Error('Invalid SALT_ROUNDS environment variable, must be integer between 4 and 20')
 }
+
+const client = getClient()
 
 const RegisterSchema = z.object({
   email: z.string().trim().email().transform(e => e.toLowerCase()),

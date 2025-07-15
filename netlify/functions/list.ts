@@ -1,4 +1,7 @@
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { z, ZodError } from 'zod'
+import jwt from 'jsonwebtoken'
 const db = getClient()
 
 const MAX_PAGE = 100

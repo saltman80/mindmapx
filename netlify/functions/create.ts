@@ -1,4 +1,8 @@
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { verifyToken } from '../jwtservice.js'
+import { createMindMapSchema } from '../validationschemas.js'
+import { z, ZodError } from 'zod'
 
 const db = getClient()
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET']
