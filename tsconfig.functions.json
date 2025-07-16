@@ -2,13 +2,12 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "nodenext",
-    "moduleResolution": "Node16",
-    "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "outDir": "dist/netlify/functions",
     "rootDir": "netlify/functions",
-    "types": ["node"],
+    // ensure imports include extensions and support Netlify functions
+    "types": ["node", "@netlify/functions"],
     "typeRoots": [
       "node_modules/@types",
       "node_modules"
