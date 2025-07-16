@@ -1,6 +1,6 @@
 [build]
-  command   = "npm install --include=dev && npm run compile && npm run compile:functions && npm run migrate && vite build"
-  publish   = "dist"
+  command = "npm install --include=dev && npm run build"
+  publish = "dist"
   functions = "netlify/functions"
 
 [context.production.environment]
