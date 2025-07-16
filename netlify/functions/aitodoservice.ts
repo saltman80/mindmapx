@@ -40,11 +40,18 @@ function initTodoService(apiKey: string) {
         }
       }
       if (!Array.isArray(todosRaw)) throw new Error('AI response is not an array')
-      return todosRaw.map((t: any) => ({
-        id: typeof t.id === 'string' ? t.id : randomUUID(),
-        title: typeof t.title === 'string' ? t.title : String(t.title),
-        completed: typeof t.completed === 'boolean' ? t.completed : Boolean(t.completed)
+      const rows = todosRaw as any[]
+      const todos: Todo[] = rows.map(r => ({
+        id: typeof r.id === 'string' ? r.id : randomUUID(),
+        title: typeof r.title === 'string' ? r.title : String(r.title),
+        completed: typeof r.completed === 'boolean' ? r.completed : Boolean(r.completed),
+        user_id: r.user_id,
+        description: r.description,
+        assignee_id: r.assignee_id,
+        created_at: r.created_at instanceof Date ? r.created_at.toISOString() : new Date(r.created_at).toISOString(),
+        updated_at: r.updated_at instanceof Date ? r.updated_at.toISOString() : new Date(r.updated_at).toISOString(),
       }))
+      return todos
     }
   }
 }

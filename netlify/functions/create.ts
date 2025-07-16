@@ -51,21 +51,17 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  let title: string
-  let description: string
-  try {
-    ({ title, description } = JSON.parse(event.body!) as {
-      title: string
-      description: string
-    })
-  } catch {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
-  }
-
   let data: { title: string; description: string }
   try {
+    const { title, description } = JSON.parse(event.body!) as {
+      title: string
+      description: string
+    }
     data = createMindMapSchema.parse({ title, description })
   } catch (err) {
+    if (err instanceof SyntaxError) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
+    }
     if (err instanceof ZodError) {
       return {
         statusCode: 400,
