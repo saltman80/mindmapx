@@ -24,7 +24,7 @@ export async function runMigrations(): Promise<void> {
         run_on TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `)
-    const files = (await fs.readdir(migrationsDir))
+    const files = fs.readdirSync(migrationsDir)
       .filter((file: string) => file.endsWith('.sql'))
       .sort((a: string, b: string) => {
         const pa = parseInt(a.split('_')[0], 10)
@@ -37,7 +37,7 @@ export async function runMigrations(): Promise<void> {
     for (const file of files) {
       if (applied.has(file)) continue
       const filePath = path.join(migrationsDir, file)
-      const sql = await fs.readFile(filePath, 'utf8')
+      const sql = fs.readFileSync(filePath, 'utf8')
       const statements = splitSql(sql)
       await client.query('BEGIN')
       try {
@@ -46,6 +46,7 @@ export async function runMigrations(): Promise<void> {
         }
         await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
         await client.query('COMMIT')
+        console.log(`Applied ${file}`)
       } catch (err) {
         try { await client.query('ROLLBACK') } catch {}
         throw err
@@ -54,6 +55,7 @@ export async function runMigrations(): Promise<void> {
   } finally {
     try { await client.query('SELECT pg_advisory_unlock($1)', [LOCK_KEY]) } catch {}
     client.release()
+    await pool.end()
   }
 }
 
