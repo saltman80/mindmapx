@@ -1,6 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { randomBytes, createHmac } from 'crypto'
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from './db-client.js'
 const {
   DATABASE_URL,
   FRONTEND_URL,

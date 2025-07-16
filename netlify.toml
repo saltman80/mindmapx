@@ -1,7 +1,7 @@
 [build]
-  command = "npm install && npm run compile:migrations && npm run compile:functions && npm run migrate && vite build"
-  functionsDirectory = "dist/netlify/functions"
-  publish = "dist"
+  command   = "npm install && npm run compile:migrations && npm run compile:functions && npm run migrate && vite build"
+  publish   = "dist"
+  functions = "dist/netlify/functions"
 
 [context.production.environment]
   NPM_FLAGS = "--include=dev"
