@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import type { Pool } from 'pg'
 import { verify } from 'jsonwebtoken'
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from '../netlify/functions/db-client'
 
 const { DATABASE_URL, JWT_SECRET } = process.env
 if (!DATABASE_URL) {

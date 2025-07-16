@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { verifySignature } from '../stripeclient.js'
+import { verifySignature } from '../stripeclient'
 import Stripe from 'stripe'
 import type { Client } from 'pg'
 const stripeSecret = process.env.STRIPE_SECRET_KEY
@@ -23,7 +23,7 @@ declare global {
   var _dbClient: Client | undefined
 }
 
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from '../netlify/functions/db-client'
 const db: Client = getClient()
 
 export const handler: Handler = async (event) => {
