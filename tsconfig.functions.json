@@ -1,15 +1,13 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "ESNext",
     "moduleResolution": "node16",
-    "target": "ES2020",
-    "rootDir": "netlify/functions",
     "outDir": "dist/netlify/functions",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "declaration": true,
+    "declarationMap": true
   },
-  "include": ["netlify/functions/**/*"]
+  "include": ["netlify/functions/**/*.ts"]
 }

@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from './db-client.js'
 
 const db = getClient()
 const openaiKey = process.env.OPENAI_API_KEY

@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from './db-client.js'
 import { hash } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { z } from 'zod'
