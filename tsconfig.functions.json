@@ -13,8 +13,7 @@
       "uuid",
       "jsonwebtoken",
       "pg",
-      "stripe",
-      "zod"
+      "stripe"
     ],
     "typeRoots": [
       "node_modules/@types",
