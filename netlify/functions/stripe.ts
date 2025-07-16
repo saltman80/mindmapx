@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { verifySignature } from '../stripeclient.js'
 import Stripe from 'stripe'
 import type { Client } from 'pg'
@@ -23,7 +23,7 @@ declare global {
   var _dbClient: Client | undefined
 }
 
-import { getClient } from './db-client.js'
+import { getClient } from '../netlify/functions/db-client.js'
 const db: Client = getClient()
 
 export const handler: Handler = async (event) => {

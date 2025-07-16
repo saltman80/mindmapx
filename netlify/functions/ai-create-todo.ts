@@ -1,9 +1,9 @@
-import type { Handler } from '@netlify/functions'
-import { Configuration, OpenAIApi } from 'openai'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import OpenAI from 'openai'
 
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
-const openai = new OpenAIApi(new Configuration({ apiKey: openaiKey }))
+const openai = new OpenAI({ apiKey: openaiKey })
 const MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
 
 export const handler: Handler = async (event) => {

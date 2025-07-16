@@ -1,7 +1,7 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import sgMail from '@sendgrid/mail'
 import { randomBytes, createHmac } from 'crypto'
-import { getClient } from './db-client.js'
+import { getClient } from '../netlify/functions/db-client.js'
 const {
   DATABASE_URL,
   SENDGRID_API_KEY,

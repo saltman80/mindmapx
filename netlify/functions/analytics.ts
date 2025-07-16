@@ -1,3 +1,8 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { Pool } from 'pg'
+import { verify } from 'jsonwebtoken'
+import { getClient } from '../netlify/functions/db-client.js'
+
 const { DATABASE_URL, JWT_SECRET } = process.env
 if (!DATABASE_URL) {
   throw new Error('Missing environment variable: DATABASE_URL')
@@ -9,11 +14,6 @@ if (!JWT_SECRET) {
 declare global {
   var __dbPool: Pool | undefined
 }
-
-import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Pool } from 'pg'
-import { verify } from 'jsonwebtoken'
-import { getClient } from './db-client.js'
 const pool = getClient()
 
 const CORS_HEADERS = {

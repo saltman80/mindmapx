@@ -1,5 +1,5 @@
-import type { Handler } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import { getClient } from '../netlify/functions/db-client.js'
 import { verifyToken } from '../jwtservice.js'
 import { createMindMapSchema } from '../validationschemas.js'
 import { z, ZodError } from 'zod'

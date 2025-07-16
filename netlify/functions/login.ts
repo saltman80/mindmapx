@@ -1,13 +1,13 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import { getClient } from '../netlify/functions/db-client.js'
+import { z, ZodError } from 'zod'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+
 const { DATABASE_URL, JWT_SECRET } = process.env
 if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
 }
-
-import type { Handler } from '@netlify/functions'
-import { getClient } from './db-client.js'
-import { z, ZodError } from 'zod'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 const pool = { query: (...args) => getClient().query(...args) }
 
 const loginSchema = z.object({

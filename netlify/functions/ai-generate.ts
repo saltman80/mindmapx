@@ -1,5 +1,6 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { createPool } from '@vercel/postgres'
-import { Configuration, OpenAIApi } from 'openai'
+import OpenAI from 'openai'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -9,7 +10,7 @@ const pool = createPool(databaseUrl)
 
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
-const openai = new OpenAIApi(new Configuration({ apiKey: openaiKey }))
+const openai = new OpenAI({ apiKey: openaiKey })
 
 const DEFAULT_MODEL = 'gpt-3.5-turbo'
 const DEFAULT_MAX_TOKENS = 150
@@ -30,7 +31,10 @@ const todosResponseSchema = z.array(todoItemSchema).max(50)
 
 const headers = { 'Content-Type': 'application/json' }
 
-export const handler = async (event: any, context: any) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  context: HandlerContext
+) => {
   try {
     const user = context.clientContext?.user
     if (!user) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
