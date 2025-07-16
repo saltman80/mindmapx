@@ -66,7 +66,7 @@ export const handler = async (
     }
   }
   try {
-    const path = event.rawPath || event.path || ''
+    const path = event.path || ''
     const parts = path.split('/').filter(Boolean)
     const idx = parts.findIndex(p => p === 'update')
     const resource = parts[idx + 1]

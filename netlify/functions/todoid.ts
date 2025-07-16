@@ -108,7 +108,7 @@ export const handler: Handler = async (event, context) => {
       }
     }
     const userId = identity.sub
-    const todoId = (event.rawPath || '').split('/').pop()!
+    const todoId = (event.path || '').split('/').pop()!
     if (!todoId) {
       return {
         statusCode: 400,

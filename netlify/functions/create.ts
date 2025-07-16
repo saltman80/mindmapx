@@ -51,10 +51,13 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  let title: string = ''
-  let description: string = ''
+  let title: string
+  let description: string
   try {
-    ;({ title = '', description = '' } = JSON.parse(event.body || '{}'))
+    ({ title, description } = JSON.parse(event.body!) as {
+      title: string
+      description: string
+    })
   } catch {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
   }

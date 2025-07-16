@@ -1,5 +1,9 @@
-import { createClient } from "@netlify/neon";
-let client;
-export function getClient() {
-  return client ?? (client = createClient(process.env.NETLIFY_DATABASE_URL));
+import { Pool } from 'pg'
+
+export const pool = new Pool({
+  connectionString: process.env.NETLIFY_DATABASE_URL,
+})
+
+export async function getClient() {
+  return await pool.connect()
 }
