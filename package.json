@@ -10,9 +10,9 @@
     "dev:web": "vite",
     "dev:api": "netlify functions:serve --port=8888",
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
-    "compile": "tsc -p tsconfig.migrations.json",
+    "compile:migrations": "tsc -p tsconfig.migrations.json",
     "compile:functions": "tsc -p tsconfig.functions.json",
-    "build": "npm run compile && npm run compile:functions && node dist/runmigrations.js && vite build",
+    "build": "npm run compile:migrations && npm run compile:functions && npm run migrate && vite build",
     "preview": "vite preview",
     "migrate": "node dist/runmigrations.js",
     "start": "npm run dev"

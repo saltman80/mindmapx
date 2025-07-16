@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "es2020",
-    "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist/netlify/functions",
+    "rootDir": "netlify/functions"
   },
-  "include": ["runmigrations.ts", "netlify/functions/**/*.ts"]
+  "include": ["netlify/functions/**/*.ts"]
 }
