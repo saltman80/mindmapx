@@ -1,12 +1,12 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { createPool } from '@vercel/postgres'
+import { createClient } from '@vercel/postgres'
 import OpenAI from 'openai'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 
-const databaseUrl = process.env.DATABASE_URL
-if (!databaseUrl) throw new Error('Missing DATABASE_URL')
-const pool = createPool(databaseUrl)
+const databaseUrl = process.env.NETLIFY_DATABASE_URL_UNPOOLED
+if (!databaseUrl) throw new Error('Missing NETLIFY_DATABASE_URL_UNPOOLED')
+const pool = createClient({ connectionString: databaseUrl })
 
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
