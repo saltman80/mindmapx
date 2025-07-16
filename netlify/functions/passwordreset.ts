@@ -1,6 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
-import { sql } from '@vercel/postgres'
+import { pool } from './db-client.js'
+
 import { randomBytes } from 'crypto'
 
 const SITE_URL = process.env.SITE_URL
@@ -34,7 +34,7 @@ export const handler: Handler = async (event, _context) => {
   }
 
   try {
-    const db = await getClient()
+    const db = pool
     try {
       if (event.httpMethod === "POST") {
       let parsedBody: any
@@ -83,14 +83,16 @@ export const handler: Handler = async (event, _context) => {
       global.resetRateLimitMap.set(ip, rl)
 
       const { rows } = await db.query(
-        sql`SELECT id FROM users WHERE email = ${email}`
+        'SELECT id FROM users WHERE email = $1',
+        [email]
       )
       if (rows.length > 0) {
         const userId = rows[0].id
         const token = randomBytes(32).toString("hex")
         const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString()
         await db.query(
-          sql`INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (${userId}, ${token}, ${expiresAt})`
+          'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+          [userId, token, expiresAt]
         )
         const resetLink = `${SITE_URL}/reset-password?token=${token}`
         const html = `<p>You requested a password reset. Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 1 hour.</p>`
@@ -133,16 +135,17 @@ export const handler: Handler = async (event, _context) => {
 
       // start transaction for atomic check-and-update with row lock
       try {
-        await db.query(sql`BEGIN`)
+        await db.query('BEGIN')
         const { rows } = await db.query(
-          sql`SELECT user_id, expires_at, used FROM password_reset_tokens WHERE token = ${token} FOR UPDATE`
+          'SELECT user_id, expires_at, used FROM password_reset_tokens WHERE token = $1 FOR UPDATE',
+          [token]
         )
         if (
           rows.length === 0 ||
           rows[0].used ||
           new Date(String(rows[0].expires_at)) < new Date()
         ) {
-          await db.query(sql`ROLLBACK`)
+          await db.query('ROLLBACK')
           return {
             statusCode: 400,
             headers,
@@ -153,14 +156,16 @@ export const handler: Handler = async (event, _context) => {
         const userId = rows[0].user_id
         const hashedPassword = await bcrypt.hash(password, 10)
         await db.query(
-          sql`UPDATE users SET password_hash = ${hashedPassword} WHERE id = ${userId}`
+          'UPDATE users SET password_hash = $1 WHERE id = $2',
+          [hashedPassword, userId]
         )
         await db.query(
-          sql`UPDATE password_reset_tokens SET used = true WHERE token = ${token}`
+          'UPDATE password_reset_tokens SET used = true WHERE token = $1',
+          [token]
         )
-        await db.query(sql`COMMIT`)
+        await db.query('COMMIT')
       } catch (err) {
-        await db.query(sql`ROLLBACK`)
+        await db.query('ROLLBACK')
         throw err
       }
 
@@ -179,7 +184,7 @@ export const handler: Handler = async (event, _context) => {
       }
     }
     } finally {
-      db.release()
+      db.end()
     }
   } catch (err) {
     console.error("Password reset error:", err)
