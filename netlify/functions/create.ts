@@ -53,11 +53,16 @@ export const handler: Handler = async (event) => {
 
   let data: { title: string; description: string }
   try {
-    const { title, description } = JSON.parse(event.body!) as {
-      title: string
-      description: string
+    const parsed = JSON.parse(event.body ?? '{}') as {
+      title?: string
+      description?: string
     }
-    data = createMindMapSchema.parse({ title, description })
+    const { title, description } = parsed
+    if (!title) throw new Error('Missing required field: title')
+    if (!description) throw new Error('Missing required field: description')
+    const payload: { title: string; description: string } = { title, description }
+    createMindMapSchema.parse(payload)
+    data = payload
   } catch (err) {
     if (err instanceof SyntaxError) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
@@ -67,6 +72,13 @@ export const handler: Handler = async (event) => {
         statusCode: 400,
         headers,
         body: JSON.stringify({ error: err.errors })
+      }
+    }
+    if (err instanceof Error && err.message.startsWith('Missing required field')) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: err.message })
       }
     }
     console.error(err)
