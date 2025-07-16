@@ -1,5 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["runmigrations.ts"],
-  "exclude": ["netlify/functions", "node_modules"]
+  "include": ["runmigrations.ts", "netlify/functions/db-client.ts"]
 }
