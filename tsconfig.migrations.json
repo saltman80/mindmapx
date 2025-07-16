@@ -1,7 +1,11 @@
 {
-  "extends": "./tsconfig.json",
-  "include": [
-    "runmigrations.ts",
-    "netlify/functions/db-client.ts"
-  ]
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2020",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["runmigrations.ts", "migrations/**/*.sql"]
 }

@@ -1,7 +1,7 @@
 import { Pool } from 'pg'
 
-const conn = process.env.NETLIFY_DATABASE_URL
-if (!conn) throw new Error('Missing NETLIFY_DATABASE_URL')
+const conn = process.env.NETLIFY_DATABASE_URL_UNPOOLED
+if (!conn) throw new Error('Missing NETLIFY_DATABASE_URL_UNPOOLED')
 
 export const pool = new Pool({
   connectionString: conn,
