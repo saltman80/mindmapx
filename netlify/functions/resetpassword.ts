@@ -2,7 +2,6 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { createHash } from 'crypto'
 import bcrypt from 'bcrypt'
-const db = getClient()
 
 const MAX_TOKEN_ATTEMPTS = 5
 const TOKEN_WINDOW_MS = 15 * 60 * 1000
@@ -21,7 +20,8 @@ async function validateResetToken(token: string): Promise<string | null> {
     }
   }
   const hashedToken = createHash('sha256').update(token).digest('hex')
-  const { rows } = await db.query(
+  const client = await getClient()
+  const { rows } = await client.query(
     'SELECT user_id, expires_at FROM password_reset_tokens WHERE token_hash = $1',
     [hashedToken]
   )
@@ -36,27 +36,32 @@ async function validateResetToken(token: string): Promise<string | null> {
   tokenAttempts.delete(token)
   const { user_id, expires_at } = rows[0]
   if (new Date(expires_at) < new Date()) {
-    await db.query('DELETE FROM password_reset_tokens WHERE token_hash = $1', [hashedToken])
+    await client.query('DELETE FROM password_reset_tokens WHERE token_hash = $1', [hashedToken])
+    client.release()
     return null
   }
+  client.release()
   return user_id
 }
 
 async function updatePassword(userId: string, newPassword: string): Promise<void> {
   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10)
   const passwordHash = await bcrypt.hash(newPassword, saltRounds)
+  const client = await getClient()
   try {
-    await db.query('BEGIN')
-    const result = await db.query(
+    await client.query('BEGIN')
+    const result = await client.query(
       'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
       [passwordHash, userId]
     )
     if (result.rowCount === 0) throw new Error('User not found')
-    await db.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId])
-    await db.query('COMMIT')
+    await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId])
+    await client.query('COMMIT')
   } catch (err) {
-    await db.query('ROLLBACK')
+    await client.query('ROLLBACK')
     throw err
+  } finally {
+    client.release()
   }
 }
 

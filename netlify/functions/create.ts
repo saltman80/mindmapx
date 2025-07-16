@@ -3,8 +3,6 @@ import { getClient } from './db-client.js'
 import { verifyToken } from './jwtservice.js'
 import { createMindMapSchema } from './validationschemas.js'
 import { z, ZodError } from 'zod'
-
-const db = getClient()
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET']
 REQUIRED_ENV.forEach((name) => {
   if (!process.env[name]) {
@@ -82,6 +80,8 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ error: 'Internal Server Error' })
     }
   }
+
+  const db = await getClient()
 
   try {
     const result = await db.query(

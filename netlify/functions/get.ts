@@ -8,8 +8,6 @@ if (!jwtSecret) {
   throw new Error('JWT_SECRET environment variable is not set')
 }
 
-const db = getClient()
-
 const QuerySchema = z.object({
   mapId: z.string().uuid().optional(),
   completed: z.preprocess(
@@ -60,6 +58,7 @@ export const handler: Handler = async (event, context) => {
     }
 
     const userId = decoded.userId
+    const db = await getClient()
     const queryParams = QuerySchema.parse(event.queryStringParameters || {})
 
     let sql = `

@@ -1,13 +1,13 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 
-const db = getClient()
-
 export const handler: Handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false
   let dbHealthy = false
   try {
+    const db = await getClient()
     await db.query('SELECT 1')
+    db.release()
     dbHealthy = true
   } catch (error) {
     console.error('Healthcheck DB error:', error)

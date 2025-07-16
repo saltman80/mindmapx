@@ -1,21 +1,27 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import { withCors } from './corsmiddleware.js'
+import { cors } from './corsmiddleware.js'
+import type { Todo } from './types.js'
 
 function initTodoService(apiKey: string) {
   const openai = new OpenAI({ apiKey })
   return {
     generateTodos: async (prompt: string): Promise<Todo[]> => {
+      const baseMessages = [
+        { role: 'system', content: 'You generate todo lists.' },
+        {
+          role: 'user',
+          content: `Generate a JSON array of todos with fields id (uuid), title (string), and completed (boolean) for this request: "${prompt}". Return valid JSON only.`
+        }
+      ]
       const completion = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: 'You generate todo lists.' },
-          {
-            role: 'user',
-            content: `Generate a JSON array of todos with fields id (uuid), title (string), and completed (boolean) for this request: "${prompt}". Return valid JSON only.`
-          }
-        ],
+        messages: baseMessages.map(m => ({
+          role: m.role as any,
+          content: m.content,
+          name: (m as any).name ?? undefined
+        })),
         temperature: 0.7,
         max_tokens: 200
       })
@@ -49,7 +55,7 @@ if (!API_KEY) {
 }
 const todoService = initTodoService(API_KEY)
 
-export const handler: Handler = withCors(async (event) => {
+export const handler: Handler = cors(async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,

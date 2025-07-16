@@ -1,5 +1,4 @@
 import { getClient } from './db-client.js'
-const client = getClient()
 
 const buildResponse = (statusCode, payload) => {
   const headers = {
@@ -12,26 +11,32 @@ const buildResponse = (statusCode, payload) => {
 }
 
 async function createNode(data) {
+  const client = await getClient()
   const res = await client.query(
     'INSERT INTO nodes(data) VALUES($1) RETURNING *',
     [data]
   )
+  client.release()
   return res.rows[0]
 }
 
 async function updateNode(id, updates) {
+  const client = await getClient()
   const res = await client.query(
     'UPDATE nodes SET data = data || $2 WHERE id = $1 RETURNING *',
     [id, updates]
   )
+  client.release()
   return res.rows[0]
 }
 
 async function deleteNode(id) {
+  const client = await getClient()
   const res = await client.query(
     'DELETE FROM nodes WHERE id = $1 RETURNING *',
     [id]
   )
+  client.release()
   return res.rows[0]
 }
 
@@ -57,7 +62,9 @@ export const handler = async (event) => {
 
     switch (method) {
       case 'GET': {
-        const res = await client.query('SELECT id, data FROM nodes')
+        const db = await getClient()
+        const res = await db.query('SELECT id, data FROM nodes')
+        db.release()
         return buildResponse(200, { nodes: res.rows })
       }
       case 'POST': {

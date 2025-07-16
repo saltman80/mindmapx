@@ -24,7 +24,6 @@ declare global {
 }
 
 import { getClient } from './db-client.js'
-const db: Client = getClient()
 
 export const handler: Handler = async (event) => {
   const sig = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
@@ -45,6 +44,8 @@ export const handler: Handler = async (event) => {
     console.error('Webhook signature verification failed.', err.message)
     return { statusCode: 400, body: `Webhook Error: ${err.message}` }
   }
+
+  const db = await getClient()
 
   try {
     const insertResult = await db.query(

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "Node16",
     "moduleResolution": "node16",
     "outDir": "dist/netlify/functions",
     "esModuleInterop": true,

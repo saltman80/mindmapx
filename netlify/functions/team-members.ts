@@ -3,8 +3,6 @@ import { getClient } from './db-client.js'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 
-const db = getClient()
-
 const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -32,6 +30,8 @@ export const handler: Handler = async (event) => {
   } catch {
     return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
   }
+
+  const db = await getClient()
 
   if (event.httpMethod === 'GET') {
     const { rows } = await db.query(

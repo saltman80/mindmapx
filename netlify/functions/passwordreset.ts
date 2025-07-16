@@ -20,7 +20,6 @@ if (!global.resetRateLimitMap) {
 }
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
-const db = getClient()
 
 async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }): Promise<void> {
   // Placeholder for email sending implementation
@@ -40,6 +39,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    const db = await getClient()
     if (event.httpMethod === "POST") {
       let parsedBody: any
       try {

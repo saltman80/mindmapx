@@ -11,7 +11,9 @@ if (!DATABASE_URL) throw new Error('Missing DATABASE_URL')
 if (!FRONTEND_URL) throw new Error('Missing FRONTEND_URL')
 if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
 
-const pool = { query: (...args) => getClient().query(...args) }
+const pool = {
+  query: async (...args: any[]) => (await getClient()).query(...args)
+}
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -42,7 +44,7 @@ export const handler: Handler = async (event) => {
   }
 
   const normalizedEmail = email.toLowerCase().trim()
-  const client = getClient()
+  const client = await getClient()
 
   try {
     const userRes = await client.query('SELECT id FROM users WHERE email = $1', [normalizedEmail])
@@ -71,7 +73,7 @@ export const handler: Handler = async (event) => {
     console.error(err)
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) }
   } finally {
-    // no release needed for serverless client
+    client.release()
   }
 
   return {
