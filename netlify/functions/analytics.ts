@@ -1,5 +1,4 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Pool } from 'pg'
 import { verify } from 'jsonwebtoken'
 import { getClient } from './db-client.js'
 
@@ -11,10 +10,7 @@ if (!JWT_SECRET) {
   throw new Error('Missing environment variable: JWT_SECRET')
 }
 
-declare global {
-  var __dbPool: Pool | undefined
-}
-const pool = getClient()
+
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -67,6 +63,8 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       body: JSON.stringify({ success: false, error: 'Forbidden' })
     }
   }
+
+  const pool = await getClient()
 
   try {
     const { rows } = await pool.query(`

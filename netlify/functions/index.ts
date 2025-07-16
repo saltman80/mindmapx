@@ -2,7 +2,9 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
-const pool = { query: (...args) => getClient().query(...args) }
+const pool = {
+  query: async (...args: any[]) => (await getClient()).query(...args)
+}
 
 const mapInputSchema = z.object({
   data: z.record(z.any()),

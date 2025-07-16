@@ -79,7 +79,11 @@ export const handler: Handler = async (
 
     const completion = await openai.chat.completions.create({
       model: data.model,
-      messages,
+      messages: messages.map(m => ({
+        role: m.role as any,
+        content: m.content,
+        name: (m as any).name ?? undefined
+      })),
       max_tokens: data.maxTokens
     })
     const aiContent = completion.choices?.[0]?.message?.content

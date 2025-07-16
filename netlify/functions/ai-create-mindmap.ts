@@ -2,8 +2,6 @@ import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
 import { getClient } from './db-client.js'
-
-const db = getClient()
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
 const openai = new OpenAI({ apiKey: openaiKey })
@@ -18,7 +16,7 @@ export const handler: Handler = async (event) => {
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }
   const { title, description = '', prompt } = data
   if (typeof title !== 'string' || !title.trim()) return { statusCode: 400, body: 'Invalid title' }
-  const client = await db.connect()
+  const client = await getClient()
   try {
     await client.query('BEGIN')
     const res = await client.query(
@@ -28,15 +26,20 @@ export const handler: Handler = async (event) => {
     )
     const mapId = res.rows[0].id
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
+      const baseMessages = [
+        {
+          role: 'system',
+          content: 'Generate a JSON array of mind map node titles based on the user prompt.'
+        },
+        { role: 'user', content: prompt }
+      ]
       const completion = await openai.chat.completions.create({
         model: MODEL,
-        messages: [
-          {
-            role: 'system',
-            content: 'Generate a JSON array of mind map node titles based on the user prompt.'
-          },
-          { role: 'user', content: prompt }
-        ],
+        messages: baseMessages.map(m => ({
+          role: m.role as any,
+          content: m.content,
+          name: (m as any).name ?? undefined
+        })),
         max_tokens: 200
       })
       const text = completion.choices?.[0]?.message?.content

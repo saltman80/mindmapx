@@ -2,7 +2,6 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import jwt from 'jsonwebtoken'
-const db = getClient()
 
 const MAX_PAGE = 100
 
@@ -101,6 +100,7 @@ export const handler: Handler = async event => {
 
   const { page, limit, completed } = params
   const offset = (page - 1) * limit
+  const db = await getClient()
 
   const whereClauses = [
     '(user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1))'

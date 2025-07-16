@@ -16,12 +16,17 @@ export const handler: Handler = async (event) => {
   const { prompt } = data
   if (!prompt || typeof prompt !== 'string') return { statusCode: 400, body: 'Invalid prompt' }
   try {
+    const baseMessages = [
+      { role: 'system', content: 'Generate a JSON array of todo items with title and optional description.' },
+      { role: 'user', content: prompt }
+    ]
     const completion = await openai.chat.completions.create({
       model: MODEL,
-      messages: [
-        { role: 'system', content: 'Generate a JSON array of todo items with title and optional description.' },
-        { role: 'user', content: prompt }
-      ],
+      messages: baseMessages.map(m => ({
+        role: m.role as any,
+        content: m.content,
+        name: (m as any).name ?? undefined
+      })),
       max_tokens: 200
     })
     const text = completion.choices?.[0]?.message?.content

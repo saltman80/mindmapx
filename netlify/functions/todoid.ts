@@ -1,20 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z } from 'zod'
-const client = getClient()
-
-type Todo = {
-  id: string
-  user_id: string
-  title: string
-  description: string | null
-  completed: boolean
-  assignee_id: string | null
-  assignee_name?: string | null
-  assignee_email?: string | null
-  created_at: string
-  updated_at: string
-}
+import type { Todo } from './types.js'
 
 type TodoInput = {
   title?: string
@@ -35,6 +22,7 @@ const updateTodoSchema = z
   })
 
 async function getTodo(todoId: string, userId: string): Promise<Todo> {
+  const client = await getClient()
   const result = await client.query(
     `SELECT t.id, t.user_id, t.title, t.description, t.completed,
             t.assignee_id, t.created_at, t.updated_at,
@@ -47,7 +35,9 @@ async function getTodo(todoId: string, userId: string): Promise<Todo> {
   if (result.rowCount === 0) {
     throw new Error('NotFound')
   }
-  return result.rows[0]
+  const todo = result.rows[0]
+  client.release()
+  return todo
 }
 
 async function updateTodo(
@@ -83,21 +73,28 @@ async function updateTodo(
     WHERE id = $${idPos} AND user_id = $${userPos}
     RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at
   `
+  const client = await getClient()
   const result = await client.query(query, values)
   if (result.rowCount === 0) {
+    client.release()
     throw new Error('NotFound')
   }
-  return result.rows[0]
+  const todo = result.rows[0]
+  client.release()
+  return todo
 }
 
 async function deleteTodo(todoId: string, userId: string): Promise<void> {
+  const client = await getClient()
   const result = await client.query(
     'DELETE FROM todos WHERE id = $1 AND user_id = $2',
     [todoId, userId]
   )
   if (result.rowCount === 0) {
+    client.release()
     throw new Error('NotFound')
   }
+  client.release()
 }
 
 export const handler: Handler = async (event, context) => {

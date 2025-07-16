@@ -1,7 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-const db = getClient()
 
 const headers = {
   'Content-Type': 'application/json',
@@ -99,6 +98,7 @@ export const handler = async (
     const keys = Object.keys(parsedBody)
     const setClause = keys.map((k, i) => `"${k}"=$${i + 1}`).join(', ')
     const values = keys.map(k => (parsedBody as any)[k])
+    const db = await getClient()
     const query = `UPDATE "${config.table}" SET ${setClause} WHERE id=$${
       keys.length + 1
     } RETURNING *`

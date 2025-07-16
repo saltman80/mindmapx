@@ -8,7 +8,9 @@ const { DATABASE_URL, JWT_SECRET } = process.env
 if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
 }
-const pool = { query: (...args) => getClient().query(...args) }
+const pool = {
+  query: async (...args: any[]) => (await getClient()).query(...args)
+}
 
 const loginSchema = z.object({
   email: z.string().email().transform(s => s.trim().toLowerCase()),

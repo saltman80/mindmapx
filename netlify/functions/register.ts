@@ -17,7 +17,6 @@ if (Number.isNaN(SALT_ROUNDS) || SALT_ROUNDS < 4 || SALT_ROUNDS > 20) {
   throw new Error('Invalid SALT_ROUNDS environment variable, must be integer between 4 and 20')
 }
 
-const client = getClient()
 
 const RegisterSchema = z.object({
   email: z.string().trim().email().transform(e => e.toLowerCase()),
@@ -39,6 +38,7 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ error: 'Method Not Allowed' }),
     }
   }
+  const client = await getClient()
   if (!event.body) {
     return {
       statusCode: 400,

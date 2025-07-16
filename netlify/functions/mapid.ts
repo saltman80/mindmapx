@@ -1,7 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z } from 'zod'
-const pool = getClient()
 
 const MapDataSchema = z.record(z.unknown())
 type MapData = z.infer<typeof MapDataSchema>
@@ -69,19 +68,25 @@ export const handler: Handler = async event => {
 }
 
 async function getMap(mapId: string): Promise<{ id: string; data: MapData; created_at: string; updated_at: string | null } | null> {
-  const res = await pool.query('SELECT id, data, created_at, updated_at FROM maps WHERE id = $1', [mapId])
+  const client = await getClient()
+  const res = await client.query('SELECT id, data, created_at, updated_at FROM maps WHERE id = $1', [mapId])
+  client.release()
   return res.rowCount > 0 ? res.rows[0] : null
 }
 
 async function updateMap(mapId: string, data: MapData): Promise<{ id: string; data: MapData; created_at: string; updated_at: string | null } | null> {
-  const res = await pool.query(
+  const client = await getClient()
+  const res = await client.query(
     'UPDATE maps SET data = $2, updated_at = NOW() WHERE id = $1 RETURNING id, data, created_at, updated_at',
     [mapId, data]
   )
+  client.release()
   return res.rowCount > 0 ? res.rows[0] : null
 }
 
 async function deleteMap(mapId: string): Promise<number> {
-  const res = await pool.query('DELETE FROM maps WHERE id = $1', [mapId])
+  const client = await getClient()
+  const res = await client.query('DELETE FROM maps WHERE id = $1', [mapId])
+  client.release()
   return res.rowCount
 }

@@ -15,8 +15,6 @@ const updateSchema = z.object({
   role: z.enum(['user', 'admin']).optional(),
 })
 
-const db = getClient()
-
 export const handler: Handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' }
 
@@ -55,6 +53,8 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ error: 'Forbidden' }),
     }
   }
+
+  const db = await getClient()
 
   try {
     const method = event.httpMethod
