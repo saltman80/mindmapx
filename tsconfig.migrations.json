@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["runmigrations.ts"],
+  "exclude": ["netlify/functions", "node_modules"]
+}
