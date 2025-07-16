@@ -28,14 +28,15 @@ const headers = {
   "Content-Type": "application/json",
 }
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (event, _context) => {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" }
   }
 
   try {
     const db = await getClient()
-    if (event.httpMethod === "POST") {
+    try {
+      if (event.httpMethod === "POST") {
       let parsedBody: any
       try {
         parsedBody = JSON.parse(event.body || "{}")
@@ -176,6 +177,9 @@ export const handler: Handler = async (event) => {
         headers,
         body: JSON.stringify({ error: "Method Not Allowed" }),
       }
+    }
+    } finally {
+      db.release()
     }
   } catch (err) {
     console.error("Password reset error:", err)
