@@ -1,7 +1,7 @@
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
+import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import cors from './corsmiddleware.js'
+import cors from '../corsmiddleware.js'
 import type { Todo } from './types.js'
 
 function initTodoService(apiKey: string) {
@@ -55,7 +55,7 @@ if (!API_KEY) {
 }
 const todoService = initTodoService(API_KEY)
 
-export const handler: Handler = cors(async (event) => {
+export const handler: Handler = cors(async (event, context): Promise<HandlerResponse> => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,

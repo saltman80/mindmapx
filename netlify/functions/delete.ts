@@ -111,12 +111,13 @@ export const handler: Handler = async (
     const { id } = parsed.data
 
     // Delete record
-    const deleted = await db.sql`
+    const result = await db.sql`
       DELETE FROM todos
       WHERE id = ${id} AND user_id = ${userId}
       RETURNING id
     `
-    if (!deleted || deleted.length === 0) {
+    const deleted = result.rowCount
+    if (!deleted || deleted === 0) {
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
