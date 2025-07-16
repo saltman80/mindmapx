@@ -41,7 +41,7 @@ export const handler: Handler = async (event) => {
   const token = authHeader.split(' ')[1]
   let userId: string
   try {
-    const payload = verifyToken(token)
+    const payload = verifyToken(token) as { userId: string }
     userId = payload.userId
   } catch {
     return {
@@ -51,14 +51,13 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  let parsed
+  let title: string = ''
+  let description: string = ''
   try {
-    parsed = event.body ? JSON.parse(event.body) : {}
+    ;({ title = '', description = '' } = JSON.parse(event.body || '{}'))
   } catch {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
   }
-
-  const { title = '', description = '' } = parsed
 
   let data: { title: string; description: string }
   try {

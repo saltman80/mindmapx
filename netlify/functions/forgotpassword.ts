@@ -18,11 +18,11 @@ const pool = {
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function generateResetToken(): string {
-  return crypto.randomBytes(32).toString('hex')
+  return randomBytes(32).toString('hex')
 }
 
 function hashToken(token: string): string {
-  return crypto.createHmac('sha256', RESET_TOKEN_SECRET!).update(token).digest('hex')
+  return createHmac('sha256', RESET_TOKEN_SECRET!).update(token).digest('hex')
 }
 
 

@@ -92,7 +92,7 @@ export const handler: Handler = async (event) => {
       if (userRes.rows.length > 0) {
         const userId = userRes.rows[0].id
         const token = randomBytes(32).toString("hex")
-        const expiresAt = new Date(Date.now() + 3600 * 1000)
+        const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString()
         await db.query(
           sql`INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (${userId}, ${token}, ${expiresAt})`
         )
@@ -149,7 +149,7 @@ export const handler: Handler = async (event) => {
         if (
           tokenRes.rows.length === 0 ||
           tokenRes.rows[0].used ||
-          new Date(tokenRes.rows[0].expires_at) < new Date()
+          new Date(String(tokenRes.rows[0].expires_at)) < new Date()
         ) {
           await db.query(sql`ROLLBACK`)
           return {

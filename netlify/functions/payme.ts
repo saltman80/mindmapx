@@ -1,7 +1,9 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
-import { createClient } from '@vercel/postgres'
-const db = createClient({ connectionString: process.env.NETLIFY_DATABASE_URL_UNPOOLED })
+import { getClient } from './db-client.js'
+const db = {
+  query: async (...args: any[]) => (await getClient()).query(...args)
+}
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 if (!stripeSecret || !stripeWebhookSecret) {
@@ -34,20 +36,26 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         if (userId) {
           const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
           const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
-          await db.sql.begin(async (tx) => {
-            await tx`
-              UPDATE users
-              SET stripe_customer_id = ${customerId},
-                  stripe_subscription_id = ${subscriptionId},
-                  subscription_status = 'active'
-              WHERE id = ${userId}
-            `
-            await tx`
-              INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, status)
-              VALUES (${userId}, ${session.payment_intent}, ${session.amount_total}, ${session.currency}, ${session.payment_status})
-              ON CONFLICT (stripe_payment_intent_id) DO NOTHING
-            `
-          })
+          const client = await getClient()
+          try {
+            await client.query('BEGIN')
+            await client.query(
+              `UPDATE users SET stripe_customer_id = $1, stripe_subscription_id = $2, subscription_status = 'active' WHERE id = $3`,
+              [customerId, subscriptionId, userId]
+            )
+            await client.query(
+              `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, status)
+               VALUES ($1, $2, $3, $4, $5)
+               ON CONFLICT (stripe_payment_intent_id) DO NOTHING`,
+              [userId, session.payment_intent, session.amount_total, session.currency, session.payment_status]
+            )
+            await client.query('COMMIT')
+          } catch {
+            await client.query('ROLLBACK')
+            throw
+          } finally {
+            client.release()
+          }
         }
         break
       }
@@ -56,29 +64,29 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
         let userId: string | undefined
         if (subscriptionId) {
-          const res = await db.sql`SELECT id FROM users WHERE stripe_subscription_id = ${subscriptionId}`
-          userId = res?.[0]?.id
+          const res = await db.query('SELECT id FROM users WHERE stripe_subscription_id = $1', [subscriptionId])
+          userId = res.rows[0]?.id
         }
         if (!userId && invoice.customer) {
-          const res2 = await db.sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`
-          userId = res2?.[0]?.id
+          const res2 = await db.query('SELECT id FROM users WHERE stripe_customer_id = $1', [invoice.customer])
+          userId = res2.rows[0]?.id
         }
         if (userId) {
-          await db.sql`
-            INSERT INTO payments (user_id, stripe_invoice_id, amount, currency, status)
-            VALUES (${userId}, ${invoice.id}, ${invoice.amount_paid}, ${invoice.currency}, 'paid')
-            ON CONFLICT (stripe_invoice_id) DO NOTHING
-          `
+          await db.query(
+            `INSERT INTO payments (user_id, stripe_invoice_id, amount, currency, status)
+             VALUES ($1, $2, $3, $4, 'paid')
+             ON CONFLICT (stripe_invoice_id) DO NOTHING`,
+            [userId, invoice.id, invoice.amount_paid, invoice.currency]
+          )
         }
         break
       }
       case 'customer.subscription.deleted': {
         const subscription = obj as Stripe.Subscription
-        await db.sql`
-          UPDATE users
-          SET subscription_status = 'canceled'
-          WHERE stripe_subscription_id = ${subscription.id}
-        `
+        await db.query(
+          'UPDATE users SET subscription_status = $1 WHERE stripe_subscription_id = $2',
+          ['canceled', subscription.id]
+        )
         break
       }
       default:
