@@ -82,11 +82,11 @@ export const handler: Handler = async (event, _context) => {
       rl.count++
       global.resetRateLimitMap.set(ip, rl)
 
-      const { rows: userRows } = await db.query(
+      const { rows } = await db.query(
         sql`SELECT id FROM users WHERE email = ${email}`
       )
-      if (userRows.length > 0) {
-        const userId = userRows[0].id
+      if (rows.length > 0) {
+        const userId = rows[0].id
         const token = randomBytes(32).toString("hex")
         const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString()
         await db.query(
@@ -134,13 +134,13 @@ export const handler: Handler = async (event, _context) => {
       // start transaction for atomic check-and-update with row lock
       try {
         await db.query(sql`BEGIN`)
-        const { rows: tokenRows } = await db.query(
+        const { rows } = await db.query(
           sql`SELECT user_id, expires_at, used FROM password_reset_tokens WHERE token = ${token} FOR UPDATE`
         )
         if (
-          tokenRows.length === 0 ||
-          tokenRows[0].used ||
-          new Date(String(tokenRows[0].expires_at)) < new Date()
+          rows.length === 0 ||
+          rows[0].used ||
+          new Date(String(rows[0].expires_at)) < new Date()
         ) {
           await db.query(sql`ROLLBACK`)
           return {
@@ -150,7 +150,7 @@ export const handler: Handler = async (event, _context) => {
           }
         }
 
-        const userId = tokenRows[0].user_id
+        const userId = rows[0].user_id
         const hashedPassword = await bcrypt.hash(password, 10)
         await db.query(
           sql`UPDATE users SET password_hash = ${hashedPassword} WHERE id = ${userId}`
