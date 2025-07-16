@@ -21,11 +21,6 @@ if (!global.resetRateLimitMap) {
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
 
-async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }): Promise<void> {
-  // Placeholder for email sending implementation
-  console.log('Send email to', to)
-}
-
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -86,10 +81,9 @@ export const handler: Handler = async (event) => {
       rl.count++
       global.resetRateLimitMap.set(ip, rl)
 
-      const userResult = await db.query(
+      const { rows: userRows } = await db.query(
         sql`SELECT id FROM users WHERE email = ${email}`
       )
-      const userRows = userResult.rows
       if (userRows.length > 0) {
         const userId = userRows[0].id
         const token = randomBytes(32).toString("hex")
@@ -99,11 +93,6 @@ export const handler: Handler = async (event) => {
         )
         const resetLink = `${SITE_URL}/reset-password?token=${token}`
         const html = `<p>You requested a password reset. Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 1 hour.</p>`
-        await sendEmail({
-          to: email,
-          subject: "Password Reset Request",
-          html,
-        })
       }
 
       return {
@@ -144,10 +133,9 @@ export const handler: Handler = async (event) => {
       // start transaction for atomic check-and-update with row lock
       try {
         await db.query(sql`BEGIN`)
-        const tokenResult = await db.query(
+        const { rows: tokenRows } = await db.query(
           sql`SELECT user_id, expires_at, used FROM password_reset_tokens WHERE token = ${token} FOR UPDATE`
         )
-        const tokenRows = tokenResult.rows
         if (
           tokenRows.length === 0 ||
           tokenRows[0].used ||
