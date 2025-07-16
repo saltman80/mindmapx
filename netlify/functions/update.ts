@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import { getClient } from '../netlify/functions/db-client.js'
 import { z, ZodError } from 'zod'
 const db = getClient()
 

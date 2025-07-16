@@ -1,6 +1,10 @@
+import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
+import OpenAI from 'openai'
+import { randomUUID } from 'crypto'
+import { withCors } from '../corsmiddleware.js'
+
 function initTodoService(apiKey: string) {
-  const configuration = new Configuration({ apiKey })
-  const openai = new OpenAIApi(configuration)
+  const openai = new OpenAI({ apiKey })
   return {
     generateTodos: async (prompt: string): Promise<Todo[]> => {
       const completion = await openai.createChatCompletion({
@@ -89,7 +93,3 @@ export const handler: Handler = withCors(async (event) => {
     }
   }
 })
-import type { Handler } from '@netlify/functions'
-import { Configuration, OpenAIApi } from 'openai'
-import { randomUUID } from 'crypto'
-import { withCors } from '../corsmiddleware.js'

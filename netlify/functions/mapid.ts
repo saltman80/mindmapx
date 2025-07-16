@@ -1,5 +1,5 @@
-import type { Handler } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import { getClient } from '../netlify/functions/db-client.js'
 import { z } from 'zod'
 const pool = getClient()
 

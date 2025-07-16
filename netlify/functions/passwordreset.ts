@@ -1,3 +1,8 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import { getClient } from '../netlify/functions/db-client.js'
+import { sql } from '@vercel/postgres'
+import { randomBytes } from 'crypto'
+
 const SITE_URL = process.env.SITE_URL
 if (!SITE_URL) {
   console.error("Missing required SITE_URL environment variable")
@@ -13,11 +18,6 @@ declare global {
 if (!global.resetRateLimitMap) {
   global.resetRateLimitMap = new Map()
 }
-
-import type { Handler } from '@netlify/functions'
-import { getClient } from './db-client.js'
-import { sql } from '@vercel/postgres'
-import { randomBytes } from 'crypto'
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
 const db = getClient()

@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
