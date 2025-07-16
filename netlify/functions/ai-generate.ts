@@ -77,12 +77,12 @@ export const handler: Handler = async (
       { role: 'user', content: data.prompt }
     ]
 
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: data.model,
       messages,
       max_tokens: data.maxTokens
     })
-    const aiContent = completion.data.choices?.[0]?.message?.content
+    const aiContent = completion.choices?.[0]?.message?.content
     if (!aiContent) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'No content from AI' }) }
     }

@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import { getClient } from '../netlify/functions/db-client.js'
+import { getClient } from '../netlify/functions/db-client'
 
 const db = getClient()
 const openaiKey = process.env.OPENAI_API_KEY
@@ -28,7 +28,7 @@ export const handler: Handler = async (event) => {
     )
     const mapId = res.rows[0].id
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
-      const completion = await openai.createChatCompletion({
+      const completion = await openai.chat.completions.create({
         model: MODEL,
         messages: [
           {
@@ -39,7 +39,7 @@ export const handler: Handler = async (event) => {
         ],
         max_tokens: 200
       })
-      const text = completion.data.choices?.[0]?.message?.content
+      const text = completion.choices?.[0]?.message?.content
       if (text) {
         try {
           const items: string[] = JSON.parse(text)

@@ -2,12 +2,24 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Node16",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "outDir": "dist/netlify/functions",
     "rootDir": "netlify/functions",
-    "types": ["node", "@netlify/functions"]
+    "types": [
+      "@netlify/functions",
+      "uuid",
+      "jsonwebtoken",
+      "pg",
+      "stripe",
+      "zod"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules"
+    ]
   },
   "include": ["netlify/functions/**/*.ts"]
 }

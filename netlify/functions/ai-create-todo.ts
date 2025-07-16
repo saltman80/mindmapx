@@ -16,7 +16,7 @@ export const handler: Handler = async (event) => {
   const { prompt } = data
   if (!prompt || typeof prompt !== 'string') return { statusCode: 400, body: 'Invalid prompt' }
   try {
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: MODEL,
       messages: [
         { role: 'system', content: 'Generate a JSON array of todo items with title and optional description.' },
@@ -24,7 +24,7 @@ export const handler: Handler = async (event) => {
       ],
       max_tokens: 200
     })
-    const text = completion.data.choices?.[0]?.message?.content
+    const text = completion.choices?.[0]?.message?.content
     if (!text) return { statusCode: 500, body: 'No AI content' }
     let todos
     try { todos = JSON.parse(text) } catch { todos = [] }
