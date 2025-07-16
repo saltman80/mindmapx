@@ -50,9 +50,9 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
               [userId, session.payment_intent, session.amount_total, session.currency, session.payment_status]
             )
             await client.query('COMMIT')
-          } catch {
+          } catch (err) {
             await client.query('ROLLBACK')
-            throw
+            throw err
           } finally {
             client.release()
           }
