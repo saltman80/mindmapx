@@ -1,9 +1,15 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+import OpenAI from "openai";
+import { randomUUID } from 'crypto';
+import { z } from "zod";
+import { withCors } from '../../corsmiddleware.js'
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 function initTodoService(apiKey: string) {
-  const configuration = new Configuration({ apiKey })
-  const openai = new OpenAIApi(configuration)
   return {
     generateTodos: async (prompt: string): Promise<Todo[]> => {
-      const completion = await openai.createChatCompletion({
+      const completion = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: 'You generate todo lists.' },
@@ -15,7 +21,7 @@ function initTodoService(apiKey: string) {
         temperature: 0.7,
         max_tokens: 200
       })
-      const content = completion.data.choices[0].message?.content
+      const content = completion.choices[0].message?.content
       if (!content) throw new Error('Empty response from AI')
       let todosRaw: unknown
       try {
@@ -89,7 +95,3 @@ export const handler: Handler = withCors(async (event) => {
     }
   }
 })
-import type { Handler } from '@netlify/functions'
-import { Configuration, OpenAIApi } from 'openai'
-import { randomUUID } from 'crypto'
-import { withCors } from '../corsmiddleware.js'

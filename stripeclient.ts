@@ -1,3 +1,6 @@
+import Stripe from 'stripe';
+import { randomUUID } from 'crypto';
+
 let stripeInstance: Stripe | null = null
 let webhookSecretVal: string | null = null
 
@@ -5,7 +8,7 @@ function getStripeClient(): Stripe {
   if (!stripeInstance) {
     const key = process.env.STRIPE_SECRET_KEY
     if (!key) throw new Error('Missing STRIPE_SECRET_KEY environment variable')
-    stripeInstance = new Stripe(key, { apiVersion: '2022-11-15', typescript: true })
+    stripeInstance = new Stripe(key, { apiVersion: '2023-10-16', typescript: true })
   }
   return stripeInstance
 }

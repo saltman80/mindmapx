@@ -1,4 +1,4 @@
-import { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import { getClient } from './db-client.js'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'

@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import Stripe from 'stripe'
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +20,7 @@ export const handler: Handler = async (event) => {
     console.error('Missing Stripe secret key')
     return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: 'Internal server error' }) }
   }
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2022-11-15' })
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' })
 
   let data: any
   try {

@@ -1,12 +1,12 @@
-import type { Handler } from '@netlify/functions'
-import { verifySignature } from '../stripeclient.js'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+import { verifySignature } from '../../stripeclient.js'
 import Stripe from 'stripe'
 import type { Client } from 'pg'
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 if (!stripeSecret) {
   throw new Error('Missing STRIPE_SECRET_KEY environment variable.')
 }
-const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' })
+const stripe = new Stripe(stripeSecret, { apiVersion: '2023-10-16' })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 if (!webhookSecret) {
@@ -40,7 +40,7 @@ export const handler: Handler = async (event) => {
     const payload = event.isBase64Encoded
       ? Buffer.from(event.body, 'base64').toString('utf8')
       : event.body
-    stripeEvent = verifySignature(payload, sig)
+    stripeEvent = stripe.webhooks.constructEvent(payload, sig, webhookSecret)
   } catch (err: any) {
     console.error('Webhook signature verification failed.', err.message)
     return { statusCode: 400, body: `Webhook Error: ${err.message}` }

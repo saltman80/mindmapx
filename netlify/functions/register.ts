@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import { getClient } from './db-client.js'
 import { hash } from 'bcrypt'
 import { sign } from 'jsonwebtoken'

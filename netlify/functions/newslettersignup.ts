@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import mailchimp from '@mailchimp/mailchimp_marketing'
 const {
   MAILCHIMP_API_KEY,

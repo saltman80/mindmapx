@@ -6,15 +6,13 @@ if (!JWT_SECRET) {
   throw new Error('Missing environment variable: JWT_SECRET')
 }
 
-declare global {
-  var __dbPool: Pool | undefined
-}
-
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Pool } from 'pg'
+import { sql } from "@vercel/postgres";
 import { verify } from 'jsonwebtoken'
+import { createPool } from '@vercel/postgres'
 import { getClient } from './db-client.js'
-const pool = getClient()
+
+const pool = createPool({ connectionString: process.env.DATABASE_URL })
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

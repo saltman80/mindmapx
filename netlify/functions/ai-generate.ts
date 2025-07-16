@@ -1,15 +1,18 @@
+import { sql } from "@vercel/postgres";
+import OpenAI from "openai";
+import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+
 import { createPool } from '@vercel/postgres'
-import { Configuration, OpenAIApi } from 'openai'
-import { z } from 'zod'
-import { v4 as uuidv4 } from 'uuid'
 
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('Missing DATABASE_URL')
-const pool = createPool(databaseUrl)
+const pool = createPool({ connectionString: databaseUrl })
 
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
-const openai = new OpenAIApi(new Configuration({ apiKey: openaiKey }))
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const DEFAULT_MODEL = 'gpt-3.5-turbo'
 const DEFAULT_MAX_TOKENS = 150
@@ -73,12 +76,12 @@ export const handler = async (event: any, context: any) => {
       { role: 'user', content: data.prompt }
     ]
 
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: data.model,
       messages,
       max_tokens: data.maxTokens
     })
-    const aiContent = completion.data.choices?.[0]?.message?.content
+    const aiContent = completion.choices[0]?.message?.content
     if (!aiContent) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'No content from AI' }) }
     }

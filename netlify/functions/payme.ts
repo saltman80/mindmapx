@@ -1,12 +1,12 @@
-import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import Stripe from 'stripe'
-import { sql } from '@vercel/postgres'
+import { sql } from "@vercel/postgres";
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 if (!stripeSecret || !stripeWebhookSecret) {
   throw new Error('Missing Stripe environment variables')
 }
-const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' })
+const stripe = new Stripe(stripeSecret, { apiVersion: '2023-10-16' })
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   if (event.httpMethod !== 'POST') {
@@ -56,11 +56,11 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         let userId: string | undefined
         if (subscriptionId) {
           const res = await sql`SELECT id FROM users WHERE stripe_subscription_id = ${subscriptionId}`
-          userId = res?.[0]?.id
+          userId = res.rows[0]?.id
         }
         if (!userId && invoice.customer) {
-          const res2 = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`
-          userId = res2?.[0]?.id
+          const res2 = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer as string}`
+          userId = res2.rows[0]?.id
         }
         if (userId) {
           await sql`
