@@ -1,6 +1,6 @@
+import { pool } from './netlify/functions/db-client.js'
 import fs from 'fs'
 import path from 'path'
-import { pool } from '../netlify/functions/db-client.js'
 
 function splitSql(sql: string): string[] {
   return sql
