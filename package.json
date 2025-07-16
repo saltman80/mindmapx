@@ -26,8 +26,6 @@
     "jsonwebtoken": "^9.0.0",
     "pg": "^8.10.0",
     "stripe": "^12.0.0",
-    "@sendgrid/mail": "^7.7.0",
-    "@mailchimp/mailchimp_marketing": "^3.0.91",
     "zod": "^3.21.4",
     "@vercel/postgres": "^0.10.0"
   },
@@ -38,8 +36,6 @@
     "@types/uuid": "^8.3.4",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/stripe": "^8.0.417",
-    "@types/sendgrid__mail": "^7.2.1",
-    "@types/mailchimp__mailchimp_marketing": "^3.0.3",
     "@types/zod": "^3.0.0",
     "@netlify/functions": "^1.0.0"
   }
