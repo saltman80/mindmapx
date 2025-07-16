@@ -10,9 +10,9 @@
     "dev:web": "vite",
     "dev:api": "netlify functions:serve --port=8888",
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
-    "compile:migrations": "tsc -p tsconfig.migrations.json",
+    "compile": "tsc -p tsconfig.migrations.json",
     "compile:functions": "tsc -p tsconfig.functions.json",
-    "build": "npm run compile:migrations && npm run compile:functions && npm run migrate && vite build",
+    "build": "npm run compile && npm run compile:functions && npm run migrate && vite build",
     "preview": "vite preview",
     "migrate": "node dist/runmigrations.js",
     "start": "npm run dev"
@@ -29,6 +29,7 @@
   "devDependencies": {
     "typescript": "^5.1.0",
     "@types/node": "^20.0.0",
-    "@types/pg": "^8.6.6"
+    "@types/pg": "^8.6.6",
+    "@netlify/functions": "^1.0.0"
   }
 }
