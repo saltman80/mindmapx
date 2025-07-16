@@ -1,22 +1,15 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import sgMail from '@sendgrid/mail'
 import { randomBytes, createHmac } from 'crypto'
 import { getClient } from '../netlify/functions/db-client'
 const {
   DATABASE_URL,
-  SENDGRID_API_KEY,
-  SENDGRID_FROM_EMAIL,
   FRONTEND_URL,
   RESET_TOKEN_SECRET
 } = process.env
 
 if (!DATABASE_URL) throw new Error('Missing DATABASE_URL')
-if (!SENDGRID_API_KEY) throw new Error('Missing SENDGRID_API_KEY')
-if (!SENDGRID_FROM_EMAIL) throw new Error('Missing SENDGRID_FROM_EMAIL')
 if (!FRONTEND_URL) throw new Error('Missing FRONTEND_URL')
 if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
-
-sgMail.setApiKey(SENDGRID_API_KEY)
 
 const pool = { query: (...args) => getClient().query(...args) }
 
@@ -30,16 +23,6 @@ function hashToken(token: string): string {
   return crypto.createHmac('sha256', RESET_TOKEN_SECRET!).update(token).digest('hex')
 }
 
-async function sendResetEmail(email: string, token: string): Promise<void> {
-  const resetUrl = `${FRONTEND_URL}/reset-password?token=${encodeURIComponent(token)}`
-  await sgMail.send({
-    to: email,
-    from: SENDGRID_FROM_EMAIL!,
-    subject: 'Password Reset Request',
-    text: `Reset your password by visiting: ${resetUrl}`,
-    html: `<p>Reset your password by clicking <a href="${resetUrl}">here</a>. This link expires in one hour.</p>`
-  })
-}
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -82,11 +65,6 @@ export const handler: Handler = async (event) => {
           [userId, tokenHash, expiresAt]
         )
 
-        try {
-          await sendResetEmail(normalizedEmail, token)
-        } catch (err) {
-          console.error('Error sending reset email:', err)
-        }
       }
     }
   } catch (err) {
