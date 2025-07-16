@@ -1,6 +1,12 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// define __dirname in ESM
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 import { pool } from './netlify/functions/db-client.js'
 import fs from 'fs'
-import path from 'path'
 
 function splitSql(sql: string): string[] {
   return sql
