@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { pool } from './netlify/functions/db-client.js'
+import { pool } from '../netlify/functions/db-client.js'
 
 function splitSql(sql: string): string[] {
   return sql
@@ -10,7 +10,7 @@ function splitSql(sql: string): string[] {
 }
 
 export async function runMigrations(): Promise<void> {
-  const migrationsDir = path.resolve(process.cwd(), 'migrations')
+  const migrationsDir = path.resolve(__dirname, '../migrations')
   const client = await pool.connect()
   const LOCK_KEY = 1234567890
   try {
