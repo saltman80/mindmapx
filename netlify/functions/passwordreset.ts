@@ -168,9 +168,9 @@ export const handler: Handler = async (event) => {
           sql`UPDATE password_reset_tokens SET used = true WHERE token = ${token}`
         )
         await db.query(sql`COMMIT`)
-      } catch {
+      } catch (err) {
         await db.query(sql`ROLLBACK`)
-        throw
+        throw err
       }
 
       return {
