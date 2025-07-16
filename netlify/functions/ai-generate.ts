@@ -1,16 +1,9 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { createClient } from '@vercel/postgres'
+import { getClient } from './db-client.js'
 import OpenAI from 'openai'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 
-const databaseUrl = process.env.NETLIFY_DATABASE_URL_UNPOOLED
-if (!databaseUrl) throw new Error('Missing NETLIFY_DATABASE_URL_UNPOOLED')
-const pool = createClient({ connectionString: databaseUrl })
-
-const openaiKey = process.env.OPENAI_API_KEY
-if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
-const openai = new OpenAI({ apiKey: openaiKey })
 
 const DEFAULT_MODEL = 'gpt-3.5-turbo'
 const DEFAULT_MAX_TOKENS = 150
@@ -60,63 +53,64 @@ export const handler: Handler = async (
       }
     }
 
-    const ownershipResult = await pool.query(
-      'SELECT 1 FROM mind_maps WHERE id = $1 AND user_id = $2',
-      [data.mindMapId, userId]
-    )
-    if (ownershipResult.rowCount === 0) {
-      return { statusCode: 404, headers, body: JSON.stringify({ error: 'Mind map not found' }) }
-    }
-
-    const messages = [
-      {
-        role: 'system',
-        content:
-          "You are an AI assistant that generates to-do items based on the user's prompt. Respond strictly with a JSON array of objects with 'title' and optional 'description' fields."
-      },
-      { role: 'user', content: data.prompt }
-    ]
-
-    const completion = await openai.chat.completions.create({
-      model: data.model,
-      messages: messages.map(m => ({
-        role: m.role as any,
-        content: m.content,
-        name: (m as any).name ?? undefined
-      })),
-      max_tokens: data.maxTokens
-    })
-    const aiContent = completion.choices?.[0]?.message?.content
-    if (!aiContent) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'No content from AI' }) }
-    }
-
-    let aiTodos: unknown
+    const client = await getClient()
     try {
-      aiTodos = JSON.parse(aiContent)
-    } catch (err) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to parse AI response', details: (err as Error).message })
+      const ownershipResult = await client.query(
+        'SELECT 1 FROM mind_maps WHERE id = $1 AND user_id = $2',
+        [data.mindMapId, userId]
+      )
+      if (ownershipResult.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Mind map not found' }) }
       }
-    }
 
-    let validTodos
-    try {
-      validTodos = todosResponseSchema.parse(aiTodos)
-    } catch (err) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'AI response validation failed', details: (err as any).errors })
+      const messages = [
+        {
+          role: 'system',
+          content:
+            "You are an AI assistant that generates to-do items based on the user's prompt. Respond strictly with a JSON array of objects with 'title' and optional 'description' fields."
+        },
+        { role: 'user', content: data.prompt }
+      ]
+
+      const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+      const completion = await ai.chat.completions.create({
+        model: data.model,
+        messages: messages.map(m => ({
+          role: m.role as any,
+          content: m.content,
+          name: (m as any).name ?? undefined
+        })),
+        max_tokens: data.maxTokens
+      })
+      const aiContent = completion.choices?.[0]?.message?.content
+      if (!aiContent) {
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'No content from AI' }) }
       }
-    }
 
-    const client = await pool.connect()
-    try {
+      let aiTodos: unknown
+      try {
+        aiTodos = JSON.parse(aiContent)
+      } catch (err) {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: 'Failed to parse AI response', details: (err as Error).message })
+        }
+      }
+
+      let validTodos
+      try {
+        validTodos = todosResponseSchema.parse(aiTodos)
+      } catch (err) {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: 'AI response validation failed', details: (err as any).errors })
+        }
+      }
+
       await client.query('BEGIN')
-      const insertedTodos = []
+      const insertedTodos = [] as any[]
       for (const item of validTodos) {
         const id = uuidv4()
         const result = await client.query(
@@ -137,11 +131,11 @@ export const handler: Handler = async (
       await client.query('COMMIT')
       return { statusCode: 200, headers, body: JSON.stringify({ todos: insertedTodos }) }
     } catch (err) {
-      await client.query('ROLLBACK')
+      await client.query('ROLLBACK').catch(() => {})
       console.error('DB transaction error:', err)
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
     } finally {
-      client.release()
+      await client.release()
     }
   } catch (err) {
     console.error('AI Generate Error:', err)

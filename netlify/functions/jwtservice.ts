@@ -1,11 +1,9 @@
 import jwt from 'jsonwebtoken'
 
-const secret = process.env.JWT_SECRET as string
-
-export function sign(payload: string | object | Buffer, options?: jwt.SignOptions) {
-  return jwt.sign(payload, secret, options)
+export function signToken(payload: any) {
+  return jwt.sign(payload, process.env.JWT_SECRET!)
 }
 
-export function verify(token: string) {
-  return jwt.verify(token, secret)
+export function verifyToken(token: string) {
+  return jwt.verify(token, process.env.JWT_SECRET!)
 }
