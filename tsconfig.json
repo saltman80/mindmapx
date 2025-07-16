@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["node"]
   },
   "include": [
     "stubs-node.d.ts",
