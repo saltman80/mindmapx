@@ -3,7 +3,10 @@ import { getClient } from './db-client.js'
 import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
 const pool = {
-  query: async (...args: any[]) => (await getClient()).query(...args)
+  async query(text: string, params?: any[]) {
+    const client = await getClient()
+    return client.query(text, params)
+  }
 }
 
 const mapInputSchema = z.object({

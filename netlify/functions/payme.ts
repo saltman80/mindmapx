@@ -2,7 +2,10 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
 import { getClient } from './db-client.js'
 const db = {
-  query: async (...args: any[]) => (await getClient()).query(...args)
+  async query(text: string, params?: any[]) {
+    const client = await getClient()
+    return client.query(text, params)
+  }
 }
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
