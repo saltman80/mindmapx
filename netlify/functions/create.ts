@@ -51,20 +51,18 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  let bodyObj: unknown
+  let parsed
   try {
-    bodyObj = event.body ? JSON.parse(event.body) : {}
+    parsed = event.body ? JSON.parse(event.body) : {}
   } catch {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Invalid JSON body' })
-    }
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
   }
 
-  let data: { title: string; description?: string }
+  const { title = '', description = '' } = parsed
+
+  let data: { title: string; description: string }
   try {
-    data = createMindMapSchema.parse(bodyObj)
+    data = createMindMapSchema.parse({ title, description })
   } catch (err) {
     if (err instanceof ZodError) {
       return {
@@ -82,7 +80,6 @@ export const handler: Handler = async (event) => {
   }
 
   const db = await getClient()
-
   try {
     const result = await db.query(
       `
@@ -90,7 +87,7 @@ export const handler: Handler = async (event) => {
         VALUES ($1, $2, $3, NOW())
         RETURNING id, user_id, title, description, created_at
       `,
-      [userId, data.title, data.description ?? null]
+      [userId, data.title, data.description]
     )
     const mindMap = result.rows[0]
     return {
@@ -105,5 +102,7 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({ error: 'Internal Server Error' })
     }
+  } finally {
+    await db.release()
   }
 }
