@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import { withCors } from '../corsmiddleware'
+import { withCors } from '../corsmiddleware.js'
 
 function initTodoService(apiKey: string) {
   const openai = new OpenAI({ apiKey })

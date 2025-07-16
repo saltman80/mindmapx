@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from '../netlify/functions/db-client'
+import { getClient } from '../netlify/functions/db-client.js'
 import { z, ZodError } from 'zod'
 import jwt from 'jsonwebtoken'
 const querySchema = z.object({

@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from '../netlify/functions/db-client'
+import { getClient } from '../netlify/functions/db-client.js'
 import { createHash } from 'crypto'
 import bcrypt from 'bcrypt'
 const db = getClient()

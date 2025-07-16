@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from '../netlify/functions/db-client'
-import { verifyToken } from '../jwtservice'
-import { createMindMapSchema } from '../validationschemas'
+import { getClient } from '../netlify/functions/db-client.js'
+import { verifyToken } from '../jwtservice.js'
+import { createMindMapSchema } from '../validationschemas.js'
 import { z, ZodError } from 'zod'
 
 const db = getClient()
