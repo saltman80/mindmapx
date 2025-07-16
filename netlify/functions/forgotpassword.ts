@@ -11,10 +11,6 @@ if (!DATABASE_URL) throw new Error('Missing DATABASE_URL')
 if (!FRONTEND_URL) throw new Error('Missing FRONTEND_URL')
 if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
 
-const pool = {
-  query: async (...args: any[]) => (await getClient()).query(...args)
-}
-
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function generateResetToken(): string {

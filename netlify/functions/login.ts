@@ -9,7 +9,10 @@ if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
 }
 const pool = {
-  query: async (...args: any[]) => (await getClient()).query(...args)
+  async query(text: string, params?: any[]) {
+    const client = await getClient()
+    return client.query(text, params)
+  }
 }
 
 const loginSchema = z.object({
