@@ -1,6 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
-import { sql } from '@vercel/postgres'
+import { createClient } from '@vercel/postgres'
+const db = createClient({ connectionString: process.env.NETLIFY_DATABASE_URL_UNPOOLED })
 const stripeSecret = process.env.STRIPE_SECRET_KEY
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 if (!stripeSecret || !stripeWebhookSecret) {
@@ -33,7 +34,7 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         if (userId) {
           const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
           const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
-          await sql.begin(async (tx) => {
+          await db.sql.begin(async (tx) => {
             await tx`
               UPDATE users
               SET stripe_customer_id = ${customerId},
@@ -55,15 +56,15 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
         let userId: string | undefined
         if (subscriptionId) {
-          const res = await sql`SELECT id FROM users WHERE stripe_subscription_id = ${subscriptionId}`
+          const res = await db.sql`SELECT id FROM users WHERE stripe_subscription_id = ${subscriptionId}`
           userId = res?.[0]?.id
         }
         if (!userId && invoice.customer) {
-          const res2 = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`
+          const res2 = await db.sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`
           userId = res2?.[0]?.id
         }
         if (userId) {
-          await sql`
+          await db.sql`
             INSERT INTO payments (user_id, stripe_invoice_id, amount, currency, status)
             VALUES (${userId}, ${invoice.id}, ${invoice.amount_paid}, ${invoice.currency}, 'paid')
             ON CONFLICT (stripe_invoice_id) DO NOTHING
@@ -73,7 +74,7 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       }
       case 'customer.subscription.deleted': {
         const subscription = obj as Stripe.Subscription
-        await sql`
+        await db.sql`
           UPDATE users
           SET subscription_status = 'canceled'
           WHERE stripe_subscription_id = ${subscription.id}

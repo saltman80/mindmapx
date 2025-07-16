@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "node16",
     "target": "ES2020",
-    "module": "nodenext",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "outDir": "dist/netlify/functions",
     "rootDir": "netlify/functions",
-    // ensure imports include extensions and support Netlify functions
-    "types": ["node", "@netlify/functions"],
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules"
-    ]
+    "outDir": "dist/netlify/functions",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   },
-  "include": ["netlify/functions/**/*.ts"]
+  "include": ["netlify/functions/**/*"]
 }

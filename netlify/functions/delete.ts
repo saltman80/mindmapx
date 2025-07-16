@@ -1,7 +1,8 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { z } from 'zod'
 import { verify, JwtPayload } from 'jsonwebtoken'
-import { sql } from '@vercel/postgres'
+import { createClient } from '@vercel/postgres'
+const db = createClient({ connectionString: process.env.NETLIFY_DATABASE_URL_UNPOOLED })
 const DeleteRequest = z.object({
   id: z.string().uuid(),
 })
@@ -110,7 +111,7 @@ export const handler: Handler = async (
     const { id } = parsed.data
 
     // Delete record
-    const deleted = await sql`
+    const deleted = await db.sql`
       DELETE FROM todos
       WHERE id = ${id} AND user_id = ${userId}
       RETURNING id
