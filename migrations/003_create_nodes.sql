@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 BEGIN;
 
-CREATE TABLE nodes (
+CREATE TABLE IF NOT EXISTS nodes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mind_map_id UUID NOT NULL REFERENCES mind_maps(id) ON DELETE CASCADE,
   parent_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
@@ -12,8 +12,12 @@ CREATE TABLE nodes (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_nodes_mind_map_id ON nodes (mind_map_id);
-CREATE INDEX idx_nodes_parent_id ON nodes (parent_id);
+ALTER TABLE nodes
+  ADD COLUMN IF NOT EXISTS mind_map_id UUID NOT NULL
+    REFERENCES mind_maps(id) ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_nodes_mind_map_id ON nodes (mind_map_id);
+CREATE INDEX IF NOT EXISTS idx_nodes_parent_id ON nodes (parent_id);
 
 CREATE OR REPLACE FUNCTION nodes_update_updated_at()
 RETURNS TRIGGER AS $$
