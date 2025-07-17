@@ -70,14 +70,14 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     const { rows } = await pool.query(`
       SELECT
         (SELECT COUNT(*) FROM users)        AS total_users,
-        (SELECT COUNT(*) FROM mind_maps)    AS total_mind_maps,
+        (SELECT COUNT(*) FROM mindmaps)    AS total_mindmaps,
         (SELECT COUNT(*) FROM nodes)        AS total_nodes,
         (SELECT COUNT(*) FROM todos)        AS total_todos
     `)
     const row = rows[0]
     const data = {
       totalUsers:    Number(row.total_users),
-      totalMindMaps: Number(row.total_mind_maps),
+      totalMindMaps: Number(row.total_mindmaps),
       totalNodes:    Number(row.total_nodes),
       totalTodos:    Number(row.total_todos)
     }

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS maps (
+CREATE TABLE IF NOT EXISTS mindmaps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -16,8 +16,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_maps_updated_at
-BEFORE UPDATE ON maps
+CREATE TRIGGER set_mindmaps_updated_at
+BEFORE UPDATE ON mindmaps
 FOR EACH ROW EXECUTE PROCEDURE trigger_set_updated_at();
 
-CREATE INDEX IF NOT EXISTS idx_maps_user_id ON maps(user_id);
+CREATE INDEX IF NOT EXISTS idx_mindmaps_user_id ON mindmaps(user_id);

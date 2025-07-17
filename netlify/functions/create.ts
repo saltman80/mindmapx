@@ -93,7 +93,7 @@ export const handler: Handler = async (event) => {
   try {
     const result = await db.query(
       `
-        INSERT INTO mind_maps (user_id, title, description, created_at)
+        INSERT INTO mindmaps (user_id, title, description, created_at)
         VALUES ($1, $2, $3, NOW())
         RETURNING id, user_id, title, description, created_at
       `,

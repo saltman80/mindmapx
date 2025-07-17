@@ -10,7 +10,7 @@ CREATE TYPE IF NOT EXISTS todo_ai_status AS ENUM (
 CREATE TABLE IF NOT EXISTS todos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  mind_map_id UUID NOT NULL REFERENCES mind_maps(id) ON DELETE CASCADE,
+  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
   node_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   description TEXT,
@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS todos (
 );
 
 ALTER TABLE todos
-  ADD COLUMN IF NOT EXISTS mind_map_id UUID NOT NULL
-    REFERENCES mind_maps(id) ON DELETE CASCADE;
+  ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
+    REFERENCES mindmaps(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
-CREATE INDEX IF NOT EXISTS idx_todos_mind_map_id ON todos(mind_map_id);
+CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
 CREATE INDEX IF NOT EXISTS idx_todos_node_id ON todos(node_id);
 CREATE INDEX IF NOT EXISTS idx_todos_due_at ON todos(due_at);
 CREATE INDEX IF NOT EXISTS idx_todos_user_id_status ON todos(user_id, status);
