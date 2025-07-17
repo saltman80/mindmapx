@@ -2,12 +2,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE OR REPLACE FUNCTION set_updated_at()
-RETURNS trigger AS $update$
+RETURNS trigger AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$update$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
