@@ -44,7 +44,7 @@ export async function runMigrations(): Promise<void> {
           ALTER TABLE mindmaps
             ADD COLUMN user_id UUID;
         END IF;
-      END
+      END;
       $$;
     `)
 
@@ -60,8 +60,8 @@ export async function runMigrations(): Promise<void> {
           ALTER TABLE mindmaps
             ADD COLUMN owner_id UUID;
         END IF;
-      END
-      $$;
+        END;
+        $$;
     `)
 
     await client.query(`
@@ -87,7 +87,7 @@ export async function runMigrations(): Promise<void> {
             ADD COLUMN mindmap_id UUID NOT NULL
               REFERENCES mindmaps(id);
         END IF;
-      END
+      END;
       $$;
     `)
 
@@ -102,7 +102,7 @@ export async function runMigrations(): Promise<void> {
             ADD COLUMN mindmap_id UUID
               REFERENCES mindmaps(id) ON DELETE CASCADE;
         END IF;
-      END
+      END;
       $$;
     `)
     const files = fs.readdirSync(migrationsDir)
