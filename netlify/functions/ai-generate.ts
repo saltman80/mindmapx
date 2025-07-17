@@ -56,7 +56,7 @@ export const handler: Handler = async (
     const client = await getClient()
     try {
       const ownershipResult = await client.query(
-        'SELECT 1 FROM mind_maps WHERE id = $1 AND user_id = $2',
+        'SELECT 1 FROM mindmaps WHERE id = $1 AND user_id = $2',
         [data.mindMapId, userId]
       )
       if (ownershipResult.rowCount === 0) {
@@ -114,12 +114,12 @@ export const handler: Handler = async (
       for (const item of validTodos) {
         const id = uuidv4()
         const result = await client.query(
-          `INSERT INTO todos (id, user_id, mind_map_id, node_id, title, description, created_at)
+          `INSERT INTO todos (id, user_id, mindmap_id, node_id, title, description, created_at)
            VALUES ($1, $2, $3, $4, $5, $6, NOW())
            RETURNING
              id AS "id",
              user_id AS "userId",
-             mind_map_id AS "mindMapId",
+             mindmap_id AS "mindMapId",
              node_id AS "nodeId",
              title,
              description,

@@ -20,7 +20,7 @@ export const handler: Handler = async (event) => {
   try {
     await client.query('BEGIN')
     const res = await client.query(
-      `INSERT INTO mind_maps(id, user_id, title, description, created_at)
+      `INSERT INTO mindmaps(id, user_id, title, description, created_at)
        VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
       [randomUUID(), data.userId ?? null, title.trim(), description.trim() || null]
     )
@@ -48,7 +48,7 @@ export const handler: Handler = async (event) => {
           const items: string[] = JSON.parse(text)
           for (const t of items) {
             await client.query(
-              `INSERT INTO nodes(id, mind_map_id, parent_id, data) VALUES ($1,$2,NULL,$3)`,
+              `INSERT INTO nodes(id, mindmap_id, parent_id, data) VALUES ($1,$2,NULL,$3)`,
               [randomUUID(), mapId, JSON.stringify({ content: String(t) })]
             )
           }

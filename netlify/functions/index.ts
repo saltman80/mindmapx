@@ -34,7 +34,7 @@ async function getUserId(headers: { [key: string]: string }): Promise<string> {
 async function getMaps(userId: string) {
   const result = await pool.query(
     `SELECT id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"
-     FROM maps
+     FROM mindmaps
      WHERE user_id = $1
         OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1)
      ORDER BY created_at DESC`,
@@ -45,7 +45,7 @@ async function getMaps(userId: string) {
 
 async function createMap(userId: string, data: unknown) {
   const result = await pool.query(
-    `INSERT INTO maps (user_id, data)
+    `INSERT INTO mindmaps (user_id, data)
      VALUES ($1, $2)
      RETURNING id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"`,
     [userId, data]

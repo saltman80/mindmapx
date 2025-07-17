@@ -1,10 +1,6 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// define __dirname in ESM
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
 import { pool } from './netlify/functions/db-client.js'
 import fs from 'fs'
 
@@ -12,7 +8,7 @@ import fs from 'fs'
 // blocks (e.g. in PL/pgSQL functions) are not split incorrectly.
 
 export async function runMigrations(): Promise<void> {
-  const migrationsDir = path.resolve(__dirname, '../migrations')
+  const migrationsDir = fileURLToPath(new URL('../migrations', import.meta.url))
   const client = await pool.connect()
   const LOCK_KEY = 1234567890
   try {

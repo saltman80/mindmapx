@@ -4,7 +4,7 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS nodes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mind_map_id UUID NOT NULL REFERENCES mind_maps(id) ON DELETE CASCADE,
+  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
   parent_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
   data JSONB NOT NULL DEFAULT '{}'::jsonb,
   order_index INT NOT NULL DEFAULT 0,
@@ -13,10 +13,10 @@ CREATE TABLE IF NOT EXISTS nodes (
 );
 
 ALTER TABLE nodes
-  ADD COLUMN IF NOT EXISTS mind_map_id UUID NOT NULL
-    REFERENCES mind_maps(id) ON DELETE CASCADE;
+  ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
+    REFERENCES mindmaps(id) ON DELETE CASCADE;
 
-CREATE INDEX IF NOT EXISTS idx_nodes_mind_map_id ON nodes (mind_map_id);
+CREATE INDEX IF NOT EXISTS idx_nodes_mindmap_id ON nodes (mindmap_id);
 CREATE INDEX IF NOT EXISTS idx_nodes_parent_id ON nodes (parent_id);
 
 CREATE OR REPLACE FUNCTION nodes_update_updated_at()
