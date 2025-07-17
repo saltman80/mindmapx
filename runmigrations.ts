@@ -75,36 +75,9 @@ export async function runMigrations(): Promise<void> {
       );
     `)
 
-    // Ensure columns used in later indexes exist before index creation
-    await client.query(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'nodes' AND column_name = 'mindmap_id'
-        ) THEN
-          ALTER TABLE nodes
-            ADD COLUMN mindmap_id UUID NOT NULL
-              REFERENCES mindmaps(id);
-        END IF;
-      END;
-      $$;
-    `)
-
-    await client.query(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'todos' AND column_name = 'mindmap_id'
-        ) THEN
-          ALTER TABLE todos
-            ADD COLUMN mindmap_id UUID
-              REFERENCES mindmaps(id) ON DELETE CASCADE;
-        END IF;
-      END;
-      $$;
-    `)
+    // Ensure columns used in later indexes exist before index creation. The
+    // mindmap_id columns are already created in the SQL migration files, so no
+    // additional ALTER TABLE checks are required here.
     const files = fs.readdirSync(migrationsDir)
       .filter((file: string) => file.endsWith('.sql'))
       .sort((a: string, b: string) => {
