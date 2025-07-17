@@ -39,6 +39,13 @@ export async function runMigrations(): Promise<void> {
       ADD COLUMN IF NOT EXISTS user_id UUID
     `)
 
+    // Ensure the owner_id column exists for older migrations that
+    // still reference this column when creating indexes or constraints.
+    await client.query(`
+      ALTER TABLE mindmaps
+      ADD COLUMN IF NOT EXISTS owner_id UUID
+    `)
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS nodes (
         id          UUID PRIMARY KEY,
