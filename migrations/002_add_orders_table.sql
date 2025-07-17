@@ -16,7 +16,7 @@ BEGIN
   ) THEN
     CREATE TYPE order_status AS ENUM ('pending', 'paid', 'canceled');
   END IF;
-END
+END;
 $$;
 
 CREATE TABLE IF NOT EXISTS orders (

@@ -22,7 +22,7 @@ BEGIN
     ALTER TABLE nodes
       ADD COLUMN mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
-END
+END;
 $$;
 
 CREATE INDEX IF NOT EXISTS idx_nodes_mindmap_id ON nodes (mindmap_id);
