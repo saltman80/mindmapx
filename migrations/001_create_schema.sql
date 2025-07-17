@@ -27,10 +27,12 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_update_timestamp();
+DROP TRIGGER IF EXISTS update_todos_updated_at ON todos;
 CREATE TRIGGER update_todos_updated_at
 BEFORE UPDATE ON todos
 FOR EACH ROW
