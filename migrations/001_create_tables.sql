@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+DROP TRIGGER IF EXISTS set_users_updated_at ON users;
 CREATE TRIGGER set_users_updated_at BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS mindmaps (
   UNIQUE (id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_mindmaps_user_id ON mindmaps(user_id);
+DROP TRIGGER IF EXISTS set_mindmaps_updated_at ON mindmaps;
 CREATE TRIGGER set_mindmaps_updated_at BEFORE UPDATE ON mindmaps
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS todos (
 );
 CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
+DROP TRIGGER IF EXISTS set_todos_updated_at ON todos;
 CREATE TRIGGER set_todos_updated_at BEFORE UPDATE ON todos
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -67,6 +70,7 @@ CREATE TABLE IF NOT EXISTS payments (
   UNIQUE (payment_provider, provider_payment_id)
 );
 CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
+DROP TRIGGER IF EXISTS set_payments_updated_at ON payments;
 CREATE TRIGGER set_payments_updated_at BEFORE UPDATE ON payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

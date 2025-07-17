@@ -16,6 +16,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_mindmaps_updated_at ON mindmaps;
 CREATE TRIGGER set_mindmaps_updated_at
 BEFORE UPDATE ON mindmaps
 FOR EACH ROW EXECUTE PROCEDURE trigger_set_updated_at();
