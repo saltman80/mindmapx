@@ -99,6 +99,8 @@ export async function runMigrations(): Promise<void> {
 
       await client.query('BEGIN')
       try {
+        console.log(`🟡 Running SQL from file: ${file}`)
+        console.log(sql)
         await client.query(sql)
         await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
         await client.query('COMMIT')
