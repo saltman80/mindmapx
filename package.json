@@ -39,6 +39,7 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/bcrypt": "^5.0.0",
     "@types/stripe": "^8.0.417",
-    "@netlify/functions": "^1.0.0"
+    "@netlify/functions": "^1.0.0",
+    "@vitejs/plugin-react": "^4.0.3"
   }
 }
