@@ -3,13 +3,21 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE SCHEMA IF NOT EXISTS analytics;
 REVOKE ALL ON SCHEMA analytics FROM PUBLIC;
 
-CREATE TYPE IF NOT EXISTS analytics.event_type_enum AS ENUM (
-  'page_view',
-  'click',
-  'purchase',
-  'login',
-  'logout'
-);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type WHERE typname = 'event_type_enum'
+  ) THEN
+    CREATE TYPE analytics.event_type_enum AS ENUM (
+      'page_view',
+      'click',
+      'purchase',
+      'login',
+      'logout'
+    );
+  END IF;
+END;
+$$;
 REVOKE ALL ON TYPE analytics.event_type_enum FROM PUBLIC;
 
 CREATE TABLE IF NOT EXISTS analytics.events (
