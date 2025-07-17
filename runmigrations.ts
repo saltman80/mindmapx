@@ -8,12 +8,8 @@ const __dirname = path.dirname(__filename)
 import { pool } from './netlify/functions/db-client.js'
 import fs from 'fs'
 
-function splitSql(sql: string): string[] {
-  return sql
-    .split(/;\s*(?:\r?\n|$)/)
-    .map((stmt: string) => stmt.trim())
-    .filter((stmt: string) => stmt.length)
-}
+// Execute migration files as a single statement so that dollar quoted
+// blocks (e.g. in PL/pgSQL functions) are not split incorrectly.
 
 export async function runMigrations(): Promise<void> {
   const migrationsDir = path.resolve(__dirname, '../migrations')
@@ -42,12 +38,11 @@ export async function runMigrations(): Promise<void> {
       if (applied.has(file)) continue
       const filePath = path.join(migrationsDir, file)
       const sql = fs.readFileSync(filePath, 'utf8')
-      const statements = splitSql(sql)
       await client.query('BEGIN')
       try {
-        for (const stmt of statements) {
-          await client.query(stmt)
-        }
+        // Run the entire file at once to avoid breaking apart statements that
+        // contain semicolons within dollar-quoted blocks.
+        await client.query(sql)
         await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
         await client.query('COMMIT')
         console.log(`Applied ${file}`)
