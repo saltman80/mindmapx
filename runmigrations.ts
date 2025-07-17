@@ -17,13 +17,27 @@ export async function runMigrations(): Promise<void> {
   const LOCK_KEY = 1234567890
   try {
     await client.query('SELECT pg_advisory_lock($1)', [LOCK_KEY])
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS migrations (
-        id SERIAL PRIMARY KEY,
-        name TEXT UNIQUE NOT NULL,
-        run_on TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-    `)
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS migrations (
+          id SERIAL PRIMARY KEY,
+          name TEXT UNIQUE NOT NULL,
+          run_on TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+      `)
+
+      // Ensure base tables exist before applying any changes that depend on
+      // them. The nodes table is referenced later in migrations and may not
+      // exist on a fresh database, so create a minimal version here.
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS nodes (
+          id UUID PRIMARY KEY,
+          mindmap_id UUID NOT NULL REFERENCES mindmaps(id),
+          parent_id UUID REFERENCES nodes(id),
+          content TEXT NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `)
 
     // Ensure columns used in later indexes exist before index creation
     await client.query(`
