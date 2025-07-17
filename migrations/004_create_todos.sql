@@ -25,9 +25,17 @@ CREATE TABLE IF NOT EXISTS todos (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE todos
-  ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
-    REFERENCES mindmaps(id) ON DELETE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'mindmap_id'
+  ) THEN
+    ALTER TABLE todos
+      ADD COLUMN mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE;
+  END IF;
+END$$;
 
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
 CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
