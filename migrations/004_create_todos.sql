@@ -19,7 +19,7 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS todos (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL,
+  user_id UUID,
   mindmap_id UUID NOT NULL
 );
 
