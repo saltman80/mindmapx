@@ -9,7 +9,8 @@ BEGIN
     ALTER TABLE nodes
       ADD COLUMN mindmap_id UUID REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
-END$$;
+END
+$$;
 
 DO $$
 BEGIN
@@ -21,7 +22,8 @@ BEGIN
     ALTER TABLE todos
       ADD COLUMN mindmap_id UUID REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
-END$$;
+END
+$$;
 
 CREATE INDEX IF NOT EXISTS idx_nodes_mindmap_id ON nodes(mindmap_id);
 CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);

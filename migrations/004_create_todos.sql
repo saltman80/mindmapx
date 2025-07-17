@@ -35,7 +35,8 @@ BEGIN
     ALTER TABLE todos
       ADD COLUMN mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
-END$$;
+END
+$$;
 
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
 CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
