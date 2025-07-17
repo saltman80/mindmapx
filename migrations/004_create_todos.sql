@@ -7,6 +7,13 @@ CREATE TYPE IF NOT EXISTS todo_ai_status AS ENUM (
   'failed'
 );
 
+CREATE TYPE IF NOT EXISTS todo_status AS ENUM (
+  'pending',
+  'in_progress',
+  'completed',
+  'cancelled'
+);
+
 CREATE TABLE IF NOT EXISTS todos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -14,8 +21,7 @@ CREATE TABLE IF NOT EXISTS todos (
   node_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   description TEXT,
-  status TEXT NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','in_progress','completed','cancelled')),
+  status todo_status NOT NULL DEFAULT 'pending',
   due_at TIMESTAMPTZ,
   ai_generated BOOLEAN NOT NULL DEFAULT FALSE,
   ai_status todo_ai_status,
@@ -25,18 +31,6 @@ CREATE TABLE IF NOT EXISTS todos (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM information_schema.columns
-    WHERE table_name = 'todos' AND column_name = 'mindmap_id'
-  ) THEN
-    ALTER TABLE todos
-      ADD COLUMN IF NOT EXISTS mindmap_id UUID REFERENCES mindmaps(id) ON DELETE CASCADE;
-  END IF;
-END;
-$$;
 
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
 CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
