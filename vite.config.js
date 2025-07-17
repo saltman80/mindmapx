@@ -1,9 +1,12 @@
-const env = loadEnv(mode, process.cwd(), '')
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
+import netlify from '@netlify/vite-plugin-netlify'
+import path from 'path'
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   return {
-    plugins: [
-      react(),
-      netlify()
-    ],
+    plugins: [react(), netlify()],
     envPrefix: 'VITE_',
     resolve: {
       alias: {
