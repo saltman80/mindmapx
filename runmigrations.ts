@@ -24,6 +24,13 @@ export async function runMigrations(): Promise<void> {
         run_on TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `)
+
+    // Ensure columns used in later indexes exist before index creation
+    await client.query(`
+      ALTER TABLE nodes
+      ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
+        REFERENCES mindmaps(id)
+    `)
     const files = fs.readdirSync(migrationsDir)
       .filter((file: string) => file.endsWith('.sql'))
       .sort((a: string, b: string) => {
