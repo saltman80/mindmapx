@@ -95,6 +95,14 @@ export async function runMigrations(): Promise<void> {
       }
       const filePath = path.join(migrationsDir, file)
       const sql = fs.readFileSync(filePath, 'utf8')
+
+      console.log(`🟡 Running migration file: ${file}`)
+      console.log(
+        '🔹 SQL Preview Start --------\n' +
+          sql.slice(0, 500) +
+          '\n🔹 SQL Preview End --------'
+      )
+
       await client.query('BEGIN')
       try {
         // Run the entire file at once to avoid breaking apart statements that
@@ -102,9 +110,11 @@ export async function runMigrations(): Promise<void> {
         await client.query(sql)
         await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
         await client.query('COMMIT')
-        console.log(`Applied ${file}`)
-      } catch (err) {
+        console.log(`✅ Applied migration: ${file}`)
+      } catch (err: any) {
         try { await client.query('ROLLBACK') } catch {}
+        console.error(`❌ Failed migration: ${file}`)
+        console.error(err.message)
         throw err
       }
     }
