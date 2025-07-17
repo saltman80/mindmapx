@@ -16,8 +16,8 @@ CREATE TYPE IF NOT EXISTS todo_status AS ENUM (
 
 CREATE TABLE IF NOT EXISTS todos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL,
+  mindmap_id UUID NOT NULL,
   node_id UUID REFERENCES nodes(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   description TEXT,
@@ -28,7 +28,9 @@ CREATE TABLE IF NOT EXISTS todos (
   ai_response JSONB,
   metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (mindmap_id) REFERENCES mindmaps(id) ON DELETE CASCADE
 );
 
 
