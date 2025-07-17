@@ -56,6 +56,12 @@ export async function runMigrations(): Promise<void> {
       ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
         REFERENCES mindmaps(id)
     `)
+
+    await client.query(`
+      ALTER TABLE IF EXISTS todos
+      ADD COLUMN IF NOT EXISTS mindmap_id UUID
+        REFERENCES mindmaps(id) ON DELETE CASCADE
+    `)
     const files = fs.readdirSync(migrationsDir)
       .filter((file: string) => file.endsWith('.sql'))
       .sort((a: string, b: string) => {
