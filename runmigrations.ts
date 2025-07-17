@@ -65,7 +65,7 @@ export async function runMigrations(): Promise<void> {
     `)
 
     await client.query(`
-      ALTER TABLE IF EXISTS todos
+      ALTER TABLE todos
       ADD COLUMN IF NOT EXISTS mindmap_id UUID
         REFERENCES mindmaps(id) ON DELETE CASCADE
     `)
