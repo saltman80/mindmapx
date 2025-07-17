@@ -10,7 +10,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE users (
 CREATE TRIGGER set_users_updated_at BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE mindmaps (
+CREATE TABLE IF NOT EXISTS mindmaps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -33,11 +33,11 @@ CREATE TABLE mindmaps (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (id, user_id)
 );
-CREATE INDEX idx_mindmaps_user_id ON mindmaps(user_id);
+CREATE INDEX IF NOT EXISTS idx_mindmaps_user_id ON mindmaps(user_id);
 CREATE TRIGGER set_mindmaps_updated_at BEFORE UPDATE ON mindmaps
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE todos (
+CREATE TABLE IF NOT EXISTS todos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mindmap_id UUID NOT NULL,
   user_id UUID NOT NULL,
@@ -49,12 +49,12 @@ CREATE TABLE todos (
   FOREIGN KEY (mindmap_id, user_id) REFERENCES mindmaps(id, user_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_todos_mindmap_id ON todos(mindmap_id);
-CREATE INDEX idx_todos_user_id ON todos(user_id);
+CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
+CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
 CREATE TRIGGER set_todos_updated_at BEFORE UPDATE ON todos
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   amount NUMERIC(10,2) NOT NULL,
@@ -66,19 +66,19 @@ CREATE TABLE payments (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (payment_provider, provider_payment_id)
 );
-CREATE INDEX idx_payments_user_id ON payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
 CREATE TRIGGER set_payments_updated_at BEFORE UPDATE ON payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE usage_events (
+CREATE TABLE IF NOT EXISTS usage_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   event_type TEXT NOT NULL,
   event_payload JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX idx_usage_events_user_id ON usage_events(user_id);
-CREATE INDEX idx_usage_events_event_type ON usage_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_usage_events_event_type ON usage_events(event_type);
 
 COMMIT;
 
