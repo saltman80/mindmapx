@@ -35,15 +35,31 @@ export async function runMigrations(): Promise<void> {
     // Ensure the user_id column exists so later migrations that reference it do
     // not fail when creating indexes or constraints.
     await client.query(`
-      ALTER TABLE mindmaps
-      ADD COLUMN IF NOT EXISTS user_id UUID
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'user_id'
+        ) THEN
+          ALTER TABLE mindmaps
+            ADD COLUMN user_id UUID;
+        END IF;
+      END$$;
     `)
 
     // Ensure the owner_id column exists for older migrations that
     // still reference this column when creating indexes or constraints.
     await client.query(`
-      ALTER TABLE mindmaps
-      ADD COLUMN IF NOT EXISTS owner_id UUID
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'owner_id'
+        ) THEN
+          ALTER TABLE mindmaps
+            ADD COLUMN owner_id UUID;
+        END IF;
+      END$$;
     `)
 
     await client.query(`
@@ -59,15 +75,31 @@ export async function runMigrations(): Promise<void> {
 
     // Ensure columns used in later indexes exist before index creation
     await client.query(`
-      ALTER TABLE nodes
-      ADD COLUMN IF NOT EXISTS mindmap_id UUID NOT NULL
-        REFERENCES mindmaps(id)
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'mindmap_id'
+        ) THEN
+          ALTER TABLE nodes
+            ADD COLUMN mindmap_id UUID NOT NULL
+              REFERENCES mindmaps(id);
+        END IF;
+      END$$;
     `)
 
     await client.query(`
-      ALTER TABLE todos
-      ADD COLUMN IF NOT EXISTS mindmap_id UUID
-        REFERENCES mindmaps(id) ON DELETE CASCADE
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'todos' AND column_name = 'mindmap_id'
+        ) THEN
+          ALTER TABLE todos
+            ADD COLUMN mindmap_id UUID
+              REFERENCES mindmaps(id) ON DELETE CASCADE;
+        END IF;
+      END$$;
     `)
     const files = fs.readdirSync(migrationsDir)
       .filter((file: string) => file.endsWith('.sql'))
