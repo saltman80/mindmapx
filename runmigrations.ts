@@ -60,8 +60,8 @@ export async function runMigrations(): Promise<void> {
           ALTER TABLE mindmaps
             ADD COLUMN owner_id UUID;
         END IF;
-        END;
-        $$;
+      END
+      $$;
     `)
 
     await client.query(`
