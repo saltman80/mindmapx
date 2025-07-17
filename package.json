@@ -31,6 +31,7 @@
     "@vercel/postgres": "^0.10.0"
   },
   "devDependencies": {
+    "vite": "^5.0.0",
     "typescript": "^5.1.0",
     "@types/node": "^20.0.0",
     "@types/pg": "^8.6.6",
