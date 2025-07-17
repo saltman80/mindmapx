@@ -25,6 +25,10 @@ CREATE TABLE IF NOT EXISTS todos (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE todos
+  ADD COLUMN IF NOT EXISTS mind_map_id UUID NOT NULL
+    REFERENCES mind_maps(id) ON DELETE CASCADE;
+
 CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
 CREATE INDEX IF NOT EXISTS idx_todos_mind_map_id ON todos(mind_map_id);
 CREATE INDEX IF NOT EXISTS idx_todos_node_id ON todos(node_id);
