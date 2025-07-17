@@ -19,7 +19,7 @@ BEGIN
 END
 $$;
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   stripe_session_id TEXT UNIQUE NOT NULL,
   customer_email CITEXT NOT NULL CHECK (

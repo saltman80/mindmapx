@@ -1,4 +1,4 @@
-CREATE TABLE maps (
+CREATE TABLE IF NOT EXISTS maps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -20,4 +20,4 @@ CREATE TRIGGER set_maps_updated_at
 BEFORE UPDATE ON maps
 FOR EACH ROW EXECUTE PROCEDURE trigger_set_updated_at();
 
-CREATE INDEX idx_maps_user_id ON maps(user_id);
+CREATE INDEX IF NOT EXISTS idx_maps_user_id ON maps(user_id);
