@@ -27,4 +27,6 @@ CREATE TRIGGER users_set_updated_at_tr
   EXECUTE PROCEDURE public.users_update_updated_at_fn();
 
 REVOKE ALL ON TABLE public.users FROM PUBLIC;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.users TO your_app_role;
+-- Grant privileges to the user running the migrations. This avoids hard coding
+-- a specific role name that may not exist in all environments.
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.users TO CURRENT_USER;
