@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TYPE IF NOT EXISTS todo_ai_status AS ENUM (
@@ -15,7 +16,7 @@ CREATE TYPE IF NOT EXISTS todo_status AS ENUM (
 );
 
 CREATE TABLE IF NOT EXISTS todos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL,
   mindmap_id UUID NOT NULL,
   node_id UUID DEFAULT NULL,
