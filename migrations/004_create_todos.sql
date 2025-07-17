@@ -33,7 +33,7 @@ BEGIN
     WHERE table_name = 'todos' AND column_name = 'mindmap_id'
   ) THEN
     ALTER TABLE todos
-      ADD COLUMN mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE;
+      ADD COLUMN IF NOT EXISTS mindmap_id UUID REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
 END;
 $$;

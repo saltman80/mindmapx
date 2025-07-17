@@ -20,7 +20,7 @@ BEGIN
     WHERE table_name = 'nodes' AND column_name = 'mindmap_id'
   ) THEN
     ALTER TABLE nodes
-      ADD COLUMN mindmap_id UUID NOT NULL REFERENCES mindmaps(id) ON DELETE CASCADE;
+      ADD COLUMN IF NOT EXISTS mindmap_id UUID REFERENCES mindmaps(id) ON DELETE CASCADE;
   END IF;
 END;
 $$;
