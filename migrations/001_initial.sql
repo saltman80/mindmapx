@@ -87,3 +87,4 @@ DROP TRIGGER IF EXISTS trg_edges_updated_at ON edges;
 CREATE TRIGGER trg_edges_updated_at
 BEFORE UPDATE ON edges
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+COMMIT;
