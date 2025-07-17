@@ -90,31 +90,24 @@ export async function runMigrations(): Promise<void> {
     const applied = new Set(rows.map((r: any) => r.name))
     for (const file of files) {
       if (applied.has(file)) {
-        console.warn(`[skip] Migration already applied: ${file}`)
+        console.log(`[skip] Migration already applied: ${file}`)
         continue
       }
       const filePath = path.join(migrationsDir, file)
       const sql = fs.readFileSync(filePath, 'utf8')
-
-      console.log(`🟡 Running migration file: ${file}`)
-      console.log(
-        '🔹 SQL Preview Start --------\n' +
-          sql.slice(0, 500) +
-          '\n🔹 SQL Preview End --------'
-      )
+      console.log(`🟡 Starting migration: ${file}`)
 
       await client.query('BEGIN')
       try {
-        // Run the entire file at once to avoid breaking apart statements that
-        // contain semicolons within dollar-quoted blocks.
         await client.query(sql)
         await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
         await client.query('COMMIT')
-        console.log(`✅ Applied migration: ${file}`)
+        console.log(`✅ Successfully applied: ${file}`)
       } catch (err: any) {
-        try { await client.query('ROLLBACK') } catch {}
-        console.error(`❌ Failed migration: ${file}`)
-        console.error(err.message)
+        await client.query('ROLLBACK').catch(() => {})
+        console.error(`❌ Migration failed in file: ${file}`)
+        console.error(`🔴 Error message: ${err.message}`)
+        console.error(`📝 First few lines of SQL:\n${sql.slice(0, 300)}...`)
         throw err
       }
     }
