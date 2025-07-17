@@ -85,18 +85,3 @@ CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_events_event_type ON usage_events(event_type);
 
 COMMIT;
-
--- +migrate Down
-BEGIN;
-DROP TRIGGER IF EXISTS set_payments_updated_at ON payments;
-DROP TRIGGER IF EXISTS set_todos_updated_at ON todos;
-DROP TRIGGER IF EXISTS set_mindmaps_updated_at ON mindmaps;
-DROP TRIGGER IF EXISTS set_users_updated_at ON users;
-DROP TABLE IF EXISTS usage_events;
-DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS todos;
-DROP TABLE IF EXISTS mindmaps;
-DROP TABLE IF EXISTS users;
-DROP FUNCTION IF EXISTS update_updated_at_column();
-DROP EXTENSION IF EXISTS "pgcrypto";
-COMMIT;
