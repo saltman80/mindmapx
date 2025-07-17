@@ -116,7 +116,10 @@ export async function runMigrations(): Promise<void> {
     const { rows } = await client.query<{ name: string }>('SELECT name FROM migrations')
     const applied = new Set(rows.map((r: any) => r.name))
     for (const file of files) {
-      if (applied.has(file)) continue
+      if (applied.has(file)) {
+        console.warn(`[skip] Migration already applied: ${file}`)
+        continue
+      }
       const filePath = path.join(migrationsDir, file)
       const sql = fs.readFileSync(filePath, 'utf8')
       await client.query('BEGIN')
