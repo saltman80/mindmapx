@@ -40,7 +40,6 @@
     "@types/bcrypt": "^5.0.0",
     "@types/stripe": "^8.0.417",
     "@netlify/functions": "^1.0.0",
-    "@vitejs/plugin-react": "^4.0.3",
-    "@netlify/vite-plugin-netlify": "^1.0.0"
+    "@vitejs/plugin-react": "^4.0.3"
   }
 }
