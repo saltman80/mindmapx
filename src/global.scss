@@ -445,14 +445,28 @@ hr {
   padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
-.faq-item {
-  margin-bottom: var(--spacing-md);
-  overflow: hidden;
+.accordion {
+  display: grid;
+  gap: var(--spacing-md);
 }
 
-.faq-item summary {
-  cursor: pointer;
+.accordion-item {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+.accordion-header {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   font-weight: 600;
+  padding: var(--spacing-sm) 0;
+  cursor: pointer;
+}
+
+.accordion-body {
+  padding: var(--spacing-sm) 0;
 }
 
 .shape {
@@ -492,6 +506,11 @@ hr {
 /* --- Layout Enhancements --- */
 .section {
   padding: var(--spacing-2xl) var(--spacing-lg);
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .section-bg-alt {

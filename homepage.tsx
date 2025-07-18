@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import AnimatedAccordion from './animatedaccordion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
 import MindmapDemo from './mindmapdemo'
@@ -57,6 +58,12 @@ const features = [
       'Your data stays safe and synced across devices with encrypted cloud backup.',
     icon: './assets/placeholder.png',
   },
+]
+
+const faqItems = [
+  { q: 'What is MindXdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
+  { q: 'How does the AI help?', a: 'It automates task creation and finds connections between ideas.' },
+  { q: 'Can I collaborate with my team?', a: 'Yes, share maps and task boards in real time.' },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
@@ -286,19 +293,8 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="faq section">
         <div className="container">
-        <h2>Frequently Asked Questions</h2>
-        {[
-          { q: 'What is MindXdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
-          { q: 'How does the AI help?', a: 'It automates task creation and finds connections between ideas.' },
-          { q: 'Can I collaborate with my team?', a: 'Yes, share maps and task boards in real time.' },
-        ].map(item => (
-          <motion.div key={item.q} className="faq-item" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-            <details>
-              <summary>{item.q}</summary>
-              <p>{item.a}</p>
-            </details>
-          </motion.div>
-        ))}
+          <h2>Frequently Asked Questions</h2>
+          <AnimatedAccordion items={faqItems} />
         </div>
       </section>
 
