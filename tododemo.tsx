@@ -172,10 +172,10 @@ export default function TodoDemo(): JSX.Element {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            Vision Beyond a Task Board
+            Vision Meets Action
           </motion.h2>
           <p className="section-subtext">
-            Mind maps reveal relationships so you plan and execute with clarity.
+            Use AI to find opportunities and aid you in executing your team's vision.
           </p>
         </div>
       </section>

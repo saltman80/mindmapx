@@ -26,6 +26,7 @@ const sections: AboutSection[] = [
     img: './assets/placeholder.svg',
     bulletPoints: [
       'One workspace for mapping and doing',
+      'Kanban board shows todo progress at a glance',
       'Visual and list views always in sync',
       'Seamless flow from brainstorming to execution',
     ],
@@ -71,19 +72,18 @@ export default function AboutPage(): JSX.Element {
         <div className="about-hero-inner">
           <h1>About MindXdo</h1>
           <p>
-            MindXdo blends mind maps and to‑do lists into a single workflow so you
-            can plan and execute without friction.
+            Vision Meets Action. Plan the big picture, create the details and track the action.
           </p>
           <p>
-            Capture ideas in seconds, break them into tasks, and watch our AI keep
-            everything organized while you focus on the big picture.
+            Stop getting lost in the details and focus on what matters. Use AI to find opportunities and aid you in executing your team's vision.
           </p>
           <Link to="/purchase" className="btn">Purchase</Link>
         </div>
       </section>
       {sections.map((s, i) => (
         <section
-          className={`about-section reveal${i % 2 ? ' reverse' : ''}`}
+          className={`about-section reveal${i === 0 ? ' is-visible' : ''}${
+            i % 2 ? ' reverse' : ''}`}
           key={s.title}
         >
           {i % 2 === 0 && (

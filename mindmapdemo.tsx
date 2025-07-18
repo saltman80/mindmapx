@@ -212,10 +212,10 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                See Beyond a Task Board
+                Vision Meets Action
               </motion.h2>
               <p className="section-subtext">
-                Mind map connections provide a bird's-eye view of every project step.
+                Plan the big picture, create the details and track the action with AI assistance.
               </p>
             </div>
           </section>

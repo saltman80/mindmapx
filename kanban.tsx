@@ -85,7 +85,7 @@ export default function Kanban(): JSX.Element {
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <img src="./assets/placeholder.svg" alt="" className="section-icon" />
             <h1 className="marketing-text-large">Smooth Kanban Flow</h1>
-            <p className="section-subtext">Marketing tasks glide across each phase</p>
+            <p className="section-subtext">A Kanban board is a perfect tool for showing progress of todo items.</p>
           </div>
           <div className="kanban-board">
             {lanes.map((lane, laneIndex) => {

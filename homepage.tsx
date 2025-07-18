@@ -55,6 +55,12 @@ const features = [
     icon: './assets/feature-ai-automation.png',
   },
   {
+    title: 'Kanban Board',
+    description:
+      'A perfect tool for showing progress of todo items from start to finish.',
+    icon: './assets/feature-kanban.png',
+  },
+  {
     title: 'Secure Cloud Storage',
     description:
       'Your data stays safe and synced across devices with encrypted cloud backup.',
@@ -97,11 +103,11 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">MindXdo: Mindmaps Meet Todos with AI</h1>
+          <h1 className="hero-title">MindXdo: Vision Meets Action</h1>
           <p>
-            Experience the power of AI as your ideas become actionable plans.
-            Map a long‑term vision, break it down into tasks, and let MindXdo
-            guide the next steps.
+            Plan the big picture, create the details and track the action.
+            Stop getting lost in the details and focus on what matters.
+            Use AI to find opportunities and aid you in executing your team's vision.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -133,12 +139,10 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <StackingText text="Mindmaps + Todos + Team Effort" />
+            <StackingText text="Vision Meets Action" />
           </motion.h2>
-          <p className="section-subtext">Use AI to lay out visual plans and structure</p>
-          <p className="section-subtext">
-            Leverage our assistant to instantly convert ideas into organized mind maps.
-          </p>
+          <p className="section-subtext">Plan the big picture, create the details and track the action.</p>
+          <p className="section-subtext">Stop getting lost in the details and focus on what matters.</p>
         </div>
       </section>
 
