@@ -27,37 +27,37 @@ const features = [
     title: 'Mind Mapping',
     description:
       'Visualize your ideas with dynamic, draggable mind maps that expand as you think.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-mind-mapping.png',
   },
   {
     title: 'Integrated To-Do Lists',
     description:
       'Link tasks to your mind map nodes and track progress effortlessly in one place.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-todo-integration.png',
   },
   {
     title: 'Real-Time Collaboration',
     description:
       'Work together with your team on interactive maps and task lists in real time.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-collaboration.png',
   },
   {
     title: 'Cross-Platform Sync',
     description:
       'Access your projects on any device with instant syncing and offline support.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-cross-platform.png',
   },
   {
     title: 'AI Automation',
     description:
       'Let MindXdo suggest tasks and connections so you can focus on the experience.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-ai-automation.png',
   },
   {
     title: 'Secure Cloud Storage',
     description:
       'Your data stays safe and synced across devices with encrypted cloud backup.',
-    icon: './assets/placeholder.png',
+    icon: './assets/feature-secure-storage.png',
   },
 ]
 
@@ -69,9 +69,9 @@ const faqItems = [
 
 const Homepage: React.FC = (): JSX.Element => {
   const heroImages = [
-    './assets/placeholder.png',
-    './assets/placeholder.png',
-    './assets/placeholder.png',
+    './assets/hero-mindmap.png',
+    './assets/hero-todo.png',
+    './assets/hero-collaboration.png',
   ]
   const [currentHero, setCurrentHero] = useState(0)
 
@@ -231,8 +231,8 @@ const Homepage: React.FC = (): JSX.Element => {
             Map your ideas visually while keeping tasks in focus.
           </div>
           <img
-            src="./assets/placeholder.png"
-            alt="Two column placeholder"
+            src="./assets/integration-banner.png"
+            alt="Visual integration banner"
             className="banner-image"
           />
         </div>
@@ -273,7 +273,7 @@ const Homepage: React.FC = (): JSX.Element => {
           timelines so you never wonder what comes next.
         </p>
         <img
-          src="./assets/placeholder.png"
+          src="./assets/ai-showcase.png"
           alt="AI showcase"
           className="banner-image"
         />

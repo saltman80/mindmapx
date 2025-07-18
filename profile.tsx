@@ -58,7 +58,7 @@ export default function ProfilePage(): JSX.Element {
     <div className="profile-page container mx-auto p-6 max-w-lg">
       <h1 className="text-2xl font-semibold mb-4">Update Profile</h1>
       <img
-        src="./assets/profile.png"
+        src="./assets/profile-header.png"
         alt="Profile header"
         className="profile-image w-32 mx-auto mb-4"
       />
