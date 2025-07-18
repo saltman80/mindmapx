@@ -971,6 +971,7 @@ hr {
   inset: 0;
   pointer-events: none;
   opacity: 0.3;
+  z-index: -2;
 }
 
 .mindmap-bg-small {
@@ -981,6 +982,7 @@ hr {
   right: auto;
   bottom: auto;
   transform: translate(-50%, -50%);
+  z-index: -2;
 }
 
 .mindmap-bg {
