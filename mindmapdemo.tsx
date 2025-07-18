@@ -59,28 +59,58 @@ export default function MindmapDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="mindmap-demo section section--two-col reveal">
-      {maps.map((map, mapIndex) => (
-        <div className="mindmap-card" key={map.title}>
-          <h3>{map.title}</h3>
-          <ul className="mindmap-list">
-            {map.items.map((item, itemIndex) => {
-              const visible = step >= itemIndex * mapCount + mapIndex
-              return (
-                <motion.li
-                  className="mindmap-item"
-                  key={item.text}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {item.text}
-                </motion.li>
-              )
-            })}
-          </ul>
-        </div>
-      ))}
+    <div className="mindmap-demo section reveal">
+      <h1 className="demo-title">MindmapX Visualizer</h1>
+      <p className="demo-sub">Ideas burst from the center of your screen</p>
+      <div className="mindmap-grid">
+        {maps.map((map, mapIndex) => (
+          <div className="mindmap-container" key={map.title}>
+            <svg viewBox="-160 -160 320 320" className="mindmap-svg">
+              <circle cx="0" cy="0" r="35" fill="orange" stroke="black" />
+              <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="root-text">
+                {map.title}
+              </text>
+              {map.items.map((item, itemIndex) => {
+                const angle = (itemIndex / map.items.length) * Math.PI * 2 - Math.PI / 2
+                const x = 110 * Math.cos(angle)
+                const y = 110 * Math.sin(angle)
+                const visible = step >= itemIndex * mapCount + mapIndex
+                return (
+                  <g key={item.text}>
+                    <motion.line
+                      x1="0"
+                      y1="0"
+                      x2={visible ? x : 0}
+                      y2={visible ? y : 0}
+                      stroke="black"
+                      strokeWidth="2"
+                      transition={{ duration: 0.6 }}
+                    />
+                    <motion.circle
+                      cx={visible ? x : 0}
+                      cy={visible ? y : 0}
+                      r="25"
+                      fill="orange"
+                      stroke="black"
+                      transition={{ duration: 0.6 }}
+                    />
+                    <motion.text
+                      x={visible ? x : 0}
+                      y={visible ? y : 0}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="node-text"
+                      transition={{ duration: 0.6 }}
+                    >
+                      {item.text}
+                    </motion.text>
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
+        ))}
+      </div>
       <div className="mindmap-upgrade">
         <Link to="/payment" className="btn">
           Upgrade
