@@ -126,14 +126,6 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="section section--one-col section-bg-alt text-center" style={{ marginTop: '100px' }}>
         <div className="container text-center">
-          <h2 className="marketing-text-large">
-            <StackingText text="Mindmaps + Todos + Team Effort" />
-          </h2>
-        </div>
-      </section>
-
-      <section className="section section--one-col section-bg-alt text-center">
-        <div className="container text-center">
           <motion.h2
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
@@ -141,8 +133,9 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Use AI to lay out visual plans and structure
+            <StackingText text="Mindmaps + Todos + Team Effort" />
           </motion.h2>
+          <p className="section-subtext">Use AI to lay out visual plans and structure</p>
           <p className="section-subtext">
             Leverage our assistant to instantly convert ideas into organized mind maps.
           </p>
