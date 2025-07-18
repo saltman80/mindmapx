@@ -126,17 +126,6 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
                 Purchase
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/login"
-                className={({ isActive }) =>
-                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
-                }
-                onClick={handleLinkClick}
-              >
-                Login
-              </NavLink>
-            </li>
             </ul>
           </nav>
         </div>

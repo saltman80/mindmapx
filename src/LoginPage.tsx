@@ -1,4 +1,5 @@
 import React, { useState, FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 
 const LoginPage = () => {
@@ -48,6 +49,11 @@ const LoginPage = () => {
             />
           </div>
           <button type="submit" className="btn w-full">Login</button>
+          <p className="mt-4 text-center">
+            <Link to="/reset-password" className="text-blue-600 hover:underline">
+              Reset Password
+            </Link>
+          </p>
         </form>
       </div>
     </section>
