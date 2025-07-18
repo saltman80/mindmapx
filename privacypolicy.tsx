@@ -1,11 +1,11 @@
 export default function PrivacyPolicy(): JSX.Element {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-semibold mb-6">Privacy Policy</h1>
-      <p className="text-sm text-gray-600 mb-8">Last updated: July 10, 2024</p>
+    <main className="container legal-page text-center py-lg">
+      <h1 className="mb-lg">Privacy Policy</h1>
+      <p className="text-muted mb-lg">Last updated: July 10, 2024</p>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">1. Introduction</h2>
         <p>
           Welcome to MindXdo. Your privacy is important to us. This Privacy Policy
           explains how we collect, use, disclose, and safeguard your information when you
@@ -13,9 +13,9 @@ export default function PrivacyPolicy(): JSX.Element {
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">2. Information We Collect</h2>
-        <ul className="list-disc list-inside space-y-2">
+      <section className="mb-lg">
+        <h2 className="mb-md">2. Information We Collect</h2>
+        <ul>
           <li>
             <strong>Personal Data:</strong> Name, email address, billing information when you
             sign up or purchase a subscription through Stripe.
@@ -31,9 +31,9 @@ export default function PrivacyPolicy(): JSX.Element {
         </ul>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">3. How We Use Your Information</h2>
-        <ul className="list-disc list-inside space-y-2">
+      <section className="mb-lg">
+        <h2 className="mb-md">3. How We Use Your Information</h2>
+        <ul>
           <li>To provide, operate, and maintain our website and services.</li>
           <li>
             To process transactions and send you related information, including purchase
@@ -48,8 +48,8 @@ export default function PrivacyPolicy(): JSX.Element {
         </ul>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">4. Cookies and Tracking Technologies</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">4. Cookies and Tracking Technologies</h2>
         <p>
           We use cookies and similar tracking technologies to track activity on our site and hold
           certain information. You can set your browser to refuse cookies or alert you when
@@ -57,12 +57,12 @@ export default function PrivacyPolicy(): JSX.Element {
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">5. Third-Party Services</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">5. Third-Party Services</h2>
         <p>
           We may share your information with third parties for processing and analytics, including:
         </p>
-        <ul className="list-disc list-inside space-y-2">
+        <ul>
           <li><strong>Netlify:</strong> Hosting and serverless functions.</li>
           <li><strong>Neon (Postgres):</strong> Database storage.</li>
           <li><strong>Stripe:</strong> Payment processing.</li>
@@ -74,35 +74,35 @@ export default function PrivacyPolicy(): JSX.Element {
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">6. Data Security</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">6. Data Security</h2>
         <p>
           We implement reasonable security measures to protect your information. However, no
           electronic transmission or storage method is 100% secure.
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">7. Children's Privacy</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">7. Children's Privacy</h2>
         <p>
           Our services are not directed to children under 13. We do not knowingly collect personal
           information from children under 13.
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">8. Changes to This Privacy Policy</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">8. Changes to This Privacy Policy</h2>
         <p>
           We may update this Privacy Policy periodically. We will notify you of any changes by
           posting the new policy on this page with an updated "Last updated" date.
         </p>
       </section>
 
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
+      <section className="mb-lg">
+        <h2 className="mb-md">9. Contact Us</h2>
         <p>
           If you have questions or concerns about this Privacy Policy, please contact us at{' '}
-          <a href="mailto:privacy@mindmap-todo.com" className="text-blue-600 hover:underline">
+          <a href="mailto:privacy@mindmap-todo.com" className="text-primary">
             privacy@mindmap-todo.com
           </a>.
         </p>

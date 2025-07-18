@@ -69,14 +69,14 @@ const PaymentPage: React.FC = (): JSX.Element => {
   }
 
   return (
-    <div className="payment-page container mx-auto p-6 text-center">
-      <h1 className="text-3xl font-semibold mb-4">Upgrade to Premium</h1>
-      <p className="mb-6">Unlock all features, priority support, and unlimited projects.</p>
-      {error && <div className="text-red-600 mb-4">{error}</div>}
+    <div className="payment-page container text-center p-lg">
+      <h1 className="mb-md">Upgrade to Premium</h1>
+      <p className="mb-lg">Unlock all features, priority support, and unlimited projects.</p>
+      {error && <div className="text-error mb-md">{error}</div>}
       <button
         onClick={handleCheckout}
         disabled={loading}
-        className="bg-blue-600 text-white px-5 py-2 rounded disabled:opacity-50"
+        className="btn"
       >
         {loading ? 'Processing...' : 'Start Checkout'}
       </button>
