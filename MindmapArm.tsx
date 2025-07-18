@@ -2,7 +2,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
 
 export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' }): JSX.Element {
-  const width = 1600
+  const width = 3200
   const startX = side === 'left' ? -50 : width - 50
   const endX = width / 2
   const ref = useRef<SVGSVGElement>(null)
@@ -11,7 +11,7 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
 
   useEffect(() => {
     if (!isInView) return
-    const t = setTimeout(() => setStart(true), 1000)
+    const t = setTimeout(() => setStart(true), 500)
     return () => clearTimeout(t)
   }, [isInView])
 
