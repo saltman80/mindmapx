@@ -806,7 +806,8 @@ hr {
 
 /* --- Demo Styles --- */
 .todo-demo,
-.mindmap-demo {
+.mindmap-demo,
+.kanban-demo {
   justify-items: center;
   text-align: center;
 }
@@ -817,7 +818,8 @@ hr {
 }
 
 .todo-card,
-.mindmap-card {
+.mindmap-card,
+.kanban-card {
   background-color: var(--color-surface);
   padding: var(--spacing-lg);
   border-radius: 8px;
@@ -827,7 +829,8 @@ hr {
 }
 
 .todo-list,
-.mindmap-list {
+.mindmap-list,
+.kanban-list {
   list-style: none;
   padding: 0;
   margin: var(--spacing-sm) 0 0;
@@ -835,7 +838,8 @@ hr {
 }
 
 .todo-item,
-.mindmap-item {
+.mindmap-item,
+.kanban-item {
   margin-bottom: var(--spacing-sm);
 }
 
@@ -903,6 +907,31 @@ hr {
   grid-template-columns: repeat(2, minmax(250px, 1fr));
   gap: var(--spacing-lg);
   justify-items: center;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  justify-items: stretch;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.kanban-lane {
+  background-color: var(--color-bg-alt);
+  padding: var(--spacing-md);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 640px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
