@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
 export default function AboutPage(): JSX.Element {
   useScrollReveal()
   return (
     <div className="about-page">
-      <section className="section section--one-col reveal">
+      <section className="section section--one-col reveal relative overflow-hidden">
+        <FaintMindmapBackground />
         <h1>About MindXdo</h1>
         <p>
           MindXdo blends mind maps and to‑do lists into a single workflow so you

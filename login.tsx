@@ -1,3 +1,5 @@
+import FaintMindmapBackground from './FaintMindmapBackground'
+
 const LoginPage = (): JSX.Element => {
   const [values, setValues] = useState<LoginFormValues>({ email: '', password: '' })
   const [errors, setErrors] = useState<Partial<LoginFormValues>>({})
@@ -92,12 +94,14 @@ const LoginPage = (): JSX.Element => {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <img
-        src="./assets/login.png"
-        alt="Login"
-        className="w-24 mx-auto mb-4"
-      />
+    <section className="section relative overflow-hidden">
+      <FaintMindmapBackground />
+      <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+        <img
+          src="./assets/login.png"
+          alt="Login"
+          className="w-24 mx-auto mb-4"
+        />
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
       {submitError && (
         <div role="alert" aria-live="assertive" className="text-red-600 mb-4">
@@ -144,7 +148,8 @@ const LoginPage = (): JSX.Element => {
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-    </div>
+      </div>
+    </section>
   )
 }
 
