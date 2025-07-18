@@ -550,7 +550,7 @@ hr {
   top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  width: 400px;
+  width: 800px;
   height: 300px;
   background: radial-gradient(circle at center, var(--color-secondary), transparent);
 }
@@ -1057,18 +1057,18 @@ hr {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 400px;
+  width: 800px;
   height: 100px;
   pointer-events: none;
   opacity: 0.4;
 }
 
 .mindmap-arm.left {
-  left: -50px;
+  left: -100px;
 }
 
 .mindmap-arm.right {
-  right: -50px;
+  right: -100px;
 }
 
 .section-icon {
