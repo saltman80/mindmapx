@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 async function loadMap(mapId: string, signal?: AbortSignal): Promise<MapData> {
   const res = await fetch(`/api/maps/${mapId}`, { signal })
   if (!res.ok) throw new Error(`Failed to load map: ${res.status}`)
