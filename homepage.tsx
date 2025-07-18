@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedAccordion from './animatedaccordion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
-import MindmapDemo from './mindmapdemo'
+import { CompactMindmapDemo } from './mindmapdemo'
+import MindmapArm from './MindmapArm'
 import FaintMindmapBackground from './FaintMindmapBackground'
 
 const StackingText: React.FC<{ text: string }> = ({ text }) => (
@@ -178,7 +179,7 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <MindmapDemo />
+            <CompactMindmapDemo />
           </motion.div>
           <motion.div
             className="marketing-text-large"
@@ -189,6 +190,56 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             See how AI instantly creates a map for your ideas.
           </motion.div>
+        </div>
+      </section>
+
+      <section className="section section--one-col section-bg-alt text-center reveal relative overflow-hidden">
+        <MindmapArm side="left" />
+        <div className="container text-center">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <h2 className="marketing-text-large">
+            <StackingText text="Simple and Powerful" />
+          </h2>
+          <p className="section-subtext">
+            Plan projects effortlessly with intuitive maps that grow alongside your ideas.
+          </p>
+        </div>
+      </section>
+
+      <section className="section section--one-col text-center reveal">
+        <div className="container text-center">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            AI Todo Lists Keep Teams Aligned
+          </motion.h2>
+          <p className="section-subtext">
+            Assign tasks from your maps and watch progress unfold automatically.
+          </p>
+        </div>
+      </section>
+
+      <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-hidden">
+        <MindmapArm side="right" />
+        <div className="container text-center">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            See Beyond a Task Board
+          </motion.h2>
+          <p className="section-subtext">
+            Mind map connections provide a bird's-eye view of every project step.
+          </p>
         </div>
       </section>
 
