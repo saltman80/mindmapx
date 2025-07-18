@@ -80,7 +80,7 @@ export default function MindmapDemo(): JSX.Element {
     <div className="mindmap-demo-page">
       <section className="mindmap-demo section reveal relative overflow-hidden">
         <FaintMindmapBackground />
-        <div className="container section--one-col text-center">
+        <div className="container container-full section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
           <p className="section-subtext">
@@ -162,7 +162,7 @@ export default function MindmapDemo(): JSX.Element {
 
       <section className="section section-bg-alt reveal relative overflow-hidden">
         <MindmapArm side="left" />
-        <div className="container section--one-col text-center">
+        <div className="container container-full section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h2 className="marketing-text-large">
             <StackingText text="Simple and Powerful" />
@@ -174,7 +174,7 @@ export default function MindmapDemo(): JSX.Element {
       </section>
 
       <section className="section reveal">
-        <div className="container section--one-col text-center">
+        <div className="container container-full section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
@@ -193,7 +193,7 @@ export default function MindmapDemo(): JSX.Element {
 
       <section className="section section-bg-primary-light reveal relative overflow-hidden">
         <MindmapArm side="right" />
-        <div className="container section--one-col text-center">
+        <div className="container container-full section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
