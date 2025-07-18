@@ -19,36 +19,18 @@ const PurchasePage = () => {
             <div className="offer-card text-center">
               <FaintMindmapBackground className="mindmap-bg-small" />
               <h2 className="mb-md">Monthly Service Includes</h2>
-              <table className="table-auto mx-auto text-left mb-lg">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2">Item</th>
-                    <th className="px-4 py-2">Limit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border px-4 py-2">Manual mindmaps &amp; todos</td>
-                    <td className="border px-4 py-2">Unlimited</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">AI mind maps</td>
-                    <td className="border px-4 py-2">20 / month</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">AI todo lists</td>
-                    <td className="border px-4 py-2">200 / month</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">Kanban board</td>
-                    <td className="border px-4 py-2">Coming soon</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">Team members</td>
-                    <td className="border px-4 py-2">3 seats</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="features-grid mb-lg">
+                <div className="feature-name">Manual mindmaps &amp; todos</div>
+                <div className="feature-limit">Unlimited</div>
+                <div className="feature-name">AI mind maps</div>
+                <div className="feature-limit">20 / month</div>
+                <div className="feature-name">AI todo lists</div>
+                <div className="feature-limit">200 / month</div>
+                <div className="feature-name">Kanban board</div>
+                <div className="feature-limit">Coming soon</div>
+                <div className="feature-name">Team members</div>
+                <div className="feature-limit">3 seats</div>
+              </div>
               <p className="mb-md">
                 Need more AI credits?{' '}
                 <a href="mailto:hey@mindxdo.com">hey@mindxdo.com</a>
@@ -115,6 +97,7 @@ const PurchasePage = () => {
                 />
               </label>
             </div>
+            <p className="total-charge text-center">Total: $9.99 / month</p>
             <div className="payment-actions">
               <button type="submit" className="btn" disabled>
                 Place Order
