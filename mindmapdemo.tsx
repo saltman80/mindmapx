@@ -80,7 +80,7 @@ export default function MindmapDemo(): JSX.Element {
     <div className="mindmap-demo-page">
       <section className="mindmap-demo section reveal relative overflow-hidden">
         <FaintMindmapBackground />
-        <div className="container container-full section--one-col text-center">
+        <div className="container section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
           <p className="section-subtext">

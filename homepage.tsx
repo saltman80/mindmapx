@@ -123,7 +123,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section-bg-alt" style={{ marginTop: '300px' }}>
+      <section className="section section-bg-alt" style={{ marginTop: '100px' }}>
         <div className="container">
           <h2 className="marketing-text-large">
             <StackingText text="Mindmaps + Todos + Team Effort" />
