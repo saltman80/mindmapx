@@ -406,6 +406,10 @@ hr {
   justify-items: center;
 }
 
+.purchase-grid {
+  align-items: start;
+}
+
 .three-column {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -981,6 +985,17 @@ hr {
   max-width: 420px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.offer-card {
+  background-color: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-xl);
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--spacing-xl);
 }
 
 .form-field {
