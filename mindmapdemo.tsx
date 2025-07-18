@@ -87,14 +87,16 @@ export default function MindmapDemo(): JSX.Element {
                 const angle = (itemIndex / map.items.length) * Math.PI * 2 - Math.PI / 2
                 const x = 110 * Math.cos(angle)
                 const y = 110 * Math.sin(angle)
+                const lineX = x - 25 * Math.cos(angle)
+                const lineY = y - 25 * Math.sin(angle)
                 const visible = step >= itemIndex * mapCount + mapIndex
                 return (
                   <g key={item.text}>
                     <motion.line
                       x1="0"
                       y1="0"
-                      x2={visible ? x : 0}
-                      y2={visible ? y : 0}
+                      x2={visible ? lineX : 0}
+                      y2={visible ? lineY : 0}
                       stroke="var(--color-border)"
                       strokeWidth="2"
                       transition={{ duration: 0.6 }}
@@ -107,22 +109,30 @@ export default function MindmapDemo(): JSX.Element {
                       stroke="var(--color-border)"
                       transition={{ duration: 0.6 }}
                     />
-                    <motion.text
-                      x={visible ? x : 0}
-                      y={visible ? y : 0}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="node-text"
-                      transition={{ duration: 0.6 }}
-                    >
-                      {item.text}
-                    </motion.text>
+                    {visible && (
+                      <motion.text
+                        x={x}
+                        y={y}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="node-text"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 0.6 }}
+                      >
+                        {item.text}
+                      </motion.text>
+                    )}
                   </g>
                 )
               })}
             </svg>
           </div>
-        ))}
+          ))}
+          <div className="mindmap-text-block">
+            Harness the power of AI-driven mind mapping to quickly expand and
+            organize your best ideas into actionable plans.
+          </div>
         </div>
         <div className="mindmap-upgrade text-center">
           <Link to="/purchase" className="btn">
