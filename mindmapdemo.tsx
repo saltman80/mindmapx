@@ -82,6 +82,7 @@ export default function MindmapDemo(): JSX.Element {
         <FaintMindmapBackground />
         <div className="container text-center">
           <div className="max-w-2xl mx-auto mb-8">
+            <img src="./assets/placeholder.svg" alt="" className="section-icon" />
             <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
             <p className="section-subtext">
               Mind maps animate to life so you can focus on brainstorming
@@ -105,16 +106,18 @@ export default function MindmapDemo(): JSX.Element {
                 const angle = (itemIndex / map.items.length) * Math.PI * 2 - Math.PI / 2
                 const x = 110 * Math.cos(angle)
                 const y = 110 * Math.sin(angle)
+                const startX = 35 * Math.cos(angle)
+                const startY = 35 * Math.sin(angle)
                 const lineX = x - 25 * Math.cos(angle)
                 const lineY = y - 25 * Math.sin(angle)
                 const visible = step >= itemIndex * mapCount + mapIndex
                 return (
                   <g key={item.text}>
                     <motion.line
-                      x1="0"
-                      y1="0"
-                      x2={visible ? lineX : 0}
-                      y2={visible ? lineY : 0}
+                      x1={startX}
+                      y1={startY}
+                      x2={visible ? lineX : startX}
+                      y2={visible ? lineY : startY}
                       stroke="var(--color-border)"
                       strokeWidth="2"
                       transition={{ duration: 0.6 }}
@@ -163,6 +166,7 @@ export default function MindmapDemo(): JSX.Element {
       <section className="section section-bg-alt reveal relative overflow-hidden">
         <MindmapArm side="left" />
         <div className="container">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h2 className="marketing-text-large">
             <StackingText text="Simple and Powerful" />
           </h2>
@@ -174,6 +178,7 @@ export default function MindmapDemo(): JSX.Element {
 
       <section className="section reveal">
         <div className="container">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ x: 100, opacity: 0 }}
@@ -192,6 +197,7 @@ export default function MindmapDemo(): JSX.Element {
       <section className="section section-bg-primary-light reveal relative overflow-hidden">
         <MindmapArm side="right" />
         <div className="container">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}
