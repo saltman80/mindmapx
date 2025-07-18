@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
 import FaintMindmapBackground from './FaintMindmapBackground'
@@ -69,20 +69,23 @@ interface MindmapDemoProps {
 
 export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.Element {
   useScrollReveal()
+  const sectionRef = useRef<HTMLElement>(null)
+  const inView = useInView(sectionRef, { margin: '-40% 0px -40% 0px', once: true })
   const mapCount = maps.length
   const maxItems = Math.max(...maps.map(m => m.items.length))
   const totalSteps = mapCount * maxItems
   const [step, setStep] = useState(0)
 
   useEffect(() => {
+    if (!inView) return
     if (step >= totalSteps) return
     const t = setTimeout(() => setStep(prev => prev + 1), 600)
     return () => clearTimeout(t)
-  }, [step, totalSteps])
+  }, [inView, step, totalSteps])
 
   return (
     <div className="mindmap-demo-page">
-      <section className="mindmap-demo section reveal relative overflow-hidden">
+      <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-hidden">
         <FaintMindmapBackground />
         <div className="container section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />

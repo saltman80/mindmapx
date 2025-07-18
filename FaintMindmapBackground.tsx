@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 
 interface NodePos {
   angle: number
@@ -19,16 +19,25 @@ interface BgProps {
 
 export default function FaintMindmapBackground({ className = '' }: BgProps): JSX.Element {
   const [visible, setVisible] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { margin: '-40% 0px -40% 0px', once: true })
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setVisible(v => (v < nodes.length ? v + 1 : v))
-    }, 800)
-    return () => clearInterval(id)
-  }, [])
+    if (!isInView) return
+    let interval: number | undefined
+    const start = setTimeout(() => {
+      interval = window.setInterval(() => {
+        setVisible(v => (v < nodes.length ? v + 1 : v))
+      }, 800)
+    }, 1000)
+    return () => {
+      clearTimeout(start)
+      if (interval !== undefined) clearInterval(interval)
+    }
+  }, [isInView])
 
   return (
-    <div className={`mindmap-bg-container ${className}`} aria-hidden="true">
+    <div ref={ref} className={`mindmap-bg-container ${className}`} aria-hidden="true">
       <svg viewBox="-150 -150 300 300" className="mindmap-bg">
         <circle
           cx="0"
