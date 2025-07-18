@@ -96,7 +96,7 @@ const LoginPage = (): JSX.Element => {
   return (
     <section className="section relative overflow-hidden">
       <FaintMindmapBackground />
-      <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <div className="form-card text-center">
         <img
           src="./assets/login.png"
           alt="Login"
@@ -109,41 +109,37 @@ const LoginPage = (): JSX.Element => {
         </div>
       )}
       <form onSubmit={handleSubmit} noValidate>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
+        <div className="form-field">
+          <label htmlFor="email" className="form-label">Email</label>
           <input
             type="email"
             name="email"
             id="email"
             value={values.email}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`form-input${errors.email ? ' form-error' : ''}`}
             required
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="text-error text-sm mt-1">{errors.email}</p>}
         </div>
-        <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium mb-1">
-            Password
-          </label>
+        <div className="form-field">
+          <label htmlFor="password" className="form-label">Password</label>
           <input
             type="password"
             name="password"
             id="password"
             value={values.password}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
+            className={`form-input${errors.password ? ' form-error' : ''}`}
             required
             minLength={6}
           />
-          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          {errors.password && <p className="text-error text-sm mt-1">{errors.password}</p>}
         </div>
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="btn w-full"
         >
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
