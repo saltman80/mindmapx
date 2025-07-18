@@ -240,9 +240,18 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="three-column section">
         <div className="container three-column">
-          <div className="bold-marketing-text">Plan</div>
-          <div className="bold-marketing-text">Track</div>
-          <div className="bold-marketing-text">Launch</div>
+          <div>
+            <img src="./assets/placeholder.svg" alt="Plan" />
+            <div className="bold-marketing-text">Plan</div>
+          </div>
+          <div>
+            <img src="./assets/placeholder.svg" alt="Track" />
+            <div className="bold-marketing-text">Track</div>
+          </div>
+          <div>
+            <img src="./assets/placeholder.svg" alt="Launch" />
+            <div className="bold-marketing-text">Launch</div>
+          </div>
         </div>
       </section>
 
