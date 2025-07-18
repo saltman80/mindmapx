@@ -982,3 +982,21 @@ hr {
   border-color: var(--color-error);
 }
 
+.mindmap-arm {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 100px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.mindmap-arm.left {
+  left: 0;
+}
+
+.mindmap-arm.right {
+  right: 0;
+}
+

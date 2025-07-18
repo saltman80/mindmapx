@@ -3,6 +3,23 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
+
+const StackingText: React.FC<{ text: string }> = ({ text }) => (
+  <span className="stacking-text">
+    {text.split('').map((ch, i) => (
+      <motion.span
+        key={i}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: i * 0.05 }}
+      >
+        {ch}
+      </motion.span>
+    ))}
+  </span>
+)
 
 interface MapItem {
   text: string
@@ -60,19 +77,20 @@ export default function MindmapDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="mindmap-demo section reveal relative overflow-hidden">
-      <FaintMindmapBackground />
-      <div className="container">
-        <div className="max-w-2xl mx-auto mb-8 text-center">
-          <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
-          <p className="section-subtext">
-            Mind maps animate to life so you can focus on brainstorming
-          </p>
-        </div>
-        <div className="mindmap-grid section--two-col">
-          {maps.map((map, mapIndex) => (
-            <div className="mindmap-container" key={map.title}>
-            <svg viewBox="-160 -160 320 320" className="mindmap-svg">
+    <div className="mindmap-demo-page">
+      <section className="mindmap-demo section reveal relative overflow-hidden">
+        <FaintMindmapBackground />
+        <div className="container">
+          <div className="max-w-2xl mx-auto mb-8 text-center">
+            <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
+            <p className="section-subtext">
+              Mind maps animate to life so you can focus on brainstorming
+            </p>
+          </div>
+          <div className="mindmap-grid section--two-col">
+            {maps.map((map, mapIndex) => (
+              <div className="mindmap-container" key={map.title}>
+              <svg viewBox="-160 -160 320 320" className="mindmap-svg">
               <circle
                 cx="0"
                 cy="0"
@@ -140,6 +158,54 @@ export default function MindmapDemo(): JSX.Element {
           </Link>
         </div>
       </div>
+      </section>
+
+      <section className="section section-bg-alt reveal relative overflow-hidden">
+        <MindmapArm side="left" />
+        <div className="container">
+          <h2 className="marketing-text-large">
+            <StackingText text="Simple and Powerful" />
+          </h2>
+          <p className="section-subtext">
+            Plan projects effortlessly with intuitive maps that grow alongside your ideas.
+          </p>
+        </div>
+      </section>
+
+      <section className="section reveal">
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            AI Todo Lists Keep Teams Aligned
+          </motion.h2>
+          <p className="section-subtext">
+            Assign tasks from your maps and watch progress unfold automatically.
+          </p>
+        </div>
+      </section>
+
+      <section className="section section-bg-primary-light reveal relative overflow-hidden">
+        <MindmapArm side="right" />
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            See Beyond a Task Board
+          </motion.h2>
+          <p className="section-subtext">
+            Mind map connections provide a bird's-eye view of every project step.
+          </p>
+        </div>
+      </section>
     </div>
   )
 }
