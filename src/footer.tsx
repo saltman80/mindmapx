@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const BRAND_NAME = 'Mindxdo'
+const BRAND_NAME = 'MindXdo'
 const CURRENT_YEAR = new Date().getFullYear();
 const FOOTER_LINKS = [
   { label: 'GitHub', href: 'https://github.com/your-org/plan-scaler-mindmap-tools', external: true },

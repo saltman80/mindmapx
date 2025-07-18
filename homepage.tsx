@@ -30,7 +30,7 @@ const features = [
   {
     title: 'AI Automation',
     description:
-      'Let Mindxdo suggest tasks and connections so you can focus on the experience.',
+      'Let MindXdo suggest tasks and connections so you can focus on the experience.',
     icon: './assets/placeholder.png',
   },
 ]
@@ -87,10 +87,10 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>Mindxdo: Mindmaps Meet Todos with AI</h1>
+          <h1>MindXdo: Mindmaps Meet Todos with AI</h1>
           <p>
             Experience the power of AI as your ideas become actionable plans.
-            Mindxdo weaves mindmaps and todos together so you can strategize
+            MindXdo weaves mindmaps and todos together so you can strategize
             and execute without friction.
           </p>
           <button
@@ -143,7 +143,7 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="demo">
         <h2>Try It Live</h2>
-        <p>Interactive demo of Mindxdo ? no signup required.</p>
+        <p>Interactive demo of MindXdo – no signup required.</p>
         <Demo />
       </section>
 
@@ -176,7 +176,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </motion.h2>
         <p className="ai-copy">
           Harness automation to turn complex mindmaps into actionable workflows.
-          Mindxdo helps you execute ambitious plans with ease.
+          MindXdo helps you execute ambitious plans with ease.
         </p>
         <img
           src="./assets/placeholder.png"
@@ -214,7 +214,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="faq">
         <h2>Frequently Asked Questions</h2>
         {[
-          { q: 'What is Mindxdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
+          { q: 'What is MindXdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
           { q: 'How does the AI help?', a: 'It automates task creation and finds connections between ideas.' },
           { q: 'Can I collaborate with my team?', a: 'Yes, share maps and task boards in real time.' },
         ].map(item => (
@@ -228,7 +228,7 @@ const Homepage: React.FC = (): JSX.Element => {
       </section>
 
       <footer className="site-footer">
-        <p>&copy; {new Date().getFullYear()} Mindxdo. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} MindXdo. All rights reserved.</p>
       </footer>
     </div>
   )
