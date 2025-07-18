@@ -1,12 +1,8 @@
 [build]
-  command   = "npm run compile:migrations && npm run compile:functions && npm run migrate && npm run build"
-  publish   = "dist"
-  functions = "dist/netlify/functions"
-
-[context.production.environment]
-  NPM_FLAGS = "--include=dev"
+command = "npm run build"
+publish = "dist"
 
 [[redirects]]
-  from   = "/*"
-  to     = "/index.html"
-  status = 200
+from = "/*"
+to = "/index.html"
+status = 200
