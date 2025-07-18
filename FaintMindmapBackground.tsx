@@ -20,19 +20,17 @@ interface BgProps {
 export default function FaintMindmapBackground({ className = '' }: BgProps): JSX.Element {
   const [visible, setVisible] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { margin: '-50% 0px -50% 0px', once: true })
+  const isInView = useInView(ref, { amount: 0.2, once: true })
 
   useEffect(() => {
     if (!isInView) return
-    let interval: number | undefined
-    const start = setTimeout(() => {
-      interval = window.setInterval(() => {
-        setVisible(v => (v < nodes.length ? v + 1 : v))
-      }, 800)
-    }, 1000)
+    const timeouts = nodes.map((_n, i) =>
+      window.setTimeout(() => {
+        setVisible(v => (v < i + 1 ? i + 1 : v))
+      }, 800 + i * 800)
+    )
     return () => {
-      clearTimeout(start)
-      if (interval !== undefined) clearInterval(interval)
+      timeouts.forEach(t => clearTimeout(t))
     }
   }, [isInView])
 
