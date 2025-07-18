@@ -18,7 +18,7 @@ const StackingText: React.FC<{ text: string }> = ({ text }) => (
         viewport={{ once: true }}
         transition={{ delay: i * 0.05 }}
       >
-        {ch}
+        {ch === ' ' ? '\u00A0' : ch}
       </motion.span>
     ))}
   </span>
