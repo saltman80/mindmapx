@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion'
 
 export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' }): JSX.Element {
-  const startX = side === 'left' ? -50 : 350
-  const endX = 200
+  const startX = side === 'left' ? -50 : 750
+  const endX = 400
   return (
-    <svg className={`mindmap-arm ${side}`} viewBox="0 0 400 100" aria-hidden="true">
+    <svg className={`mindmap-arm ${side}`} viewBox="0 0 800 100" aria-hidden="true">
       <motion.line
         x1={startX}
         y1="50"
         x2={endX}
         y2="50"
         stroke="var(--mindmap-color)"
-        strokeWidth="3"
+        strokeWidth="6"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={{ duration: 4, delay: 2 }}
@@ -19,9 +19,10 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
       <motion.circle
         cx={startX}
         cy="50"
-        r="20"
+        r="30"
         fill="none"
         stroke="var(--mindmap-color)"
+        strokeWidth="6"
         initial={{ scale: 0, cx: startX }}
         animate={{ scale: 1, cx: endX }}
         transition={{ duration: 4, delay: 2 }}
