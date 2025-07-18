@@ -133,6 +133,11 @@ button {
   padding-left: var(--spacing-md);
   padding-right: var(--spacing-md);
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
   @media (min-width: 640px) {
     max-width: 640px;
   }
@@ -427,6 +432,9 @@ hr {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-lg);
+  justify-items: center;
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
 .section--two-col {
@@ -555,6 +563,14 @@ hr {
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.section.section--one-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
 .section-bg-alt {
