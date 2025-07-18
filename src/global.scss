@@ -910,6 +910,16 @@ hr {
   opacity: 0.3;
 }
 
+.mindmap-bg-small {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+}
+
 .mindmap-bg {
   width: 100%;
   height: 100%;
@@ -1004,6 +1014,7 @@ hr {
 }
 
 .offer-card {
+  position: relative;
   background-color: var(--color-surface);
   border-radius: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);

@@ -1,6 +1,5 @@
 import React from 'react'
 import FaintMindmapBackground from '../FaintMindmapBackground'
-import MindmapDemo from '../mindmapdemo'
 
 const PurchasePage = () => {
   const handleSubmit = (e: React.FormEvent) => {
@@ -9,16 +8,13 @@ const PurchasePage = () => {
 
   return (
     <section className="section relative overflow-hidden">
-      <FaintMindmapBackground />
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
         <p className="text-center mb-lg">$9.99 per month - Mindmap and Todo platform</p>
         <div className="two-column purchase-grid">
           <div>
-            <div className="mini-mindmap-container mb-lg">
-              <MindmapDemo />
-            </div>
             <div className="offer-card text-center">
+              <FaintMindmapBackground className="mindmap-bg-small" />
               <h2 className="mb-md">Monthly Service Includes</h2>
               <table className="table-auto mx-auto text-left mb-lg">
                 <thead>
