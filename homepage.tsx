@@ -170,8 +170,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container two-column mini-mindmap-container">
+      <section className="section section--one-col">
+        <div className="container mini-mindmap-container">
           <motion.div
             initial={{ clipPath: 'inset(0 0 100% 0)' }}
             whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
@@ -225,8 +225,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="two-column section">
-        <div className="container two-column">
+      <section className="section section--one-col">
+        <div className="container">
           <div className="bold-marketing-text">
             Map your ideas visually while keeping tasks in focus.
           </div>
