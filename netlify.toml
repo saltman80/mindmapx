@@ -4,7 +4,7 @@ functions = "netlify/functions"
 publish = "dist"
 
 [build.environment]
-NODE_VERSION = "20.11.1"
+NODE_VERSION = "18"
 
 [[redirects]]
 from = "/api/*"
