@@ -122,7 +122,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section section-bg-alt">
         <div className="container">
           <motion.h2
             className="marketing-text-large"
@@ -133,10 +133,13 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             Use AI to lay out visual plans and structure
           </motion.h2>
+          <p className="section-subtext">
+            Leverage our assistant to instantly convert ideas into organized mind maps.
+          </p>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section section-bg-primary-light">
         <div className="container">
           <motion.h2
             className="marketing-text-large"
@@ -147,6 +150,14 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             Rapidly prototype business ideas, flows, systems, and more.
           </motion.h2>
+          <p className="section-subtext">
+            Sketch processes and tasks in minutes and refine them with your team.
+          </p>
+          <div className="icon-row">
+            <img src="./assets/placeholder.svg" alt="Flow icon" />
+            <img src="./assets/placeholder.svg" alt="Checklist icon" />
+            <img src="./assets/placeholder.svg" alt="Team icon" />
+          </div>
         </div>
       </section>
 
