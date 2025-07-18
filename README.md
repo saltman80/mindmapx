@@ -4,8 +4,8 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
 
 ## Deploying
 
-1. Install dependencies (optional if the build only runs in CI). Use Node.js 20
-   with npm version 9.9.4 or newer:
+1. Install dependencies (optional if the build only runs in CI). Use Node.js 22
+   with npm version 10.9.2 or newer:
    ```bash
    npm install
    ```
