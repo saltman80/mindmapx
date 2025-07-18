@@ -18,8 +18,18 @@ const Header = (): JSX.Element => {
   const location = useLocation()
   const { user, logout } = useAuth()
 
+  const marketingItems: NavItem[] = [
+    { label: 'Home', route: '/' },
+    { label: 'About', route: '/about' },
+    { label: 'Mindmap Demo', route: '/mindmap-demo' },
+    { label: 'Todo Demo', route: '/todo-demo' },
+    { label: 'Purchase', route: '/payment' },
+    { label: 'Reset Password', route: '/reset-password' },
+  ]
+
   const navItems: NavItem[] = user
     ? [
+        ...marketingItems,
         { label: 'Dashboard', route: '/dashboard' },
         { label: 'Mindmaps', route: '/mindmaps' },
         { label: 'Todos', route: '/todos' },
@@ -31,7 +41,7 @@ const Header = (): JSX.Element => {
             ]
           : []),
       ]
-    : [{ label: 'Home', route: '/' }]
+    : [...marketingItems, { label: 'Login', route: '/login' }]
 
   const handleAvatarClick = (): void => {
     setProfileMenuOpen(prev => !prev)

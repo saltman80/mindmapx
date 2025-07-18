@@ -351,6 +351,25 @@ hr {
   text-align: center;
 }
 
+.section--one-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+.section--two-col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.section--three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  text-align: center;
+}
+
 .bold-marketing-text {
   font-size: 1.5rem;
   font-weight: 700;

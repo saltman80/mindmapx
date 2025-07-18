@@ -30,7 +30,12 @@ const defaultNodes: Node[] = [
   }
 ]
 
+import { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
+import useScrollReveal from './useScrollReveal'
+
 export default function MindmapDemo(): JSX.Element {
+  useScrollReveal()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [flatNodes, setFlatNodes] = useState<Node[]>([])
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
@@ -162,9 +167,14 @@ export default function MindmapDemo(): JSX.Element {
   }, [handleNodeClick])
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ width: '100%', maxWidth: '800px', height: 'auto', display: 'block' }}
-    />
+    <div className="mindmap-demo reveal section section--one-col">
+      <canvas
+        ref={canvasRef}
+        style={{ width: '100%', maxWidth: '800px', height: 'auto', display: 'block' }}
+      />
+      <div className="mt-md">
+        <Link to="/payment" className="btn">Upgrade</Link>
+      </div>
+    </div>
   )
 }
