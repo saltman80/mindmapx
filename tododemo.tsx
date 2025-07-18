@@ -3,6 +3,23 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
+
+const StackingText: React.FC<{ text: string }> = ({ text }) => (
+  <span className="stacking-text">
+    {text.split('').map((ch, i) => (
+      <motion.span
+        key={i}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: i * 0.05 }}
+      >
+        {ch}
+      </motion.span>
+    ))}
+  </span>
+)
 
 interface TodoItem {
   text: string
@@ -71,16 +88,17 @@ export default function TodoDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="todo-demo section reveal relative overflow-hidden">
-      <FaintMindmapBackground />
-      <div className="container">
-        <div className="max-w-2xl mx-auto mb-8 text-center">
-          <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
-          <p className="section-subtext">Watch todos appear with smooth animations</p>
-        </div>
-        <div className="todo-grid section--two-col">
-          {lists.map((list, listIndex) => (
-            <div className="todo-card" key={list.title}>
+    <div className="todo-demo-page">
+      <section className="todo-demo section reveal relative overflow-hidden">
+        <FaintMindmapBackground />
+        <div className="container">
+          <div className="max-w-2xl mx-auto mb-8 text-center">
+            <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
+            <p className="section-subtext">Watch todos appear with smooth animations</p>
+          </div>
+          <div className="todo-grid section--two-col">
+            {lists.map((list, listIndex) => (
+              <div className="todo-card" key={list.title}>
             <h3>{list.title}</h3>
             <ul className="todo-list">
               {list.items.map((item, itemIndex) => {
@@ -109,6 +127,54 @@ export default function TodoDemo(): JSX.Element {
           </Link>
         </div>
       </div>
+      </section>
+
+      <section className="section section-bg-alt reveal relative overflow-hidden">
+        <MindmapArm side="left" />
+        <div className="container">
+          <h2 className="marketing-text-large">
+            <StackingText text="AI Simplicity" />
+          </h2>
+          <p className="section-subtext">
+            Generate prioritized todos straight from your mind maps in moments.
+          </p>
+        </div>
+      </section>
+
+      <section className="section reveal">
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Team Management Made Powerful
+          </motion.h2>
+          <p className="section-subtext">
+            Everyone sees their tasks and how they connect to the bigger picture.
+          </p>
+        </div>
+      </section>
+
+      <section className="section section-bg-primary-light reveal relative overflow-hidden">
+        <MindmapArm side="right" />
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            Vision Beyond a Task Board
+          </motion.h2>
+          <p className="section-subtext">
+            Mind maps reveal relationships so you plan and execute with clarity.
+          </p>
+        </div>
+      </section>
     </div>
   )
 }
