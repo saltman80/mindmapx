@@ -147,6 +147,12 @@ button {
   }
 }
 
+.container-full {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .sr-only,
 .visually-hidden {
   position: absolute;
