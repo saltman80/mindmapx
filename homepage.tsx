@@ -97,8 +97,8 @@ const Homepage: React.FC = (): JSX.Element => {
           <h1 className="hero-title">MindXdo: Mindmaps Meet Todos with AI</h1>
           <p>
             Experience the power of AI as your ideas become actionable plans.
-            MindXdo weaves mindmaps and todos together so you can strategize
-            and execute without friction.
+            Map a long‑term vision, break it down into tasks, and let MindXdo
+            guide the next steps.
           </p>
           <Link to="/payment" className="btn">
             Get Started
@@ -256,8 +256,10 @@ const Homepage: React.FC = (): JSX.Element => {
           AI Superpowers
         </motion.h2>
         <p className="ai-copy">
-          Harness automation to turn complex mindmaps into actionable workflows.
-          MindXdo helps you execute ambitious plans with ease.
+          Harness automation to turn complex mind maps into actionable
+          workflows. MindXdo helps you execute ambitious plans with ease.
+          Mind maps show the big picture—our assistant suggests tasks and
+          timelines so you never wonder what comes next.
         </p>
         <img
           src="./assets/placeholder.png"
