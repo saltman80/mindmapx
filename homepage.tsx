@@ -102,7 +102,7 @@ const Homepage: React.FC = (): JSX.Element => {
             Map a long‑term vision, break it down into tasks, and let MindXdo
             guide the next steps.
           </p>
-          <Link to="/payment" className="btn">
+          <Link to="/purchase" className="btn">
             Get Started
           </Link>
         </motion.div>
@@ -288,7 +288,7 @@ const Homepage: React.FC = (): JSX.Element => {
             <li>Priority support</li>
             <li>All future features</li>
           </ul>
-          <Link to="/payment" className="btn">
+          <Link to="/purchase" className="btn">
             Upgrade Now
           </Link>
         </motion.div>
@@ -302,11 +302,6 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="container">
-          <p>&copy; {new Date().getFullYear()} MindXdo. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   )
 }

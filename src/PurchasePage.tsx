@@ -1,11 +1,11 @@
 import React from 'react'
 
-const BillingPage = () => {
+const PurchasePage = () => {
   return (
     <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Billing</h1>
+      <h1>Purchase</h1>
     </div>
   )
 }
 
-export default BillingPage
+export default PurchasePage

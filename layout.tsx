@@ -50,42 +50,90 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
           >
             <ul className="layout-nav-list">
               <li>
-              <NavLink to="/" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Home
               </NavLink>
             </li>
             <li>
-              <NavLink to="/dashboard" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Dashboard
               </NavLink>
             </li>
             <li>
-              <NavLink to="/mindmap" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/mindmap"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Mindmap
               </NavLink>
             </li>
             <li>
-              <NavLink to="/todos" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/todos"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Todos
               </NavLink>
             </li>
             <li>
-              <NavLink to="/billing" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/billing"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Billing
               </NavLink>
             </li>
             <li>
-              <NavLink to="/profile" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/profile"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Profile
               </NavLink>
             </li>
             <li>
-              <NavLink to="/payment" className="layout-nav-link" onClick={handleLinkClick}>
-                Upgrade
+              <NavLink
+                to="/purchase"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
+                Purchase
               </NavLink>
             </li>
             <li>
-              <NavLink to="/login" className="layout-nav-link" onClick={handleLinkClick}>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `layout-nav-link${isActive ? ' layout-nav-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
                 Login
               </NavLink>
             </li>
