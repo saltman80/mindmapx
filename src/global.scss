@@ -835,6 +835,11 @@ hr {
   height: 320px;
 }
 
+.mindmap-text-block {
+  max-width: 320px;
+  line-height: 1.4;
+}
+
 .root-text,
 .node-text {
   fill: #000;
