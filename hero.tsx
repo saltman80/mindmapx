@@ -86,8 +86,8 @@ const Hero: React.FC = () => {
           MindXdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-          Organize your mindmaps and todos with AI-driven automations for a
-          seamless experience.
+          Organize your mind maps and tasks. Let AI turn your long‑term vision
+          into an actionable roadmap.
         </p>
         <a
           href="#get-started"
