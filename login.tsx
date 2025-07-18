@@ -94,13 +94,13 @@ const LoginPage = (): JSX.Element => {
   }
 
   return (
-    <section className="section relative overflow-hidden">
+    <section className="section login-page relative overflow-hidden">
       <FaintMindmapBackground />
-      <div className="form-card text-center">
+      <div className="form-card text-center login-form">
         <img
-          src="./assets/login.png"
+          src="./assets/placeholder.svg"
           alt="Login"
-          className="w-24 mx-auto mb-4"
+          className="login-icon"
         />
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
       {submitError && (

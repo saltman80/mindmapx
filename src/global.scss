@@ -532,7 +532,7 @@ hr {
   top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  width: 300px;
+  width: 400px;
   height: 300px;
   background: radial-gradient(circle at center, var(--color-secondary), transparent);
 }
@@ -954,8 +954,9 @@ hr {
 
 .form-card {
   background-color: var(--color-surface);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  background-image: linear-gradient(135deg, var(--color-bg), var(--color-bg-alt));
   padding: var(--spacing-xl);
   max-width: 420px;
   margin-left: auto;
@@ -994,17 +995,39 @@ hr {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 300px;
+  width: 400px;
   height: 100px;
   pointer-events: none;
   opacity: 0.4;
 }
 
 .mindmap-arm.left {
-  left: 0;
+  left: -50px;
 }
 
 .mindmap-arm.right {
-  right: 0;
+  right: -50px;
+}
+
+.section-icon {
+  width: 64px;
+  margin: 0 auto var(--spacing-md);
+  display: block;
+}
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+}
+
+.login-form {
+  width: 100%;
+}
+
+.login-icon {
+  width: 96px;
+  margin: 0 auto var(--spacing-lg);
 }
 

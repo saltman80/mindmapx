@@ -14,11 +14,13 @@ import PurchasePage from './PurchasePage'
 import NotFound from './NotFound'
 import Header from './header'
 import Footer from './footer'
+import ScrollToTop from './ScrollToTop'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Header />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/about" element={<AboutPage />} />
