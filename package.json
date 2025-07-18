@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.x",
-    "npm": "9.x"
+    "node": "20.11.1",
+    "npm": "9.9.4"
   },
   "scripts": {
     "dev": "vite",
