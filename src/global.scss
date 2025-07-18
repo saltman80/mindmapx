@@ -599,3 +599,29 @@ hr {
   padding: var(--spacing-lg) var(--spacing-md);
   background-color: var(--color-bg-alt);
 }
+
+.footer {
+  padding: var(--spacing-lg) var(--spacing-md);
+  background-color: var(--color-bg-alt);
+}
+
+.footer__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer__links {
+  list-style: none;
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: 0;
+  margin-top: var(--spacing-sm);
+  justify-content: center;
+}
+.footer__links li {
+  margin: 0;
+}

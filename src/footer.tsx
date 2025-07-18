@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 const BRAND_NAME = 'MindXdo'
 const CURRENT_YEAR = new Date().getFullYear();
 const FOOTER_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/your-org/plan-scaler-mindmap-tools', external: true },
   { label: 'Terms of Service', href: '/terms', external: false },
   { label: 'Privacy Policy', href: '/privacy', external: false },
   { label: 'Hosted on Netlify', href: 'https://www.netlify.com', external: true },
