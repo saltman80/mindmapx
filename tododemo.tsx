@@ -70,29 +70,33 @@ export default function TodoDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="todo-demo section section--two-col reveal">
-      {lists.map((list, listIndex) => (
-        <div className="todo-card" key={list.title}>
-          <h3>{list.title}</h3>
-          <ul className="todo-list">
-            {list.items.map((item, itemIndex) => {
-              const visible = step >= itemIndex * listCount + listIndex
-              return (
-                <motion.li
-                  className="todo-item"
-                  key={item.text}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {item.text}{' '}
-                  <span className="assignee">- {item.assignee}</span>
-                </motion.li>
-              )
-            })}
-          </ul>
-        </div>
-      ))}
+    <div className="todo-demo section reveal">
+      <h1 className="demo-title">AI Todo Lists</h1>
+      <div className="todo-grid section--two-col">
+        {lists.map((list, listIndex) => (
+          <div className="todo-card" key={list.title}>
+            <h3>{list.title}</h3>
+            <ul className="todo-list">
+              {list.items.map((item, itemIndex) => {
+                const visible = step >= itemIndex * listCount + listIndex
+                return (
+                  <motion.li
+                    className="todo-item"
+                    key={item.text}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <span className="sparkle" aria-hidden="true">✨</span>
+                    {item.text}{' '}
+                    <span className="assignee">- {item.assignee}</span>
+                  </motion.li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
       <div className="todo-upgrade">
         <Link to="/payment" className="btn">
           Upgrade
