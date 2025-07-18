@@ -47,7 +47,7 @@ export default function AboutPage(): JSX.Element {
           MindXdo blends mind maps and to‑do lists into a single workflow so you
           can plan and execute without friction.
         </p>
-        <Link to="/payment" className="btn">Purchase</Link>
+        <Link to="/purchase" className="btn">Purchase</Link>
       </section>
       {sections.map((s, i) => (
         <section

@@ -69,7 +69,7 @@ export default function BillingPage(): JSX.Element {
             Cancel Subscription
           </button>
           <div className="mt-lg text-center">
-            <Link to="/checkout" className="btn">Checkout</Link>
+            <Link to="/purchase" className="btn">Purchase</Link>
           </div>
         </div>
       )}

@@ -316,6 +316,34 @@ hr {
   gap: var(--spacing-lg);
 }
 
+.layout-nav-list {
+  display: flex;
+  gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layout-nav-link {
+  color: var(--color-text);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  transition: background-color var(--transition-duration) var(--transition-ease),
+    transform var(--transition-duration) var(--transition-ease),
+    color var(--transition-duration) var(--transition-ease);
+  font-weight: 500;
+}
+
+.layout-nav-link:hover,
+.layout-nav-link-active {
+  background-color: rgba(255, 255, 255, 0.4);
+  color: var(--color-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 .layout-menu-button {
   display: none;
 }
@@ -342,6 +370,8 @@ hr {
     flex-direction: column;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
+    list-style: none;
+    margin: 0;
   }
 }
 
@@ -572,8 +602,9 @@ hr {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: var(--color-bg);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .header__container {
@@ -588,22 +619,29 @@ hr {
 .header__nav-list {
   display: flex;
   gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .header__nav-link {
   color: var(--color-text);
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 9999px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
   transition: background-color var(--transition-duration) var(--transition-ease),
+    transform var(--transition-duration) var(--transition-ease),
     color var(--transition-duration) var(--transition-ease);
   font-weight: 500;
-  background-color: var(--color-bg-alt);
 }
 
 .header__nav-link--active,
 .header__nav-link:hover {
-  background-color: var(--color-warning);
+  background-color: rgba(255, 255, 255, 0.4);
   color: var(--color-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header__toggle {

@@ -10,7 +10,7 @@ import CheckoutPage from '../checkout'
 
 import LoginPage from './LoginPage'
 import DashboardPage from './DashboardPage'
-import BillingPage from './BillingPage'
+import PurchasePage from './PurchasePage'
 import NotFound from './NotFound'
 import Header from './header'
 import Footer from './footer'
@@ -29,7 +29,7 @@ export default function App() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/payment" element={<BillingPage />} />
+        <Route path="/purchase" element={<PurchasePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
