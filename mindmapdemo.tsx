@@ -145,9 +145,10 @@ export default function MindmapDemo(): JSX.Element {
                   </g>
                 )
               })}
-            </svg>
-          </div>
+              </svg>
+            </div>
           ))}
+          </div>
           <div className="mindmap-text-block">
             Harness the power of AI-driven mind mapping to quickly expand and
             organize your best ideas into actionable plans.
