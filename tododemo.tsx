@@ -1,99 +1,102 @@
-import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
 
+interface TodoItem {
+  text: string
+  assignee?: string
+}
+
+interface TodoList {
+  title: string
+  items: TodoItem[]
+}
+
+const lists: TodoList[] = [
+  {
+    title: 'Marketing Plan',
+    items: [
+      { text: 'Research target audience', assignee: 'Alice' },
+      { text: 'Set campaign goals', assignee: 'Bob' },
+      { text: 'Outline content strategy', assignee: 'Carol' },
+      { text: 'Prepare landing pages', assignee: 'Dave' },
+      { text: 'Launch and monitor', assignee: 'Eve' },
+    ],
+  },
+  {
+    title: 'Facebook Ads',
+    items: [
+      { text: 'Define audience segments', assignee: 'Mallory' },
+      { text: 'Design creative assets', assignee: 'Trent' },
+      { text: 'Write ad copy', assignee: 'Peggy' },
+      { text: 'Set budget', assignee: 'Victor' },
+      { text: 'Analyze results', assignee: 'Walter' },
+    ],
+  },
+  {
+    title: 'Email Outreach',
+    items: [
+      { text: 'Compile contact list', assignee: 'Alice' },
+      { text: 'Draft email templates', assignee: 'Bob' },
+      { text: 'Schedule sends', assignee: 'Carol' },
+      { text: 'Track opens', assignee: 'Dave' },
+      { text: 'Follow up', assignee: 'Eve' },
+    ],
+  },
+  {
+    title: 'SEO Checklist',
+    items: [
+      { text: 'Keyword research', assignee: 'Mallory' },
+      { text: 'Optimize metadata', assignee: 'Trent' },
+      { text: 'Improve page speed', assignee: 'Peggy' },
+      { text: 'Build backlinks', assignee: 'Victor' },
+      { text: 'Review analytics', assignee: 'Walter' },
+    ],
+  },
+]
+
 export default function TodoDemo(): JSX.Element {
   useScrollReveal()
-  const [mode, setMode] = useState<Mode>('manual')
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [inputText, setInputText] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
+  const listCount = lists.length
+  const maxItems = Math.max(...lists.map(l => l.items.length))
+  const totalSteps = listCount * maxItems
+  const [step, setStep] = useState(0)
 
-  const toggleMode = (newMode: Mode) => {
-    setMode(newMode)
-    setTodos([])
-    setInputText('')
-    setError('')
-    setLoading(false)
-  }
-
-  const generateTodosAI = async (): Promise<Todo[]> => {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await fetch('/.netlify/functions/generateTodos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
-      const data = (await res.json()) as { todos: string[] }
-      return data.todos.map(text => ({ id: uuidv4(), text }))
-    } catch (err) {
-      console.error(err)
-      setError('Could not generate todos. Please try again.')
-      return []
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleGenerateClick = async () => {
-    const aiTodos = await generateTodosAI()
-    setTodos(aiTodos)
-  }
-
-  const handleAdd = () => {
-    const trimmed = inputText.trim()
-    if (!trimmed) return
-    const newTodo = { id: uuidv4(), text: trimmed }
-    setTodos(prev => [...prev, newTodo])
-    setInputText('')
-  }
+  useEffect(() => {
+    if (step >= totalSteps) return
+    const t = setTimeout(() => setStep(prev => prev + 1), 600)
+    return () => clearTimeout(t)
+  }, [step, totalSteps])
 
   return (
-    <div className="todo-demo reveal section section--one-col">
-      <div className="mode-toggle">
-        <button onClick={() => toggleMode('manual')} disabled={mode === 'manual'}>
-          Manual
-        </button>
-        <button onClick={() => toggleMode('ai')} disabled={mode === 'ai'}>
-          AI
-        </button>
-      </div>
-      <div className="mode-content">
-        {mode === 'manual' && (
-          <div className="manual-mode">
-            <input
-              type="text"
-              value={inputText}
-              onChange={e => setInputText(e.target.value)}
-              placeholder="Enter a todo"
-            />
-            <button onClick={handleAdd} disabled={inputText.trim() === ''}>
-              Add Todo
-            </button>
-          </div>
-        )}
-        {mode === 'ai' && (
-          <div className="ai-mode">
-            <button onClick={handleGenerateClick} disabled={loading}>
-              {loading ? 'Generating...' : 'Generate Todos'}
-            </button>
-          </div>
-        )}
-        {error && <div className="error">{error}</div>}
-        {todos.length > 0 && (
+    <div className="todo-demo section section--two-col reveal">
+      {lists.map((list, listIndex) => (
+        <div className="todo-card" key={list.title}>
+          <h3>{list.title}</h3>
           <ul className="todo-list">
-            {todos.map(todo => (
-              <li key={todo.id}>{todo.text}</li>
-            ))}
+            {list.items.map((item, itemIndex) => {
+              const visible = step >= itemIndex * listCount + listIndex
+              return (
+                <motion.li
+                  className="todo-item"
+                  key={item.text}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {item.text}{' '}
+                  <span className="assignee">- {item.assignee}</span>
+                </motion.li>
+              )
+            })}
           </ul>
-        )}
-      </div>
-      <div className="mt-md">
-        <Link to="/payment" className="btn">Upgrade</Link>
+        </div>
+      ))}
+      <div className="todo-upgrade">
+        <Link to="/payment" className="btn">
+          Upgrade
+        </Link>
       </div>
     </div>
   )
