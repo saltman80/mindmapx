@@ -1,10 +1,22 @@
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
 
 export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' }): JSX.Element {
-  const startX = side === 'left' ? -50 : 750
-  const endX = 400
+  const width = 1600
+  const startX = side === 'left' ? -50 : width - 50
+  const endX = width / 2
+  const ref = useRef<SVGSVGElement>(null)
+  const isInView = useInView(ref, { margin: '-40% 0px -40% 0px', once: true })
+  const [start, setStart] = useState(false)
+
+  useEffect(() => {
+    if (!isInView) return
+    const t = setTimeout(() => setStart(true), 1000)
+    return () => clearTimeout(t)
+  }, [isInView])
+
   return (
-    <svg className={`mindmap-arm ${side}`} viewBox="0 0 800 100" aria-hidden="true">
+    <svg ref={ref} className={`mindmap-arm ${side}`} viewBox={`0 0 ${width} 100`} aria-hidden="true">
       <motion.line
         x1={startX}
         y1="50"
@@ -13,8 +25,8 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
         stroke="var(--mindmap-color)"
         strokeWidth="6"
         initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 4, delay: 2 }}
+        animate={start ? { pathLength: 1 } : { pathLength: 0 }}
+        transition={{ duration: 4 }}
       />
       <motion.circle
         cx={startX}
@@ -24,8 +36,8 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
         stroke="var(--mindmap-color)"
         strokeWidth="6"
         initial={{ scale: 0, cx: startX }}
-        animate={{ scale: 1, cx: endX }}
-        transition={{ duration: 4, delay: 2 }}
+        animate={start ? { scale: 1, cx: endX } : { scale: 0, cx: startX }}
+        transition={{ duration: 4 }}
       />
     </svg>
   )
