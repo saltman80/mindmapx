@@ -6,6 +6,7 @@ import TodoDemo from '../tododemo'
 import ResetPassword from '../reset-password'
 import PrivacyPolicy from '../privacypolicy'
 import TermsOfService from '../terms'
+import CheckoutPage from '../checkout'
 
 import LoginPage from './LoginPage'
 import DashboardPage from './DashboardPage'
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/payment" element={<BillingPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
