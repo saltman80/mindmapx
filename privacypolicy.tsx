@@ -7,7 +7,7 @@ export default function PrivacyPolicy(): JSX.Element {
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
         <p>
-          Welcome to Mindxdo. Your privacy is important to us. This Privacy Policy
+          Welcome to MindXdo. Your privacy is important to us. This Privacy Policy
           explains how we collect, use, disclose, and safeguard your information when you
           visit our website and use our services.
         </p>

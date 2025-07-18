@@ -83,7 +83,7 @@ const Hero: React.FC = () => {
       <div className="shape shape-circle hero-shape2" />
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
         <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-          Mindxdo
+          MindXdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
           Organize your mindmaps and todos with AI-driven automations for a
