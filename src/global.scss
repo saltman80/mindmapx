@@ -696,3 +696,42 @@ hr {
 .footer__links li {
   margin: 0;
 }
+
+/* --- Demo Styles --- */
+.todo-demo,
+.mindmap-demo {
+  justify-items: center;
+  text-align: center;
+}
+
+.todo-card,
+.mindmap-card {
+  background-color: var(--color-surface);
+  padding: var(--spacing-lg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 300px;
+}
+
+.todo-list,
+.mindmap-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-sm) 0 0;
+  text-align: left;
+}
+
+.todo-item,
+.mindmap-item {
+  margin-bottom: var(--spacing-sm);
+}
+
+.assignee {
+  opacity: 0.6;
+}
+
+.todo-upgrade,
+.mindmap-upgrade {
+  grid-column: span 2;
+}
