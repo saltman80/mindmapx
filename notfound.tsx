@@ -1,3 +1,5 @@
+import { Link, useNavigate } from 'react-router-dom'
+
 export default function NotFound(): JSX.Element {
   const navigate = useNavigate()
 
@@ -10,18 +12,14 @@ export default function NotFound(): JSX.Element {
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>404</h1>
-      <p className={styles.message}>
-        Oops! The page you&apos;re looking for doesn&apos;t exist.
-      </p>
-      <div className={styles.actions}>
-        <button onClick={handleGoBack} className={styles.button}>
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>404</h1>
+      <p>Oops! The page you're looking for doesn't exist.</p>
+      <div style={{ marginTop: '1rem' }}>
+        <button onClick={handleGoBack} style={{ marginRight: '1rem' }}>
           Go Back
         </button>
-        <Link to="/" className={styles.homeLink}>
-          Home
-        </Link>
+        <Link to="/">Home</Link>
       </div>
     </div>
   )
