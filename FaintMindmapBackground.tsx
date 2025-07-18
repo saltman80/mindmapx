@@ -13,7 +13,11 @@ const nodes: NodePos[] = [
   { angle: 288 },
 ]
 
-export default function FaintMindmapBackground(): JSX.Element {
+interface BgProps {
+  className?: string
+}
+
+export default function FaintMindmapBackground({ className = '' }: BgProps): JSX.Element {
   const [visible, setVisible] = useState(0)
 
   useEffect(() => {
@@ -24,7 +28,7 @@ export default function FaintMindmapBackground(): JSX.Element {
   }, [])
 
   return (
-    <div className="mindmap-bg-container" aria-hidden="true">
+    <div className={`mindmap-bg-container ${className}`} aria-hidden="true">
       <svg viewBox="-150 -150 300 300" className="mindmap-bg">
         <circle
           cx="0"
