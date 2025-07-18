@@ -2,22 +2,22 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Fira Code', monospace;
 
-  --color-primary: #4f46e5;
-  --color-secondary: #6366f1;
-  --color-accent: #10b981;
+  --color-primary: #f97316;
+  --color-secondary: #334155;
+  --color-accent: #fb923c;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #3b82f6;
 
-  --color-bg: #f9fafb;
-  --color-bg-alt: #ffffff;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f1f5f9;
   --color-surface: #ffffff;
-  --color-border: #e5e7eb;
+  --color-border: #e2e8f0;
 
-  --color-text: #111827;
-  --color-text-muted: #6b7280;
-  --color-text-inverse: #f9fafb;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-inverse: #ffffff;
 
   --transition-duration: 0.3s;
   --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -357,7 +357,7 @@ hr {
 }
 
 .ai-button {
-  background: linear-gradient(90deg, #10b981, #a855f7);
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
   color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -371,13 +371,13 @@ hr {
 }
 
 .ai-power {
-  background: radial-gradient(circle at top left, #ecfdf5, #f0f9ff);
+  background: radial-gradient(circle at top left, var(--color-bg-alt), #fff7ed);
   padding: var(--spacing-2xl) var(--spacing-lg);
   text-align: center;
 }
 
 .faq {
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
@@ -405,7 +405,7 @@ hr {
   right: -80px;
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle at center, #a855f7, transparent);
+  background: radial-gradient(circle at center, var(--color-primary), transparent);
 }
 
 .hero-shape2 {
@@ -413,7 +413,7 @@ hr {
   left: -80px;
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle at center, #10b981, transparent);
+  background: radial-gradient(circle at center, var(--color-secondary), transparent);
 }
 
 .ai-power-shape {
@@ -422,5 +422,5 @@ hr {
   transform: translateX(-50%);
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle at center, #6366f1, transparent);
+  background: radial-gradient(circle at center, var(--color-secondary), transparent);
 }
