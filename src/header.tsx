@@ -24,7 +24,6 @@ const Header = (): JSX.Element => {
     { label: 'Mindmap Demo', route: '/mindmap-demo' },
     { label: 'Todo Demo', route: '/todo-demo' },
     { label: 'Purchase', route: '/purchase' },
-    { label: 'Reset Password', route: '/reset-password' },
   ]
 
   const navItems: NavItem[] = user
@@ -41,7 +40,7 @@ const Header = (): JSX.Element => {
             ]
           : []),
       ]
-    : [...marketingItems, { label: 'Login', route: '/login' }]
+    : [...marketingItems]
 
   const handleAvatarClick = (): void => {
     setProfileMenuOpen(prev => !prev)

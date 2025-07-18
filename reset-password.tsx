@@ -1,110 +1,48 @@
-const ResetPasswordPage: React.FC = () => {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [loading, setLoading] = useState(false)
-  const location = useLocation()
-  const [token, setToken] = useState('')
+import React, { useState, FormEvent } from 'react'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const t = params.get('token') || ''
-    setToken(t)
-    if (!t) {
-      setError('Invalid or missing reset token.')
-    }
-  }, [location.search])
+const ResetPasswordPage = () => {
+  const [email, setEmail] = useState('')
 
-  const validatePasswords = (pw: string, cpw: string): boolean => {
-    if (pw.length < 8) {
-      setError('Password must be at least 8 characters long.')
-      return false
-    }
-    if (pw !== cpw) {
-      setError('Passwords do not match.')
-      return false
-    }
-    return true
-  }
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
-    if (!token) {
-      setError('Invalid or missing reset token.')
-      return
-    }
-    if (!validatePasswords(password, confirmPassword)) {
-      return
-    }
-    setLoading(true)
-    try {
-      const fnPath = import.meta.env.VITE_NETLIFY_FUNCTIONS_PATH || '/.netlify/functions'
-      const response = await fetch(`${fnPath}/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      })
-      const result = await response.json()
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to reset password.')
-      }
-      setSuccess('Password reset successfully. You can now log in with your new password.')
-      setPassword('')
-      setConfirmPassword('')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (error) setError('')
-    setPassword(e.target.value)
-  }
-
-  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (error) setError('')
-    setConfirmPassword(e.target.value)
+    window.alert(
+      'If an account with that email exists, you will receive a password reset link.'
+    )
+    setEmail('')
   }
 
   return (
-    <div className="reset-password-page">
-      <h1>Reset Password</h1>
-      {error && <div role="alert" className="error-message">{error}</div>}
-      {success && <div role="status" className="success-message">{success}</div>}
-      {!success && (
+    <section className="section login-page relative overflow-hidden">
+      <FaintMindmapBackground />
+      <div className="form-card text-center login-form">
+        <img
+          src="./assets/placeholder.svg"
+          alt="Reset Password"
+          className="login-icon"
+        />
+        <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
         <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label htmlFor="password">New Password</label>
+          <div className="form-field">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-              required
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm New Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="form-input"
               required
             />
           </div>
-          <button type="submit" disabled={loading || !token}>
-            {loading ? 'Resetting...' : 'Reset Password'}
+          <button type="submit" className="btn w-full">
+            Send Reset Link
           </button>
         </form>
-      )}
-    </div>
+      </div>
+    </section>
   )
 }
 
