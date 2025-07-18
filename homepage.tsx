@@ -78,7 +78,8 @@ const Homepage: React.FC = (): JSX.Element => {
 
   return (
     <div className="homepage">
-      <section className="hero relative">
+      <section className="hero section relative">
+        <div className="container">
         <div className="shape shape-circle hero-shape1" />
         <div className="shape shape-circle hero-shape2" />
         <motion.div
@@ -115,11 +116,13 @@ const Homepage: React.FC = (): JSX.Element => {
             />
           </AnimatePresence>
         </div>
+        </div>
       </section>
 
 
 
-      <section className="features">
+      <section className="features section">
+        <div className="container">
         <h2>Features</h2>
         <div className="feature-grid">
           {features.map((f, i) => (
@@ -139,32 +142,40 @@ const Homepage: React.FC = (): JSX.Element => {
             </motion.div>
           ))}
         </div>
-      </section>
-
-      <section className="demo">
-        <h2>Try It Live</h2>
-        <p>Interactive demo of MindXdo – no signup required.</p>
-        <Demo />
-      </section>
-
-      <section className="two-column">
-        <div className="bold-marketing-text">
-          Map your ideas visually while keeping tasks in focus.
         </div>
-        <img
-          src="./assets/placeholder.png"
-          alt="Two column placeholder"
-          className="banner-image"
-        />
       </section>
 
-      <section className="three-column">
-        <div className="bold-marketing-text">Plan</div>
-        <div className="bold-marketing-text">Track</div>
-        <div className="bold-marketing-text">Launch</div>
+      <section className="demo section">
+        <div className="container">
+          <h2>Try It Live</h2>
+          <p>Interactive demo of MindXdo – no signup required.</p>
+          <Demo />
+        </div>
       </section>
 
-      <section className="ai-power relative">
+      <section className="two-column section">
+        <div className="container two-column">
+          <div className="bold-marketing-text">
+            Map your ideas visually while keeping tasks in focus.
+          </div>
+          <img
+            src="./assets/placeholder.png"
+            alt="Two column placeholder"
+            className="banner-image"
+          />
+        </div>
+      </section>
+
+      <section className="three-column section">
+        <div className="container three-column">
+          <div className="bold-marketing-text">Plan</div>
+          <div className="bold-marketing-text">Track</div>
+          <div className="bold-marketing-text">Launch</div>
+        </div>
+      </section>
+
+      <section className="ai-power section relative">
+        <div className="container">
         <div className="shape shape-circle ai-power-shape" />
         <motion.h2
           initial={{ opacity: 0, scale: 0.8 }}
@@ -183,9 +194,11 @@ const Homepage: React.FC = (): JSX.Element => {
           alt="AI showcase"
           className="banner-image"
         />
+        </div>
       </section>
 
-      <section className="pricing">
+      <section className="pricing section">
+        <div className="container">
         <motion.div
           className="pricing-content"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -209,9 +222,11 @@ const Homepage: React.FC = (): JSX.Element => {
             {loading ? 'Processing...' : 'Upgrade Now'}
           </button>
         </motion.div>
+        </div>
       </section>
 
-      <section className="faq">
+      <section className="faq section">
+        <div className="container">
         <h2>Frequently Asked Questions</h2>
         {[
           { q: 'What is MindXdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
@@ -225,10 +240,13 @@ const Homepage: React.FC = (): JSX.Element => {
             </details>
           </motion.div>
         ))}
+        </div>
       </section>
 
       <footer className="site-footer">
-        <p>&copy; {new Date().getFullYear()} MindXdo. All rights reserved.</p>
+        <div className="container">
+          <p>&copy; {new Date().getFullYear()} MindXdo. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   )
