@@ -80,15 +80,13 @@ export default function MindmapDemo(): JSX.Element {
     <div className="mindmap-demo-page">
       <section className="mindmap-demo section reveal relative overflow-hidden">
         <FaintMindmapBackground />
-        <div className="container text-center">
-          <div className="max-w-2xl mx-auto mb-8">
-            <img src="./assets/placeholder.svg" alt="" className="section-icon" />
-            <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
-            <p className="section-subtext">
-              Mind maps animate to life so you can focus on brainstorming
-            </p>
-          </div>
-          <div className="mindmap-grid section--two-col">
+        <div className="container section--one-col text-center">
+          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
+          <p className="section-subtext">
+            Mind maps animate to life so you can focus on brainstorming
+          </p>
+          <div className="mindmap-grid">
             {maps.map((map, mapIndex) => (
               <div className="mindmap-container" key={map.title}>
               <svg viewBox="-160 -160 320 320" className="mindmap-svg">
@@ -160,12 +158,11 @@ export default function MindmapDemo(): JSX.Element {
             Upgrade
           </Link>
         </div>
-      </div>
       </section>
 
       <section className="section section-bg-alt reveal relative overflow-hidden">
         <MindmapArm side="left" />
-        <div className="container">
+        <div className="container section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h2 className="marketing-text-large">
             <StackingText text="Simple and Powerful" />
@@ -177,7 +174,7 @@ export default function MindmapDemo(): JSX.Element {
       </section>
 
       <section className="section reveal">
-        <div className="container">
+        <div className="container section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
@@ -196,7 +193,7 @@ export default function MindmapDemo(): JSX.Element {
 
       <section className="section section-bg-primary-light reveal relative overflow-hidden">
         <MindmapArm side="right" />
-        <div className="container">
+        <div className="container section--one-col text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
