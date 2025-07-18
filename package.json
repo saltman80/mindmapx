@@ -7,6 +7,9 @@
     "node": ">=18"
   },
   "scripts": {
+    "clean": "rm -rf node_modules package-lock.json .npm",
+    "prepare": "echo 'Skipping prepare script'",
+    "postinstall": "echo 'Skipping postinstall script'",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
