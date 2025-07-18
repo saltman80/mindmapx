@@ -1,4 +1,6 @@
-const BRAND_NAME = 'Mindxdo';
+import { Link } from 'react-router-dom'
+
+const BRAND_NAME = 'Mindxdo'
 const CURRENT_YEAR = new Date().getFullYear();
 const FOOTER_LINKS = [
   { label: 'GitHub', href: 'https://github.com/your-org/plan-scaler-mindmap-tools', external: true },
@@ -11,7 +13,7 @@ function Footer(): JSX.Element {
   return (
     <footer className="footer" role="contentinfo">
       <div className="footer__content">
-        <p>? {CURRENT_YEAR} {BRAND_NAME}. All rights reserved.</p>
+        <p>&copy; {CURRENT_YEAR} {BRAND_NAME}. All rights reserved.</p>
         <nav aria-label="Footer navigation">
           <ul className="footer__links">
             {FOOTER_LINKS.map(({ label, href, external }) => (

@@ -1,3 +1,12 @@
+import { useState, useRef, useEffect } from 'react'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from './useAuth'
+
+export interface NavItem {
+  label: string
+  route: string
+}
+
 const Header = (): JSX.Element => {
   const [isProfileMenuOpen, setProfileMenuOpen] = useState(false)
   const [isMobileNavOpen, setMobileNavOpen] = useState(false)
