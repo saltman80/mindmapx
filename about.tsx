@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 interface AboutSection {
   title: string
@@ -68,6 +69,7 @@ export default function AboutPage(): JSX.Element {
   return (
     <div className="about-page">
       <section className="section section--one-col reveal relative overflow-hidden">
+        <MindmapArm side="left" />
         <FaintMindmapBackground />
         <div className="about-hero-inner">
           <h1>About MindXdo</h1>
@@ -86,6 +88,7 @@ export default function AboutPage(): JSX.Element {
             i % 2 ? ' reverse' : ''}`}
           key={s.title}
         >
+          <MindmapArm side={i % 2 ? 'right' : 'left'} />
           {i % 2 === 0 && (
             <img src={s.img} alt={s.title} width={400} height={400} />
           )}

@@ -70,7 +70,7 @@ interface MindmapDemoProps {
 export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.Element {
   useScrollReveal()
   const sectionRef = useRef<HTMLElement>(null)
-  const inView = useInView(sectionRef, { margin: '-40% 0px -40% 0px', once: true })
+  const inView = useInView(sectionRef, { margin: '-50% 0px -50% 0px', once: true })
   const mapCount = maps.length
   const maxItems = Math.max(...maps.map(m => m.items.length))
   const totalSteps = mapCount * maxItems

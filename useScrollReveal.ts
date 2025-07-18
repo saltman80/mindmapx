@@ -11,7 +11,7 @@ export default function useScrollReveal(selector = '.reveal') {
           entry.target.classList.add('is-visible')
         }
       })
-    }, { threshold: 0.1, rootMargin: '-40% 0px -40% 0px' })
+    }, { threshold: 0.1, rootMargin: '-50% 0px -50% 0px' })
 
     elements.forEach(el => observer.observe(el))
     return () => {
