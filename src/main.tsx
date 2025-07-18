@@ -2,11 +2,16 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 
-const root = document.getElementById('root')
-if (!root) throw new Error('Missing #root div in index.html')
+console.log('main.tsx: script start')
 
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+const root = document.getElementById('root')
+if (!root) {
+  console.error('Missing #root div in index.html')
+} else {
+  console.log('main.tsx: rendering App')
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+}
