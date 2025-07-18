@@ -14,17 +14,17 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
         strokeWidth="2"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 4, delay: 2 }}
       />
       <motion.circle
-        cx={endX}
+        cx={startX}
         cy="50"
         r="12"
         fill="none"
         stroke="var(--mindmap-color)"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1, delay: 1 }}
+        initial={{ scale: 0, cx: startX }}
+        animate={{ scale: 1, cx: endX }}
+        transition={{ duration: 4, delay: 2 }}
       />
     </svg>
   )

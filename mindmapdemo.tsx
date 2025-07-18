@@ -80,8 +80,8 @@ export default function MindmapDemo(): JSX.Element {
     <div className="mindmap-demo-page">
       <section className="mindmap-demo section reveal relative overflow-hidden">
         <FaintMindmapBackground />
-        <div className="container">
-          <div className="max-w-2xl mx-auto mb-8 text-center">
+        <div className="container text-center">
+          <div className="max-w-2xl mx-auto mb-8">
             <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
             <p className="section-subtext">
               Mind maps animate to life so you can focus on brainstorming
