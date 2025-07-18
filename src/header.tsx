@@ -21,8 +21,9 @@ const Header = (): JSX.Element => {
   const marketingItems: NavItem[] = [
     { label: 'Home', route: '/' },
     { label: 'About', route: '/about' },
-    { label: 'Mindmap Demo', route: '/mindmap-demo' },
-    { label: 'Todo Demo', route: '/todo-demo' },
+    { label: 'Mindmap', route: '/mindmap-demo' },
+    { label: 'Todo', route: '/todo-demo' },
+    { label: 'KanBan', route: '/kanban' },
     { label: 'Purchase', route: '/purchase' },
   ]
 

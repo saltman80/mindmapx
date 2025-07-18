@@ -3,6 +3,7 @@ import Homepage from '../homepage'
 import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
 import TodoDemo from '../tododemo'
+import Kanban from '../kanban'
 import ResetPassword from '../reset-password'
 import PrivacyPolicy from '../privacypolicy'
 import TermsOfService from '../terms'
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/mindmap-demo" element={<MindmapDemo />} />
         <Route path="/todo-demo" element={<TodoDemo />} />
+        <Route path="/kanban" element={<Kanban />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
