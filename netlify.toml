@@ -1,8 +1,13 @@
+
 [build]
-command = "npm run build"
-publish = "dist"
+  command = "npm run clean && npm install --legacy-peer-deps && npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18.20.8"
 
 [[redirects]]
-from = "/*"
-to = "/index.html"
+from = "/api/*"
+to = "/.netlify/functions/:splat"
 status = 200

@@ -1,4 +1,10 @@
+import { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { Link } from 'react-router-dom'
+import useScrollReveal from './useScrollReveal'
+
 export default function TodoDemo(): JSX.Element {
+  useScrollReveal()
   const [mode, setMode] = useState<Mode>('manual')
   const [todos, setTodos] = useState<Todo[]>([])
   const [inputText, setInputText] = useState<string>('')
@@ -47,7 +53,7 @@ export default function TodoDemo(): JSX.Element {
   }
 
   return (
-    <div className="todo-demo">
+    <div className="todo-demo reveal section section--one-col">
       <div className="mode-toggle">
         <button onClick={() => toggleMode('manual')} disabled={mode === 'manual'}>
           Manual
@@ -85,6 +91,9 @@ export default function TodoDemo(): JSX.Element {
             ))}
           </ul>
         )}
+      </div>
+      <div className="mt-md">
+        <Link to="/payment" className="btn">Upgrade</Link>
       </div>
     </div>
   )

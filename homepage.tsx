@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
@@ -36,7 +37,6 @@ const features = [
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
-  const [loading, setLoading] = useState(false)
   const heroImages = [
     './assets/placeholder.png',
     './assets/placeholder.png',
@@ -51,30 +51,6 @@ const Homepage: React.FC = (): JSX.Element => {
     return () => clearInterval(id)
   }, [])
 
-  const handleCheckout = async () => {
-    if (loading) return
-    setLoading(true)
-    try {
-      const res = await fetch(
-        '/.netlify/functions/create-checkout-session',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planId: 'mindmap_todo_pro' }),
-        }
-      )
-      const data = await res.json()
-      if (data.sessionUrl) {
-        window.location.href = data.sessionUrl
-      } else {
-        console.error('No session URL returned')
-      }
-    } catch (err) {
-      console.error('Checkout error', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className="homepage">
@@ -94,13 +70,9 @@ const Homepage: React.FC = (): JSX.Element => {
             MindXdo weaves mindmaps and todos together so you can strategize
             and execute without friction.
           </p>
-          <button
-            className="btn-primary"
-            onClick={handleCheckout}
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : 'Get Started'}
-          </button>
+          <Link to="/payment" className="btn-primary">
+            Get Started
+          </Link>
         </motion.div>
         <div className="banner-slider">
           <AnimatePresence mode="wait">
@@ -214,13 +186,9 @@ const Homepage: React.FC = (): JSX.Element => {
             <li>Priority support</li>
             <li>All future features</li>
           </ul>
-          <button
-            className="btn-secondary"
-            onClick={handleCheckout}
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : 'Upgrade Now'}
-          </button>
+          <Link to="/payment" className="btn-secondary">
+            Upgrade Now
+          </Link>
         </motion.div>
         </div>
       </section>
