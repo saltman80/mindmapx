@@ -837,3 +837,41 @@ hr {
 :root {
   --mindmap-color: rgba(255, 165, 0, 0.4);
 }
+
+.about-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--spacing-lg);
+  align-items: center;
+  justify-items: center;
+  margin: var(--spacing-2xl) auto;
+  max-width: 1200px;
+}
+.about-section img {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.about-section.reverse {
+  direction: rtl;
+}
+.about-section.reverse > * {
+  direction: ltr;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.checkout-form input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+

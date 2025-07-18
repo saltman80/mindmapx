@@ -73,13 +73,14 @@ export default function TodoDemo(): JSX.Element {
   return (
     <div className="todo-demo section reveal relative overflow-hidden">
       <FaintMindmapBackground />
-      <div className="max-w-2xl mx-auto mb-8">
-        <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
-        <p className="section-subtext">Watch todos appear with smooth animations</p>
-      </div>
-      <div className="todo-grid section--two-col">
-        {lists.map((list, listIndex) => (
-          <div className="todo-card" key={list.title}>
+      <div className="container">
+        <div className="max-w-2xl mx-auto mb-8 text-center">
+          <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
+          <p className="section-subtext">Watch todos appear with smooth animations</p>
+        </div>
+        <div className="todo-grid section--two-col">
+          {lists.map((list, listIndex) => (
+            <div className="todo-card" key={list.title}>
             <h3>{list.title}</h3>
             <ul className="todo-list">
               {list.items.map((item, itemIndex) => {
@@ -101,11 +102,12 @@ export default function TodoDemo(): JSX.Element {
             </ul>
           </div>
         ))}
-      </div>
-      <div className="todo-upgrade">
-        <Link to="/payment" className="btn">
-          Upgrade
-        </Link>
+        </div>
+        <div className="todo-upgrade text-center">
+          <Link to="/payment" className="btn">
+            Upgrade
+          </Link>
+        </div>
       </div>
     </div>
   )

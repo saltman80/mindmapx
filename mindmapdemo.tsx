@@ -62,15 +62,16 @@ export default function MindmapDemo(): JSX.Element {
   return (
     <div className="mindmap-demo section reveal relative overflow-hidden">
       <FaintMindmapBackground />
-      <div className="max-w-2xl mx-auto mb-8">
-        <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
-        <p className="section-subtext">
-          Mind maps animate to life so you can focus on brainstorming
-        </p>
-      </div>
-      <div className="mindmap-grid section--two-col">
-        {maps.map((map, mapIndex) => (
-          <div className="mindmap-container" key={map.title}>
+      <div className="container">
+        <div className="max-w-2xl mx-auto mb-8 text-center">
+          <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
+          <p className="section-subtext">
+            Mind maps animate to life so you can focus on brainstorming
+          </p>
+        </div>
+        <div className="mindmap-grid section--two-col">
+          {maps.map((map, mapIndex) => (
+            <div className="mindmap-container" key={map.title}>
             <svg viewBox="-160 -160 320 320" className="mindmap-svg">
               <circle
                 cx="0"
@@ -122,11 +123,12 @@ export default function MindmapDemo(): JSX.Element {
             </svg>
           </div>
         ))}
-      </div>
-      <div className="mindmap-upgrade">
-        <Link to="/payment" className="btn">
-          Upgrade
-        </Link>
+        </div>
+        <div className="mindmap-upgrade text-center">
+          <Link to="/payment" className="btn">
+            Upgrade
+          </Link>
+        </div>
       </div>
     </div>
   )

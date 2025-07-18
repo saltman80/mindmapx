@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 
 interface BillingInfo {
@@ -67,6 +68,9 @@ export default function BillingPage(): JSX.Element {
           >
             Cancel Subscription
           </button>
+          <div className="mt-lg text-center">
+            <Link to="/checkout" className="btn">Checkout</Link>
+          </div>
         </div>
       )}
       </div>
