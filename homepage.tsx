@@ -340,13 +340,14 @@ const Homepage: React.FC = (): JSX.Element => {
           <h2>Pro Plan</h2>
           <p className="price">$9.99 / month</p>
           <ul>
-            <li>Unlimited mind maps</li>
-            <li>Advanced collaboration</li>
-            <li>Priority support</li>
-            <li>All future features</li>
+            <li>Unlimited manual mind maps</li>
+            <li>Unlimited manual todos</li>
+            <li>Unlimited manual kanban</li>
+            <li>AI assistance available</li>
+            <li>Support &amp; Training Available</li>
           </ul>
           <Link to="/purchase" className="btn">
-            Upgrade Now
+            Purchase Today &gt;
           </Link>
         </motion.div>
         </div>
