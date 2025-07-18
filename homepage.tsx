@@ -123,16 +123,16 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section-bg-alt" style={{ marginTop: '100px' }}>
-        <div className="container">
+      <section className="section section--one-col section-bg-alt text-center" style={{ marginTop: '100px' }}>
+        <div className="container text-center">
           <h2 className="marketing-text-large">
             <StackingText text="Mindmaps + Todos + Team Effort" />
           </h2>
         </div>
       </section>
 
-      <section className="section section-bg-alt">
-        <div className="container">
+      <section className="section section--one-col section-bg-alt text-center">
+        <div className="container text-center">
           <motion.h2
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
@@ -148,8 +148,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section-bg-primary-light">
-        <div className="container">
+      <section className="section section--one-col section-bg-primary-light text-center">
+        <div className="container text-center">
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}
@@ -217,8 +217,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="demo section">
-        <div className="container">
+      <section className="demo section section--one-col text-center">
+        <div className="container text-center">
           <h2>Try It Live</h2>
           <p>Interactive demo of MindXdo – no signup required.</p>
           <Demo />
@@ -255,8 +255,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="ai-power section relative">
-        <div className="container">
+      <section className="ai-power section section--one-col text-center relative">
+        <div className="container text-center">
         <div className="shape shape-circle ai-power-shape" />
         <motion.h2
           initial={{ opacity: 0, scale: 0.8 }}
@@ -280,8 +280,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="pricing section">
-        <div className="container">
+      <section className="pricing section section--one-col text-center">
+        <div className="container text-center">
         <motion.div
           className="pricing-content"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -304,8 +304,8 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="faq section">
-        <div className="container">
+      <section className="faq section section--one-col text-center">
+        <div className="container text-center">
           <h2>Frequently Asked Questions</h2>
           <AnimatedAccordion items={faqItems} />
         </div>
