@@ -474,6 +474,37 @@ hr {
   padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
+.section-bg-alt {
+  background-color: var(--color-bg-alt);
+}
+
+.section-bg-primary-light {
+  background-color: rgba(10, 132, 255, 0.05);
+}
+
+.section-subtext {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: var(--color-text);
+  opacity: 0.8;
+  font-size: 1.125rem;
+  margin-top: var(--spacing-sm);
+}
+
+.icon-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.icon-row img {
+  height: 48px;
+  width: 48px;
+}
+
 .section .container {
   max-width: 1200px;
   margin: 0 auto;
