@@ -945,11 +945,25 @@ hr {
   margin-left: auto;
   margin-right: auto;
 }
-.checkout-form input {
+.checkout-form .form-input {
   width: 100%;
-  padding: var(--spacing-sm);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+}
+
+.payment-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+.btn-paypal {
+  background-color: #ffc439;
+  border-color: #ffc439;
+  color: #111;
+}
+.btn-paypal:hover {
+  background-color: #ffb347;
+  border-color: #ffb347;
+  color: #111;
 }
 
 .form-card {

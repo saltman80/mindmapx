@@ -12,19 +12,71 @@ const PurchasePage = () => {
       <div className="container text-center">
         <h1 className="mb-md">Purchase MindXdo</h1>
         <p className="mb-lg">$9.99 per month - Mindmap and Todo platform</p>
-        <form className="checkout-form" onSubmit={handleSubmit}>
-          <label>
-            Name
-            <input type="text" placeholder="Your Name" required />
-          </label>
-          <label>
-            Email
-            <input type="email" placeholder="Your Email" required />
-          </label>
-          <button type="submit" className="btn" disabled>
-            Place Order
-          </button>
-        </form>
+        <div className="form-card">
+          <form className="checkout-form" onSubmit={handleSubmit}>
+            <div className="form-field">
+              <label className="form-label">
+                Name
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  className="form-input"
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-field">
+              <label className="form-label">
+                Email
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  className="form-input"
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-field">
+              <label className="form-label">
+                Card Number
+                <input
+                  type="text"
+                  placeholder="0000 0000 0000 0000"
+                  className="form-input"
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-field">
+              <label className="form-label">
+                Expiration
+                <input
+                  type="text"
+                  placeholder="MM/YY"
+                  className="form-input"
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-field">
+              <label className="form-label">
+                CVC
+                <input
+                  type="text"
+                  placeholder="123"
+                  className="form-input"
+                  required
+                />
+              </label>
+            </div>
+            <div className="payment-actions">
+              <button type="submit" className="btn" disabled>
+                Place Order
+              </button>
+              <button type="button" className="btn btn-paypal">PayPal</button>
+            </div>
+          </form>
+        </div>
         <h2 className="mt-xl mb-md">Monthly Service Includes</h2>
         <table className="table-auto mx-auto text-left mb-lg">
           <thead>
