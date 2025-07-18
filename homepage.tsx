@@ -34,6 +34,12 @@ const features = [
       'Let MindXdo suggest tasks and connections so you can focus on the experience.',
     icon: './assets/placeholder.png',
   },
+  {
+    title: 'Secure Cloud Storage',
+    description:
+      'Your data stays safe and synced across devices with encrypted cloud backup.',
+    icon: './assets/placeholder.png',
+  },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
@@ -64,13 +70,13 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>MindXdo: Mindmaps Meet Todos with AI</h1>
+          <h1 className="hero-title">MindXdo: Mindmaps Meet Todos with AI</h1>
           <p>
             Experience the power of AI as your ideas become actionable plans.
             MindXdo weaves mindmaps and todos together so you can strategize
             and execute without friction.
           </p>
-          <Link to="/payment" className="btn-primary">
+          <Link to="/payment" className="btn">
             Get Started
           </Link>
         </motion.div>
@@ -186,7 +192,7 @@ const Homepage: React.FC = (): JSX.Element => {
             <li>Priority support</li>
             <li>All future features</li>
           </ul>
-          <Link to="/payment" className="btn-secondary">
+          <Link to="/payment" className="btn">
             Upgrade Now
           </Link>
         </motion.div>
