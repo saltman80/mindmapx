@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
 interface TodoItem {
   text: string
@@ -70,8 +71,12 @@ export default function TodoDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="todo-demo section reveal">
-      <h1 className="demo-title">AI Todo Lists</h1>
+    <div className="todo-demo section reveal relative overflow-hidden">
+      <FaintMindmapBackground />
+      <div className="max-w-2xl mx-auto mb-8">
+        <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
+        <p className="section-subtext">Watch todos appear with smooth animations</p>
+      </div>
       <div className="todo-grid section--two-col">
         {lists.map((list, listIndex) => (
           <div className="todo-card" key={list.title}>

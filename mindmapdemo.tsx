@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useScrollReveal from './useScrollReveal'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
 interface MapItem {
   text: string
@@ -59,14 +60,25 @@ export default function MindmapDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div className="mindmap-demo section reveal">
-      <h1 className="demo-title">MindmapX Visualizer</h1>
-      <p className="demo-sub">Ideas burst from the center of your screen</p>
-      <div className="mindmap-grid">
+    <div className="mindmap-demo section reveal relative overflow-hidden">
+      <FaintMindmapBackground />
+      <div className="max-w-2xl mx-auto mb-8">
+        <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
+        <p className="section-subtext">
+          Mind maps animate to life so you can focus on brainstorming
+        </p>
+      </div>
+      <div className="mindmap-grid section--two-col">
         {maps.map((map, mapIndex) => (
           <div className="mindmap-container" key={map.title}>
             <svg viewBox="-160 -160 320 320" className="mindmap-svg">
-              <circle cx="0" cy="0" r="35" fill="orange" stroke="black" />
+              <circle
+                cx="0"
+                cy="0"
+                r="35"
+                fill="orange"
+                stroke="var(--color-border)"
+              />
               <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="root-text">
                 {map.title}
               </text>
@@ -82,7 +94,7 @@ export default function MindmapDemo(): JSX.Element {
                       y1="0"
                       x2={visible ? x : 0}
                       y2={visible ? y : 0}
-                      stroke="black"
+                      stroke="var(--color-border)"
                       strokeWidth="2"
                       transition={{ duration: 0.6 }}
                     />
@@ -91,7 +103,7 @@ export default function MindmapDemo(): JSX.Element {
                       cy={visible ? y : 0}
                       r="25"
                       fill="orange"
-                      stroke="black"
+                      stroke="var(--color-border)"
                       transition={{ duration: 0.6 }}
                     />
                     <motion.text

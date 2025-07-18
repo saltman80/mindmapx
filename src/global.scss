@@ -776,10 +776,16 @@ hr {
 
 .mindmap-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
   gap: var(--spacing-lg);
   width: 100%;
   justify-items: center;
+}
+
+@media (max-width: 640px) {
+  .mindmap-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mindmap-svg {
@@ -801,9 +807,15 @@ hr {
 
 .todo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, minmax(250px, 1fr));
   gap: var(--spacing-lg);
   justify-items: center;
+}
+
+@media (max-width: 640px) {
+  .todo-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sparkle {
