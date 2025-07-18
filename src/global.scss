@@ -272,6 +272,17 @@ $spacers: (
   }
 }
 
+@keyframes hero-shape-up {
+  from {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(-300px);
+    opacity: 0;
+  }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(20px);
@@ -543,7 +554,8 @@ hr {
   left: -80px;
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle at center, var(--color-secondary), transparent);
+  background: radial-gradient(circle at center, #d3d3d3, transparent);
+  animation: hero-shape-up 10s linear infinite;
 }
 
 .ai-power-shape {
