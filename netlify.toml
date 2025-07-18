@@ -5,7 +5,7 @@ publish = "dist"
 
 [build.environment]
 NODE_VERSION = "20"
-NPM_VERSION = "9"
+NPM_VERSION = "9.9.4"
 
 [[redirects]]
 from = "/api/*"
