@@ -1,4 +1,5 @@
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 const LoginPage = (): JSX.Element => {
   const [values, setValues] = useState<LoginFormValues>({ email: '', password: '' })
@@ -95,6 +96,7 @@ const LoginPage = (): JSX.Element => {
 
   return (
     <section className="section login-page relative overflow-hidden">
+      <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <img

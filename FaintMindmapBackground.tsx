@@ -20,7 +20,7 @@ interface BgProps {
 export default function FaintMindmapBackground({ className = '' }: BgProps): JSX.Element {
   const [visible, setVisible] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { margin: '-40% 0px -40% 0px', once: true })
+  const isInView = useInView(ref, { margin: '-50% 0px -50% 0px', once: true })
 
   useEffect(() => {
     if (!isInView) return

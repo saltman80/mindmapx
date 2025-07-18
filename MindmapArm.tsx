@@ -15,7 +15,7 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
       aria-hidden="true"
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-40% 0px -40% 0px' }}
+      viewport={{ once: true, margin: '-50% 0px -50% 0px' }}
     >
       <motion.line
         x1={startX}
