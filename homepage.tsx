@@ -3,6 +3,23 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
+import MindmapDemo from './mindmapdemo'
+
+const StackingText: React.FC<{ text: string }> = ({ text }) => (
+  <span className="stacking-text">
+    {text.split('').map((ch, i) => (
+      <motion.span
+        key={i}
+        initial={{ y: 50, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: i * 0.05 }}
+      >
+        {ch}
+      </motion.span>
+    ))}
+  </span>
+)
 const features = [
   {
     title: 'Mind Mapping',
@@ -97,6 +114,63 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
+      <section className="section">
+        <div className="container">
+          <h2 className="marketing-text-large">
+            <StackingText text="Mindmaps + Todos + Team Effort" />
+          </h2>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Use AI to lay out visual plans and structure
+          </motion.h2>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <motion.h2
+            className="marketing-text-large"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Rapidly prototype business ideas, flows, systems, and more.
+          </motion.h2>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container two-column mini-mindmap-container">
+          <motion.div
+            initial={{ clipPath: 'inset(0 0 100% 0)' }}
+            whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <MindmapDemo />
+          </motion.div>
+          <motion.div
+            className="marketing-text-large"
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            See how AI instantly creates a map for your ideas.
+          </motion.div>
+        </div>
+      </section>
 
 
       <section className="features section">

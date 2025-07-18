@@ -346,6 +346,8 @@ hr {
   gap: var(--spacing-lg);
   align-items: center;
   margin: var(--spacing-2xl) 0;
+  text-align: center;
+  justify-items: center;
 }
 
 .three-column {
@@ -354,6 +356,7 @@ hr {
   gap: var(--spacing-lg);
   margin: var(--spacing-2xl) 0;
   text-align: center;
+  justify-items: center;
 }
 
 .section--one-col {
@@ -366,6 +369,8 @@ hr {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-lg);
+  text-align: center;
+  justify-items: center;
 }
 
 .section--three-col {
@@ -373,11 +378,26 @@ hr {
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
   text-align: center;
+  justify-items: center;
 }
 
 .bold-marketing-text {
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.marketing-text-large {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  text-align: center;
+}
+
+.stacking-text span {
+  display: inline-block;
+}
+
+.mini-mindmap-container .btn {
+  display: none;
 }
 
 .ai-button {
