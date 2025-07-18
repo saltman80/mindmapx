@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import FeatureCard from './featurecard'
+import Demo from './demo'
 const features = [
   {
     title: 'Mind Mapping',
