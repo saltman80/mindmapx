@@ -9,13 +9,11 @@ const PurchasePage = () => {
 
   return (
     <section className="section relative overflow-hidden">
-      <MindmapArm side="left" />
-      <MindmapArm side="right" />
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
         <p className="text-center mb-lg">$9.99 per month - Mindmap and Todo platform</p>
         <div className="two-column purchase-grid">
-          <div>
+          <div className="relative">
             <div className="offer-card text-center">
               <FaintMindmapBackground className="mindmap-bg-small" />
               <h2 className="mb-md">Monthly Service Includes</h2>
@@ -39,6 +37,7 @@ const PurchasePage = () => {
                 Mindmaps, todos and the kanban board can be created separately or together.
               </p>
             </div>
+            <MindmapArm side="left" />
           </div>
           <div className="form-card">
             <form className="checkout-form" onSubmit={handleSubmit}>
@@ -105,6 +104,7 @@ const PurchasePage = () => {
               <button type="button" className="btn btn-paypal">PayPal</button>
             </div>
           </form>
+          <MindmapArm side="right" />
         </div>
         </div>
       </div>
