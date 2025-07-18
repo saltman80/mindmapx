@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
 interface BillingInfo {
   lastInvoiceDate: string
@@ -42,7 +43,9 @@ export default function BillingPage(): JSX.Element {
   }
 
   return (
-    <div className="billing-page container mx-auto p-6 max-w-lg">
+    <section className="section relative overflow-hidden">
+      <FaintMindmapBackground />
+      <div className="billing-page container mx-auto p-6 max-w-lg">
       <h1 className="text-2xl font-semibold mb-4">Billing Details</h1>
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {cancelMsg && <div className="text-green-600 mb-4">{cancelMsg}</div>}
@@ -66,6 +69,7 @@ export default function BillingPage(): JSX.Element {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </section>
   )
 }

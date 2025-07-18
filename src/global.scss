@@ -506,7 +506,7 @@ hr {
 /* --- Layout Enhancements --- */
 .section {
   padding: var(--spacing-2xl) var(--spacing-lg);
-  min-height: 600px;
+  min-height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -808,4 +808,20 @@ hr {
 
 .sparkle {
   margin-right: var(--spacing-xs);
+}
+
+.mindmap-bg-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.mindmap-bg {
+  width: 100%;
+  height: 100%;
+}
+
+:root {
+  --mindmap-color: rgba(255, 165, 0, 0.4);
 }

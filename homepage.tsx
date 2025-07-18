@@ -5,6 +5,7 @@ import AnimatedAccordion from './animatedaccordion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
 import MindmapDemo from './mindmapdemo'
+import FaintMindmapBackground from './FaintMindmapBackground'
 
 const StackingText: React.FC<{ text: string }> = ({ text }) => (
   <span className="stacking-text">
@@ -84,7 +85,8 @@ const Homepage: React.FC = (): JSX.Element => {
 
   return (
     <div className="homepage">
-      <section className="hero section relative">
+      <section className="hero section relative overflow-hidden">
+        <FaintMindmapBackground />
         <div className="container">
         <div className="shape shape-circle hero-shape1" />
         <div className="shape shape-circle hero-shape2" />
