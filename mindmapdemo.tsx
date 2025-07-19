@@ -181,20 +181,27 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             </div>
           </section>
 
-          <section className="section section--one-col text-center reveal">
-            <div className="container text-center">
-              <motion.h2
-                className="marketing-text-large"
-                initial={{ x: 100, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                AI Todo Lists Keep Teams Aligned
-              </motion.h2>
-              <p className="section-subtext">
-                Assign tasks from your maps and watch progress unfold automatically.
-              </p>
+          <section className="section text-center reveal">
+            <div className="container two-column">
+              <div>
+                <motion.h2
+                  className="marketing-text-large"
+                  initial={{ x: 100, opacity: 0 }}
+                  whileInView={{ x: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  AI Todo Lists Keep Teams Aligned
+                </motion.h2>
+                <p className="section-subtext">
+                  Assign tasks from your maps and watch progress unfold automatically.
+                </p>
+              </div>
+              <img
+                src="./assets/hero-collaboration.png"
+                alt="Collaboration"
+                style={{ width: '400px' }}
+              />
             </div>
           </section>
 
