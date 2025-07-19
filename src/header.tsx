@@ -105,6 +105,26 @@ const Header = (): JSX.Element => {
             <span className="header__toggle-bar" />
             <span className="header__toggle-bar" />
           </button>
+
+          <nav className="header__nav" aria-label="Primary">
+            <ul className="header__nav-list">
+              {navItems.map(item => (
+                <li key={item.route} className="header__nav-item">
+                  <NavLink
+                    to={item.route}
+                    className={({ isActive }) =>
+                      `header__nav-link${
+                        isActive ? ' header__nav-link--active' : ''
+                      }`
+                    }
+                    onClick={() => handleNavSelect(item.route)}
+                  >
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <div className="header__actions">
           {user ? (
             <div className="header__avatar-container" ref={avatarRef}>

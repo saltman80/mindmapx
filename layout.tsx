@@ -39,7 +39,9 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
             aria-controls={navId}
             onClick={() => setMenuOpen(open => !open)}
           >
-            <span className="layout-menu-icon">?</span>
+            <span className="layout-menu-icon">
+              {menuOpen ? '✕' : '☰'}
+            </span>
           </button>
           <nav
             id={navId}
