@@ -86,53 +86,32 @@ const Header = (): JSX.Element => {
     .toUpperCase()
 
   return (
-    <header className="header">
-      <div className="header__container">
-        <div className="header__logo">
-          <Link to="/" aria-label="Home">
-            <img
-              src="./assets/logo.png"
-              alt="MindXdo logo"
-              className="header__logo-img"
-            />
-          </Link>
-        </div>
-        <button
-          ref={toggleRef}
-          className="header__toggle"
-          type="button"
-          onClick={() => setMobileNavOpen(prev => !prev)}
-          aria-label="Toggle navigation"
-          aria-expanded={isMobileNavOpen}
-          aria-controls="primary-navigation"
-        >
-          <span className="header__toggle-bar" />
-          <span className="header__toggle-bar" />
-          <span className="header__toggle-bar" />
-        </button>
-        <nav
-          id="primary-navigation"
-          ref={navRef}
-          className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
-          aria-label="Main navigation"
-        >
-          <ul className="header__nav-list">
-            {navItems.map(item => (
-              <li key={item.route} className="header__nav-item">
-                <NavLink
-                  to={item.route}
-                  className={({ isActive }) =>
-                    `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-                  }
-                  onClick={() => setMobileNavOpen(false)}
-                >
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="header__actions">
+    <>
+      <header className="header">
+        <div className="header__container">
+          <div className="header__logo">
+            <Link to="/" aria-label="Home">
+              <img
+                src="./assets/logo.png"
+                alt="MindXdo logo"
+                className="header__logo-img"
+              />
+            </Link>
+          </div>
+          <button
+            ref={toggleRef}
+            className="header__toggle"
+            type="button"
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            aria-label="Toggle navigation"
+            aria-expanded={isMobileNavOpen}
+            aria-controls="primary-navigation"
+          >
+            <span className="header__toggle-bar" />
+            <span className="header__toggle-bar" />
+            <span className="header__toggle-bar" />
+          </button>
+          <div className="header__actions">
           {user ? (
             <div className="header__avatar-container" ref={avatarRef}>
               <button
@@ -188,9 +167,32 @@ const Header = (): JSX.Element => {
               Login
             </Link>
           )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <nav
+        id="primary-navigation"
+        ref={navRef}
+        className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
+        aria-label="Main navigation"
+      >
+        <ul className="header__nav-list">
+          {navItems.map(item => (
+            <li key={item.route} className="header__nav-item">
+              <NavLink
+                to={item.route}
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
+                }
+                onClick={() => setMobileNavOpen(false)}
+              >
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   )
 }
 
