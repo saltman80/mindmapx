@@ -1262,15 +1262,15 @@ hr {
 .mobile-menu__overlay {
   position: fixed;
   inset: 0;
-  padding: var(--spacing-2xl) var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-4xl);
   background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  height: 100vh;
   overflow-y: auto;
   animation: fade-in var(--transition-duration) var(--transition-ease);
-  padding-bottom: var(--spacing-4xl);
 }
 
 .mobile-menu__list {
@@ -1281,6 +1281,7 @@ hr {
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-xl);
+  width: 100%;
 }
 
 .mobile-menu__item {
