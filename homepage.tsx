@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import AnimatedAccordion from './animatedaccordion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
@@ -69,19 +68,7 @@ const faqItems = [
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
-  const heroImages = [
-    './assets/hero-mindmap.png',
-    './assets/hero-todo.png',
-    './assets/hero-collaboration.png',
-  ]
-  const [currentHero, setCurrentHero] = useState(0)
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setCurrentHero(i => (i + 1) % heroImages.length)
-    }, 4000)
-    return () => clearInterval(id)
-  }, [])
+  const heroImage = './assets/hero-todo.png'
 
 
   return (
@@ -108,18 +95,7 @@ const Homepage: React.FC = (): JSX.Element => {
           </Link>
         </motion.div>
         <div className="banner-slider">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentHero}
-              src={heroImages[currentHero]}
-              alt="Hero banner"
-              className="banner-image"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-            />
-          </AnimatePresence>
+          <img src={heroImage} alt="Hero banner" className="banner-image" />
         </div>
         </div>
       </section>

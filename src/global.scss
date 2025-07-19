@@ -398,7 +398,7 @@ hr {
 }
 
 .header__logo-img {
-  height: 40px;
+  height: 100px;
 }
 
 .banner-slider {
@@ -409,7 +409,8 @@ hr {
 .banner-image {
   width: 100%;
   display: block;
-  height: auto;
+  max-height: 600px;
+  object-fit: cover;
 }
 
 .two-column {
@@ -457,8 +458,9 @@ hr {
   justify-items: center;
 }
 .three-column img {
-  height: 80px;
-  margin-bottom: var(--spacing-sm);
+  height: 96px;
+  margin: 0 auto var(--spacing-sm);
+  display: block;
 }
 
 .section--one-col {
@@ -779,8 +781,9 @@ hr {
 }
 
 .feature-card__icon {
-  height: 64px;
-  margin-bottom: var(--spacing-md);
+  height: 96px;
+  margin: 0 auto var(--spacing-md);
+  display: block;
 }
 
 .pricing-content {
@@ -1140,7 +1143,7 @@ hr {
 }
 
 .section-icon {
-  width: 64px;
+  width: 96px;
   margin: 0 auto var(--spacing-md);
   display: block;
 }
