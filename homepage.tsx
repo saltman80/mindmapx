@@ -67,7 +67,7 @@ const faqItems = [
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
-  const heroImage = './assets/hero-todo.png'
+  const heroImage = './assets/main_hero_banner_mindxdo_cloud.png'
 
 
   return (
@@ -248,7 +248,7 @@ const Homepage: React.FC = (): JSX.Element => {
             Map your ideas visually while keeping tasks in focus.
           </div>
           <img
-            src="./assets/integration-banner.png"
+            src="./assets/simple_main_banner_home.png"
             alt="Visual integration banner"
             className="banner-image"
           />
@@ -290,7 +290,7 @@ const Homepage: React.FC = (): JSX.Element => {
           timelines so you never wonder what comes next.
         </p>
         <img
-          src="./assets/ai-showcase.png"
+          src="./assets/system_banner_people.png"
           alt="AI showcase"
           className="banner-image"
         />

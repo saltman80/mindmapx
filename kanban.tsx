@@ -127,9 +127,13 @@ export default function Kanban(): JSX.Element {
         </div>
       </section>
 
-      <section className="section section-bg-alt reveal relative overflow-x-visible">
+      <section className="about-section reveal">
         <MindmapArm side="left" />
-        <div className="container">
+        <img
+          src="./assets/marketing_square_treasuremap.png"
+          alt="AI Workflows"
+        />
+        <div>
           <h2 className="marketing-text-large">
             <StackingText text="AI Workflows" />
           </h2>
@@ -139,8 +143,13 @@ export default function Kanban(): JSX.Element {
         </div>
       </section>
 
-      <section className="section reveal">
-        <div className="container">
+      <section className="about-section reveal reverse">
+        <MindmapArm side="right" />
+        <img
+          src="./assets/marketing_square_mindmap_people.png"
+          alt="Stay Organized"
+        />
+        <div>
           <motion.h2
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
@@ -156,9 +165,13 @@ export default function Kanban(): JSX.Element {
         </div>
       </section>
 
-      <section className="section section-bg-primary-light reveal relative overflow-x-visible">
-        <MindmapArm side="right" />
-        <div className="container">
+      <section className="about-section reveal">
+        <MindmapArm side="left" />
+        <img
+          src="./assets/marketing_square_ai_connecting.png"
+          alt="Coordinate With Clarity"
+        />
+        <div>
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}

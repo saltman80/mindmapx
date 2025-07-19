@@ -14,7 +14,7 @@ const sections: AboutSection[] = [
   {
     title: 'Our Mission',
     text: 'We help visualize big ideas and break them into manageable steps using AI planning tools.',
-    img: './assets/hero-mindmap.png',
+    img: './assets/marketing_square_mindmap_people.png',
     bulletPoints: [
       'Capture concepts quickly with intuitive mind maps',
       'Turn every idea into an actionable task',
@@ -24,7 +24,7 @@ const sections: AboutSection[] = [
   {
     title: 'Key Benefits',
     text: 'MindXdo keeps your plans and tasks together so you stay organized and focused.',
-    img: './assets/hero-collaboration.png',
+    img: './assets/marketing_square_lightbulb_team.png',
     bulletPoints: [
       'One workspace for mapping and doing',
       'Kanban board shows todo progress at a glance',
@@ -35,7 +35,7 @@ const sections: AboutSection[] = [
   {
     title: 'Performance Insights',
     text: 'Track progress at a glance and let data drive your next move.',
-    img: './assets/hero-todo.png',
+    img: './assets/marketing_square_todolist_in_cloud.png',
     bulletPoints: [
       'Dashboards highlight your progress',
       'AI suggestions keep you on the right path',
@@ -45,7 +45,7 @@ const sections: AboutSection[] = [
   {
     title: 'Continuous Improvement',
     text: 'We evolve alongside your workflow so you can focus on what matters most.',
-    img: './assets/ai-showcase.png',
+    img: './assets/marketing_square_ai_connecting.png',
     bulletPoints: [
       'Frequent feature releases based on feedback',
       'Tools that scale with your ambitions',
