@@ -28,6 +28,7 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Credentials': 'true'
 }
 
 export const handler: Handler = async (event) => {
@@ -133,12 +134,31 @@ export const handler: Handler = async (event) => {
     }
 
     failedLoginAttempts.delete(ip)
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' })
+    const token = jwt.sign(
+      { userId: user.id, sessionStart: Date.now() },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    )
+
+    const cookieParts = [
+      `session=${token}`,
+      'HttpOnly',
+      'Path=/',
+      'SameSite=Lax',
+      'Max-Age=86400'
+    ]
+    if (process.env.NODE_ENV === 'production') {
+      cookieParts.push('Secure')
+    }
 
     return {
       statusCode: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+        'Set-Cookie': cookieParts.join('; ')
+      },
+      body: JSON.stringify({ success: true })
     }
   } catch (error) {
     console.error('Login error:', error)

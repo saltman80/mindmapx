@@ -14,7 +14,7 @@ export default function TodoDashboard() {
     setError(null)
     setIsLoadingList(true)
     try {
-      const res = await fetch('/api/todos')
+      const res = await fetch('/api/todos', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to fetch todos')
       const data = await res.json()
       if (isMounted.current) setTodos(data.todos)
@@ -51,6 +51,7 @@ export default function TodoDashboard() {
       const res = await fetch('/api/todos/bulk-complete', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ ids }),
       })
       if (!res.ok) throw new Error('Bulk complete failed')
@@ -69,7 +70,7 @@ export default function TodoDashboard() {
     setError(null)
     setIsClearing(true)
     try {
-      const res = await fetch('/api/todos/completed', { method: 'DELETE' })
+      const res = await fetch('/api/todos/completed', { method: 'DELETE', credentials: 'include' })
       if (!res.ok) throw new Error('Clear completed failed')
       await loadTodos()
     } catch (err) {

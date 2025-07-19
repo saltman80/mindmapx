@@ -1,6 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { z } from 'zod'
-import { verify, JwtPayload } from 'jsonwebtoken'
+import { extractToken, verifySession } from './auth.js'
 import { createClient } from '@vercel/postgres'
 const db = createClient({ connectionString: process.env.NETLIFY_DATABASE_URL_UNPOOLED })
 const DeleteRequest = z.object({
@@ -35,47 +35,26 @@ export const handler: Handler = async (
 
   try {
     // Authenticate
-    const authHeader = event.headers.authorization || event.headers.Authorization || ''
-    const token = authHeader.startsWith('Bearer ')
-      ? authHeader.slice(7)
-      : authHeader
+    const token = extractToken(event)
     if (!token) {
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' }),
+        body: JSON.stringify({ error: 'Unauthorized' })
       }
     }
 
-    const secret = process.env.JWT_SECRET
-    if (!secret) throw new Error('JWT_SECRET not set')
-
-    let payload: string | JwtPayload
+    let payload: any
     try {
-      payload = verify(token, secret)
+      payload = verifySession(token)
     } catch {
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid token' }),
+        body: JSON.stringify({ error: 'Invalid token' })
       }
     }
-
-    let userId: string | undefined
-    if (typeof payload === 'object') {
-      if (typeof payload.userId === 'string') {
-        userId = payload.userId
-      } else if (typeof payload.sub === 'string') {
-        userId = payload.sub
-      }
-    }
-    if (!userId) {
-      return {
-        statusCode: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' }),
-      }
-    }
+    const userId = payload.userId
 
     // Parse and validate body
     if (!event.body) {

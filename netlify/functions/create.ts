@@ -1,6 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { verifyToken } from './jwtservice.js'
+import { extractToken, verifySession } from './auth.js'
 import { createMindMapSchema } from './validationschemas.js'
 import { z, ZodError } from 'zod'
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET']
@@ -29,19 +29,17 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  const authHeader = event.headers.authorization || event.headers.Authorization || ''
-  if (!authHeader.startsWith('Bearer ')) {
+  const token = extractToken(event)
+  if (!token) {
     return {
       statusCode: 401,
       headers,
       body: JSON.stringify({ error: 'Unauthorized' })
     }
   }
-
-  const token = authHeader.split(' ')[1]
   let userId: string
   try {
-    const payload = verifyToken(token) as { userId: string }
+    const payload = verifySession(token) as { userId: string }
     userId = payload.userId
   } catch {
     return {

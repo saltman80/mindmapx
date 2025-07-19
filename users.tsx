@@ -94,6 +94,7 @@ export default function UsersPage(): JSX.Element {
         const res = await fetch('/api/users/deactivate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ userIds }),
         })
         if (!res.ok) throw new Error(`Error deactivating users: ${res.statusText}`)

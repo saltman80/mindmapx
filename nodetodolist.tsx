@@ -41,6 +41,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
       const res = await fetch('/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ nodeId, title: text }),
       })
       if (!res.ok) throw new Error(`Error adding todo: ${res.statusText}`)
@@ -63,6 +64,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
       const res = await fetch('/api/todos/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ nodeId, prompt }),
       })
       if (!res.ok) throw new Error(`Error generating todos: ${res.statusText}`)
@@ -85,6 +87,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
       const res = await fetch(`/api/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ title: text }),
       })
       if (!res.ok) throw new Error(`Error editing todo: ${res.statusText}`)
@@ -102,7 +105,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
   const handleDeleteTodo = async (id: string) => {
     setDeletingIds(prev => [...prev, id])
     try {
-      const res = await fetch(`/api/todos/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/todos/${id}`, { method: 'DELETE', credentials: 'include' })
       if (!res.ok) throw new Error(`Error deleting todo: ${res.statusText}`)
       setTodos(prev => prev.filter(t => t.id !== id))
     } catch (error: any) {
@@ -122,6 +125,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
       const res = await fetch(`/api/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ completed: newStatus }),
       })
       if (!res.ok) throw new Error(`Error toggling todo: ${res.statusText}`)

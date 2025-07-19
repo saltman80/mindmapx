@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import jwt from 'jsonwebtoken'
+import { extractToken, verifySession } from './auth.js'
 const querySchema = z.object({
   id: z.string().uuid().optional(),
   skip: z.preprocess(val => val ? parseInt(val as string, 10) : undefined, z.number().int().nonnegative().optional()),
@@ -18,32 +18,22 @@ const updateSchema = z.object({
 export const handler: Handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' }
 
-  const authHeaderRaw = event.headers.authorization || event.headers.Authorization || ''
-  const authHeader = authHeaderRaw.trim()
-  const [scheme, token] = authHeader.split(' ')
-  if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
+  const token = extractToken(event)
+  if (!token) {
     return {
       statusCode: 401,
       headers,
-      body: JSON.stringify({ error: 'Unauthorized' }),
-    }
-  }
-  if (!process.env.JWT_SECRET) {
-    console.error('JWT_SECRET not set')
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Server configuration error' }),
+      body: JSON.stringify({ error: 'Unauthorized' })
     }
   }
   let user: any
   try {
-    user = jwt.verify(token, process.env.JWT_SECRET) as { role: string }
+    user = verifySession(token)
   } catch {
     return {
       statusCode: 401,
       headers,
-      body: JSON.stringify({ error: 'Invalid token' }),
+      body: JSON.stringify({ error: 'Invalid token' })
     }
   }
   if (user.role !== 'admin') {
