@@ -707,10 +707,22 @@ hr {
   margin: 0 auto;
 }
 
+.header__nav {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
 
 .header__nav-list {
   display: flex;
-  gap: 0;
+  gap: var(--spacing-md);
   list-style: none;
   margin: 0;
   padding: 0;

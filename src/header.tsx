@@ -98,6 +98,28 @@ const Header = (): JSX.Element => {
               />
             </Link>
           </div>
+          <nav
+            id="primary-navigation"
+            ref={navRef}
+            className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
+            aria-label="Main navigation"
+          >
+            <ul className="header__nav-list">
+              {navItems.map(item => (
+                <li key={item.route} className="header__nav-item">
+                  <NavLink
+                    to={item.route}
+                    className={({ isActive }) =>
+                      `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
+                    }
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <button
             ref={toggleRef}
             className="header__toggle"
@@ -170,28 +192,6 @@ const Header = (): JSX.Element => {
           </div>
         </div>
       </header>
-      <nav
-        id="primary-navigation"
-        ref={navRef}
-        className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
-        aria-label="Main navigation"
-      >
-        <ul className="header__nav-list">
-          {navItems.map(item => (
-            <li key={item.route} className="header__nav-item">
-              <NavLink
-                to={item.route}
-                className={({ isActive }) =>
-                  `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-                }
-                onClick={() => setMobileNavOpen(false)}
-              >
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </>
   )
 }
