@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+
 const navItems = [
   { label: 'Home', href: '#home' },
   { label: 'Features', href: '#features' },
@@ -99,6 +101,14 @@ const MobileMenu = (): JSX.Element => {
           <a href="/login" className="mobile-menu__login" onClick={toggleMenu}>
             Login
           </a>
+          <button
+            type="button"
+            className="mobile-menu__close"
+            aria-label="Close menu"
+            onClick={toggleMenu}
+          >
+            <CloseIcon />
+          </button>
         </div>
       )}
     </nav>
