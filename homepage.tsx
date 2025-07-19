@@ -58,12 +58,6 @@ const features = [
       'Your data stays safe and synced across devices with encrypted cloud backup.',
     icon: './assets/feature-secure-storage.png',
   },
-  {
-    title: 'Cross-Platform Sync',
-    description:
-      'Access your maps and tasks anywhere with seamless device syncing.',
-    icon: './assets/feature-cross-platform.png',
-  },
 ]
 
 const faqItems = [
@@ -172,21 +166,27 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section--one-col text-center reveal">
-        <div className="container text-center">
-          <img src="./assets/hero-collaboration.png" alt="Collaboration" className="section-icon" />
-          <motion.h2
-            className="marketing-text-large"
-            initial={{ x: 100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            AI Todo Lists Keep Teams Aligned
-          </motion.h2>
-          <p className="section-subtext">
-            Assign tasks from your maps and watch progress unfold automatically.
-          </p>
+      <section className="section text-center reveal">
+        <div className="container two-column">
+          <div>
+            <motion.h2
+              className="marketing-text-large"
+              initial={{ x: 100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              AI Todo Lists Keep Teams Aligned
+            </motion.h2>
+            <p className="section-subtext">
+              Assign tasks from your maps and watch progress unfold automatically.
+            </p>
+          </div>
+          <img
+            src="./assets/hero-collaboration.png"
+            alt="Collaboration"
+            style={{ width: '400px' }}
+          />
         </div>
       </section>
 
