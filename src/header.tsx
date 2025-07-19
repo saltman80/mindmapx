@@ -189,11 +189,11 @@ const Header = (): JSX.Element => {
         onClose={() => setMenuOpen(false)}
         title="Menu"
       >
-        <nav id="mobile-navigation">
-          <ul className="header__nav-list">
-            {navItems.map(item => (
-              <li key={item.route} className="header__nav-item">
-                <NavLink
+          <nav id="mobile-navigation">
+            <ul className="header__nav-list header__nav-list--vertical">
+              {navItems.map(item => (
+                <li key={item.route} className="header__nav-item">
+                  <NavLink
                   to={item.route}
                   className={({ isActive }) =>
                     `header__nav-link${isActive ? ' header__nav-link--active' : ''}`

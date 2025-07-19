@@ -126,7 +126,7 @@ export function Drawer({ isOpen, onClose, children, title }: DrawerProps): JSX.E
               lineHeight: 1,
             }}
           >
-            ?
+            ×
           </button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
