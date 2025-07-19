@@ -409,8 +409,15 @@ hr {
 .banner-image {
   width: 100%;
   display: block;
-  max-height: 600px;
+  max-height: 400px;
   object-fit: cover;
+}
+
+.site-image {
+  width: 100%;
+  display: block;
+  max-height: 400px;
+  object-fit: contain;
 }
 
 .two-column {

@@ -58,6 +58,12 @@ const features = [
       'Your data stays safe and synced across devices with encrypted cloud backup.',
     icon: './assets/feature-secure-storage.png',
   },
+  {
+    title: 'Cross-Platform Sync',
+    description:
+      'Access your maps and tasks anywhere with seamless device syncing.',
+    icon: './assets/feature-cross-platform.png',
+  },
 ]
 
 const faqItems = [
@@ -129,9 +135,9 @@ const Homepage: React.FC = (): JSX.Element => {
             Sketch processes and tasks in minutes and refine them with your team.
           </p>
           <div className="icon-row">
-            <img src="./assets/placeholder.svg" alt="Flow icon" />
-            <img src="./assets/placeholder.svg" alt="Checklist icon" />
-            <img src="./assets/placeholder.svg" alt="Team icon" />
+            <img src="./assets/feature-mind-mapping.png" alt="Flow icon" />
+            <img src="./assets/feature-todo-integration.png" alt="Checklist icon" />
+            <img src="./assets/feature-collaboration.png" alt="Team icon" />
           </div>
         </div>
       </section>
@@ -161,7 +167,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col section-bg-alt text-center reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <div className="container text-center">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <img src="./assets/feature-cross-platform.png" alt="Cross platform" className="section-icon" />
           <h2 className="marketing-text-large">
             <StackingText text="Simple and Powerful" />
           </h2>
@@ -173,7 +179,7 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="section section--one-col text-center reveal">
         <div className="container text-center">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <img src="./assets/hero-collaboration.png" alt="Collaboration" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ x: 100, opacity: 0 }}
@@ -192,7 +198,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-x-visible">
         <MindmapArm side="right" />
         <div className="container text-center">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <img src="./assets/hero-mindmap.png" alt="Mindmap" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}
@@ -257,15 +263,15 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="three-column section">
         <div className="container three-column">
           <div>
-            <img src="./assets/placeholder.svg" alt="Plan" />
+            <img src="./assets/feature-mind-mapping.png" alt="Plan" />
             <div className="bold-marketing-text">Plan</div>
           </div>
           <div>
-            <img src="./assets/placeholder.svg" alt="Track" />
+            <img src="./assets/feature-kanban.png" alt="Track" />
             <div className="bold-marketing-text">Track</div>
           </div>
           <div>
-            <img src="./assets/placeholder.svg" alt="Launch" />
+            <img src="./assets/feature-ai-automation.png" alt="Launch" />
             <div className="bold-marketing-text">Launch</div>
           </div>
         </div>

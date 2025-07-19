@@ -14,7 +14,7 @@ const sections: AboutSection[] = [
   {
     title: 'Our Mission',
     text: 'We help visualize big ideas and break them into manageable steps using AI planning tools.',
-    img: './assets/placeholder.svg',
+    img: './assets/hero-mindmap.png',
     bulletPoints: [
       'Capture concepts quickly with intuitive mind maps',
       'Turn every idea into an actionable task',
@@ -24,7 +24,7 @@ const sections: AboutSection[] = [
   {
     title: 'Key Benefits',
     text: 'MindXdo keeps your plans and tasks together so you stay organized and focused.',
-    img: './assets/placeholder.svg',
+    img: './assets/hero-collaboration.png',
     bulletPoints: [
       'One workspace for mapping and doing',
       'Kanban board shows todo progress at a glance',
@@ -35,7 +35,7 @@ const sections: AboutSection[] = [
   {
     title: 'Earn Rewards',
     text: 'Achieve milestones to unlock perks as you progress through your goals.',
-    img: './assets/placeholder.svg',
+    img: './assets/feature-cross-platform.png',
     bulletPoints: [
       'Celebrate wins with badges and perks',
       'Level up productivity through gamification',
@@ -45,7 +45,7 @@ const sections: AboutSection[] = [
   {
     title: 'Performance Insights',
     text: 'Track progress at a glance and let data drive your next move.',
-    img: './assets/placeholder.svg',
+    img: './assets/hero-todo.png',
     bulletPoints: [
       'Dashboards highlight your progress',
       'AI suggestions keep you on the right path',
@@ -55,7 +55,7 @@ const sections: AboutSection[] = [
   {
     title: 'Continuous Improvement',
     text: 'We evolve alongside your workflow so you can focus on what matters most.',
-    img: './assets/placeholder.svg',
+    img: './assets/ai-showcase.png',
     bulletPoints: [
       'Frequent feature releases based on feedback',
       'Tools that scale with your ambitions',
@@ -72,6 +72,7 @@ export default function AboutPage(): JSX.Element {
         <MindmapArm side="left" />
         <FaintMindmapBackground />
         <div className="about-hero-inner">
+          <img src="./assets/hero-mindmap.png" alt="Mindmap" className="banner-image" />
           <h1>About MindXdo</h1>
           <p>
             Vision Meets Action. Plan the big picture, create the details and track the action.

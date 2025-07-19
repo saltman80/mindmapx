@@ -100,9 +100,9 @@ const LoginPage = (): JSX.Element => {
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <img
-          src="./assets/placeholder.svg"
+          src="./assets/hero-collaboration.png"
           alt="Login"
-          className="login-icon"
+          className="login-icon banner-image"
         />
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
       {submitError && (
