@@ -29,6 +29,8 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 96px;
 }
 
 [data-theme='dark'] {
@@ -1273,6 +1275,7 @@ hr {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 1200;
   padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-4xl);
   background: #fff;
   display: flex;
@@ -1291,7 +1294,7 @@ hr {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-2xl);
   width: 100%;
 }
 
