@@ -86,8 +86,6 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
   return (
     <div className="mindmap-demo-page">
       <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-x-visible">
-        <MindmapArm side="left" />
-        <MindmapArm side="right" />
         <FaintMindmapBackground />
         <div className="container section--one-col text-center">
           <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
