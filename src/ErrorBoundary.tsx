@@ -13,6 +13,7 @@ class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { hasError: false }
+    this.reset = this.reset.bind(this)
   }
 
   static getDerivedStateFromError(error: Error): State {
@@ -23,9 +24,23 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error', error, errorInfo)
   }
 
+  reset() {
+    this.setState({ hasError: false, error: undefined })
+  }
+
   render() {
     if (this.state.hasError) {
-      return <div role="alert">Something went wrong.</div>
+      return (
+        <div role="alert" style={{ padding: '1rem', textAlign: 'center' }}>
+          <h2>Something went wrong.</h2>
+          {this.state.error && (
+            <pre style={{ color: 'red' }}>{this.state.error.message}</pre>
+          )}
+          <button onClick={this.reset} style={{ marginTop: '1rem' }}>
+            Try again
+          </button>
+        </div>
+      )
     }
 
     return this.props.children
