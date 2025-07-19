@@ -33,16 +33,6 @@ const sections: AboutSection[] = [
     ],
   },
   {
-    title: 'Earn Rewards',
-    text: 'Achieve milestones to unlock perks as you progress through your goals.',
-    img: './assets/feature-cross-platform.png',
-    bulletPoints: [
-      'Celebrate wins with badges and perks',
-      'Level up productivity through gamification',
-      'Share achievements with your team',
-    ],
-  },
-  {
     title: 'Performance Insights',
     text: 'Track progress at a glance and let data drive your next move.',
     img: './assets/hero-todo.png',
@@ -72,7 +62,6 @@ export default function AboutPage(): JSX.Element {
         <MindmapArm side="left" />
         <FaintMindmapBackground />
         <div className="about-hero-inner">
-          <img src="./assets/hero-mindmap.png" alt="Mindmap" className="banner-image" />
           <h1>About MindXdo</h1>
           <p>
             Vision Meets Action. Plan the big picture, create the details and track the action.
