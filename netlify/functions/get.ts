@@ -1,12 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import jwt from 'jsonwebtoken'
-
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) {
-  throw new Error('JWT_SECRET environment variable is not set')
-}
+import { extractToken, verifySession } from './auth.js'
 
 const QuerySchema = z.object({
   mapId: z.string().uuid().optional(),
@@ -36,8 +31,8 @@ export const handler: Handler = async (event, context) => {
   }
 
   try {
-    const authHeader = event.headers.authorization || event.headers.Authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = extractToken(event)
+    if (!token) {
       return {
         statusCode: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -45,10 +40,9 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    const token = authHeader.slice(7)
-    let decoded: any
+    let payload: any
     try {
-      decoded = jwt.verify(token, jwtSecret)
+      payload = verifySession(token)
     } catch {
       return {
         statusCode: 401,
@@ -57,7 +51,7 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    const userId = decoded.userId
+    const userId = payload.userId
     const db = await getClient()
     const queryParams = QuerySchema.parse(event.queryStringParameters || {})
 

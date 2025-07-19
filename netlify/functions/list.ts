@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import jwt from 'jsonwebtoken'
+import { extractToken, verifySession } from './auth.js'
 
 const MAX_PAGE = 100
 
@@ -58,27 +58,25 @@ export const handler: Handler = async event => {
     }
   }
 
-  const authHeader = event.headers.authorization || event.headers.Authorization
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = extractToken(event)
+  if (!token) {
     return {
       statusCode: 401,
       headers: commonHeaders,
-      body: JSON.stringify({ error: 'Unauthorized' }),
+      body: JSON.stringify({ error: 'Unauthorized' })
     }
   }
 
-  const token = authHeader.split(' ')[1]
   let userId: string
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] })
-    const payload = JwtPayloadSchema.parse(decoded)
-    userId = payload.userId
+    const payload = verifySession(token)
+    const parsed = JwtPayloadSchema.parse(payload)
+    userId = parsed.userId
   } catch {
     return {
       statusCode: 401,
       headers: commonHeaders,
-      body: JSON.stringify({ error: 'Invalid token' }),
+      body: JSON.stringify({ error: 'Invalid token' })
     }
   }
 

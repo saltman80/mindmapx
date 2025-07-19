@@ -7,7 +7,7 @@ const MapSelector: React.FC<MapSelectorProps> = ({ selectedMapId, onSelectMap })
     const controller = new AbortController()
     const fetchMaps = async () => {
       try {
-        const res = await fetch('/api/maps', { signal: controller.signal })
+        const res = await fetch('/api/maps', { signal: controller.signal, credentials: 'include' })
         if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`)
         const data: MapInfo[] = await res.json()
         setMaps(data)

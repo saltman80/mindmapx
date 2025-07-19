@@ -1,13 +1,10 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { verify } from 'jsonwebtoken'
 import { getClient } from './db-client.js'
+import { extractToken, verifySession } from './auth.js'
 
-const { DATABASE_URL, JWT_SECRET } = process.env
+const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {
   throw new Error('Missing environment variable: DATABASE_URL')
-}
-if (!JWT_SECRET) {
-  throw new Error('Missing environment variable: JWT_SECRET')
 }
 
 
@@ -35,8 +32,8 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     }
   }
 
-  const authHeader = event.headers.authorization || event.headers.Authorization
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = extractToken(event)
+  if (!token) {
     return {
       statusCode: 401,
       headers: CORS_HEADERS,
@@ -44,10 +41,9 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     }
   }
 
-  const token = authHeader.split(' ')[1]
   let payload: any
   try {
-    payload = verify(token, JWT_SECRET)
+    payload = verifySession(token)
   } catch {
     return {
       statusCode: 401,
