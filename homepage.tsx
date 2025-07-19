@@ -117,8 +117,8 @@ const Homepage: React.FC = (): JSX.Element => {
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
             whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>

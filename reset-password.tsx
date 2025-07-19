@@ -16,11 +16,6 @@ const ResetPasswordPage = () => {
     <section className="section login-page relative overflow-hidden">
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
-        <img
-          src="./assets/hero-mindmap.png"
-          alt="Reset Password"
-          className="login-icon banner-image"
-        />
         <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-field">
