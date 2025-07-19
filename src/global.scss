@@ -1179,3 +1179,41 @@ hr {
   margin: 0 auto var(--spacing-lg);
 }
 
+@media (max-width: 640px) {
+  .header__nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: var(--spacing-xl);
+    align-items: center;
+    justify-content: center;
+  }
+  .header__nav-list {
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+  .banner-image,
+  .site-image,
+  .section-icon,
+  .feature-card__icon,
+  .about-section img {
+    width: 80%;
+    max-width: 80%;
+    height: auto;
+  }
+  .two-column,
+  .purchase-grid {
+    grid-template-columns: 1fr;
+  }
+  .purchase-grid > .form-card {
+    order: -1;
+  }
+  .section-subtext {
+    font-size: 1rem;
+  }
+  .bold-marketing-text {
+    font-size: 1.25rem;
+  }
+}
