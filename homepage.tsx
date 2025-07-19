@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import React from 'react'
 import AnimatedAccordion from './animatedaccordion'
 import FeatureCard from './featurecard'
 import Demo from './demo'
@@ -8,17 +9,31 @@ import MindmapArm from './MindmapArm'
 
 const StackingText: React.FC<{ text: string }> = ({ text }) => (
   <span className="stacking-text">
-    {text.split('').map((ch, i) => (
-      <motion.span
-        key={i}
-        initial={{ y: 50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: i * 0.05 }}
-      >
-        {ch === ' ' ? '\u00A0' : ch}
-      </motion.span>
-    ))}
+    {text.split('').map((ch, i) =>
+      ch === '+' ? (
+        <React.Fragment key={i}>
+          <motion.span
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.05 }}
+          >
+            {ch}
+          </motion.span>
+          <br className="mobile-linebreak" />
+        </React.Fragment>
+      ) : (
+        <motion.span
+          key={i}
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.05 }}
+        >
+          {ch === ' ' ? '\u00A0' : ch}
+        </motion.span>
+      )
+    )}
   </span>
 )
 const features = [
