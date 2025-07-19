@@ -1127,7 +1127,8 @@ hr {
   height: 100px;
   pointer-events: none;
   opacity: 0.4;
-  z-index: 1;
+  /* Appear above faint background but below text */
+  z-index: 2;
 }
 
 .mindmap-arm.left {
