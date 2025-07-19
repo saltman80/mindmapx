@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './useAuth'
+import { Drawer } from '../drawer'
 
 export interface NavItem {
   label: string
@@ -9,10 +10,8 @@ export interface NavItem {
 
 const Header = (): JSX.Element => {
   const [isProfileMenuOpen, setProfileMenuOpen] = useState(false)
-  const [isMobileNavOpen, setMobileNavOpen] = useState(false)
+  const [isMenuOpen, setMenuOpen] = useState(false)
   const avatarRef = useRef<HTMLDivElement>(null)
-  const navRef = useRef<HTMLElement>(null)
-  const toggleRef = useRef<HTMLButtonElement>(null)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -49,7 +48,7 @@ const Header = (): JSX.Element => {
 
   const handleNavSelect = (route: string): void => {
     setProfileMenuOpen(false)
-    setMobileNavOpen(false)
+    setMenuOpen(false)
     navigate(route)
   }
 
@@ -59,13 +58,9 @@ const Header = (): JSX.Element => {
       if (avatarRef.current && !avatarRef.current.contains(target)) {
         setProfileMenuOpen(false)
       }
-      if (
-        navRef.current &&
-        toggleRef.current &&
-        !navRef.current.contains(target) &&
-        !toggleRef.current.contains(target)
-      ) {
-        setMobileNavOpen(false)
+      // Close the menu if a click happens outside the header while it is open
+      if (isMenuOpen && !(event.target as Node).closest('header')) {
+        setMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -76,7 +71,7 @@ const Header = (): JSX.Element => {
 
   useEffect(() => {
     setProfileMenuOpen(false)
-    setMobileNavOpen(false)
+    setMenuOpen(false)
   }, [location.pathname])
 
   const initials = user?.name
@@ -98,36 +93,13 @@ const Header = (): JSX.Element => {
               />
             </Link>
           </div>
-          <nav
-            id="primary-navigation"
-            ref={navRef}
-            className={`header__nav${isMobileNavOpen ? ' header__nav--open' : ''}`}
-            aria-label="Main navigation"
-          >
-            <ul className="header__nav-list">
-              {navItems.map(item => (
-                <li key={item.route} className="header__nav-item">
-                  <NavLink
-                    to={item.route}
-                    className={({ isActive }) =>
-                      `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-                    }
-                    onClick={() => setMobileNavOpen(false)}
-                  >
-                    {item.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
           <button
-            ref={toggleRef}
             className="header__toggle"
             type="button"
-            onClick={() => setMobileNavOpen(prev => !prev)}
+            onClick={() => setMenuOpen(open => !open)}
             aria-label="Toggle navigation"
-            aria-expanded={isMobileNavOpen}
-            aria-controls="primary-navigation"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
             <span className="header__toggle-bar" />
             <span className="header__toggle-bar" />
@@ -192,6 +164,29 @@ const Header = (): JSX.Element => {
           </div>
         </div>
       </header>
+      <Drawer
+        isOpen={isMenuOpen}
+        onClose={() => setMenuOpen(false)}
+        title="Menu"
+      >
+        <nav id="mobile-navigation">
+          <ul className="header__nav-list">
+            {navItems.map(item => (
+              <li key={item.route} className="header__nav-item">
+                <NavLink
+                  to={item.route}
+                  className={({ isActive }) =>
+                    `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
+                  }
+                  onClick={() => handleNavSelect(item.route)}
+                >
+                  {item.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </Drawer>
     </>
   )
 }
