@@ -155,15 +155,17 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             </div>
           ))}
           </div>
-          <div className="mindmap-text-block">
-            Harness the power of AI-driven mind mapping to quickly expand and
-            organize your best ideas into actionable plans.
+          <div className="mindmap-info">
+            <div className="mindmap-text-block">
+              Harness the power of AI-driven mind mapping to quickly expand and
+              organize your best ideas into actionable plans.
+            </div>
+            <div className="mindmap-upgrade text-center">
+              <Link to="/purchase" className="btn">
+                Get Started
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="mindmap-upgrade text-center">
-          <Link to="/purchase" className="btn">
-            Upgrade
-          </Link>
         </div>
       </section>
 

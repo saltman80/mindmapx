@@ -121,7 +121,7 @@ export default function Kanban(): JSX.Element {
           </div>
           <div className="kanban-upgrade text-center">
             <Link to="/purchase" className="btn">
-              Upgrade
+              Get Started
             </Link>
           </div>
         </div>
