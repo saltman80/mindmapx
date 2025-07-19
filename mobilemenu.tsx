@@ -8,6 +8,23 @@ const navItems = [
   { label: 'Docs', href: '/docs' },
 ]
 
+const DesktopMenu = (): JSX.Element => (
+  <nav className="desktop-menu" aria-label="Desktop">
+    <ul className="desktop-menu__list">
+      {navItems.map(item => (
+        <li key={item.href} className="desktop-menu__item">
+          <a href={item.href} className="desktop-menu__link">
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a href="/login" className="desktop-menu__login">
+      Login
+    </a>
+  </nav>
+)
+
 const MobileMenu = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -130,4 +147,11 @@ const CloseIcon = (): JSX.Element => (
   </svg>
 )
 
-export default MobileMenu
+const Menu = (): JSX.Element => (
+  <>
+    <DesktopMenu />
+    <MobileMenu />
+  </>
+)
+
+export default Menu

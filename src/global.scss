@@ -1195,30 +1195,7 @@ hr {
 
 @media (max-width: 1024px) {
   .header__nav {
-    display: flex;
-    position: fixed;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding-top: var(--spacing-2xl);
-    background-color: var(--color-bg);
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow-y: auto;
-    z-index: 1000;
-    transform: translateY(-100%);
-    transition: transform var(--transition-duration) var(--transition-ease);
-  }
-  .header__nav.header__nav--open {
-    transform: translateY(0);
-  }
-  .header__nav-list {
-    align-items: center;
-    flex-direction: column;
-    gap: var(--spacing-xl);
-    padding: 0;
+    display: none;
   }
   .hero-banner {
     margin-top: -150px;
@@ -1354,5 +1331,41 @@ hr {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.desktop-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.desktop-menu__list {
+  display: flex;
+  gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.desktop-menu__link {
+  color: var(--color-text);
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: color var(--transition-duration) var(--transition-ease);
+}
+
+.desktop-menu__link:hover {
+  color: var(--color-primary);
+}
+
+.desktop-menu__login {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none;
+  }
 }
 
