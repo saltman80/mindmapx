@@ -1,3 +1,13 @@
+import { useEffect, useRef, useState, useId, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+
+export interface DrawerProps {
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: ReactNode
+}
+
 export function Drawer({ isOpen, onClose, children, title }: DrawerProps): JSX.Element | null {
   const overlayRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
