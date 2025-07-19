@@ -92,10 +92,10 @@ const Homepage: React.FC = (): JSX.Element => {
             Get Started
           </Link>
         </motion.div>
-        <div className="banner-slider">
-          <img src={heroImage} alt="Hero banner" className="banner-image" />
         </div>
-        </div>
+      </section>
+      <section className="hero-banner">
+        <img src={heroImage} alt="Hero banner" className="banner-image" />
       </section>
 
       <section className="section section--one-col section-bg-alt text-center" style={{ marginTop: '100px' }}>
