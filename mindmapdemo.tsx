@@ -96,16 +96,6 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             {maps.map((map, mapIndex) => (
               <div className="mindmap-container" key={map.title}>
               <svg viewBox="-160 -160 320 320" className="mindmap-svg">
-              <circle
-                cx="0"
-                cy="0"
-                r="35"
-                fill="orange"
-                stroke="var(--color-border)"
-              />
-              <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="root-text">
-                {map.title}
-              </text>
               {map.items.map((item, itemIndex) => {
                 const angle = (itemIndex / map.items.length) * Math.PI * 2 - Math.PI / 2
                 const x = 110 * Math.cos(angle)
@@ -132,7 +122,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                       r="25"
                       fill="orange"
                       stroke="var(--color-border)"
-                      transition={{ duration: 0.6 }}
+                      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
                     />
                     {visible && (
                       <motion.text
@@ -143,7 +133,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                         className="node-text"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3, delay: 0.6 }}
+                        transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
                       >
                         {item.text}
                       </motion.text>
@@ -151,6 +141,16 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                   </g>
                 )
               })}
+              <circle
+                cx="0"
+                cy="0"
+                r="35"
+                fill="orange"
+                stroke="var(--color-border)"
+              />
+              <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="root-text">
+                {map.title}
+              </text>
               </svg>
             </div>
           ))}
