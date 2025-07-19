@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "compile:migrations": "tsc -p tsconfig.migrations.json",
     "compile:functions": "tsc -p tsconfig.functions.json",
-    "migrate": "node dist/runmigrations.js"
+    "migrate": "node dist/runmigrations.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
