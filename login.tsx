@@ -95,7 +95,7 @@ const LoginPage = (): JSX.Element => {
   }
 
   return (
-    <section className="section login-page relative overflow-hidden">
+    <section className="section login-page relative overflow-x-visible">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">

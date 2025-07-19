@@ -92,7 +92,7 @@ const Homepage: React.FC = (): JSX.Element => {
 
   return (
     <div className="homepage">
-      <section className="hero section relative overflow-hidden">
+        <section className="hero section relative overflow-x-visible">
         <FaintMindmapBackground />
         <div className="container">
         <div className="shape shape-circle hero-shape1" />
@@ -190,7 +190,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section--one-col section-bg-alt text-center reveal relative overflow-hidden">
+      <section className="section section--one-col section-bg-alt text-center reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <div className="container text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />
@@ -221,7 +221,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-hidden">
+      <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-x-visible">
         <MindmapArm side="right" />
         <div className="container text-center">
           <img src="./assets/placeholder.svg" alt="" className="section-icon" />

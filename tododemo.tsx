@@ -89,7 +89,7 @@ export default function TodoDemo(): JSX.Element {
 
   return (
     <div className="todo-demo-page">
-      <section className="todo-demo section reveal relative overflow-hidden">
+      <section className="todo-demo section reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <MindmapArm side="right" />
         <FaintMindmapBackground />
@@ -131,7 +131,7 @@ export default function TodoDemo(): JSX.Element {
       </div>
       </section>
 
-      <section className="section section-bg-alt reveal relative overflow-hidden">
+      <section className="section section-bg-alt reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <div className="container">
           <h2 className="marketing-text-large">
@@ -160,7 +160,7 @@ export default function TodoDemo(): JSX.Element {
         </div>
       </section>
 
-      <section className="section section-bg-primary-light reveal relative overflow-hidden">
+      <section className="section section-bg-primary-light reveal relative overflow-x-visible">
         <MindmapArm side="right" />
         <div className="container">
           <motion.h2

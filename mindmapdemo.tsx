@@ -85,7 +85,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
 
   return (
     <div className="mindmap-demo-page">
-      <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-hidden">
+      <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <MindmapArm side="right" />
         <FaintMindmapBackground />
@@ -171,7 +171,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
 
       {compact ? null : (
         <>
-          <section className="section section--one-col section-bg-alt text-center reveal relative overflow-hidden">
+          <section className="section section--one-col section-bg-alt text-center reveal relative overflow-x-visible">
             <MindmapArm side="left" />
           <div className="container text-center">
               <h2 className="marketing-text-large">
@@ -200,7 +200,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             </div>
           </section>
 
-          <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-hidden">
+          <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-x-visible">
             <MindmapArm side="right" />
             <div className="container text-center">
               <motion.h2
