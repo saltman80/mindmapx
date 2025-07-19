@@ -90,10 +90,11 @@ export default function TodoDemo(): JSX.Element {
   return (
     <div className="todo-demo-page">
       <section className="todo-demo section reveal relative overflow-hidden">
+        <MindmapArm side="left" />
+        <MindmapArm side="right" />
         <FaintMindmapBackground />
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
-            <img src="./assets/placeholder.svg" alt="" className="section-icon" />
             <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
             <p className="section-subtext">Watch todos appear with smooth animations</p>
           </div>
@@ -133,7 +134,6 @@ export default function TodoDemo(): JSX.Element {
       <section className="section section-bg-alt reveal relative overflow-hidden">
         <MindmapArm side="left" />
         <div className="container">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h2 className="marketing-text-large">
             <StackingText text="AI Simplicity" />
           </h2>
@@ -145,7 +145,6 @@ export default function TodoDemo(): JSX.Element {
 
       <section className="section reveal">
         <div className="container">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
@@ -164,7 +163,6 @@ export default function TodoDemo(): JSX.Element {
       <section className="section section-bg-primary-light reveal relative overflow-hidden">
         <MindmapArm side="right" />
         <div className="container">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}

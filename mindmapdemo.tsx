@@ -86,9 +86,10 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
   return (
     <div className="mindmap-demo-page">
       <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-hidden">
+        <MindmapArm side="left" />
+        <MindmapArm side="right" />
         <FaintMindmapBackground />
         <div className="container section--one-col text-center">
-          <img src="./assets/placeholder.svg" alt="" className="section-icon" />
           <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
           <p className="section-subtext">
             Mind maps animate to life so you can focus on brainstorming
@@ -172,8 +173,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
         <>
           <section className="section section--one-col section-bg-alt text-center reveal relative overflow-hidden">
             <MindmapArm side="left" />
-            <div className="container text-center">
-              <img src="./assets/placeholder.svg" alt="" className="section-icon" />
+          <div className="container text-center">
               <h2 className="marketing-text-large">
                 <StackingText text="Simple and Powerful" />
               </h2>
@@ -185,7 +185,6 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
 
           <section className="section section--one-col text-center reveal">
             <div className="container text-center">
-              <img src="./assets/placeholder.svg" alt="" className="section-icon" />
               <motion.h2
                 className="marketing-text-large"
                 initial={{ x: 100, opacity: 0 }}
@@ -204,7 +203,6 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
           <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-hidden">
             <MindmapArm side="right" />
             <div className="container text-center">
-              <img src="./assets/placeholder.svg" alt="" className="section-icon" />
               <motion.h2
                 className="marketing-text-large"
                 initial={{ opacity: 0 }}
