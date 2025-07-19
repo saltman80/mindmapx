@@ -96,6 +96,9 @@ const MobileMenu = (): JSX.Element => {
               </li>
             ))}
           </ul>
+          <a href="/login" className="mobile-menu__login" onClick={toggleMenu}>
+            Login
+          </a>
         </div>
       )}
     </nav>
