@@ -67,7 +67,7 @@ const faqItems = [
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
-  const heroImage = './assets/main_hero_banner_mindxdo_cloud.png'
+  const heroImage = './assets/system_banner_people.png'
 
 
   return (
