@@ -749,6 +749,7 @@ hr {
     display: flex;
   }
   .header__nav {
+    display: flex;
     position: absolute;
     top: 100%;
     left: 0;
@@ -1181,6 +1182,7 @@ hr {
 
 @media (max-width: 640px) {
   .header__nav {
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;
