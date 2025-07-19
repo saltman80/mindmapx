@@ -5,7 +5,6 @@ import FeatureCard from './featurecard'
 import Demo from './demo'
 import { CompactMindmapDemo } from './mindmapdemo'
 import MindmapArm from './MindmapArm'
-import FaintMindmapBackground from './FaintMindmapBackground'
 
 const StackingText: React.FC<{ text: string }> = ({ text }) => (
   <span className="stacking-text">
@@ -74,7 +73,6 @@ const Homepage: React.FC = (): JSX.Element => {
   return (
     <div className="homepage">
         <section className="hero section relative overflow-x-visible">
-        <FaintMindmapBackground />
         <div className="container">
         <div className="shape shape-circle hero-shape1" />
         <div className="shape shape-circle hero-shape2" />
@@ -109,7 +107,7 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <StackingText text="Vision Meets Action" />
+            <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
           <p className="section-subtext">Plan the big picture, create the details and track the action.</p>
           <p className="section-subtext">Stop getting lost in the details and focus on what matters.</p>
