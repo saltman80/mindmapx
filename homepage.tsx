@@ -88,7 +88,7 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">MindXdo: Vision Meets Action</h1>
+          <h1 className="hero-title">Vision Meets Action</h1>
           <p>
             Plan the big picture, create the details and track the action.
             Stop getting lost in the details and focus on what matters.
@@ -129,16 +129,11 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Rapidly prototype business ideas, flows, systems, and more.
+            Rapidly prototype ideas, flows, systems, & more.
           </motion.h2>
           <p className="section-subtext">
             Sketch processes and tasks in minutes and refine them with your team.
           </p>
-          <div className="icon-row">
-            <img src="./assets/feature-mind-mapping.png" alt="Flow icon" />
-            <img src="./assets/feature-todo-integration.png" alt="Checklist icon" />
-            <img src="./assets/feature-collaboration.png" alt="Team icon" />
-          </div>
         </div>
       </section>
 
