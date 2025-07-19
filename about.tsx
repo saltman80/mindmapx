@@ -68,7 +68,7 @@ export default function AboutPage(): JSX.Element {
   useScrollReveal()
   return (
     <div className="about-page">
-      <section className="section section--one-col reveal relative overflow-hidden">
+      <section className="section section--one-col reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <FaintMindmapBackground />
         <div className="about-hero-inner">

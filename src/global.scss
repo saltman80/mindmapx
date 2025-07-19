@@ -1123,20 +1123,20 @@ hr {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 3200px;
+  width: 1200px;
   height: 100px;
   pointer-events: none;
   opacity: 0.4;
   /* Appear above faint background but below text */
-  z-index: 2;
+  z-index: 1;
 }
 
 .mindmap-arm.left {
-  left: -1000px;
+  left: 0;
 }
 
 .mindmap-arm.right {
-  right: -1000px;
+  right: 0;
 }
 
 .section-icon {

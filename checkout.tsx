@@ -11,7 +11,7 @@ export default function CheckoutPage(): JSX.Element {
   }
 
   return (
-    <section className="section relative overflow-hidden">
+    <section className="section relative overflow-x-visible">
       <FaintMindmapBackground />
       <div className="container text-center">
         <h1 className="mb-lg">Checkout</h1>

@@ -2,8 +2,8 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 
 export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' }): JSX.Element {
-  const width = 3200
-  const startX = side === 'left' ? -50 : width - 50
+  const width = 1200
+  const startX = side === 'left' ? 0 : width
   const endX = width / 2
   const ref = useRef<SVGSVGElement>(null)
   // Trigger the animation even if only a small portion of the arm is visible.

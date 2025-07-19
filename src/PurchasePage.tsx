@@ -8,7 +8,7 @@ const PurchasePage = () => {
   }
 
   return (
-    <section className="section relative overflow-hidden">
+    <section className="section relative overflow-x-visible">
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
         <p className="text-center mb-lg">$9.99 per month - Mindmap and Todo platform</p>
