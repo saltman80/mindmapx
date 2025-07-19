@@ -15,7 +15,7 @@ const StackingText: React.FC<{ text: string }> = ({ text }) => (
           <motion.span
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.5 }}
             transition={{ delay: i * 0.05 }}
           >
             {ch}
@@ -27,7 +27,7 @@ const StackingText: React.FC<{ text: string }> = ({ text }) => (
           key={i}
           initial={{ y: 50, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.5 }}
           transition={{ delay: i * 0.05 }}
         >
           {ch === ' ' ? '\u00A0' : ch}
@@ -117,7 +117,7 @@ const Homepage: React.FC = (): JSX.Element => {
             className="marketing-text-large"
             initial={{ x: -100, opacity: 0 }}
             whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6 }}
           >
             <StackingText text="MindMap + Todo + Team Vision" />
