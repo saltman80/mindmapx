@@ -123,7 +123,7 @@ export default function TodoDemo(): JSX.Element {
         </div>
         <div className="todo-upgrade text-center">
           <Link to="/purchase" className="btn">
-            Upgrade
+            Get Started
           </Link>
         </div>
       </div>
