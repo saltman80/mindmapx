@@ -98,7 +98,7 @@ const Homepage: React.FC = (): JSX.Element => {
         <img src={heroImage} alt="Hero banner" className="banner-image" />
       </section>
 
-      <section className="section section--one-col section-bg-alt text-center" style={{ marginTop: '100px' }}>
+      <section className="section section--one-col section-bg-alt text-center">
         <div className="container text-center">
           <motion.h2
             className="marketing-text-large"
@@ -193,7 +193,6 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-x-visible">
         <MindmapArm side="right" />
         <div className="container text-center">
-          <img src="./assets/hero-mindmap.png" alt="Mindmap" className="section-icon" />
           <motion.h2
             className="marketing-text-large"
             initial={{ opacity: 0 }}
@@ -255,22 +254,6 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="three-column section">
-        <div className="container three-column">
-          <div>
-            <img src="./assets/feature-mind-mapping.png" alt="Plan" />
-            <div className="bold-marketing-text">Plan</div>
-          </div>
-          <div>
-            <img src="./assets/feature-kanban.png" alt="Track" />
-            <div className="bold-marketing-text">Track</div>
-          </div>
-          <div>
-            <img src="./assets/feature-ai-automation.png" alt="Launch" />
-            <div className="bold-marketing-text">Launch</div>
-          </div>
-        </div>
-      </section>
 
       <section className="ai-power section section--one-col text-center relative">
         <div className="container text-center">
