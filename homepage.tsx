@@ -84,9 +84,7 @@ const Homepage: React.FC = (): JSX.Element => {
         >
           <h1 className="hero-title">Vision Meets Action</h1>
           <p>
-            Plan the big picture, create the details and track the action.
-            Stop getting lost in the details and focus on what matters.
-            Use AI to find opportunities and aid you in executing your team's vision.
+            Plan big ideas and track tasks in one place. Let AI guide your team.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -109,8 +107,8 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
-          <p className="section-subtext">Plan the big picture, create the details and track the action.</p>
-          <p className="section-subtext">Stop getting lost in the details and focus on what matters.</p>
+          <p className="section-subtext">Plan big ideas and track tasks in one space.</p>
+          <p className="section-subtext">Let AI keep everyone focused.</p>
         </div>
       </section>
 

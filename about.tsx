@@ -64,10 +64,10 @@ export default function AboutPage(): JSX.Element {
         <div className="about-hero-inner">
           <h1>About MindXdo</h1>
           <p>
-            Vision Meets Action. Plan the big picture, create the details and track the action.
+            Vision Meets Action. Plan big ideas and track tasks together.
           </p>
           <p>
-            Stop getting lost in the details and focus on what matters. Use AI to find opportunities and aid you in executing your team's vision.
+            Stay focused on what matters. AI helps your team succeed.
           </p>
           <Link to="/purchase" className="btn">Purchase</Link>
         </div>
