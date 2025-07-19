@@ -90,8 +90,6 @@ export default function TodoDemo(): JSX.Element {
   return (
     <div className="todo-demo-page">
       <section className="todo-demo section reveal relative overflow-x-visible">
-        <MindmapArm side="left" />
-        <MindmapArm side="right" />
         <FaintMindmapBackground />
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
