@@ -169,9 +169,13 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
 
       {compact ? null : (
         <>
-          <section className="section section--one-col section-bg-alt text-center reveal relative overflow-x-visible">
+          <section className="about-section reveal">
             <MindmapArm side="left" />
-          <div className="container text-center">
+            <img
+              src="./assets/marketing_square_mindmap_people.png"
+              alt="Simple and Powerful"
+            />
+            <div>
               <h2 className="marketing-text-large">
                 <StackingText text="Simple and Powerful" />
               </h2>
@@ -181,33 +185,35 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             </div>
           </section>
 
-          <section className="section text-center reveal">
-            <div className="container two-column">
-              <div>
-                <motion.h2
-                  className="marketing-text-large"
-                  initial={{ x: 100, opacity: 0 }}
-                  whileInView={{ x: 0, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                >
-                  AI Todo Lists Keep Teams Aligned
-                </motion.h2>
-                <p className="section-subtext">
-                  Assign tasks from your maps and watch progress unfold automatically.
-                </p>
-              </div>
-              <img
-                src="./assets/hero-collaboration.png"
-                alt="Collaboration"
-                style={{ width: '400px' }}
-              />
+          <section className="about-section reveal reverse">
+            <MindmapArm side="right" />
+            <img
+              src="./assets/marketing_square_todolist_with_brain.png"
+              alt="AI Todo Lists"
+            />
+            <div>
+              <motion.h2
+                className="marketing-text-large"
+                initial={{ x: 100, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                AI Todo Lists Keep Teams Aligned
+              </motion.h2>
+              <p className="section-subtext">
+                Assign tasks from your maps and watch progress unfold automatically.
+              </p>
             </div>
           </section>
 
-          <section className="section section--one-col section-bg-primary-light text-center reveal relative overflow-x-visible">
-            <MindmapArm side="right" />
-            <div className="container text-center">
+          <section className="about-section reveal">
+            <MindmapArm side="left" />
+            <img
+              src="./assets/marketing_square_ai_connecting.png"
+              alt="Vision Meets Action"
+            />
+            <div>
               <motion.h2
                 className="marketing-text-large"
                 initial={{ opacity: 0 }}
