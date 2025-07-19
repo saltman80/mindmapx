@@ -66,6 +66,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scrollbar-width: thin;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -744,28 +745,9 @@ hr {
   background-color: var(--color-text);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .header__toggle {
     display: flex;
-  }
-  .header__nav {
-    display: flex;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--color-bg);
-    flex-direction: column;
-    transform: translateY(-200%);
-    transition: transform var(--transition-duration) var(--transition-ease);
-  }
-  .header__nav.header__nav--open {
-    transform: translateY(0);
-  }
-  .header__nav-list {
-    flex-direction: column;
-    padding: var(--spacing-md);
-    gap: var(--spacing-md);
   }
 }
 
@@ -1180,7 +1162,7 @@ hr {
   margin: 0 auto var(--spacing-lg);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .header__nav {
     display: flex;
     position: fixed;
@@ -1188,15 +1170,33 @@ hr {
     left: 0;
     right: 0;
     bottom: 0;
-    padding-top: var(--spacing-xl);
+    padding-top: var(--spacing-2xl);
+    background-color: var(--color-bg);
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform var(--transition-duration) var(--transition-ease);
+  }
+  .header__nav.header__nav--open {
+    transform: translateY(0);
   }
   .header__nav-list {
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-xl);
+    padding: 0;
   }
-  .banner-image,
+  .hero-banner {
+    margin-top: 50px;
+    text-align: center;
+  }
+  .banner-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
   .site-image,
   .section-icon,
   .feature-card__icon,
@@ -1244,12 +1244,11 @@ hr {
   position: fixed;
   inset: 0;
   padding: var(--spacing-2xl) var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(10, 132, 255, 0.8), rgba(48, 209, 88, 0.8));
-  backdrop-filter: blur(6px);
+  background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-y: auto;
   animation: fade-in var(--transition-duration) var(--transition-ease);
 }
@@ -1261,7 +1260,7 @@ hr {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .mobile-menu__item {
