@@ -409,7 +409,7 @@ hr {
 .banner-image {
   width: 100%;
   display: block;
-  max-height: 400px;
+  max-height: 600px;
   object-fit: cover;
 }
 
@@ -465,7 +465,8 @@ hr {
   justify-items: center;
 }
 .three-column img {
-  height: 96px;
+  width: 200px;
+  height: auto;
   margin: 0 auto var(--spacing-sm);
   display: block;
 }
@@ -643,8 +644,8 @@ hr {
 }
 
 .icon-row img {
-  height: 48px;
-  width: 48px;
+  width: 200px;
+  height: auto;
 }
 
 .section .container {
@@ -788,7 +789,8 @@ hr {
 }
 
 .feature-card__icon {
-  height: 96px;
+  width: 200px;
+  height: auto;
   margin: 0 auto var(--spacing-md);
   display: block;
 }
@@ -1150,7 +1152,7 @@ hr {
 }
 
 .section-icon {
-  width: 96px;
+  width: 200px;
   margin: 0 auto var(--spacing-md);
   display: block;
 }
@@ -1167,7 +1169,7 @@ hr {
 }
 
 .login-icon {
-  width: 96px;
+  width: 200px;
   margin: 0 auto var(--spacing-lg);
 }
 
