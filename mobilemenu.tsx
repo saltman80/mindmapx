@@ -56,8 +56,9 @@ const MobileMenu = (): JSX.Element => {
   }, [isOpen])
 
   return (
-    <nav className="mobile-menu">
+    <nav className="mobile-menu" role="navigation" aria-label="Mobile">
       <button
+        type="button"
         className="mobile-menu__button"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
