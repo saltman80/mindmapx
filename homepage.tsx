@@ -272,11 +272,6 @@ const Homepage: React.FC = (): JSX.Element => {
           Mind maps show the big picture—our assistant suggests tasks and
           timelines so you never wonder what comes next.
         </p>
-        <img
-          src="./assets/system_banner_people.png"
-          alt="AI showcase"
-          className="banner-image"
-        />
         </div>
       </section>
 
