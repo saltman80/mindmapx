@@ -25,7 +25,7 @@ const PurchasePage = () => {
                 <div className="feature-name">AI todo lists</div>
                 <div className="feature-limit">200 / month</div>
                 <div className="feature-name">Kanban board</div>
-                <div className="feature-limit">Coming soon</div>
+                <div className="feature-limit">50 / unlimited cards</div>
                 <div className="feature-name">Team members</div>
                 <div className="feature-limit">3 seats</div>
               </div>
