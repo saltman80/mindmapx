@@ -104,7 +104,6 @@ const PurchasePage = () => {
               <button type="button" className="btn btn-paypal">PayPal</button>
             </div>
           </form>
-          <MindmapArm side="right" />
         </div>
         </div>
       </div>
