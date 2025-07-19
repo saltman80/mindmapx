@@ -123,7 +123,7 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Rapidly prototype ideas, flows, systems, & more.
+            Create ideas, flows, systems, & more.
           </motion.h2>
           <p className="section-subtext">
             Sketch processes and tasks in minutes and refine them with your team.
@@ -252,6 +252,7 @@ const Homepage: React.FC = (): JSX.Element => {
         <div className="container text-center">
         <div className="shape shape-circle ai-power-shape" />
         <motion.h2
+          className="marketing-text-large"
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
