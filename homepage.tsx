@@ -233,13 +233,6 @@ const Homepage: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      <section className="demo section section--one-col text-center">
-        <div className="container text-center">
-          <h2>Try It Live</h2>
-          <p>Interactive demo of MindXdo – no signup required.</p>
-          <Demo />
-        </div>
-      </section>
 
       <section className="section section--one-col">
         <div className="container">
