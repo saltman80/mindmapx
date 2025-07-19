@@ -6,7 +6,11 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
   const startX = side === 'left' ? -50 : width - 50
   const endX = width / 2
   const ref = useRef<SVGSVGElement>(null)
-  const inView = useInView(ref, { amount: 0.2, once: true })
+  // Trigger the animation even if only a small portion of the arm is visible.
+  // A large width combined with `overflow-hidden` containers means the
+  // intersection ratio is often below 0.2 on mobile screens. Reducing the
+  // threshold ensures the animation runs as soon as any part is on screen.
+  const inView = useInView(ref, { amount: 0.05, once: true })
 
   return (
     <motion.svg
