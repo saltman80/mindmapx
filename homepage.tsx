@@ -43,12 +43,6 @@ const features = [
     icon: './assets/feature-collaboration.png',
   },
   {
-    title: 'Cross-Platform Sync',
-    description:
-      'Access your projects on any device with instant syncing and offline support.',
-    icon: './assets/feature-cross-platform.png',
-  },
-  {
     title: 'AI Automation',
     description:
       'Let MindXdo suggest tasks and connections so you can focus on the experience.',
