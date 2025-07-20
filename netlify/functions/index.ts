@@ -43,6 +43,7 @@ async function createMap(userId: string, data: unknown) {
   } finally {
     client.release()
   }
+}
 
 const handler: Handler = async (event) => {
   try {
