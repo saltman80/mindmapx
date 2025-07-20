@@ -94,7 +94,7 @@ export default function TodoDemo(): JSX.Element {
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
-            <p className="section-subtext">Watch todos appear with smooth animations</p>
+            <p className="section-subtext">See how todos flow from mind maps onto the Kanban board</p>
           </div>
           <div className="todo-grid section--two-col">
             {lists.map((list, listIndex) => (
@@ -140,7 +140,7 @@ export default function TodoDemo(): JSX.Element {
             <StackingText text="AI Simplicity" />
           </h2>
           <p className="section-subtext">
-            Generate prioritized todos straight from your mind maps in moments.
+            Generate prioritized todos from any mind map and sync them to your Kanban lanes.
           </p>
         </div>
       </section>
@@ -162,7 +162,7 @@ export default function TodoDemo(): JSX.Element {
             Team Management Made Powerful
           </motion.h2>
           <p className="section-subtext">
-            Everyone sees their tasks and how they connect to the bigger picture.
+            Collaborate on shared lists and boards so the whole team knows what's next.
           </p>
         </div>
       </section>
@@ -184,7 +184,7 @@ export default function TodoDemo(): JSX.Element {
             Vision Meets Action
           </motion.h2>
           <p className="section-subtext">
-            Use AI to find opportunities and aid you in executing your team's vision.
+            Link tasks to your mind map and visualize progress in Kanban while AI keeps you on target.
           </p>
         </div>
       </section>

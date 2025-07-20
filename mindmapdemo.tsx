@@ -157,8 +157,8 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
           </div>
           <div className="mindmap-info">
             <div className="mindmap-text-block">
-              Harness the power of AI-driven mind mapping to quickly expand and
-              organize your best ideas into actionable plans.
+              Harness AI to expand every idea into todos and Kanban cards so your
+              team can start executing right away.
             </div>
             <div className="mindmap-upgrade text-center">
               <Link to="/purchase" className="btn">
@@ -182,7 +182,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 <StackingText text="Simple and Powerful" />
               </h2>
               <p className="section-subtext">
-                Plan projects effortlessly with intuitive maps that grow alongside your ideas.
+                Draft your vision in a map and push items into todos whenever you're ready.
               </p>
             </div>
           </section>
@@ -204,7 +204,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 AI Todo Lists Keep Teams Aligned
               </motion.h2>
               <p className="section-subtext">
-                Assign tasks from your maps and watch progress unfold automatically.
+                AI turns map nodes into todos and Kanban cards so everyone knows what's next.
               </p>
             </div>
           </section>
@@ -226,7 +226,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 Vision Meets Action
               </motion.h2>
               <p className="section-subtext">
-                Plan the big picture, create the details and track the action with AI assistance.
+                Use AI or manual tools to expand ideas into tasks and track them on your planning board.
               </p>
             </div>
           </section>

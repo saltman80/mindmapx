@@ -84,7 +84,7 @@ export default function Kanban(): JSX.Element {
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <h1 className="marketing-text-large">Smooth Kanban Flow</h1>
-            <p className="section-subtext">A Kanban board is a perfect tool for showing progress of todo items.</p>
+            <p className="section-subtext">Boards visualize how your mind map tasks move from to-do to done.</p>
           </div>
           <div className="kanban-board">
             {lanes.map((lane, laneIndex) => {
@@ -138,7 +138,7 @@ export default function Kanban(): JSX.Element {
             <StackingText text="AI Workflows" />
           </h2>
           <p className="section-subtext">
-            Automated boards keep everyone on track through each stage.
+            New cards from your mind map appear instantly so your board stays in sync.
           </p>
         </div>
       </section>
@@ -160,7 +160,7 @@ export default function Kanban(): JSX.Element {
             Stay Organized Every Step
           </motion.h2>
           <p className="section-subtext">
-            Track progress from planning to completion all in one view.
+            Track progress from planning to completion as todos move across your board.
           </p>
         </div>
       </section>
@@ -182,7 +182,7 @@ export default function Kanban(): JSX.Element {
             Coordinate With Clarity
           </motion.h2>
           <p className="section-subtext">
-            Everyone knows what to do as cards move smoothly across lanes.
+            Everyone knows what to do as cards sync with their matching todos.
           </p>
         </div>
       </section>

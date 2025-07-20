@@ -13,43 +13,43 @@ interface AboutSection {
 const sections: AboutSection[] = [
   {
     title: 'Our Mission',
-    text: 'We help visualize big ideas and break them into manageable steps using AI planning tools.',
+    text: 'MindXdo unites mind maps, todos and Kanban so you can design large visions and execute them from one place.',
     img: './assets/marketing_square_mindmap_people.png',
     bulletPoints: [
       'Capture concepts quickly with intuitive mind maps',
-      'Turn every idea into an actionable task',
+      'Send ideas to your todo list or board with one click',
       'Stay focused thanks to AI-driven guidance',
     ],
   },
   {
     title: 'Key Benefits',
-    text: 'MindXdo keeps your plans and tasks together so you stay organized and focused.',
+    text: 'Build your mind map, auto-create todos and track them on an agile Kanban board—all synchronized.',
     img: './assets/marketing_square_lightbulb_team.png',
     bulletPoints: [
       'One workspace for mapping and doing',
       'Kanban board shows todo progress at a glance',
       'Visual and list views always in sync',
-      'Seamless flow from brainstorming to execution',
+      'Invite teammates to plan and build',
     ],
   },
   {
     title: 'Performance Insights',
-    text: 'Track progress at a glance and let data drive your next move.',
+    text: 'Dashboards reveal how tasks move from mind map to todo to Kanban so you can improve every step.',
     img: './assets/marketing_square_todolist_in_cloud.png',
     bulletPoints: [
       'Dashboards highlight your progress',
       'AI suggestions keep you on the right path',
-      'Data-backed insights for continuous growth',
+      'Prebuilt templates jumpstart your workflow',
     ],
   },
   {
     title: 'Continuous Improvement',
-    text: 'We evolve alongside your workflow so you can focus on what matters most.',
+    text: 'Add tasks manually or let AI expand your map—our Kanban system adapts as your projects grow.',
     img: './assets/marketing_square_ai_connecting.png',
     bulletPoints: [
       'Frequent feature releases based on feedback',
       'Tools that scale with your ambitions',
-      'A platform that grows as you do',
+      'Use AI or manual mode to evolve your plan',
     ],
   },
 ]
@@ -64,10 +64,12 @@ export default function AboutPage(): JSX.Element {
         <div className="about-hero-inner">
           <h1>About MindXdo</h1>
           <p>
-            Vision Meets Action. Plan big ideas and track tasks together.
+            Vision Meets Action. Build ideas in a mind map, send them to your
+            todo list and manage progress on a shared Kanban board.
           </p>
           <p>
-            Stay focused on what matters. AI helps your team succeed.
+            Use each tool alone or combine them with AI to guide your team to
+            success.
           </p>
           <Link to="/purchase" className="btn">Purchase</Link>
         </div>
