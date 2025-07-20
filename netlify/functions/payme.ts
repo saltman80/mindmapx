@@ -4,7 +4,11 @@ import { getClient } from './db-client.js'
 const db = {
   async query(text: string, params?: any[]) {
     const client = await getClient()
-    return client.query(text, params)
+    try {
+      return await client.query(text, params)
+    } finally {
+      client.release()
+    }
   }
 }
 const stripeSecret = process.env.STRIPE_SECRET_KEY

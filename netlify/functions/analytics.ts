@@ -60,10 +60,9 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     }
   }
 
-  const pool = await getClient()
-
+  const client = await getClient()
   try {
-    const { rows } = await pool.query(`
+    const { rows } = await client.query(`
       SELECT
         (SELECT COUNT(*) FROM users)        AS total_users,
         (SELECT COUNT(*) FROM mindmaps)    AS total_mindmaps,
@@ -89,5 +88,7 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
       body: JSON.stringify({ success: false, error: 'Internal Server Error' })
     }
+  } finally {
+    client.release()
   }
 }

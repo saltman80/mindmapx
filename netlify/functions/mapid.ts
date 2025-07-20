@@ -69,24 +69,33 @@ export const handler: Handler = async event => {
 
 async function getMap(mapId: string): Promise<{ id: string; data: MapData; created_at: string; updated_at: string | null } | null> {
   const client = await getClient()
-  const res = await client.query('SELECT id, data, created_at, updated_at FROM mindmaps WHERE id = $1', [mapId])
-  client.release()
-  return res.rowCount > 0 ? res.rows[0] : null
+  try {
+    const res = await client.query('SELECT id, data, created_at, updated_at FROM mindmaps WHERE id = $1', [mapId])
+    return res.rowCount > 0 ? res.rows[0] : null
+  } finally {
+    client.release()
+  }
 }
 
 async function updateMap(mapId: string, data: MapData): Promise<{ id: string; data: MapData; created_at: string; updated_at: string | null } | null> {
   const client = await getClient()
-  const res = await client.query(
-    'UPDATE mindmaps SET data = $2, updated_at = NOW() WHERE id = $1 RETURNING id, data, created_at, updated_at',
-    [mapId, data]
-  )
-  client.release()
-  return res.rowCount > 0 ? res.rows[0] : null
+  try {
+    const res = await client.query(
+      'UPDATE mindmaps SET data = $2, updated_at = NOW() WHERE id = $1 RETURNING id, data, created_at, updated_at',
+      [mapId, data]
+    )
+    return res.rowCount > 0 ? res.rows[0] : null
+  } finally {
+    client.release()
+  }
 }
 
 async function deleteMap(mapId: string): Promise<number> {
   const client = await getClient()
-  const res = await client.query('DELETE FROM mindmaps WHERE id = $1', [mapId])
-  client.release()
-  return res.rowCount
+  try {
+    const res = await client.query('DELETE FROM mindmaps WHERE id = $1', [mapId])
+    return res.rowCount
+  } finally {
+    client.release()
+  }
 }

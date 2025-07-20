@@ -37,7 +37,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, headers: corsHeaders, body: "Method Not Allowed" }
   }
 
-  const db = await getClient()
+  const client = await getClient()
 
   let items: Array<{ id: string; quantity: number }>
   try {
@@ -64,7 +64,7 @@ export const handler: Handler = async (event) => {
   const productIds = items.map((it) => it.id)
   let rows: Array<{ id: string; price_id: string }>
   try {
-    const res = await db.query("SELECT id, price_id FROM products WHERE id = ANY($1)", [
+    const res = await client.query("SELECT id, price_id FROM products WHERE id = ANY($1)", [
       productIds
     ])
     rows = res.rows
@@ -109,26 +109,28 @@ export const handler: Handler = async (event) => {
 
   // record order in DB within a transaction
   try {
-    await db.query("BEGIN")
-    await db.query(
+    await client.query("BEGIN")
+    await client.query(
       "INSERT INTO orders (session_id, created_at) VALUES ($1, now())",
       [session.id]
     )
     for (const it of items) {
-      await db.query(
+      await client.query(
         "INSERT INTO order_items (order_session_id, product_id, quantity) VALUES ($1, $2, $3)",
         [session.id, it.id, it.quantity]
       )
     }
-    await db.query("COMMIT")
+    await client.query("COMMIT")
   } catch (err) {
     console.error("Failed to record order in DB", err)
     try {
-      await db.query("ROLLBACK")
+      await client.query("ROLLBACK")
     } catch (rollbackErr) {
       console.error("Rollback failed", rollbackErr)
     }
     return { statusCode: 500, headers: corsHeaders, body: "Failed to record order" }
+  } finally {
+    client.release()
   }
 
   return {

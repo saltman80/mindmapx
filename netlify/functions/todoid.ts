@@ -23,21 +23,23 @@ const updateTodoSchema = z
 
 async function getTodo(todoId: string, userId: string): Promise<Todo> {
   const client = await getClient()
-  const result = await client.query(
-    `SELECT t.id, t.user_id, t.title, t.description, t.completed,
-            t.assignee_id, t.created_at, t.updated_at,
-            u.name AS assignee_name, u.email AS assignee_email
-       FROM todos t
-       LEFT JOIN users u ON t.assignee_id = u.id
-      WHERE t.id = $1 AND t.user_id = $2`,
-    [todoId, userId]
-  )
-  if (result.rowCount === 0) {
-    throw new Error('NotFound')
+  try {
+    const result = await client.query(
+      `SELECT t.id, t.user_id, t.title, t.description, t.completed,
+              t.assignee_id, t.created_at, t.updated_at,
+              u.name AS assignee_name, u.email AS assignee_email
+         FROM todos t
+         LEFT JOIN users u ON t.assignee_id = u.id
+        WHERE t.id = $1 AND t.user_id = $2`,
+      [todoId, userId]
+    )
+    if (result.rowCount === 0) {
+      throw new Error('NotFound')
+    }
+    return result.rows[0]
+  } finally {
+    client.release()
   }
-  const todo = result.rows[0]
-  client.release()
-  return todo
 }
 
 async function updateTodo(
@@ -74,27 +76,30 @@ async function updateTodo(
     RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at
   `
   const client = await getClient()
-  const result = await client.query(query, values)
-  if (result.rowCount === 0) {
+  try {
+    const result = await client.query(query, values)
+    if (result.rowCount === 0) {
+      throw new Error('NotFound')
+    }
+    return result.rows[0]
+  } finally {
     client.release()
-    throw new Error('NotFound')
   }
-  const todo = result.rows[0]
-  client.release()
-  return todo
 }
 
 async function deleteTodo(todoId: string, userId: string): Promise<void> {
   const client = await getClient()
-  const result = await client.query(
-    'DELETE FROM todos WHERE id = $1 AND user_id = $2',
-    [todoId, userId]
-  )
-  if (result.rowCount === 0) {
+  try {
+    const result = await client.query(
+      'DELETE FROM todos WHERE id = $1 AND user_id = $2',
+      [todoId, userId]
+    )
+    if (result.rowCount === 0) {
+      throw new Error('NotFound')
+    }
+  } finally {
     client.release()
-    throw new Error('NotFound')
   }
-  client.release()
 }
 
 export const handler: Handler = async (event, context) => {
