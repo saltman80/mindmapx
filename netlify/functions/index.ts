@@ -44,7 +44,7 @@ async function createMap(userId: string, data: unknown) {
     client.release()
   }
 
-export const handler: Handler = async (event) => {
+const handler: Handler = async (event) => {
   try {
     const userId = await getUserId(event.headers)
     if (event.httpMethod === "GET") {
@@ -121,3 +121,4 @@ export const handler: Handler = async (event) => {
     }
   }
 }
+module.exports = { handler }
