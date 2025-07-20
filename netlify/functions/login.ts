@@ -1,18 +1,13 @@
-import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 const { DATABASE_URL, JWT_SECRET } = process.env
+
 if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
-}
-const pool = {
-  async query(text: string, params?: any[]) {
-    const client = await getClient()
-    return client.query(text, params)
-  }
 }
 
 const loginSchema = z.object({
@@ -78,7 +73,7 @@ export const handler: Handler = async (event) => {
 
   let email: string, password: string
   try {
-    ({ email, password } = loginSchema.parse(parsedBody))
+    ;({ email, password } = loginSchema.parse(parsedBody))
   } catch (error) {
     if (error instanceof ZodError) {
       return {
@@ -90,13 +85,11 @@ export const handler: Handler = async (event) => {
     throw error
   }
 
-  const ip =
-    event.headers['x-nf-client-connection-ip'] ||
-    event.headers['x-forwarded-for']?.split(',')[0] ||
-    'unknown'
+  const ip = event.headers['x-nf-client-connection-ip'] || event.headers['x-forwarded-for']?.split(',')[0] || 'unknown'
   const now = Date.now()
   const attempts = failedLoginAttempts.get(ip) || []
   const recent = attempts.filter(ts => now - ts < WINDOW_MS)
+
   if (recent.length >= MAX_ATTEMPTS) {
     return {
       statusCode: 429,
@@ -104,13 +97,16 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ error: 'Too many login attempts. Please try again later.' }),
     }
   }
+
   failedLoginAttempts.set(ip, recent)
 
+  const client = await getClient()
   try {
-    const result = await pool.query(
+    const result = await client.query(
       'SELECT id, password_hash FROM users WHERE email = $1',
       [email]
     )
+
     if (result.rowCount === 0) {
       recent.push(now)
       failedLoginAttempts.set(ip, recent)
@@ -123,6 +119,7 @@ export const handler: Handler = async (event) => {
 
     const user = result.rows[0] as { id: string; password_hash: string }
     const isValid = await bcrypt.compare(password, user.password_hash)
+
     if (!isValid) {
       recent.push(now)
       failedLoginAttempts.set(ip, recent)
@@ -134,9 +131,10 @@ export const handler: Handler = async (event) => {
     }
 
     failedLoginAttempts.delete(ip)
+
     const token = jwt.sign(
       { userId: user.id, sessionStart: Date.now() },
-      JWT_SECRET,
+      JWT_SECRET!,
       { expiresIn: '1h' }
     )
 
@@ -147,6 +145,7 @@ export const handler: Handler = async (event) => {
       'SameSite=Lax',
       'Max-Age=86400'
     ]
+
     if (process.env.NODE_ENV === 'production') {
       cookieParts.push('Secure')
     }
@@ -158,7 +157,7 @@ export const handler: Handler = async (event) => {
         'Content-Type': 'application/json',
         'Set-Cookie': cookieParts.join('; ')
       },
-      body: JSON.stringify({ success: true })
+      body: JSON.stringify({ success: true, token }),
     }
   } catch (error) {
     console.error('Login error:', error)
@@ -167,5 +166,7 @@ export const handler: Handler = async (event) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Internal server error' }),
     }
+  } finally {
+    client.release()
   }
 }
