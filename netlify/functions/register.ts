@@ -107,3 +107,5 @@ export const handler: Handler = async (event) => {
     client.release()
   }
 }
+
+module.exports = { handler }
