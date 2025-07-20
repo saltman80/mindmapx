@@ -182,9 +182,6 @@ export const handler: Handler = async (event, _context) => {
         body: JSON.stringify({ error: "Method Not Allowed" }),
       }
     }
-    } finally {
-      client.release()
-    }
   } catch (err) {
     console.error("Password reset error:", err)
     return {
@@ -192,5 +189,7 @@ export const handler: Handler = async (event, _context) => {
       headers,
       body: JSON.stringify({ error: "Internal Server Error" }),
     }
+  } finally {
+    client.release()
   }
 }
