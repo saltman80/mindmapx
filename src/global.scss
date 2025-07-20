@@ -557,6 +557,11 @@ hr {
 .faq {
   background-color: var(--color-bg);
   padding: var(--spacing-2xl) var(--spacing-lg);
+  
+  .container {
+    width: 80%;
+    max-width: 80%;
+  }
 }
 
 .accordion {
