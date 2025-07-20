@@ -1,19 +1,36 @@
 import React, { useState, FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password }),
-    })
+    setError('')
+    setIsSubmitting(true)
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Login failed')
+      }
+      await res.json().catch(() => ({}))
+      navigate('/dashboard')
+    } catch (err: any) {
+      setError(err?.message || 'An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -23,6 +40,9 @@ const LoginPage = () => {
         <h1 className="marketing-text-large mb-4 text-center">Welcome Back</h1>
         <p className="section-subtext mb-6 text-center">Sign in to continue</p>
         <form onSubmit={handleSubmit} className="login-form">
+          {error && (
+            <p className="text-red-600 mb-4" role="alert">{error}</p>
+          )}
           <div className="form-field">
             <label htmlFor="email" className="form-label">
               Email
@@ -49,7 +69,9 @@ const LoginPage = () => {
               className="form-input"
             />
           </div>
-          <button type="submit" className="btn w-full">Login</button>
+          <button type="submit" className="btn w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Logging in...' : 'Login'}
+          </button>
           <p className="mt-4 text-center">
             <Link to="/reset-password" className="text-blue-600 hover:underline">
               Reset Password
