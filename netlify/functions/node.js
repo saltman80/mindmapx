@@ -12,32 +12,41 @@ const buildResponse = (statusCode, payload) => {
 
 async function createNode(data) {
   const client = await getClient()
-  const res = await client.query(
-    'INSERT INTO nodes(data) VALUES($1) RETURNING *',
-    [data]
-  )
-  client.release()
-  return res.rows[0]
+  try {
+    const res = await client.query(
+      'INSERT INTO nodes(data) VALUES($1) RETURNING *',
+      [data]
+    )
+    return res.rows[0]
+  } finally {
+    client.release()
+  }
 }
 
 async function updateNode(id, updates) {
   const client = await getClient()
-  const res = await client.query(
-    'UPDATE nodes SET data = data || $2 WHERE id = $1 RETURNING *',
-    [id, updates]
-  )
-  client.release()
-  return res.rows[0]
+  try {
+    const res = await client.query(
+      'UPDATE nodes SET data = data || $2 WHERE id = $1 RETURNING *',
+      [id, updates]
+    )
+    return res.rows[0]
+  } finally {
+    client.release()
+  }
 }
 
 async function deleteNode(id) {
   const client = await getClient()
-  const res = await client.query(
-    'DELETE FROM nodes WHERE id = $1 RETURNING *',
-    [id]
-  )
-  client.release()
-  return res.rows[0]
+  try {
+    const res = await client.query(
+      'DELETE FROM nodes WHERE id = $1 RETURNING *',
+      [id]
+    )
+    return res.rows[0]
+  } finally {
+    client.release()
+  }
 }
 
 export const handler = async (event) => {
@@ -62,10 +71,13 @@ export const handler = async (event) => {
 
     switch (method) {
       case 'GET': {
-        const db = await getClient()
-        const res = await db.query('SELECT id, data FROM nodes')
-        db.release()
-        return buildResponse(200, { nodes: res.rows })
+        const client = await getClient()
+        try {
+          const res = await client.query('SELECT id, data FROM nodes')
+          return buildResponse(200, { nodes: res.rows })
+        } finally {
+          client.release()
+        }
       }
       case 'POST': {
         const { data } = bodyData

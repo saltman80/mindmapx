@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
-import { pool } from './db-client.js'
+import { getClient } from './db-client.js'
 
 import { randomBytes } from 'crypto'
 
@@ -33,9 +33,8 @@ export const handler: Handler = async (event, _context) => {
     return { statusCode: 200, headers, body: "" }
   }
 
+  const client = await getClient()
   try {
-    const db = pool
-    try {
       if (event.httpMethod === "POST") {
       let parsedBody: any
       try {
@@ -82,7 +81,7 @@ export const handler: Handler = async (event, _context) => {
       rl.count++
       global.resetRateLimitMap.set(ip, rl)
 
-      const { rows } = await db.query(
+      const { rows } = await client.query(
         'SELECT id FROM users WHERE email = $1',
         [email]
       )
@@ -90,7 +89,7 @@ export const handler: Handler = async (event, _context) => {
         const userId = rows[0].id
         const token = randomBytes(32).toString("hex")
         const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString()
-        await db.query(
+        await client.query(
           'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
           [userId, token, expiresAt]
         )
@@ -135,8 +134,8 @@ export const handler: Handler = async (event, _context) => {
 
       // start transaction for atomic check-and-update with row lock
       try {
-        await db.query('BEGIN')
-        const { rows } = await db.query(
+        await client.query('BEGIN')
+        const { rows } = await client.query(
           'SELECT user_id, expires_at, used FROM password_reset_tokens WHERE token = $1 FOR UPDATE',
           [token]
         )
@@ -145,7 +144,7 @@ export const handler: Handler = async (event, _context) => {
           rows[0].used ||
           new Date(String(rows[0].expires_at)) < new Date()
         ) {
-          await db.query('ROLLBACK')
+          await client.query('ROLLBACK')
           return {
             statusCode: 400,
             headers,
@@ -155,17 +154,17 @@ export const handler: Handler = async (event, _context) => {
 
         const userId = rows[0].user_id
         const hashedPassword = await bcrypt.hash(password, 10)
-        await db.query(
+        await client.query(
           'UPDATE users SET password_hash = $1 WHERE id = $2',
           [hashedPassword, userId]
         )
-        await db.query(
+        await client.query(
           'UPDATE password_reset_tokens SET used = true WHERE token = $1',
           [token]
         )
-        await db.query('COMMIT')
+        await client.query('COMMIT')
       } catch (err) {
-        await db.query('ROLLBACK')
+        await client.query('ROLLBACK')
         throw err
       }
 
@@ -184,7 +183,7 @@ export const handler: Handler = async (event, _context) => {
       }
     }
     } finally {
-      db.end()
+      client.release()
     }
   } catch (err) {
     console.error("Password reset error:", err)

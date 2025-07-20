@@ -44,14 +44,13 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  const db = await getClient()
-
+  const client = await getClient()
   try {
     const method = event.httpMethod
     if (method === 'GET') {
       const params = querySchema.parse(event.queryStringParameters || {})
       if (params.id) {
-        const { rows } = await db.query(
+        const { rows } = await client.query(
           'SELECT id, email, name, role, created_at FROM users WHERE id = $1',
           [params.id]
         )
@@ -70,7 +69,7 @@ export const handler: Handler = async (event) => {
       } else {
         const skip = params.skip ?? 0
         const limit = params.limit ?? 100
-        const { rows } = await db.query(
+        const { rows } = await client.query(
           'SELECT id, email, name, role, created_at FROM users ORDER BY created_at DESC OFFSET $1 LIMIT $2',
           [skip, limit]
         )
@@ -123,7 +122,7 @@ export const handler: Handler = async (event) => {
       }
       values.push(data.id)
       const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, email, name, role, created_at`
-      const { rows } = await db.query(query, values)
+      const { rows } = await client.query(query, values)
       if (rows.length === 0) {
         return {
           statusCode: 404,
@@ -139,7 +138,7 @@ export const handler: Handler = async (event) => {
     } else if (method === 'DELETE') {
       const schema = z.object({ id: z.string().uuid() })
       const params = schema.parse(event.queryStringParameters || {})
-      const { rows } = await db.query(
+      const { rows } = await client.query(
         'DELETE FROM users WHERE id = $1 RETURNING id',
         [params.id]
       )
@@ -180,5 +179,7 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({ error: 'Internal Server Error' }),
     }
+  } finally {
+    client.release()
   }
 }
