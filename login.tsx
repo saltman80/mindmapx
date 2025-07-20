@@ -1,5 +1,18 @@
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  FormEvent
+} from 'react'
+import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
+
+interface LoginFormValues {
+  email: string
+  password: string
+}
 
 const LoginPage = (): JSX.Element => {
   const [values, setValues] = useState<LoginFormValues>({ email: '', password: '' })
