@@ -79,6 +79,10 @@ const faqItems = [
   { q: 'What is MindXdo?', a: 'An AI-driven experience blending mindmaps and todos.' },
   { q: 'How does the AI help?', a: 'It automates task creation and finds connections between ideas.' },
   { q: 'Can I collaborate with my team?', a: 'Yes, share maps and task boards in real time.' },
+  { q: 'Is my data secure?', a: 'All information is encrypted and safely stored in the cloud.' },
+  { q: 'Does it work on mobile devices?', a: 'MindXdo is accessible from any modern browser or device.' },
+  { q: 'What if I need support?', a: 'Our team offers assistance and training whenever you need it.' },
+  { q: 'How do I start?', a: 'Simply sign up and create your first mind map or to-do list.' },
 ]
 
 const Homepage: React.FC = (): JSX.Element => {
