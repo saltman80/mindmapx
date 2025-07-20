@@ -2,12 +2,6 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
-const pool = {
-  async query(text: string, params?: any[]) {
-    const client = await getClient()
-    return client.query(text, params)
-  }
-}
 
 const mapInputSchema = z.object({
   data: z.record(z.any()),
@@ -32,26 +26,23 @@ async function getUserId(headers: { [key: string]: string }): Promise<string> {
 }
 
 async function getMaps(userId: string) {
-  const result = await pool.query(
-    `SELECT id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"
-     FROM mindmaps
-     WHERE user_id = $1
-        OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1)
-     ORDER BY created_at DESC`,
-    [userId]
-  )
-  return result.rows
+  const client = await getClient()
+  try {
+    const result = await client.query(`SELECT id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt" FROM mindmaps WHERE user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1) ORDER BY created_at DESC`, [userId])
+    return result.rows
+  } finally {
+    client.release()
+  }
 }
 
 async function createMap(userId: string, data: unknown) {
-  const result = await pool.query(
-    `INSERT INTO mindmaps (user_id, data)
-     VALUES ($1, $2)
-     RETURNING id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [userId, data]
-  )
-  return result.rows[0]
-}
+  const client = await getClient()
+  try {
+    const result = await client.query(`INSERT INTO mindmaps (user_id, data) VALUES ($1, $2) RETURNING id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"`, [userId, data])
+    return result.rows[0]
+  } finally {
+    client.release()
+  }
 
 export const handler: Handler = async (event) => {
   try {
