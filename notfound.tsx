@@ -12,14 +12,17 @@ export default function NotFound(): JSX.Element {
   }
 
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>404</h1>
-      <p>Oops! The page you're looking for doesn't exist.</p>
-      <div style={{ marginTop: '1rem' }}>
-        <button onClick={handleGoBack} style={{ marginRight: '1rem' }}>
+    <div className="not-found">
+      <img src="./assets/logo.png" alt="MindXdo logo" className="not-found__logo" />
+      <h1 className="not-found__title">404</h1>
+      <p className="not-found__message">
+        Oops, there is no page here! Try clicking back or return home.
+      </p>
+      <div className="not-found__actions">
+        <button onClick={handleGoBack} className="btn" style={{ marginRight: '1rem' }}>
           Go Back
         </button>
-        <Link to="/">Home</Link>
+        <Link to="/" className="btn">Home</Link>
       </div>
     </div>
   )
