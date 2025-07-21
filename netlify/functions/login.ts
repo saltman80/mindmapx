@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 const { DATABASE_URL, JWT_SECRET } = process.env
-
 if (!DATABASE_URL || !JWT_SECRET) {
   throw new Error('Missing required environment variables')
 }
@@ -26,7 +25,7 @@ const corsHeaders = {
   'Access-Control-Allow-Credentials': 'true'
 }
 
-export const handler: Handler = async (event) => {
+const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -48,7 +47,7 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 415,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Unsupported Media Type, expected application/json' }),
+      body: JSON.stringify({ error: 'Unsupported Media Type' }),
     }
   }
 
@@ -73,7 +72,7 @@ export const handler: Handler = async (event) => {
 
   let email: string, password: string
   try {
-    ;({ email, password } = loginSchema.parse(parsedBody))
+    ({ email, password } = loginSchema.parse(parsedBody))
   } catch (error) {
     if (error instanceof ZodError) {
       return {
@@ -94,7 +93,7 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 429,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Too many login attempts. Please try again later.' }),
+      body: JSON.stringify({ error: 'Too many login attempts' }),
     }
   }
 
@@ -134,7 +133,7 @@ export const handler: Handler = async (event) => {
 
     const token = jwt.sign(
       { userId: user.id, sessionStart: Date.now() },
-      JWT_SECRET!,
+      JWT_SECRET,
       { expiresIn: '1h' }
     )
 
@@ -157,7 +156,7 @@ export const handler: Handler = async (event) => {
         'Content-Type': 'application/json',
         'Set-Cookie': cookieParts.join('; ')
       },
-      body: JSON.stringify({ success: true, token }),
+      body: JSON.stringify({ success: true, token })
     }
   } catch (error) {
     console.error('Login error:', error)
@@ -171,3 +170,4 @@ export const handler: Handler = async (event) => {
   }
 }
 
+module.exports = { handler }
