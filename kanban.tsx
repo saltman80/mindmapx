@@ -84,7 +84,7 @@ export default function Kanban(): JSX.Element {
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <h1 className="marketing-text-large">Smooth Kanban Flow</h1>
-            <p className="section-subtext">Boards visualize how your mind map tasks move from to-do to done.</p>
+            <p className="section-subtext">Kanban boards are perfect for executing your vision across a team, showing how mind map tasks move from to-do to done.</p>
           </div>
           <div className="kanban-board">
             {lanes.map((lane, laneIndex) => {

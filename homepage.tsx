@@ -104,7 +104,7 @@ const Homepage: React.FC = (): JSX.Element => {
           <h1 className="hero-title">AI Builds Your Vision</h1>
           <p>
             Craft your roadmap with mind maps while AI auto-creates todos and Kanban cards.
-            Automation links every element so you can form complete plans faster.
+            Every task stays connected to the board so the big picture is always clear.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -128,10 +128,10 @@ const Homepage: React.FC = (): JSX.Element => {
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
           <p className="section-subtext">
-            Start with a mind map and let AI auto-build your todos and Kanban cards as you outline your goals.
+            Start with a mind map to organize your goals, then instantly turn nodes into todos and Kanban cards that mirror the big picture.
           </p>
           <p className="section-subtext">
-            AI assistance can even expand your map so you create more complete plans while staying connected.
+            AI assistance can even expand your map so every todo links back to the board and the broader vision.
           </p>
         </div>
       </section>
@@ -148,7 +148,7 @@ const Homepage: React.FC = (): JSX.Element => {
             Create ideas, flows, systems, & more.
           </motion.h2>
           <p className="section-subtext">
-            Sketch processes in a mind map and instantly generate todos to manage on your board.
+            Sketch processes in a mind map and instantly generate todos that sync to your Kanban board for full visibility.
           </p>
         </div>
       </section>
@@ -170,7 +170,7 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            See how AI instantly creates a map for your ideas.
+            See how AI instantly creates a connected map so tasks flow right to your board.
           </motion.div>
         </div>
       </section>
@@ -183,7 +183,7 @@ const Homepage: React.FC = (): JSX.Element => {
             <StackingText text="Simple and Powerful" />
           </h2>
           <p className="section-subtext">
-            Plan projects effortlessly and send tasks from the map to your Kanban board.
+            Plan projects effortlessly by sending tasks from the map to your Kanban board so the big picture never gets lost.
           </p>
         </div>
       </section>
@@ -225,7 +225,7 @@ const Homepage: React.FC = (): JSX.Element => {
             See Beyond a Task Board
           </motion.h2>
           <p className="section-subtext">
-            Mind map connections provide a bird's-eye view while Kanban shows progress below.
+            Mind map connections provide a bird's-eye view while Kanban boards track execution so teams see the full picture.
           </p>
         </div>
       </section>
@@ -259,7 +259,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col">
         <div className="container">
           <div className="bold-marketing-text">
-            AI auto-builds maps and todos so you can turn big ideas into complete plans faster.
+            AI auto-builds maps and todos so you can turn big ideas into complete plans while keeping your board in view.
           </div>
           <img
             src="./assets/simple_main_banner_home.png"
@@ -284,7 +284,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </motion.h2>
         <p className="ai-copy">
           Harness automation to turn complex mind maps into todos and Kanban workflows.
-          AI builds out your plan so you can execute faster and always know the next step.
+          AI builds out your plan so you can execute faster while staying aware of the big picture.
         </p>
         </div>
       </section>
