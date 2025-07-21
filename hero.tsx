@@ -86,8 +86,9 @@ const Hero: React.FC = () => {
           MindXdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-          Mind map your vision, manage todos, and plan on a connected Kanban
-          board. AI or manual tools help you turn ideas into action.
+          AI helps auto-create your vision and todos so you build plans faster.
+          Let automation generate maps and tasks so you can focus on bringing
+          ideas to life.
         </p>
         <a
           href="#get-started"
