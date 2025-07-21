@@ -103,8 +103,8 @@ const Homepage: React.FC = (): JSX.Element => {
         >
           <h1 className="hero-title">Vision Meets Action</h1>
           <p>
-            Build your vision with mind maps, manage todos, and plan in Kanban—together or separately.
-            AI keeps everything connected.
+            Craft your roadmap with mind maps, break work into todos, and track progress on a Kanban board.
+            AI links every element so your next step is always clear as you shape your big idea.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -127,8 +127,12 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
-          <p className="section-subtext">Map your vision, create todos and monitor them on the board.</p>
-          <p className="section-subtext">AI or manual tools keep every piece in sync.</p>
+          <p className="section-subtext">
+            Start with a mind map to organize your goals, then instantly turn nodes into todos and Kanban cards.
+          </p>
+          <p className="section-subtext">
+            Rely on AI suggestions or handle tasks manually—either way, every update stays connected.
+          </p>
         </div>
       </section>
 
