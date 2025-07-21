@@ -64,7 +64,7 @@ export default function AboutPage(): JSX.Element {
         <div className="about-hero-inner">
           <h1>About MindXdo</h1>
           <p>
-            Vision Meets Action. Build ideas in a mind map, send them to your
+            AI Turns Vision Into Action. Build ideas in a mind map, send them to your
             todo list and manage progress on a shared Kanban board so you always see the big picture.
           </p>
           <p>
