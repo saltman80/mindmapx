@@ -14,7 +14,7 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    npm run migrate
    ```
 
-Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
+Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `dist/netlify/functions`.
 
 ## OpenAI Configuration
 
