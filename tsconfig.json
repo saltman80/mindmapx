@@ -2,21 +2,9 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "moduleResolution": "Node16",
-    "outDir": "dist",
-    "rootDir": ".",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": false,
-    "types": ["node"]
+    "esModuleInterop": true,
+    "outDir": "dist"
   },
-  "include": [
-    "src",
-    "netlify/functions/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["netlify/functions"]
 }

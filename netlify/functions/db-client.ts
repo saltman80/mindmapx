@@ -1,10 +1,19 @@
 import { Pool } from 'pg'
 
-export const pool = new Pool({
-  connectionString: process.env.NETLIFY_DATABASE_URL,
+const connectionString =
+  process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL
+
+if (!connectionString) {
+  throw new Error('Missing DATABASE_URL')
+}
+
+const pool = new Pool({
+  connectionString,
+  ssl:
+    process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 })
 
 export async function getClient() {
-  return await pool.connect()
+  return pool.connect()
 }
 
