@@ -94,7 +94,7 @@ export default function TodoDemo(): JSX.Element {
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <h1 className="marketing-text-large">Tackle Tasks Effortlessly</h1>
-            <p className="section-subtext">See how todos flow from mind maps onto the Kanban board so every step reflects the big picture</p>
+            <p className="section-subtext">See how AI can help create todos that flow from mind maps onto the Kanban board so every step reflects the big picture</p>
           </div>
           <div className="todo-grid section--two-col">
             {lists.map((list, listIndex) => (
