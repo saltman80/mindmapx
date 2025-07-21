@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "Node16",
+    "module": "CommonJS",
     "moduleResolution": "node16",
     "outDir": "dist/netlify/functions",
     "esModuleInterop": true,
