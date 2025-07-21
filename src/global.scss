@@ -1396,3 +1396,39 @@ hr {
   }
 }
 
+.not-found {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  text-align: center;
+  background-image: linear-gradient(135deg, var(--color-bg), var(--color-bg-alt));
+}
+
+.not-found__logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.not-found__title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.not-found__message {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  max-width: 600px;
+}
+
+.not-found__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
