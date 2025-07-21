@@ -124,7 +124,7 @@ const Homepage: React.FC = (): JSX.Element => {
             viewport={{ once: true, amount: 0.8 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <StackingText text="MindMap + Todo + Team Vision" />
+            <StackingText text="MindMap + Todo + Task Tracker" />
           </motion.h2>
           <p className="section-subtext">
             Map goals visually, then convert nodes into todos and Kanban cards.
@@ -200,7 +200,7 @@ const Homepage: React.FC = (): JSX.Element => {
               AI Todo Lists Keep Teams Aligned
             </motion.h2>
             <p className="section-subtext">
-              AI turns map nodes into todos and Kanban cards so everyone stays aligned.
+              AI turns map nodes into actionable todos and linked Kanban cards, ensuring everyone knows the plan and stays aligned.
             </p>
           </div>
           <img
