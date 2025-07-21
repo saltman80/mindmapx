@@ -171,7 +171,7 @@ export default function TodoDemo(): JSX.Element {
         <MindmapArm side="left" />
         <img
           src="./assets/marketing_square_ai_connecting.png"
-          alt="AI Turns Vision Into Action"
+          alt="Vision Meets Action"
         />
         <div>
           <motion.h2
@@ -181,7 +181,7 @@ export default function TodoDemo(): JSX.Element {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            AI Turns Vision Into Action
+            Vision Meets Action
           </motion.h2>
           <p className="section-subtext">
             Link tasks to your mind map and visualize progress in Kanban while AI keeps the big picture front and center.
