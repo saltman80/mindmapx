@@ -101,10 +101,10 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">AI Builds Your Vision</h1>
+          <h1 className="hero-title">Vision Meets Action</h1>
           <p>
-            Craft your roadmap with mind maps while AI auto-creates todos and Kanban cards.
-            Every task stays connected to the board so the big picture is always clear.
+            Map your ideas while AI helps create tasks and build boards so your vision becomes a complete plan.
+            Every task stays connected to keep the big picture clear.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
