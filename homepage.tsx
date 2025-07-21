@@ -64,7 +64,7 @@ const features = [
   {
     title: 'Kanban Board',
     description:
-      'A perfect tool for showing progress of todo items from start to finish.',
+      'Cards sync with your todos so you always know what is in progress and what is done.',
     icon: './assets/feature-kanban.png',
   },
   {
@@ -103,7 +103,8 @@ const Homepage: React.FC = (): JSX.Element => {
         >
           <h1 className="hero-title">Vision Meets Action</h1>
           <p>
-            Plan big ideas and track tasks in one place. Let AI guide your team.
+            Build your vision with mind maps, manage todos, and plan in Kanban—together or separately.
+            AI keeps everything connected.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -126,8 +127,8 @@ const Homepage: React.FC = (): JSX.Element => {
           >
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
-          <p className="section-subtext">Plan big ideas and track tasks in one space.</p>
-          <p className="section-subtext">Let AI keep everyone focused.</p>
+          <p className="section-subtext">Map your vision, create todos and monitor them on the board.</p>
+          <p className="section-subtext">AI or manual tools keep every piece in sync.</p>
         </div>
       </section>
 
@@ -143,7 +144,7 @@ const Homepage: React.FC = (): JSX.Element => {
             Create ideas, flows, systems, & more.
           </motion.h2>
           <p className="section-subtext">
-            Sketch processes and tasks in minutes and refine them with your team.
+            Sketch processes in a mind map and instantly generate todos to manage on your board.
           </p>
         </div>
       </section>
@@ -178,7 +179,7 @@ const Homepage: React.FC = (): JSX.Element => {
             <StackingText text="Simple and Powerful" />
           </h2>
           <p className="section-subtext">
-            Plan projects effortlessly with intuitive maps that grow alongside your ideas.
+            Plan projects effortlessly and send tasks from the map to your Kanban board.
           </p>
         </div>
       </section>
@@ -196,7 +197,7 @@ const Homepage: React.FC = (): JSX.Element => {
               AI Todo Lists Keep Teams Aligned
             </motion.h2>
             <p className="section-subtext">
-              Assign tasks from your maps and watch progress unfold automatically.
+              AI turns map nodes into todos and Kanban cards so everyone stays aligned.
             </p>
           </div>
           <img
@@ -220,7 +221,7 @@ const Homepage: React.FC = (): JSX.Element => {
             See Beyond a Task Board
           </motion.h2>
           <p className="section-subtext">
-            Mind map connections provide a bird's-eye view of every project step.
+            Mind map connections provide a bird's-eye view while Kanban shows progress below.
           </p>
         </div>
       </section>
@@ -254,7 +255,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col">
         <div className="container">
           <div className="bold-marketing-text">
-            Map your ideas visually while keeping tasks in focus.
+            Map big ideas, manage todos and drag cards across the board with ease.
           </div>
           <img
             src="./assets/simple_main_banner_home.png"
@@ -278,10 +279,8 @@ const Homepage: React.FC = (): JSX.Element => {
           AI Superpowers
         </motion.h2>
         <p className="ai-copy">
-          Harness automation to turn complex mind maps into actionable
-          workflows. MindXdo helps you execute ambitious plans with ease.
-          Mind maps show the big picture—our assistant suggests tasks and
-          timelines so you never wonder what comes next.
+          Harness automation to turn complex mind maps into todos and Kanban workflows.
+          MindXdo helps you execute ambitious plans with ease and suggests next steps so you never wonder what comes next.
         </p>
         </div>
       </section>

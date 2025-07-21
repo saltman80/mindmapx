@@ -86,8 +86,8 @@ const Hero: React.FC = () => {
           MindXdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-          Organize your mind maps and tasks. Let AI turn your long‑term vision
-          into an actionable roadmap.
+          Mind map your vision, manage todos, and plan on a connected Kanban
+          board. AI or manual tools help you turn ideas into action.
         </p>
         <a
           href="#get-started"
