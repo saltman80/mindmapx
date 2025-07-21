@@ -127,10 +127,10 @@ const Homepage: React.FC = (): JSX.Element => {
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
           <p className="section-subtext">
-            Start with a mind map to organize your goals, then instantly turn nodes into todos and Kanban cards that mirror the big picture.
+            Map goals visually, then convert nodes into todos and Kanban cards.
           </p>
           <p className="section-subtext">
-            AI assistance can even expand your map so every todo links back to the board and the broader vision.
+            AI expands the map so each task ties back to your board and vision.
           </p>
         </div>
       </section>
