@@ -101,7 +101,7 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">AI Turns Vision Into Action</h1>
+          <h1 className="hero-title">Vision Meets Action</h1>
           <p>
             Map your ideas while AI builds mind maps and auto-creates todos so your vision becomes a complete plan. Every task stays connected to keep the big picture clear.
           </p>
