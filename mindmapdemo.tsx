@@ -213,7 +213,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             <MindmapArm side="left" />
             <img
               src="./assets/marketing_square_ai_connecting.png"
-              alt="Vision Meets Action"
+              alt="AI Turns Vision Into Action"
             />
             <div>
               <motion.h2
@@ -223,7 +223,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                Vision Meets Action
+                AI Turns Vision Into Action
               </motion.h2>
               <p className="section-subtext">
                 Use AI or manual tools to expand ideas into tasks and track them on your planning board.

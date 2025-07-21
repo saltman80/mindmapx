@@ -86,9 +86,8 @@ const Hero: React.FC = () => {
           MindXdo
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-          AI helps auto-create your vision, todos and Kanban cards so you build plans faster.
-          Automation keeps every task tied to the big picture while you focus on bringing
-          ideas to life.
+          AI assists you in shaping mind maps and auto-creating todos so every idea becomes part of a complete plan.
+          Automation keeps tasks linked to the big picture while you bring ideas to life.
         </p>
         <a
           href="#get-started"
