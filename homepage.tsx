@@ -101,10 +101,10 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">Vision Meets Action</h1>
+          <h1 className="hero-title">AI Builds Your Vision</h1>
           <p>
-            Craft your roadmap with mind maps, break work into todos, and track progress on a Kanban board.
-            AI links every element so your next step is always clear as you shape your big idea.
+            Craft your roadmap with mind maps while AI auto-creates todos and Kanban cards.
+            Automation links every element so you can form complete plans faster.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
@@ -128,10 +128,10 @@ const Homepage: React.FC = (): JSX.Element => {
             <StackingText text="MindMap + Todo + Team Vision" />
           </motion.h2>
           <p className="section-subtext">
-            Start with a mind map to organize your goals, then instantly turn nodes into todos and Kanban cards.
+            Start with a mind map and let AI auto-build your todos and Kanban cards as you outline your goals.
           </p>
           <p className="section-subtext">
-            Rely on AI suggestions or handle tasks manually—either way, every update stays connected.
+            AI assistance can even expand your map so you create more complete plans while staying connected.
           </p>
         </div>
       </section>
@@ -259,7 +259,7 @@ const Homepage: React.FC = (): JSX.Element => {
       <section className="section section--one-col">
         <div className="container">
           <div className="bold-marketing-text">
-            Map big ideas, manage todos and drag cards across the board with ease.
+            AI auto-builds maps and todos so you can turn big ideas into complete plans faster.
           </div>
           <img
             src="./assets/simple_main_banner_home.png"
@@ -284,7 +284,7 @@ const Homepage: React.FC = (): JSX.Element => {
         </motion.h2>
         <p className="ai-copy">
           Harness automation to turn complex mind maps into todos and Kanban workflows.
-          MindXdo helps you execute ambitious plans with ease and suggests next steps so you never wonder what comes next.
+          AI builds out your plan so you can execute faster and always know the next step.
         </p>
         </div>
       </section>
