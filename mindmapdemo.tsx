@@ -90,7 +90,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
         <div className="container section--one-col text-center">
           <h1 className="marketing-text-large">Visualize Ideas in Seconds</h1>
           <p className="section-subtext">
-            Mind maps animate to life so you can focus on brainstorming
+            Mind maps animate to life and AI can auto-create them so you focus purely on brainstorming
           </p>
           <div className="mindmap-grid">
             {maps.map((map, mapIndex) => (
@@ -182,7 +182,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                 <StackingText text="Simple and Powerful" />
               </h2>
               <p className="section-subtext">
-                Draft your vision in a map and push items into todos whenever you're ready.
+                Draft your vision in a map and push items into todos whenever you're ready, keeping your Kanban board in sync.
               </p>
             </div>
           </section>

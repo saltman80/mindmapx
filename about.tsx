@@ -13,7 +13,7 @@ interface AboutSection {
 const sections: AboutSection[] = [
   {
     title: 'Our Mission',
-    text: 'MindXdo unites mind maps, todos and Kanban so you can design large visions and execute them from one place.',
+    text: 'MindXdo unites mind maps, todos and Kanban so every task stays linked to the big picture you want to achieve.',
     img: './assets/marketing_square_mindmap_people.png',
     bulletPoints: [
       'Capture concepts quickly with intuitive mind maps',
@@ -23,7 +23,7 @@ const sections: AboutSection[] = [
   },
   {
     title: 'Key Benefits',
-    text: 'Build your mind map, auto-create todos and track them on an agile Kanban board—all synchronized.',
+    text: 'Build your mind map, auto-create todos and track them on an agile Kanban board so the entire plan stays connected.',
     img: './assets/marketing_square_lightbulb_team.png',
     bulletPoints: [
       'One workspace for mapping and doing',
@@ -34,7 +34,7 @@ const sections: AboutSection[] = [
   },
   {
     title: 'Performance Insights',
-    text: 'Dashboards reveal how tasks move from mind map to todo to Kanban so you can improve every step.',
+    text: 'Dashboards reveal how tasks flow from mind map to todo to Kanban so you never lose sight of the whole plan.',
     img: './assets/marketing_square_todolist_in_cloud.png',
     bulletPoints: [
       'Dashboards highlight your progress',
@@ -44,7 +44,7 @@ const sections: AboutSection[] = [
   },
   {
     title: 'Continuous Improvement',
-    text: 'Add tasks manually or let AI expand your map—our Kanban system adapts as your projects grow.',
+    text: 'Add tasks manually or let AI expand your map—our Kanban system adapts as your projects grow while keeping everything tied to your vision.',
     img: './assets/marketing_square_ai_connecting.png',
     bulletPoints: [
       'Frequent feature releases based on feedback',
@@ -65,7 +65,7 @@ export default function AboutPage(): JSX.Element {
           <h1>About MindXdo</h1>
           <p>
             Vision Meets Action. Build ideas in a mind map, send them to your
-            todo list and manage progress on a shared Kanban board.
+            todo list and manage progress on a shared Kanban board so you always see the big picture.
           </p>
           <p>
             Use each tool alone or combine them with AI to guide your team to
