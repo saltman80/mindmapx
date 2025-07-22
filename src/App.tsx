@@ -4,6 +4,10 @@ import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
 import TodoDemo from '../tododemo'
 import Kanban from '../kanban'
+import TeamMembers from '../teammembers'
+import ProfilePage from '../profile'
+import BillingPage from '../billing'
+import AccountPage from '../account'
 import ResetPassword from '../reset-password'
 import PrivacyPolicy from '../privacypolicy'
 import TermsOfService from '../terms'
@@ -31,6 +35,10 @@ function AppRoutes() {
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/team-members" element={<TeamMembers />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/billing" element={<BillingPage />} />
+      <Route path="/account" element={<AccountPage />} />
       <Route path="/purchase" element={<PurchasePage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="*" element={<NotFound />} />
@@ -40,7 +48,7 @@ function AppRoutes() {
 
 function RouterContent() {
   const location = useLocation()
-  const internal = /^\/(dashboard|mindmaps|todos)/.test(location.pathname)
+  const internal = /^\/(dashboard|mindmaps|todos|kanban|team-members|profile|billing|account)/.test(location.pathname)
 
   return internal ? (
     <div className="app-layout">
