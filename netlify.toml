@@ -1,5 +1,6 @@
 [build]
-  command = "npm install && npm run deploy-seed && npm run build"
+  # Install dev dependencies so the vite build tool is available
+  command = "npm install --include=dev && npm run deploy-seed && npm run build"
   publish = "dist"
   functions = "netlify/functions"
 
