@@ -45,7 +45,7 @@ async function createMap(userId: string, data: unknown) {
   }
 }
 
-const handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {
@@ -129,4 +129,4 @@ const handler = async (
     }
   }
 }
-module.exports = { handler }
+
