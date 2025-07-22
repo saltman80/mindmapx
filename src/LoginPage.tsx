@@ -14,7 +14,7 @@ const LoginPage = () => {
     setError('')
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/.netlify/functions/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
