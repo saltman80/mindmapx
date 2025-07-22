@@ -82,6 +82,7 @@ export const handler = async (
   let email: string, password: string
   try {
     ({ email, password } = loginSchema.parse(parsedBody))
+    console.log('LOGIN BODY', { email, password })
   } catch (error) {
     if (error instanceof ZodError) {
       return {
@@ -91,6 +92,14 @@ export const handler = async (
       }
     }
     throw error
+  }
+
+  if (!email || !password) {
+    return {
+      statusCode: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Missing email or password' }),
+    }
   }
 
   const ip = event.headers['x-nf-client-connection-ip'] || event.headers['x-forwarded-for']?.split(',')[0] || 'unknown'
@@ -124,7 +133,7 @@ export const handler = async (
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid email or password' }),
+        body: JSON.stringify({ error: 'User not found' }),
       }
     }
 
@@ -138,7 +147,7 @@ export const handler = async (
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid email or password' }),
+        body: JSON.stringify({ error: 'Invalid password' }),
       }
     }
 
