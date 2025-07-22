@@ -4,10 +4,15 @@ import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-const { DATABASE_URL, JWT_SECRET } = process.env
+const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL, JWT_SECRET } = process.env
+const DATABASE_URL = LOCAL_DB || NETLIFY_DATABASE_URL
 if (!DATABASE_URL || !JWT_SECRET) {
+  console.error('Missing DATABASE_URL or JWT_SECRET')
   throw new Error('Missing required environment variables')
 }
+console.info(
+  `login using ${LOCAL_DB ? 'DATABASE_URL' : 'NETLIFY_DATABASE_URL'} connection`
+)
 
 const loginSchema = z.object({
   email: z.string().email().transform((s: string) => s.trim().toLowerCase()),

@@ -133,6 +133,10 @@ async function seedAdminUser() {
   const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
   const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS || '10', 10)
 
+  console.info(
+    `seeding admin user using ${ADMIN_EMAIL && ADMIN_PASSWORD ? 'provided credentials' : 'no credentials'}`
+  )
+
   if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
     console.log('Skipping admin user seed: ADMIN_EMAIL or ADMIN_PASSWORD missing')
     return

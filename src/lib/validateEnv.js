@@ -1,8 +1,9 @@
 export function validateEnv() {
-  const required = ['NETLIFY_DATABASE_URL']
-  for (const key of required) {
-    if (!process.env[key]) {
-      throw new Error(`Missing ${key}`)
-    }
+  const { NETLIFY_DATABASE_URL, DATABASE_URL, JWT_SECRET } = process.env
+  if (!NETLIFY_DATABASE_URL && !DATABASE_URL) {
+    throw new Error('Missing NETLIFY_DATABASE_URL')
+  }
+  if (!JWT_SECRET) {
+    throw new Error('Missing JWT_SECRET')
   }
 }

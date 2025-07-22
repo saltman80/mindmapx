@@ -1,11 +1,15 @@
 import { Pool } from 'pg'
 
-const connectionString =
-  process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL
+const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL } = process.env
+const connectionString = LOCAL_DB || NETLIFY_DATABASE_URL
 
 if (!connectionString) {
   throw new Error('Missing DATABASE_URL')
 }
+
+console.info(
+  `db-client using ${LOCAL_DB ? 'DATABASE_URL' : 'NETLIFY_DATABASE_URL'} connection`
+)
 
 const pool = new Pool({
   connectionString,
