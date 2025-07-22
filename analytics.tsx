@@ -47,7 +47,7 @@ export default function AnalyticsPage(): JSX.Element {
           start: dateRange.start.toISOString(),
           end: dateRange.end.toISOString(),
         })
-        const res = await fetch(`/.netlify/functions/get-analytics?${params.toString()}`, { signal })
+        const res = await fetch(`/.netlify/functions/analytics?${params.toString()}`, { signal })
         if (!res.ok) {
           const errText = await res.text()
           throw new Error(errText || res.statusText)
