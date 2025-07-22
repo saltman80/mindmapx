@@ -696,14 +696,28 @@ hr {
 }
 
 .hero-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
   margin-bottom: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
+
 .hero-title .hero-logo {
   height: 100px;
-  margin-right: var(--spacing-sm);
   vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+  .hero-title {
+    flex-direction: column;
+  }
+
+  .hero-title .hero-logo {
+    margin-bottom: var(--spacing-sm);
+  }
 }
 
 .header {
