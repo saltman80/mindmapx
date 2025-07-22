@@ -96,8 +96,8 @@ export const handler: Handler = async (
       WHERE id = ${id} AND user_id = ${userId}
       RETURNING id
     `
-    const deleted = result.rowCount
-    if (!deleted || deleted === 0) {
+    const deleted = result.rowCount ?? 0
+    if (deleted === 0) {
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

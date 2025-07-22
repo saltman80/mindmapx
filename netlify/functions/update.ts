@@ -104,7 +104,8 @@ export const handler: Handler = async (
       keys.length + 1
     } RETURNING *`
     const result = await db.query(query, [...values, id])
-    if (result.rowCount === 0) {
+    const count = result.rowCount ?? 0
+    if (count === 0) {
       return {
         statusCode: 404,
         headers,

@@ -56,7 +56,8 @@ export const handler: Handler = async (
       'INSERT INTO stripe_events(id, type, created_at) VALUES($1, $2, to_timestamp($3)) ON CONFLICT(id) DO NOTHING',
       [stripeEvent.id, stripeEvent.type, stripeEvent.created]
     )
-    if (insertResult.rowCount === 0) {
+    const count = insertResult.rowCount ?? 0
+    if (count === 0) {
       console.log(`Duplicate event ${stripeEvent.id} of type ${stripeEvent.type} skipped.`)
       return { statusCode: 200, body: 'OK' }
     }

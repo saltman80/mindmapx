@@ -64,7 +64,8 @@ export const handler: Handler = async (
 
   try {
     const userRes = await client.query('SELECT id FROM users WHERE email = $1', [normalizedEmail])
-    if (userRes.rowCount > 0) {
+    const count = userRes.rowCount ?? 0
+    if (count > 0) {
       const userId = userRes.rows[0].id
 
       const rateRes = await client.query(
