@@ -7,25 +7,46 @@ interface BillingInfo {
   lastAmount: number
 }
 
+interface Invoice {
+  id: string
+  amount: number
+  date: string
+  url: string
+}
+
 export default function BillingPage(): JSX.Element {
   const [info, setInfo] = useState<BillingInfo | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [cancelMsg, setCancelMsg] = useState<string | null>(null)
+  const [invoices, setInvoices] = useState<Invoice[]>([])
 
   useEffect(() => {
     const controller = new AbortController()
-    setLoading(true)
-    fetch('/api/billing', { credentials: 'include', signal: controller.signal })
-      .then(res => {
+    const load = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch('/api/billing', {
+          credentials: 'include',
+          signal: controller.signal,
+        })
         if (!res.ok) throw new Error('Failed to load billing info')
-        return res.json() as Promise<BillingInfo>
-      })
-      .then(data => setInfo(data))
-      .catch(err => {
+        const billData: BillingInfo = await res.json()
+        setInfo(billData)
+        const invRes = await fetch('/api/billing/invoices?limit=12', {
+          credentials: 'include',
+          signal: controller.signal,
+        })
+        if (!invRes.ok) throw new Error('Failed to load invoices')
+        const invData: Invoice[] = await invRes.json()
+        setInvoices(Array.isArray(invData) ? invData : [])
+      } catch (err: any) {
         if (err.name !== 'AbortError') setError(err.message || 'Unknown error')
-      })
-      .finally(() => setLoading(false))
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
     return () => controller.abort()
   }, [])
 
@@ -60,6 +81,25 @@ export default function BillingPage(): JSX.Element {
           <p>
             Amount Paid: <strong>${info.lastAmount.toFixed(2)}</strong>
           </p>
+          <div>
+            <Link to="/checkout" className="text-blue-600 underline">
+              Update Payment Method
+            </Link>
+          </div>
+          {invoices.length > 0 && (
+            <div>
+              <h2 className="font-semibold mt-4">Recent Invoices</h2>
+              <ul className="list-disc pl-4 space-y-1">
+                {invoices.map(inv => (
+                  <li key={inv.id}>
+                    <a href={inv.url} className="text-blue-600 underline" download>
+                      {new Date(inv.date).toLocaleDateString()} - ${inv.amount.toFixed(2)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button
             type="button"
             onClick={handleCancel}
