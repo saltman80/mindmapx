@@ -1,4 +1,3 @@
-
 [build]
   command = "npm install && npm run deploy-seed && npm run build"
   publish = "dist"
@@ -9,11 +8,11 @@
   NODE_ENV = "production"
 
 [[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/:splat"
-status = 200
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
 [[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  from = "/*"
+  to = "/index.html"
+  status = 200
