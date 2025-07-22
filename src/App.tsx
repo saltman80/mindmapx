@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Homepage from '../homepage'
 import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
@@ -24,7 +24,6 @@ import PurchasePage from './PurchasePage'
 import NotFound from './NotFound'
 import Header from './header'
 import Footer from './footer'
-import SidebarNav from './SidebarNav'
 import ScrollToTop from './ScrollToTop'
 
 function AppRoutes() {
@@ -56,31 +55,13 @@ function AppRoutes() {
   )
 }
 
-function RouterContent() {
-  const location = useLocation()
-  const internal = /^\/(dashboard|mindmaps|todos|kanban|workspace|team-members|profile|billing|account)/.test(location.pathname)
-
-  return internal ? (
-    <div className="app-layout">
-      <SidebarNav />
-      <main className="app-content">
-        <AppRoutes />
-      </main>
-    </div>
-  ) : (
-    <>
-      <Header />
-      <AppRoutes />
-      <Footer />
-    </>
-  )
-}
-
 export default function App() {
   return (
     <BrowserRouter>
+      <Header />
       <ScrollToTop />
-      <RouterContent />
+      <AppRoutes />
+      <Footer />
     </BrowserRouter>
   )
 }
