@@ -38,7 +38,7 @@ export default function DashboardPage(): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
-  const [createType, setCreateType] = useState<'map' | 'todo'>('map')
+  const [createType, setCreateType] = useState<'map' | 'todo' | 'board'>('map')
   const [form, setForm] = useState({ title: '', description: '' })
 
   const fetchData = async (): Promise<void> => {
@@ -82,11 +82,17 @@ export default function DashboardPage(): JSX.Element {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
         })
-      } else {
+      } else if (createType === 'todo') {
         await fetch('/.netlify/functions/todos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title, description: form.description }),
+        })
+      } else {
+        await fetch('/.netlify/functions/boards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title }),
         })
       }
       setShowModal(false)
@@ -205,7 +211,7 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Kanban Boards</h2>
-                <Link to="/kanban" className="text-blue-600 underline">Open</Link>
+                <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
               </div>
               <ul className="recent-list">
                 {boards.slice(0, 10).map(b => (
@@ -220,20 +226,21 @@ export default function DashboardPage(): JSX.Element {
       )}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)} aria-hidden="true">
-          <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
-            <h2>Create {createType === 'map' ? 'Mind Map' : 'Todo'}</h2>
+          <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+            <span className="flare-line" aria-hidden="true"></span>
+            <h2 className="fade-item">Create {createType === 'map' ? 'Mind Map' : createType === 'todo' ? 'Todo' : 'Board'}</h2>
             <form onSubmit={handleCreate}>
               <div className="form-group">
-                <label htmlFor="title">Title</label>
-                <input id="title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                <label htmlFor="title" className="fade-item" style={{ animationDelay: '0.1s' }}>Title</label>
+                <input id="title" className="fade-item" style={{ animationDelay: '0.1s' }} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
               </div>
               <div className="form-group">
-                <label htmlFor="desc">Description</label>
-                <textarea id="desc" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+                <label htmlFor="desc" className="fade-item" style={{ animationDelay: '0.2s' }}>Description</label>
+                <textarea id="desc" className="fade-item" style={{ animationDelay: '0.2s' }} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit">Create</button>
+                <button type="button" className="fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="fade-item" style={{ animationDelay: '0.3s' }}>Create</button>
               </div>
             </form>
           </div>
