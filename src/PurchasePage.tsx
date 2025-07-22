@@ -1,10 +1,37 @@
-import React from 'react'
+import React, { useState } from 'react'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 
 const PurchasePage = () => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setMessage('')
+    try {
+      const tempPassword = crypto.randomUUID()
+      await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: tempPassword })
+      })
+      await fetch('/api/forgotpassword', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      setMessage('Check your email to set your password.')
+      setName('')
+      setEmail('')
+    } catch {
+      setMessage('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -49,6 +76,8 @@ const PurchasePage = () => {
                   placeholder="Your Name"
                   className="form-input"
                   required
+                  value={name}
+                  onChange={e => setName(e.target.value)}
                 />
               </label>
             </div>
@@ -60,6 +89,8 @@ const PurchasePage = () => {
                   placeholder="Your Email"
                   className="form-input"
                   required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </label>
             </div>
@@ -97,9 +128,10 @@ const PurchasePage = () => {
               </label>
             </div>
             <p className="total-charge text-center">Total: $9.99 / month</p>
+            {message && <p className="text-center mb-md">{message}</p>}
             <div className="payment-actions">
-              <button type="submit" className="btn" disabled>
-                Place Order
+              <button type="submit" className="btn" disabled={loading}>
+                {loading ? 'Processing...' : 'Place Order'}
               </button>
               <button type="button" className="btn btn-paypal">PayPal</button>
             </div>
