@@ -82,6 +82,13 @@ export default function DashboardPage(): JSX.Element {
     }
   }
 
+  const handleTileClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    const el = e.currentTarget
+    el.classList.remove('clicked')
+    void el.offsetWidth
+    el.classList.add('clicked')
+  }
+
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
   const oneWeek = 7 * oneDay
@@ -127,7 +134,7 @@ export default function DashboardPage(): JSX.Element {
             </div>
           </div>
           <div className="tiles-grid">
-            <div className="tile">
+            <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Mind Maps</h2>
                 <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
@@ -140,7 +147,7 @@ export default function DashboardPage(): JSX.Element {
                 ))}
               </ul>
             </div>
-            <div className="tile">
+            <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Todos</h2>
                 <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
@@ -155,7 +162,7 @@ export default function DashboardPage(): JSX.Element {
                 ))}
               </ul>
             </div>
-            <div className="tile">
+            <div className="tile" onClick={handleTileClick}>
               <h2>Kanban Boards</h2>
               <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
             </div>
