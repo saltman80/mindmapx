@@ -103,6 +103,39 @@ export default function DashboardPage(): JSX.Element {
     }
   }
 
+  const handleAiCreate = async (): Promise<void> => {
+    try {
+      if (createType === 'map') {
+        await fetch('/.netlify/functions/ai-create-mindmap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: form.title,
+            description: form.description,
+            prompt: form.description,
+          }),
+        })
+      } else if (createType === 'todo') {
+        await fetch('/.netlify/functions/ai-create-todo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: form.description }),
+        })
+      } else {
+        await fetch('/.netlify/functions/boards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title }),
+        })
+      }
+      setShowModal(false)
+      setForm({ title: '', description: '' })
+      fetchData()
+    } catch (err: any) {
+      alert(err.message || 'AI creation failed')
+    }
+  }
+
   const handleTileClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     const el = e.currentTarget
     el.classList.remove('clicked')
@@ -259,17 +292,21 @@ export default function DashboardPage(): JSX.Element {
             <span className="flare-line" aria-hidden="true"></span>
             <h2 className="fade-item">Create {createType === 'map' ? 'Mind Map' : createType === 'todo' ? 'Todo' : 'Board'}</h2>
             <form onSubmit={handleCreate}>
-              <div className="form-group">
-                <label htmlFor="title" className="fade-item" style={{ animationDelay: '0.1s' }}>Title</label>
-                <input id="title" className="fade-item" style={{ animationDelay: '0.1s' }} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+              <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
+                <label htmlFor="title" className="form-label">Title</label>
+                <input id="title" className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
               </div>
-              <div className="form-group">
-                <label htmlFor="desc" className="fade-item" style={{ animationDelay: '0.2s' }}>Description</label>
-                <textarea id="desc" className="fade-item" style={{ animationDelay: '0.2s' }} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+              <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
+                <label htmlFor="desc" className="form-label">Description</label>
+                <textarea id="desc" className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
                 <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>Create</button>
+                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>Quick Create</button>
+                <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
+                  <span className="sparkle" aria-hidden="true">✨</span>
+                  Create With AI
+                </button>
               </div>
             </form>
           </div>
