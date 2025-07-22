@@ -1595,6 +1595,7 @@ hr {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fade-in 0.3s var(--transition-ease);
 }
 
 .modal {
@@ -1647,4 +1648,41 @@ hr {
 
 .tile-header button:hover {
   background-color: var(--color-warning);
+}
+
+/* Fancy modal styles */
+.fancy-modal {
+  position: relative;
+  animation: modal-pop 0.4s var(--transition-ease) both;
+  border: 2px solid var(--color-primary);
+}
+
+.fancy-modal .flare-line {
+  pointer-events: none;
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  animation: flare-line 1s forwards;
+}
+
+.fade-item {
+  opacity: 0;
+  animation: fade-item 0.5s forwards;
+}
+
+@keyframes modal-pop {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fade-item {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flare-line {
+  0% { box-shadow: 0 0 0 0 var(--color-warning); }
+  80% { box-shadow: 0 0 6px 4px var(--color-warning); }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
