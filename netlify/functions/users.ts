@@ -15,7 +15,10 @@ const updateSchema = z.object({
   role: z.enum(['user', 'admin']).optional(),
 })
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   const headers = { 'Content-Type': 'application/json' }
 
   const token = extractToken(event)

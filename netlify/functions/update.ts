@@ -51,7 +51,7 @@ const resourceConfigs: Record<string, { table: string; schema: z.ZodTypeAny }> =
   }
 }
 
-export const handler = async (
+export const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {

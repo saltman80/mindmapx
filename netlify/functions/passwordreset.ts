@@ -28,7 +28,10 @@ const headers = {
   "Content-Type": "application/json",
 }
 
-export const handler: Handler = async (event, _context) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" }
   }

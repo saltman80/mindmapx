@@ -22,7 +22,10 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 }
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,

@@ -17,7 +17,10 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 }
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers, body: '' }
   }

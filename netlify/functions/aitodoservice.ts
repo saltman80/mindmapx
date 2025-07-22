@@ -63,8 +63,8 @@ if (!API_KEY) {
 const todoService = initTodoService(API_KEY)
 
 export const handler: Handler = async (
-  event,
-  context
+  event: HandlerEvent,
+  context: HandlerContext
 ): Promise<HandlerResponse> => {
   await cors(event, context)
   if (event.httpMethod !== 'POST') {

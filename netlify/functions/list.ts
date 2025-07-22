@@ -32,7 +32,10 @@ const QuerySchema = z.object({
 
 const JwtPayloadSchema = z.object({ userId: z.string() })
 
-export const handler: Handler = async event => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   const commonHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',

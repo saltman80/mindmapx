@@ -22,7 +22,10 @@ function hashToken(token: string): string {
 }
 
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers: { Allow: 'POST' }, body: 'Method Not Allowed' }
   }

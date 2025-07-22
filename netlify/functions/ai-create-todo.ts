@@ -6,7 +6,10 @@ if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
 const openai = new OpenAI({ apiKey: openaiKey })
 const MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' }
   }

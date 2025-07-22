@@ -28,7 +28,10 @@ function getCorsHeaders(origin?: string) {
   }
 }
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   const corsHeaders = getCorsHeaders(event.headers.origin)
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: corsHeaders, body: "" }
