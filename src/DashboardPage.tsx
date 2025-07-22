@@ -239,7 +239,7 @@ export default function DashboardPage(): JSX.Element {
                 <h2>Mind Maps</h2>
                 <div className="tile-actions">
                   <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
-                  <Link to="/mindmaps" className="tile-link">Open</Link>
+                  <Link to="/mindmaps" className="tile-link">Open Mind Maps</Link>
                 </div>
               </div>
               <ul className="recent-list">
@@ -255,7 +255,7 @@ export default function DashboardPage(): JSX.Element {
                 <h2>Todos</h2>
                 <div className="tile-actions">
                   <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
-                  <Link to="/todos" className="tile-link">Open</Link>
+                  <Link to="/todos" className="tile-link">Open Todos</Link>
                 </div>
               </div>
               <ul className="recent-list">
@@ -272,7 +272,7 @@ export default function DashboardPage(): JSX.Element {
                 <h2>Kanban Boards</h2>
                 <div className="tile-actions">
                   <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
-                  <Link to="/kanban" className="tile-link">Open</Link>
+                  <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
                 </div>
               </div>
               <ul className="recent-list">
