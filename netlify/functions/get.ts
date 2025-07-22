@@ -24,12 +24,13 @@ export const handler: Handler = async (
   context: HandlerContext
 ) => {
   if (event.httpMethod !== 'GET') {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Allow: 'GET'
+    }
     return {
       statusCode: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        Allow: 'GET'
-      },
+      headers,
       body: JSON.stringify({ error: 'Method Not Allowed' })
     }
   }

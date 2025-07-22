@@ -98,14 +98,15 @@ const handler: Handler = async (
         body: JSON.stringify(map),
       }
     }
-    return {
-      statusCode: 405,
-      headers: {
-        Allow: "GET, POST",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ error: "Method not allowed" }),
-    }
+  const headers: Record<string, string> = {
+    Allow: "GET, POST",
+    "Content-Type": "application/json",
+  }
+  return {
+    statusCode: 405,
+    headers,
+    body: JSON.stringify({ error: "Method not allowed" }),
+  }
   } catch (err: any) {
     if (
       err instanceof JsonWebTokenError ||

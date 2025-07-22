@@ -28,9 +28,13 @@ export const handler: Handler = async (
   _context: HandlerContext
 ) => {
   if (event.httpMethod !== 'POST') {
+    const headers: Record<string, string> = {
+      'Content-Type': 'text/plain',
+      Allow: 'POST'
+    }
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'text/plain', Allow: 'POST' },
+      headers,
       body: 'Method Not Allowed'
     }
   }
