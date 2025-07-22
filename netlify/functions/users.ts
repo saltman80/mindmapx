@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import { extractToken, verifySession } from './auth.js'
@@ -16,7 +15,7 @@ const updateSchema = z.object({
   role: z.enum(['user', 'admin']).optional(),
 })
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import OpenAI from 'openai'
 import { z } from 'zod'
@@ -25,7 +24,7 @@ const todosResponseSchema = z.array(todoItemSchema).max(50)
 
 const headers = { 'Content-Type': 'application/json' }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {

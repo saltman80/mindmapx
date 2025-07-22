@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import OpenAI from 'openai'
 
 const openaiKey = process.env.OPENAI_API_KEY
@@ -7,7 +6,7 @@ if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
 const openai = new OpenAI({ apiKey: openaiKey })
 const MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

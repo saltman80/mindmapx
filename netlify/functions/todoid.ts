@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z } from 'zod'
 import type { Todo } from './types.js'
@@ -106,7 +105,7 @@ async function deleteTodo(todoId: string, userId: string): Promise<void> {
   }
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {

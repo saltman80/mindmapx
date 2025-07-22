@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z } from 'zod'
 
@@ -24,7 +23,7 @@ function createResponse(statusCode: number, body?: unknown, headers: Record<stri
   return response
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

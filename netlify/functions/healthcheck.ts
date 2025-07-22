@@ -1,8 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 
-export const handler: Handler = async (event, context) => {
+export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   context.callbackWaitsForEmptyEventLoop = false
   let dbHealthy = false
   try {
