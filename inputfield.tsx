@@ -1,4 +1,6 @@
-const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
+import { forwardRef, useState, type ChangeEvent } from 'react'
+
+const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({ 
   name,
   value,
   onChange,
