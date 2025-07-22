@@ -1,6 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
+import FaintMindmapBackground from '../FaintMindmapBackground'
+import MindmapArm from '../MindmapArm'
 
 interface MapItem {
   id: string
@@ -95,7 +97,10 @@ export default function DashboardPage(): JSX.Element {
   const todoDoneWeek = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page relative overflow-hidden">
+      <FaintMindmapBackground className="mindmap-bg-small" />
+      <MindmapArm side="left" />
+      <MindmapArm side="right" />
       <h1 className="dashboard-title">Dashboard</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
