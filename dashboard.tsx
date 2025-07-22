@@ -1,400 +1,178 @@
-import { useState, useEffect, useRef, useCallback, ChangeEvent, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from './loadingskeleton'
 
+interface MapItem {
+  id: string
+  title?: string
+  createdAt?: string
+  created_at?: string
+}
+
+interface TodoItem {
+  id: string
+  title?: string
+  content?: string
+  completed?: boolean
+  mindmap_id?: string
+  createdAt?: string
+  created_at?: string
+  updatedAt?: string
+  updated_at?: string
+}
+
 export default function DashboardPage(): JSX.Element {
-  const [summary, setSummary] = useState<Summary | null>(null)
-  const [summaryLoading, setSummaryLoading] = useState<boolean>(true)
-  const [summaryError, setSummaryError] = useState<string | null>(null)
-
-  const baseTabs: { key: TabKey; label: string }[] = [
-    { key: 'maps', label: 'Maps' },
-    { key: 'todos', label: 'Todos' },
-  ]
-  const adminTabs: { key: TabKey; label: string }[] = [
-    { key: 'maps', label: 'Maps' },
-    { key: 'todos', label: 'Todos' },
-    { key: 'users', label: 'Users' },
-    { key: 'payments', label: 'Payments' },
-    { key: 'analytics', label: 'Analytics' },
-  ]
-  const tabs = summary?.isAdmin ? adminTabs : baseTabs
-
-  const [activeTab, setActiveTab] = useState<TabKey>('maps')
-  const [items, setItems] = useState<Item[]>([])
-  const [itemsLoading, setItemsLoading] = useState<boolean>(false)
-  const [itemsError, setItemsError] = useState<string | null>(null)
-
-  const itemsControllerRef = useRef<AbortController | null>(null)
-
-  const [showModal, setShowModal] = useState<boolean>(false)
+  const [maps, setMaps] = useState<MapItem[]>([])
+  const [todos, setTodos] = useState<TodoItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showModal, setShowModal] = useState(false)
   const [createType, setCreateType] = useState<'map' | 'todo'>('map')
-  const [formData, setFormData] = useState<{ title: string; description: string }>({
-    title: '',
-    description: '',
-  })
-  const [aiPrompt, setAiPrompt] = useState<string>('')
+  const [form, setForm] = useState({ title: '', description: '' })
 
-  const modalRef = useRef<HTMLDivElement | null>(null)
-
-  const openCreateModal = useCallback((type: 'map' | 'todo') => {
-    setCreateType(type)
-    setFormData({ title: '', description: '' })
-    setAiPrompt('')
-    setShowModal(true)
-  }, [])
-
-  const closeCreateModal = useCallback(() => {
-    setShowModal(false)
-  }, [])
-
-  function fetchSummary(): Promise<void> {
-    return (async () => {
-      setSummaryLoading(true)
-      setSummaryError(null)
-      try {
-        const res = await fetch('/.netlify/functions/get-summary')
-        if (!res.ok) throw new Error('Failed to fetch summary')
-        const data: Summary = await res.json()
-        setSummary(data)
-        const availableTabs: TabKey[] = data.isAdmin
-          ? adminTabs.map(t => t.key)
-          : baseTabs.map(t => t.key)
-        if (!availableTabs.includes(activeTab)) {
-          setActiveTab(availableTabs[0])
-        }
-      } catch (err: any) {
-        setSummaryError(err.message || 'Unknown error')
-      } finally {
-        setSummaryLoading(false)
-      }
-    })()
-  }
-
-  useEffect(() => {
-    fetchSummary()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  async function fetchItems(type: ItemsType): Promise<void> {
-    itemsControllerRef.current?.abort()
-    const controller = new AbortController()
-    itemsControllerRef.current = controller
-    setItemsLoading(true)
-    setItemsError(null)
+  const fetchData = async (): Promise<void> => {
+    setLoading(true)
+    setError(null)
     try {
-      const endpoint =
-        type === 'maps'
-          ? '/.netlify/functions/get-maps'
-          : '/.netlify/functions/get-todos'
-      const res = await fetch(endpoint, { signal: controller.signal })
-      if (!res.ok) throw new Error('Failed to fetch ' + type)
-      const data: Item[] = await res.json()
-      setItems(data)
+      const [mapsRes, todosRes] = await Promise.all([
+        fetch('/.netlify/functions/index', { credentials: 'include' }),
+        fetch('/.netlify/functions/list', { credentials: 'include' }),
+      ])
+      const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
+        ? await mapsRes.json()
+        : []
+      const todoJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
+        ? await todosRes.json()
+        : { data: { todos: [] } }
+      const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : todoJson.data?.todos || []
+      setMaps(Array.isArray(mapsData) ? mapsData : [])
+      setTodos(todoList)
     } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        setItemsError(err.message || 'Unknown error')
-      }
+      setError(err.message || 'Failed to load data')
     } finally {
-      if (!controller.signal.aborted) {
-        setItemsLoading(false)
-      }
+      setLoading(false)
     }
   }
 
-  useEffect(() => {
-    if (activeTab === 'maps' || activeTab === 'todos') {
-      fetchItems(activeTab)
-    } else {
-      setItems([])
-    }
-    return () => {
-      itemsControllerRef.current?.abort()
-    }
-  }, [activeTab])
+  useEffect(() => { fetchData() }, [])
 
-  useEffect(() => {
-    if (!showModal) return
-    const previousActiveElement = document.activeElement as HTMLElement
-    const modalEl = modalRef.current
-    const focusableSelectors =
-      'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    let focusableEls: HTMLElement[] = []
-    let firstEl: HTMLElement | undefined
-    let lastEl: HTMLElement | undefined
-    if (modalEl) {
-      focusableEls = Array.from(modalEl.querySelectorAll<HTMLElement>(focusableSelectors))
-      firstEl = focusableEls[0]
-      lastEl = focusableEls[focusableEls.length - 1]
-      firstEl?.focus()
-    }
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        if (focusableEls.length === 0) {
-          e.preventDefault()
-          return
-        }
-        if (e.shiftKey) {
-          if (document.activeElement === firstEl) {
-            e.preventDefault()
-            lastEl?.focus()
-          }
-        } else {
-          if (document.activeElement === lastEl) {
-            e.preventDefault()
-            firstEl?.focus()
-          }
-        }
-      } else if (e.key === 'Escape') {
-        e.preventDefault()
-        closeCreateModal()
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      previousActiveElement?.focus()
-    }
-  }, [showModal, closeCreateModal])
-
-  function handleTabChange(tab: TabKey): void {
-    setActiveTab(tab)
-  }
-
-  function handleFormChange(
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
-  ): void {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  async function handleFormSubmit(e: FormEvent): Promise<void> {
+  const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const endpoint =
-        createType === 'map'
-          ? '/.netlify/functions/create-map'
-          : '/.netlify/functions/create-todo'
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-      if (!res.ok) throw new Error('Failed to create ' + createType)
-      closeCreateModal()
-      await fetchSummary()
-      if (activeTab === (createType === 'map' ? 'maps' : 'todos')) {
-        fetchItems(activeTab)
+      if (createType === 'map') {
+        await fetch('/.netlify/functions/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        })
+      } else {
+        await fetch('/.netlify/functions/todos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title, description: form.description }),
+        })
       }
+      setShowModal(false)
+      setForm({ title: '', description: '' })
+      fetchData()
     } catch (err: any) {
-      alert(err.message || 'Error')
+      alert(err.message || 'Creation failed')
     }
   }
 
-  async function handleAICreate(): Promise<void> {
-    if (!aiPrompt.trim()) return
-    try {
-      const endpoint =
-        createType === 'map'
-          ? '/.netlify/functions/ai-create-mindmap'
-          : '/.netlify/functions/ai-create-todo'
-      const body = { ...formData, prompt: aiPrompt }
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (!res.ok) throw new Error('Failed to generate ' + createType)
-      closeCreateModal()
-      await fetchSummary()
-      if (activeTab === (createType === 'map' ? 'maps' : 'todos')) {
-        fetchItems(activeTab)
-      }
-    } catch (err: any) {
-      alert(err.message || 'Error')
-    }
-  }
+  const now = Date.now()
+  const oneDay = 24 * 60 * 60 * 1000
+  const oneWeek = 7 * oneDay
+  const dayAgo = now - oneDay
+  const weekAgo = now - oneWeek
 
-  async function handleDelete(id: string): Promise<void> {
-    try {
-      const endpoint =
-        activeTab === 'maps'
-          ? `/.netlify/functions/delete-map?id=${encodeURIComponent(id)}`
-          : `/.netlify/functions/delete-todo?id=${encodeURIComponent(id)}`
-      const res = await fetch(endpoint, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Delete failed')
-      fetchItems(activeTab)
-      fetchSummary()
-    } catch (err: any) {
-      alert(err.message || 'Error deleting item')
-    }
-  }
+  const mapDay = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
+  const mapWeek = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
+
+  const todoAddedDay = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
+  const todoAddedWeek = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
+  const todoDoneDay = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
+  const todoDoneWeek = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
 
   return (
     <div className="dashboard-page">
       <h1 className="dashboard-title">Dashboard</h1>
-      <img
-        src="./assets/dashboard-banner.png"
-        alt="Dashboard banner"
-        className="dashboard-banner mb-4"
-      />
-      {summaryLoading ? (
+      {loading ? (
         <LoadingSkeleton count={3} />
-      ) : summaryError ? (
-        <p className="error">{summaryError}</p>
-      ) : summary ? (
-        <div className="summary-cards">
-          <div className="summary-card">
-            <h2>Mindmaps</h2>
-            <p>{summary.totalMaps}</p>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : (
+        <>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <h3>Mind Maps</h3>
+              <p>Total: {maps.length}</p>
+              <p>Today: {mapDay}</p>
+              <p>This Week: {mapWeek}</p>
+            </div>
+            <div className="metric-card">
+              <h3>Todos</h3>
+              <p>Total: {todos.length}</p>
+              <p>Added Today: {todoAddedDay} Completed: {todoDoneDay}</p>
+              <p>Added Week: {todoAddedWeek} Completed: {todoDoneWeek}</p>
+            </div>
+            <div className="metric-card">
+              <h3>Kanban Boards</h3>
+              <Link to="/kanban" className="text-blue-600 underline">View Boards</Link>
+            </div>
           </div>
-          <div className="summary-card">
-            <h2>Todos</h2>
-            <p>{summary.totalTodos}</p>
+          <div className="tiles-grid">
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Mind Maps</h2>
+                <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+              </div>
+              <ul>
+                {maps.map(m => (
+                  <li key={m.id}>
+                    <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Todos</h2>
+                <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+              </div>
+              <ul>
+                {todos.map(t => (
+                  <li key={t.id}>
+                    {t.title || t.content}
+                    {t.mindmap_id && <span className="text-sm text-gray-500"> (Map: {t.mindmap_id})</span>}
+                    {t.completed && ' ✓'}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="tile">
+              <h2>Kanban Boards</h2>
+              <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
+            </div>
           </div>
-          {summary.isAdmin && summary.totalUsers !== undefined && (
-            <div className="summary-card">
-              <h2>Users</h2>
-              <p>{summary.totalUsers}</p>
-            </div>
-          )}
-          {summary.isAdmin && summary.totalPayments !== undefined && (
-            <div className="summary-card">
-              <h2>Payments</h2>
-              <p>{summary.totalPayments}</p>
-            </div>
-          )}
-          {summary.isAdmin && summary.usageStats && (
-            <div className="summary-card">
-              <h2>Active Users</h2>
-              <p>{summary.usageStats.activeUsers}</p>
-              <h2>Storage Used</h2>
-              <p>{summary.usageStats.storageUsed} MB</p>
-            </div>
-          )}
-        </div>
-      ) : null}
-      <div className="tabs">
-        {tabs.map(t => (
-          <button
-            key={t.key}
-            className={`tab-button ${activeTab === t.key ? 'active' : ''}`}
-            onClick={() => handleTabChange(t.key)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div className="actions">
-        {(activeTab === 'maps' || activeTab === 'todos') && (
-          <button
-            className="create-button"
-            onClick={() => openCreateModal(activeTab === 'maps' ? 'map' : 'todo')}
-          >
-            Create New {activeTab === 'maps' ? 'Map' : 'Todo'}
-          </button>
-        )}
-      </div>
-      <div className="tab-content">
-        {itemsLoading ? (
-          <LoadingSkeleton />
-        ) : itemsError ? (
-          <p className="error">{itemsError}</p>
-        ) : activeTab === 'maps' || activeTab === 'todos' ? (
-          items.length > 0 ? (
-            <ul className="item-list">
-              {items.map(item => (
-                <li key={item.id} className="item">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <strong>
-                        <Link
-                          to={
-                            activeTab === 'maps'
-                              ? `/maps/${item.id}`
-                              : `/todos/${item.id}`
-                          }
-                          className="text-blue-600 hover:underline"
-                        >
-                          {item.title}
-                        </Link>
-                      </strong>
-                      {item.description && <p>{item.description}</p>}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No {activeTab} found.</p>
-          )
-        ) : (
-          <p>Select a tab to view content.</p>
-        )}
-      </div>
+        </>
+      )}
       {showModal && (
-        <div className="modal-overlay" onClick={closeCreateModal} aria-hidden="true">
-          <div
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-heading"
-            ref={modalRef}
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 id="modal-heading">
-              Create New {createType === 'map' ? 'Map' : 'Todo'}
-            </h2>
-            <form onSubmit={handleFormSubmit}>
+        <div className="modal-overlay" onClick={() => setShowModal(false)} aria-hidden="true">
+          <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+            <h2>Create {createType === 'map' ? 'Mind Map' : 'Todo'}</h2>
+            <form onSubmit={handleCreate}>
               <div className="form-group">
                 <label htmlFor="title">Title</label>
-                <input
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleFormChange}
-                  required
-                />
+                <input id="title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
               </div>
               <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleFormChange}
-                  rows={3}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="aiPrompt">AI Prompt (optional)</label>
-                <textarea
-                  id="aiPrompt"
-                  name="aiPrompt"
-                  value={aiPrompt}
-                  onChange={e => setAiPrompt(e.target.value)}
-                  rows={2}
-                />
+                <label htmlFor="desc">Description</label>
+                <textarea id="desc" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
-                <button type="button" onClick={closeCreateModal}>
-                  Cancel
-                </button>
+                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit">Create</button>
-                <button
-                  type="button"
-                  onClick={handleAICreate}
-                  className="ai-button"
-                >
-                  Create with AI
-                </button>
               </div>
             </form>
           </div>
