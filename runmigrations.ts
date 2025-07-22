@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url'
 
 import { pool, getClient } from './netlify/functions/db-client.js'
 import fs from 'fs'
+import bcrypt from 'bcrypt'
 
 // Execute migration files as a single statement so that dollar quoted
 // blocks (e.g. in PL/pgSQL functions) are not split incorrectly.
@@ -116,9 +117,14 @@ export async function runMigrations(): Promise<void> {
   } finally {
     try { await client.query('SELECT pg_advisory_unlock($1)', [LOCK_KEY]) } catch {}
     client.release()
+    try {
+      await seedAdminUser()
+    } catch (err) {
+      console.error('Admin user seeding failed:', err)
+    }
     await pool.end()
   }
-} 
+}
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   runMigrations().catch((err: any) => {
@@ -126,8 +132,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(1)
   })
 }
-
-import bcrypt from 'bcrypt'
 
 async function seedAdminUser() {
   const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
@@ -160,7 +164,3 @@ async function seedAdminUser() {
 
   console.log(`✅ Admin user seeded: ${ADMIN_EMAIL}`)
 }
-
-seedAdminUser().catch((err) => {
-  console.error('Admin user seeding failed:', err)
-})
