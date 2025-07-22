@@ -18,8 +18,9 @@ const MAX_ATTEMPTS = 5
 const WINDOW_MS = 15 * 60 * 1000
 const failedLoginAttempts = new Map<string, number[]>()
 
+const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': allowedOrigin,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true'
@@ -88,6 +89,7 @@ const handler = async (
   }
 
   const ip = event.headers['x-nf-client-connection-ip'] || event.headers['x-forwarded-for']?.split(',')[0] || 'unknown'
+  console.info(`Login attempt from ${ip} for ${email}`)
   const now = Date.now()
   const attempts = failedLoginAttempts.get(ip) || []
   const recent = attempts.filter(ts => now - ts < WINDOW_MS)
@@ -113,6 +115,7 @@ const handler = async (
     if (count === 0) {
       recent.push(now)
       failedLoginAttempts.set(ip, recent)
+      console.warn(`Login failed for ${email} from ${ip}`)
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -126,6 +129,7 @@ const handler = async (
     if (!isValid) {
       recent.push(now)
       failedLoginAttempts.set(ip, recent)
+      console.warn(`Login failed for ${email} from ${ip}`)
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -146,13 +150,14 @@ const handler = async (
       'HttpOnly',
       'Path=/',
       'SameSite=Lax',
-      'Max-Age=86400'
+      'Max-Age=3600'
     ]
 
     if (process.env.NODE_ENV === 'production') {
       cookieParts.push('Secure')
     }
 
+    console.info(`Login successful for ${email} from ${ip}`)
     return {
       statusCode: 200,
       headers: {

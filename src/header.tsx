@@ -177,9 +177,10 @@ const Header = (): JSX.Element => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="header__login-link">
-              Login
-            </Link>
+            <>
+              <Link to="/login" className="header__login-link">Login</Link>
+              <Link to="/register" className="header__login-link">Sign Up</Link>
+            </>
           )}
           </div>
         </div>
