@@ -701,6 +701,7 @@ hr {
   margin-bottom: var(--spacing-md);
 }
 .hero-title .hero-logo {
+  display: inline-block;
   height: 1em;
   margin-right: var(--spacing-sm);
   vertical-align: middle;
