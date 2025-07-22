@@ -171,8 +171,8 @@ export default function DashboardPage(): JSX.Element {
                 <textarea id="desc" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit">Create</button>
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn-primary">Create</button>
               </div>
             </form>
           </div>
