@@ -19,6 +19,11 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
   npm run build
 ```
 
+If your site is served from a subdirectory (for example
+`https://example.com/mindmapx/`), set the `BASE_PATH` environment variable to
+that subpath when building. Vite will use this value for asset URLs and the
+React router will use it as its basename.
+
 Netlify automatically compiles the TypeScript functions in
 `netlify/functions/` during deployment.
 
