@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
+import Sparkline from './Sparkline'
 
 interface MapItem {
   id: string
@@ -23,9 +24,17 @@ interface TodoItem {
   updated_at?: string
 }
 
+interface BoardItem {
+  id: string
+  title?: string
+  createdAt?: string
+  created_at?: string
+}
+
 export default function DashboardPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
   const [todos, setTodos] = useState<TodoItem[]>([])
+  const [boards, setBoards] = useState<BoardItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -36,9 +45,10 @@ export default function DashboardPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const [mapsRes, todosRes] = await Promise.all([
+      const [mapsRes, todosRes, boardsRes] = await Promise.all([
         fetch('/.netlify/functions/index', { credentials: 'include' }),
         fetch('/.netlify/functions/list', { credentials: 'include' }),
+        fetch('/.netlify/functions/boards', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -47,8 +57,13 @@ export default function DashboardPage(): JSX.Element {
         ? await todosRes.json()
         : { data: { todos: [] } }
       const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : todoJson.data?.todos || []
+      const boardsJson = boardsRes.ok && boardsRes.headers.get('content-type')?.includes('application/json')
+        ? await boardsRes.json()
+        : { boards: [] }
+      const boardsList: BoardItem[] = Array.isArray(boardsJson) ? boardsJson : boardsJson.boards || []
       setMaps(Array.isArray(mapsData) ? mapsData : [])
       setTodos(todoList)
+      setBoards(boardsList)
     } catch (err: any) {
       setError(err.message || 'Failed to load data')
     } finally {
@@ -103,6 +118,28 @@ export default function DashboardPage(): JSX.Element {
   const todoDoneDay = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
   const todoDoneWeek = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
 
+  const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
+  const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
+
+  const sevenDayTotals = Array.from({ length: 7 }, (_v, i) => {
+    const start = new Date(now - (6 - i) * oneDay)
+    start.setHours(0, 0, 0, 0)
+    const end = start.getTime() + oneDay
+    const countMaps = maps.filter(m => {
+      const t = new Date(m.createdAt || m.created_at || '').getTime()
+      return t >= start.getTime() && t < end
+    }).length
+    const countTodos = todos.filter(t => {
+      const t1 = new Date(t.createdAt || t.created_at || '').getTime()
+      return t1 >= start.getTime() && t1 < end
+    }).length
+    const countBoards = boards.filter(b => {
+      const t2 = new Date(b.createdAt || b.created_at || '').getTime()
+      return t2 >= start.getTime() && t2 < end
+    }).length
+    return countMaps + countTodos + countBoards
+  })
+
   return (
     <div className="dashboard-page relative overflow-hidden">
       <FaintMindmapBackground className="mindmap-bg-small" />
@@ -117,20 +154,24 @@ export default function DashboardPage(): JSX.Element {
         <>
           <div className="metrics-grid">
             <div className="metric-card">
-              <h3>Mind Maps</h3>
-              <p>Total: {maps.length}</p>
-              <p>Today: {mapDay}</p>
-              <p>This Week: {mapWeek}</p>
+              <h3 className="metric-title">Mind Maps</h3>
+              <div className="metric-value">{maps.length}</div>
+              <p>Today: {mapDay} &middot; Week: {mapWeek}</p>
             </div>
             <div className="metric-card">
-              <h3>Todos</h3>
-              <p>Total: {todos.length}</p>
-              <p>Added Today: {todoAddedDay} Completed: {todoDoneDay}</p>
-              <p>Added Week: {todoAddedWeek} Completed: {todoDoneWeek}</p>
+              <h3 className="metric-title">Todos</h3>
+              <div className="metric-value">{todos.length}</div>
+              <p>Added Today: {todoAddedDay}</p>
+              <p>Completed Today: {todoDoneDay}</p>
             </div>
             <div className="metric-card">
-              <h3>Kanban Boards</h3>
-              <Link to="/kanban" className="text-blue-600 underline">View Boards</Link>
+              <h3 className="metric-title">Kanban Boards</h3>
+              <div className="metric-value">{boards.length}</div>
+              <p>Today: {boardDay} &middot; Week: {boardWeek}</p>
+            </div>
+            <div className="metric-card">
+              <h3 className="metric-title">7 Day Activity</h3>
+              <Sparkline data={sevenDayTotals} />
             </div>
           </div>
           <div className="tiles-grid">
@@ -139,8 +180,8 @@ export default function DashboardPage(): JSX.Element {
                 <h2>Mind Maps</h2>
                 <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
               </div>
-              <ul>
-                {maps.map(m => (
+              <ul className="recent-list">
+                {maps.slice(0, 10).map(m => (
                   <li key={m.id}>
                     <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
                   </li>
@@ -152,19 +193,27 @@ export default function DashboardPage(): JSX.Element {
                 <h2>Todos</h2>
                 <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
               </div>
-              <ul>
-                {todos.map(t => (
+              <ul className="recent-list">
+                {todos.slice(0, 10).map(t => (
                   <li key={t.id}>
-                    {t.title || t.content}
-                    {t.mindmap_id && <span className="text-sm text-gray-500"> (Map: {t.mindmap_id})</span>}
+                    <Link to="/todo-demo">{t.title || t.content}</Link>
                     {t.completed && ' ✓'}
                   </li>
                 ))}
               </ul>
             </div>
             <div className="tile" onClick={handleTileClick}>
-              <h2>Kanban Boards</h2>
-              <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
+              <div className="tile-header">
+                <h2>Kanban Boards</h2>
+                <Link to="/kanban" className="text-blue-600 underline">Open</Link>
+              </div>
+              <ul className="recent-list">
+                {boards.slice(0, 10).map(b => (
+                  <li key={b.id}>
+                    <Link to="/kanban">{b.title || 'Board'}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </>
