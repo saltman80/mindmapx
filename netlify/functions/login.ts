@@ -110,7 +110,8 @@ const handler: Handler = async (
       [email]
     )
 
-    if (result.rowCount === 0) {
+    const count = result.rowCount ?? 0
+    if (count === 0) {
       recent.push(now)
       failedLoginAttempts.set(ip, recent)
       return {

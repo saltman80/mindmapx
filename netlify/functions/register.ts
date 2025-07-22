@@ -77,7 +77,8 @@ export const handler: Handler = async (
       'SELECT id FROM users WHERE email = $1',
       [email]
     )
-    if (existingUser.rowCount > 0) {
+    const count = existingUser.rowCount ?? 0
+    if (count > 0) {
       return {
         statusCode: 409,
         headers: corsHeaders,

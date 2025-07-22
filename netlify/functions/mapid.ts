@@ -79,7 +79,8 @@ async function getMap(mapId: string): Promise<{ id: string; data: MapData; creat
   const client = await getClient()
   try {
     const res = await client.query('SELECT id, data, created_at, updated_at FROM mindmaps WHERE id = $1', [mapId])
-    return res.rowCount > 0 ? res.rows[0] : null
+    const count = res.rowCount ?? 0
+    return count > 0 ? res.rows[0] : null
   } finally {
     client.release()
   }
@@ -92,7 +93,8 @@ async function updateMap(mapId: string, data: MapData): Promise<{ id: string; da
       'UPDATE mindmaps SET data = $2, updated_at = NOW() WHERE id = $1 RETURNING id, data, created_at, updated_at',
       [mapId, data]
     )
-    return res.rowCount > 0 ? res.rows[0] : null
+    const count = res.rowCount ?? 0
+    return count > 0 ? res.rows[0] : null
   } finally {
     client.release()
   }
@@ -102,7 +104,8 @@ async function deleteMap(mapId: string): Promise<number> {
   const client = await getClient()
   try {
     const res = await client.query('DELETE FROM mindmaps WHERE id = $1', [mapId])
-    return res.rowCount
+    const count = res.rowCount ?? 0
+    return count
   } finally {
     client.release()
   }

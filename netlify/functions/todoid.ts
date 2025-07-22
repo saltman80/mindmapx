@@ -34,7 +34,8 @@ async function getTodo(todoId: string, userId: string): Promise<Todo> {
         WHERE t.id = $1 AND t.user_id = $2`,
       [todoId, userId]
     )
-    if (result.rowCount === 0) {
+    const count = result.rowCount ?? 0
+    if (count === 0) {
       throw new Error('NotFound')
     }
     return result.rows[0]
@@ -79,7 +80,8 @@ async function updateTodo(
   const client = await getClient()
   try {
     const result = await client.query(query, values)
-    if (result.rowCount === 0) {
+    const count = result.rowCount ?? 0
+    if (count === 0) {
       throw new Error('NotFound')
     }
     return result.rows[0]
@@ -95,7 +97,8 @@ async function deleteTodo(todoId: string, userId: string): Promise<void> {
       'DELETE FROM todos WHERE id = $1 AND user_id = $2',
       [todoId, userId]
     )
-    if (result.rowCount === 0) {
+    const count = result.rowCount ?? 0
+    if (count === 0) {
       throw new Error('NotFound')
     }
   } finally {

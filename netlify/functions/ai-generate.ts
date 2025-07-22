@@ -60,7 +60,8 @@ export const handler: Handler = async (
         'SELECT 1 FROM mindmaps WHERE id = $1 AND user_id = $2',
         [data.mindMapId, userId]
       )
-      if (ownershipResult.rowCount === 0) {
+      const count = ownershipResult.rowCount ?? 0
+      if (count === 0) {
         return { statusCode: 404, headers, body: JSON.stringify({ error: 'Mind map not found' }) }
       }
 

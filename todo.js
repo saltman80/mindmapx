@@ -187,7 +187,8 @@ async function updateTodo(event, user) {
       updated_at AS "updatedAt"
   `
   const res = await client.query(query, values)
-  if (res.rowCount === 0) {
+  const count = res.rowCount ?? 0
+  if (count === 0) {
     return {
       statusCode: 404,
       headers: jsonHeaders,
@@ -226,7 +227,8 @@ async function deleteTodo(event, user) {
      RETURNING id`,
     [id, user.id]
   )
-  if (res.rowCount === 0) {
+  const countDel = res.rowCount ?? 0
+  if (countDel === 0) {
     return {
       statusCode: 404,
       headers: jsonHeaders,

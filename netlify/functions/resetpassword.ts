@@ -55,7 +55,8 @@ async function updatePassword(userId: string, newPassword: string): Promise<void
       'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
       [passwordHash, userId]
     )
-    if (result.rowCount === 0) throw new Error('User not found')
+    const count = result.rowCount ?? 0
+    if (count === 0) throw new Error('User not found')
     await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId])
     await client.query('COMMIT')
   } catch (err) {
