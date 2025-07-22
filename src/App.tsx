@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Homepage from '../homepage'
 import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
@@ -25,6 +25,7 @@ import NotFound from './NotFound'
 import Header from './header'
 import Footer from './footer'
 import ScrollToTop from './ScrollToTop'
+import SidebarNav from './SidebarNav'
 
 function AppRoutes() {
   return (
@@ -55,13 +56,31 @@ function AppRoutes() {
   )
 }
 
+function AppLayout() {
+  const location = useLocation()
+  const isDashboard = location.pathname.startsWith('/dashboard')
+
+  return isDashboard ? (
+    <div className="app-layout">
+      <SidebarNav />
+      <div className="app-content">
+        <AppRoutes />
+      </div>
+    </div>
+  ) : (
+    <>
+      <Header />
+      <AppRoutes />
+      <Footer />
+    </>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <Header />
       <ScrollToTop />
-      <AppRoutes />
-      <Footer />
+      <AppLayout />
     </BrowserRouter>
   )
 }
