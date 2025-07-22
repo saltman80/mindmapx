@@ -700,6 +700,11 @@ hr {
   font-weight: 800;
   margin-bottom: var(--spacing-md);
 }
+.hero-title .hero-logo {
+  height: 1em;
+  margin-right: var(--spacing-sm);
+  vertical-align: middle;
+}
 
 .header {
   position: sticky;
