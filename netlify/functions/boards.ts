@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 
 let boards = [
-  { id: 'demo1', title: 'Demo Board', created_at: new Date().toISOString() }
+  { id: 'demo1', title: 'Board 1', created_at: new Date().toISOString() }
 ]
 
 export const handler = async (

@@ -31,10 +31,17 @@ interface BoardItem {
   created_at?: string
 }
 
+interface NodeItem {
+  id: string
+  createdAt?: string
+  created_at?: string
+}
+
 export default function DashboardPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [boards, setBoards] = useState<BoardItem[]>([])
+  const [nodes, setNodes] = useState<NodeItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -45,10 +52,11 @@ export default function DashboardPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const [mapsRes, todosRes, boardsRes] = await Promise.all([
+      const [mapsRes, todosRes, boardsRes, nodesRes] = await Promise.all([
         fetch('/.netlify/functions/index', { credentials: 'include' }),
         fetch('/.netlify/functions/list', { credentials: 'include' }),
         fetch('/.netlify/functions/boards', { credentials: 'include' }),
+        fetch('/.netlify/functions/node', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -61,9 +69,14 @@ export default function DashboardPage(): JSX.Element {
         ? await boardsRes.json()
         : { boards: [] }
       const boardsList: BoardItem[] = Array.isArray(boardsJson) ? boardsJson : boardsJson.boards || []
+      const nodesJson = nodesRes.ok && nodesRes.headers.get('content-type')?.includes('application/json')
+        ? await nodesRes.json()
+        : { nodes: [] }
+      const nodesList: NodeItem[] = Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes || []
       setMaps(Array.isArray(mapsData) ? mapsData : [])
       setTodos(todoList)
       setBoards(boardsList)
+      setNodes(nodesList)
     } catch (err: any) {
       setError(err.message || 'Failed to load data')
     } finally {
@@ -148,9 +161,16 @@ export default function DashboardPage(): JSX.Element {
   const oneWeek = 7 * oneDay
   const dayAgo = now - oneDay
   const weekAgo = now - oneWeek
+  const twoWeekAgo = now - 2 * oneWeek
 
   const mapDay = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
   const mapWeek = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
+
+  const nodesThisWeek = nodes.filter(n => new Date(n.createdAt || n.created_at || '').getTime() > weekAgo).length
+  const nodesLastWeek = nodes.filter(n => {
+    const t = new Date(n.createdAt || n.created_at || '').getTime()
+    return t > twoWeekAgo && t <= weekAgo
+  }).length
 
   const todoAddedDay = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
   const todoAddedWeek = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
@@ -160,8 +180,8 @@ export default function DashboardPage(): JSX.Element {
   const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
   const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
 
-  const mapTrend = Array.from({ length: 7 }, (_v, i) => {
-    const start = new Date(now - (6 - i) * oneDay)
+  const mapTrend = Array.from({ length: 14 }, (_v, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
     return maps.filter(m => {
@@ -170,23 +190,33 @@ export default function DashboardPage(): JSX.Element {
     }).length
   })
 
-  const todoTrend = Array.from({ length: 7 }, (_v, i) => {
-    const start = new Date(now - (6 - i) * oneDay)
+  const todoTrend = Array.from({ length: 14 }, (_v, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
     return todos.filter(t => {
-      const t1 = new Date(t.createdAt || t.created_at || '').getTime()
-      return t1 >= start.getTime() && t1 < end
+      const t1 = new Date(t.updatedAt || t.updated_at || '').getTime()
+      return t.completed && t1 >= start.getTime() && t1 < end
     }).length
   })
 
-  const boardTrend = Array.from({ length: 7 }, (_v, i) => {
-    const start = new Date(now - (6 - i) * oneDay)
+  const boardTrend = Array.from({ length: 14 }, (_v, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
     return boards.filter(b => {
       const t2 = new Date(b.createdAt || b.created_at || '').getTime()
       return t2 >= start.getTime() && t2 < end
+    }).length
+  })
+
+  const nodeTrend = Array.from({ length: 14 }, (_v, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
+    start.setHours(0, 0, 0, 0)
+    const end = start.getTime() + oneDay
+    return nodes.filter(n => {
+      const tn = new Date(n.createdAt || n.created_at || '').getTime()
+      return tn >= start.getTime() && tn < end
     }).length
   })
 
@@ -217,19 +247,21 @@ export default function DashboardPage(): JSX.Element {
               <h3 className="metric-title">Mind Maps</h3>
               <div className="metric-value">{maps.length}</div>
               <p>Today: {mapDay} &middot; Week: {mapWeek}</p>
-              <Sparkline data={mapTrend} />
+              <p>Nodes: {nodesThisWeek} vs {nodesLastWeek}</p>
+              <Sparkline data={nodeTrend} />
             </div>
             <div className="metric-card">
               <h3 className="metric-title">Todos</h3>
               <div className="metric-value">{todos.length}</div>
-              <p>Added Today: {todoAddedDay}</p>
-              <p>Completed Today: {todoDoneDay}</p>
+              <p>Added Week: {todoAddedWeek}</p>
+              <p>Completed Week: {todoDoneWeek}</p>
               <Sparkline data={todoTrend} />
             </div>
             <div className="metric-card">
               <h3 className="metric-title">Kanban Boards</h3>
               <div className="metric-value">{boards.length}</div>
               <p>Today: {boardDay} &middot; Week: {boardWeek}</p>
+              <p>Cards Added: 0 Completed: 0</p>
               <Sparkline data={boardTrend} />
             </div>
           </div>
