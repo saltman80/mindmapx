@@ -72,4 +72,4 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   }
 }
 
-module.exports = { handler }
+
