@@ -66,7 +66,7 @@ export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ): Promise<HandlerResponse> => {
-  await cors(event, context)
+  await cors()
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
