@@ -58,7 +58,19 @@ function AppRoutes() {
 
 function AppLayout() {
   const location = useLocation()
-  const isDashboard = location.pathname.startsWith('/dashboard')
+  const dashboardPaths = [
+    '/dashboard',
+    '/mindmaps',
+    '/todos',
+    '/kanban',
+    '/team-members',
+    '/profile',
+    '/billing',
+    '/account'
+  ]
+  const isDashboard = dashboardPaths.some(path =>
+    location.pathname.startsWith(path)
+  )
 
   return isDashboard ? (
     <div className="app-layout">
