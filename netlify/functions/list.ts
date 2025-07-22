@@ -37,27 +37,32 @@ export const handler: Handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {
-  const commonHeaders = {
+  const commonHeaders: Record<string, string> = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
   }
 
   if (event.httpMethod === 'OPTIONS') {
+    const headers: Record<string, string> = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+    }
     return {
       statusCode: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-      },
+      headers,
       body: '',
     }
   }
 
   if (event.httpMethod !== 'GET') {
+    const headers: Record<string, string> = {
+      ...commonHeaders,
+      Allow: 'GET,OPTIONS'
+    }
     return {
       statusCode: 405,
-      headers: { ...commonHeaders, Allow: 'GET,OPTIONS' },
+      headers,
       body: JSON.stringify({ error: 'Method Not Allowed' }),
     }
   }
