@@ -8,7 +8,7 @@ function netlifyRedirect() {
       this.emitFile({
         type: 'asset',
         fileName: '_redirects',
-        source: '/* /index.html 200\n'
+        source: '/api/* /.netlify/functions/:splat 200\n/* /index.html 200\n'
       })
     }
   }
