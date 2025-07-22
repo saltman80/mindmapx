@@ -8,6 +8,7 @@ interface Member {
 
 export default function TeamMembers() {
   const [members, setMembers] = useState<Member[]>([])
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -29,9 +30,10 @@ export default function TeamMembers() {
       const res = await fetch('/.netlify/functions/team-members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ name, email }),
       })
       if (!res.ok) throw new Error('Failed to add member')
+      setName('')
       setEmail('')
       loadMembers()
     } catch (err: any) {
@@ -47,15 +49,24 @@ export default function TeamMembers() {
     <div className="max-w-md mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Team Members</h1>
       {error && <div className="text-red-600 mb-2">{error}</div>}
-      <form onSubmit={addMember} className="mb-4 flex gap-2">
+      <form onSubmit={addMember} className="mb-4 flex flex-col gap-2">
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Name"
+          className="border px-2 py-1"
+          required
+        />
         <input
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="Email"
-          className="border px-2 py-1 flex-grow"
+          className="border px-2 py-1"
+          required
         />
-        <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded">
+        <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded self-start">
           Add
         </button>
       </form>
