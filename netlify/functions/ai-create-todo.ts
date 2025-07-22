@@ -1,4 +1,5 @@
-import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { HandlerEvent, HandlerContext } from '@netlify/functions'
+import type { Handler } from './types.js'
 import OpenAI from 'openai'
 
 const openaiKey = process.env.OPENAI_API_KEY
