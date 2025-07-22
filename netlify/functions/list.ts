@@ -6,21 +6,21 @@ import { extractToken, verifySession } from './auth.js'
 const MAX_PAGE = 100
 
 const QuerySchema = z.object({
-  page: z.preprocess(val => {
+  page: z.preprocess((val: unknown) => {
     if (typeof val === 'string') {
       const n = parseInt(val, 10)
       return isNaN(n) ? undefined : n
     }
     return undefined
   }, z.number().int().min(1).max(MAX_PAGE).default(1)),
-  limit: z.preprocess(val => {
+  limit: z.preprocess((val: unknown) => {
     if (typeof val === 'string') {
       const n = parseInt(val, 10)
       return isNaN(n) ? undefined : n
     }
     return undefined
   }, z.number().int().positive().max(100).default(20)),
-  completed: z.preprocess(val => {
+  completed: z.preprocess((val: unknown) => {
     if (typeof val === 'string') {
       const v = val.toLowerCase()
       if (v === 'true') return true

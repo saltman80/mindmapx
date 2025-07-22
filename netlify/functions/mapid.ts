@@ -15,7 +15,11 @@ const MapResponseSchema = z.object({
 function createResponse(statusCode: number, body?: unknown, headers: Record<string, string> = {}) {
   const defaultHeaders = { 'Content-Type': 'application/json' }
   const response: any = { statusCode, headers: { ...defaultHeaders, ...headers } }
-  if (body !== undefined) response.body = JSON.stringify(body)
+  if (body !== undefined) {
+    response.body = JSON.stringify(body)
+  } else {
+    response.body = ''
+  }
   return response
 }
 
