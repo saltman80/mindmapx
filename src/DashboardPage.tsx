@@ -157,6 +157,16 @@ export default function DashboardPage(): JSX.Element {
     }).length
   })
 
+  const dateSort = (a: { createdAt?: string; created_at?: string; updatedAt?: string; updated_at?: string }, b: { createdAt?: string; created_at?: string; updatedAt?: string; updated_at?: string }): number => {
+    const aTime = new Date(a.updatedAt || a.updated_at || a.createdAt || a.created_at || '').getTime()
+    const bTime = new Date(b.updatedAt || b.updated_at || b.createdAt || b.created_at || '').getTime()
+    return bTime - aTime
+  }
+
+  const recentMaps = [...maps].sort(dateSort).slice(0, 10)
+  const recentTodos = [...todos].sort(dateSort).slice(0, 10)
+  const recentBoards = [...boards].sort(dateSort).slice(0, 10)
+
   return (
     <div className="dashboard-page relative overflow-hidden">
       <FaintMindmapBackground className="mindmap-bg-small" />
@@ -194,10 +204,13 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Mind Maps</h2>
-                <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+                <div className="tile-actions">
+                  <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+                  <Link to="/mindmaps" className="tile-link">Open</Link>
+                </div>
               </div>
               <ul className="recent-list">
-                {maps.slice(0, 10).map(m => (
+                {recentMaps.map(m => (
                   <li key={m.id}>
                     <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
                   </li>
@@ -207,10 +220,13 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Todos</h2>
-                <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+                <div className="tile-actions">
+                  <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+                  <Link to="/todos" className="tile-link">Open</Link>
+                </div>
               </div>
               <ul className="recent-list">
-                {todos.slice(0, 10).map(t => (
+                {recentTodos.map(t => (
                   <li key={t.id}>
                     <Link to="/todo-demo">{t.title || t.content}</Link>
                     {t.completed && ' ✓'}
@@ -221,10 +237,13 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header">
                 <h2>Kanban Boards</h2>
-                <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
+                <div className="tile-actions">
+                  <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
+                  <Link to="/kanban" className="tile-link">Open</Link>
+                </div>
               </div>
               <ul className="recent-list">
-                {boards.slice(0, 10).map(b => (
+                {recentBoards.map(b => (
                   <li key={b.id}>
                     <Link to="/kanban">{b.title || 'Board'}</Link>
                   </li>
