@@ -51,7 +51,10 @@ const handler: Handler = async (
   _context: HandlerContext
 ) => {
   try {
-    const userId = await getUserId(event.headers)
+    const sanitizedHeaders = Object.fromEntries(
+      Object.entries(event.headers).filter(([, value]) => typeof value === 'string')
+    ) as Record<string, string>
+    const userId = await getUserId(sanitizedHeaders)
     if (event.httpMethod === "GET") {
       const maps = await getMaps(userId)
       return {
