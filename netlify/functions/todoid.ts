@@ -168,15 +168,16 @@ export const handler: Handler = async (
         }
       }
       default:
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          Allow: 'GET, PUT, DELETE',
+        }
         return {
           statusCode: 405,
-          headers: {
-            'Content-Type': 'application/json',
-            Allow: 'GET, PUT, DELETE',
-          },
+          headers,
           body: JSON.stringify({ error: 'Method Not Allowed' }),
         }
-    }
+      }
   } catch (err: any) {
     if (err.message === 'NotFound') {
       return {
