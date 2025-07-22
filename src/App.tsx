@@ -4,6 +4,9 @@ import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
 import TodoDemo from '../tododemo'
 import Kanban from '../kanban'
+import MindmapsPage from '../MindmapsPage'
+import TodosPage from '../TodosPage'
+import KanbanBoardsPage from '../KanbanBoardsPage'
 import TeamMembers from '../teammembers'
 import ProfilePage from '../profile'
 import BillingPage from '../billing'
@@ -29,7 +32,10 @@ function AppRoutes() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/mindmap-demo" element={<MindmapDemo />} />
       <Route path="/todo-demo" element={<TodoDemo />} />
-      <Route path="/kanban" element={<Kanban />} />
+      <Route path="/kanban-demo" element={<Kanban />} />
+      <Route path="/mindmaps" element={<MindmapsPage />} />
+      <Route path="/todos" element={<TodosPage />} />
+      <Route path="/kanban" element={<KanbanBoardsPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />

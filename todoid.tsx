@@ -40,6 +40,10 @@ export default function TodoPage({ mindmapId }: TodoPageProps) {
   const abortControllers = useRef<AbortController[]>([])
 
   useEffect(() => {
+    localStorage.setItem(`todo_last_viewed_${mindmapId}`, Date.now().toString())
+  }, [mindmapId])
+
+  useEffect(() => {
     const controller = new AbortController()
     abortControllers.current.push(controller)
     setLoading(true)

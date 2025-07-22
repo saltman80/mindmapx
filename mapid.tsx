@@ -22,6 +22,10 @@ export default function MapPage({ mapId }: { mapId: string }): JSX.Element {
   const [loadTrigger, setLoadTrigger] = useState<number>(0)
 
   useEffect(() => {
+    localStorage.setItem(`mindmap_last_viewed_${mapId}`, Date.now().toString())
+  }, [mapId])
+
+  useEffect(() => {
     const controller = new AbortController()
     setLoading(true)
     setLoadError(null)
