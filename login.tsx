@@ -63,7 +63,7 @@ const LoginPage = (): JSX.Element => {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    fetch('/api/login', {
+    fetch('/.netlify/functions/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
