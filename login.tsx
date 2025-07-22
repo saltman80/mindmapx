@@ -73,13 +73,17 @@ const LoginPage = (): JSX.Element => {
       .then(async response => {
         if (!response.ok) {
           let errorMsg = 'Login failed'
-          const contentType = response.headers.get('Content-Type') || ''
-          if (contentType.includes('application/json')) {
-            try {
-              const errorData = await response.json()
-              errorMsg = errorData.error || errorMsg
-            } catch {
-              // ignore parse error
+          if (response.status === 401) {
+            errorMsg = 'Unable to login. Username or password was not found'
+          } else {
+            const contentType = response.headers.get('Content-Type') || ''
+            if (contentType.includes('application/json')) {
+              try {
+                const errorData = await response.json()
+                errorMsg = errorData.error || errorMsg
+              } catch {
+                // ignore parse error
+              }
             }
           }
           throw new Error(errorMsg)
