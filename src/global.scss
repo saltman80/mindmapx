@@ -1736,3 +1736,31 @@ hr {
 .form-actions .btn-ai:hover {
   opacity: 0.9;
 }
+
+.workspace-page .tabs {
+  margin-bottom: var(--spacing-lg);
+}
+
+.workspace-page .tabs button {
+  margin-right: var(--spacing-sm);
+}
+
+.todo-canvas .todo-form input {
+  margin-right: 4px;
+}
+
+.kanban-canvas .card-form {
+  margin-bottom: var(--spacing-sm);
+}
+
+.kanban-canvas .kanban-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.kanban-canvas .kanban-lane {
+  background: var(--color-surface);
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+}

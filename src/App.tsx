@@ -7,6 +7,8 @@ import Kanban from '../kanban'
 import MindmapsPage from '../MindmapsPage'
 import TodosPage from '../TodosPage'
 import KanbanBoardsPage from '../KanbanBoardsPage'
+import ProjectWorkspace from '../ProjectWorkspace'
+import TodoDetail from '../TodoDetail'
 import TeamMembers from '../teammembers'
 import ProfilePage from '../profile'
 import BillingPage from '../billing'
@@ -36,6 +38,8 @@ function AppRoutes() {
       <Route path="/mindmaps" element={<MindmapsPage />} />
       <Route path="/todos" element={<TodosPage />} />
       <Route path="/kanban" element={<KanbanBoardsPage />} />
+      <Route path="/workspace" element={<ProjectWorkspace />} />
+      <Route path="/todo/:id" element={<TodoDetail />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
@@ -54,7 +58,7 @@ function AppRoutes() {
 
 function RouterContent() {
   const location = useLocation()
-  const internal = /^\/(dashboard|mindmaps|todos|kanban|team-members|profile|billing|account)/.test(location.pathname)
+  const internal = /^\/(dashboard|mindmaps|todos|kanban|workspace|team-members|profile|billing|account)/.test(location.pathname)
 
   return internal ? (
     <div className="app-layout">
