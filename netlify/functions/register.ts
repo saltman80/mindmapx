@@ -15,8 +15,9 @@ const registerSchema = z.object({
   name: z.string().min(1).optional(),
 })
 
+const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': allowedOrigin,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Content-Type': 'application/json'

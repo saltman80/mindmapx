@@ -10,6 +10,7 @@ import TermsOfService from '../terms'
 import CheckoutPage from '../checkout'
 
 import LoginPage from './LoginPage'
+import RegisterPage from './RegisterPage'
 import DashboardPage from './DashboardPage'
 import PurchasePage from './PurchasePage'
 import NotFound from './NotFound'
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/purchase" element={<PurchasePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
