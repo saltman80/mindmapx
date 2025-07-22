@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler } from './types.js'
 
 const handler: Handler = async () => ({
   statusCode: 204,
