@@ -8,11 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:functions && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "compile:migrations": "tsc -p tsconfig.migrations.json",
-    "compile:functions": "tsc -p tsconfig.functions.json",
-    "build:functions": "tsc --project tsconfig.functions.json",
     "migrate": "node dist/runmigrations.js",
     "test": "node --test"
   },
