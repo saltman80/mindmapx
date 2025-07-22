@@ -17,6 +17,9 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```bash
    npm run build
    ```
+   This command also compiles the TypeScript Netlify functions into
+   `dist/netlify/functions`. You can compile just the functions by running
+   `npm run build:functions` if you need to verify the output locally.
 
 Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `dist/netlify/functions`.
 
