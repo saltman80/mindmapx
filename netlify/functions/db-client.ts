@@ -11,7 +11,7 @@ console.info(
   `db-client using ${LOCAL_DB ? 'DATABASE_URL' : 'NETLIFY_DATABASE_URL'} connection`
 )
 
-const pool = new Pool({
+export const pool = new Pool({
   connectionString,
   ssl:
     process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
