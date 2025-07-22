@@ -2,7 +2,7 @@
 [build]
   command = "npm install --legacy-peer-deps --production=false && npm run build"
   publish = "dist"
-  functions = "dist/netlify/functions"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
