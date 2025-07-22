@@ -163,6 +163,7 @@ export const handler: Handler = async (
         await deleteTodo(todoId, userId)
         return {
           statusCode: 204,
+          body: ''
         }
       }
       default:

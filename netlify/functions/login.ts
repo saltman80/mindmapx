@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions'
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
@@ -10,7 +10,7 @@ if (!DATABASE_URL || !JWT_SECRET) {
 }
 
 const loginSchema = z.object({
-  email: z.string().email().transform(s => s.trim().toLowerCase()),
+  email: z.string().email().transform((s: string) => s.trim().toLowerCase()),
   password: z.string().min(8),
 })
 

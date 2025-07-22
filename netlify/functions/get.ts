@@ -6,7 +6,7 @@ import { extractToken, verifySession } from './auth.js'
 const QuerySchema = z.object({
   mapId: z.string().uuid().optional(),
   completed: z.preprocess(
-    (val) => {
+    (val: unknown) => {
       if (typeof val === 'string') {
         const lower = val.toLowerCase()
         if (lower === 'true') return true
@@ -18,7 +18,10 @@ const QuerySchema = z.object({
   ).optional()
 })
 
-export const handler: Handler = async (event, context) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  context: HandlerContext
+) => {
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,

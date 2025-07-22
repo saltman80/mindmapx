@@ -27,7 +27,11 @@ export const handler: Handler = async (
   _context: HandlerContext
 ) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers: { Allow: 'POST' }, body: 'Method Not Allowed' }
+    return {
+      statusCode: 405,
+      headers: { 'Content-Type': 'text/plain', Allow: 'POST' },
+      body: 'Method Not Allowed'
+    }
   }
 
   let email: string
@@ -35,11 +39,19 @@ export const handler: Handler = async (
     const body = event.body ? JSON.parse(event.body) : {}
     email = body.email
   } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) }
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid JSON' })
+    }
   }
 
   if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Valid email is required' }) }
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Valid email is required' })
+    }
   }
 
   const normalizedEmail = email.toLowerCase().trim()
@@ -70,13 +82,18 @@ export const handler: Handler = async (
     }
   } catch (err) {
     console.error(err)
-    return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) }
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Internal server error' })
+    }
   } finally {
     client.release()
   }
 
   return {
     statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: 'If that email is registered, you will receive a reset link shortly.' })
   }
 }
