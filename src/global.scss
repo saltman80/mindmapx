@@ -1539,6 +1539,11 @@ hr {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 160px;
+}
+
+.metric-card p {
+  margin: 0;
 }
 
 .metric-title {

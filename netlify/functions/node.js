@@ -73,7 +73,7 @@ export const handler = async (event) => {
       case 'GET': {
         const client = await getClient()
         try {
-          const res = await client.query('SELECT id, data FROM nodes')
+          const res = await client.query('SELECT id, data, created_at FROM nodes')
           return buildResponse(200, { nodes: res.rows })
         } finally {
           client.release()
