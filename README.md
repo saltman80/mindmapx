@@ -13,6 +13,10 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```bash
    npm run migrate
    ```
+3. Build the frontend and serverless functions:
+   ```bash
+   npm run build
+   ```
 
 Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `dist/netlify/functions`.
 
