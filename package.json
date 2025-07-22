@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "deploy-seed": "curl -s https://mindxdo.netlify.app/api/seed-admin || true",
     "build": "vite build",
     "preview": "vite preview",
     "compile:migrations": "tsc -p tsconfig.migrations.json",
