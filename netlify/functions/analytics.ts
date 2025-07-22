@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 
@@ -16,7 +15,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Authorization,Content-Type'
 }
 
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,

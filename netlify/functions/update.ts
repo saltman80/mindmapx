@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 
@@ -52,7 +51,7 @@ const resourceConfigs: Record<string, { table: string; schema: z.ZodTypeAny }> =
   }
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {

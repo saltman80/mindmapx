@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
@@ -23,7 +22,7 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

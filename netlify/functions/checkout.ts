@@ -1,7 +1,6 @@
 import { createCheckoutSession } from './stripeclient.js'
 import { getClient } from './db-client.js'
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function getCorsHeaders(origin?: string) {
@@ -29,7 +28,7 @@ function getCorsHeaders(origin?: string) {
   }
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

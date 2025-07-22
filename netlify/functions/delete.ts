@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { z } from 'zod'
 import { extractToken, verifySession } from './auth.js'
 import { createClient } from '@vercel/postgres'
@@ -14,7 +13,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type,Authorization',
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {

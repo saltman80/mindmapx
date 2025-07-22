@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import Stripe from 'stripe'
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -8,7 +7,7 @@ const HEADERS = {
   'Content-Type': 'application/json'
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

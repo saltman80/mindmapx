@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
@@ -46,7 +45,7 @@ async function createMap(userId: string, data: unknown) {
   }
 }
 
-const handler: Handler = async (
+const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

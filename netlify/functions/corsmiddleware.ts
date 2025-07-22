@@ -1,6 +1,5 @@
-import type { Handler } from './types.js'
 
-const handler: Handler = async () => ({
+const handler = async () => ({
   statusCode: 204,
   headers: {
     'Access-Control-Allow-Origin': '*',

@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import Stripe from 'stripe'
 import { getClient } from './db-client.js'
 const db = {
@@ -19,7 +18,7 @@ if (!stripeSecret || !stripeWebhookSecret) {
 }
 const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' })
 
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers: { Allow: 'POST' }, body: 'Method Not Allowed' }
   }

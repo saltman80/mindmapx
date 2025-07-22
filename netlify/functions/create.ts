@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { createMindMapSchema } from './validationschemas.js'
@@ -18,7 +17,7 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 }
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {

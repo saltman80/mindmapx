@@ -1,5 +1,4 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import type { Handler } from './types.js'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import { extractToken, verifySession } from './auth.js'
@@ -19,7 +18,7 @@ const QuerySchema = z.object({
   ).optional()
 })
 
-export const handler: Handler = async (
+export const handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {
