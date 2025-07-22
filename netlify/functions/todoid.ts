@@ -102,7 +102,10 @@ async function deleteTodo(todoId: string, userId: string): Promise<void> {
   }
 }
 
-export const handler: Handler = async (event, context) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  context: HandlerContext
+) => {
   try {
     const identity = context.clientContext?.identity
     if (!identity || !identity.sub) {

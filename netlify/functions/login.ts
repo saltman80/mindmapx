@@ -25,7 +25,10 @@ const corsHeaders = {
   'Access-Control-Allow-Credentials': 'true'
 }
 
-const handler: Handler = async (event) => {
+const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,

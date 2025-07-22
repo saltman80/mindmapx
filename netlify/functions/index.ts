@@ -45,7 +45,10 @@ async function createMap(userId: string, data: unknown) {
   }
 }
 
-const handler: Handler = async (event) => {
+const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   try {
     const userId = await getUserId(event.headers)
     if (event.httpMethod === "GET") {

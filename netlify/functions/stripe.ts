@@ -25,7 +25,10 @@ declare global {
 
 import { getClient } from './db-client.js'
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   const sig = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
   if (!sig) {
     return { statusCode: 400, body: 'Missing Stripe signature header.' }

@@ -12,7 +12,10 @@ const headers = {
 
 const payloadSchema = z.object({ email: z.string().email() })
 
-export const handler: Handler = async (event) => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers, body: '' }
   }

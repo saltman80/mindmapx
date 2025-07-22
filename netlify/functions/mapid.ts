@@ -19,7 +19,10 @@ function createResponse(statusCode: number, body?: unknown, headers: Record<stri
   return response
 }
 
-export const handler: Handler = async event => {
+export const handler: Handler = async (
+  event: HandlerEvent,
+  _context: HandlerContext
+) => {
   try {
     const path = event.path || ''
     const match = path.match(/^\/api\/maps\/(?<mapId>[0-9A-Fa-f-]{36})\/?$/)
