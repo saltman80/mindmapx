@@ -2,7 +2,11 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { z } from 'zod'
 import { extractToken, verifySession } from './auth.js'
 import { createClient } from '@vercel/postgres'
-const db = createClient({ connectionString: process.env.NETLIFY_DATABASE_URL_UNPOOLED })
+const dbUrl = process.env.NETLIFY_DATABASE_URL_UNPOOLED
+console.info(
+  `delete function using ${dbUrl ? 'NETLIFY_DATABASE_URL_UNPOOLED' : 'missing connection string'}`
+)
+const db = createClient({ connectionString: dbUrl })
 const DeleteRequest = z.object({
   id: z.string().uuid(),
 })
