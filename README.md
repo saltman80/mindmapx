@@ -13,15 +13,15 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```bash
    npm run migrate
    ```
-3. Build the frontend and serverless functions:
-   ```bash
-   npm run build
-   ```
-   This command also compiles the TypeScript Netlify functions into
-   `dist/netlify/functions`. You can compile just the functions by running
-   `npm run build:functions` if you need to verify the output locally.
+3. Build the frontend:
+```bash
+  npm run build
+```
 
-Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `dist/netlify/functions`.
+Netlify automatically compiles the TypeScript functions in
+`netlify/functions/` during deployment.
+
+Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
 
 ## OpenAI Configuration
 
