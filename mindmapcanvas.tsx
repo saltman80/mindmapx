@@ -202,6 +202,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
+          <defs>
+            <pattern
+              id="dot-grid"
+              width="50"
+              height="50"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="1" cy="1" r="1" fill="#ccc" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#dot-grid)" />
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
