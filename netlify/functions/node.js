@@ -1,4 +1,4 @@
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 
 const buildResponse = (statusCode, payload) => {
   const headers = {

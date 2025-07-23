@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 const db = {
   async query(text: string, params?: any[]) {
     const client = await getClient()
