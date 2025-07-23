@@ -10,6 +10,7 @@ interface MapItem {
   title?: string
   createdAt?: string
   created_at?: string
+  data?: { title?: string; [key: string]: any }
 }
 
 interface TodoItem {
@@ -91,14 +92,14 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       if (createType === 'map') {
-        const res = await fetch('/.netlify/functions/create', {
+        const res = await fetch('/.netlify/functions/index', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
         const json = await res.json()
-        if (json?.mindMap?.id) {
-          navigate(`/maps/${json.mindMap.id}`)
+        if (json?.id) {
+          navigate(`/maps/${json.id}`)
         }
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/todos', {
@@ -292,7 +293,7 @@ export default function DashboardPage(): JSX.Element {
               <ul className="recent-list">
                 {recentMaps.map(m => (
                   <li key={m.id}>
-                    <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
+                    <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
                   </li>
                 ))}
               </ul>
