@@ -58,6 +58,21 @@ export default function TodosPage(): JSX.Element {
     }
   }
 
+  const handleAiCreate = async (): Promise<void> => {
+    try {
+      await fetch('/.netlify/functions/ai-create-todo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: form.description }),
+      })
+      setShowModal(false)
+      setForm({ title: '', description: '' })
+      fetchData()
+    } catch (err: any) {
+      alert(err.message || 'AI creation failed')
+    }
+  }
+
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
   const oneWeek = 7 * oneDay
@@ -139,7 +154,11 @@ export default function TodosPage(): JSX.Element {
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>
-                  Create
+                  Quick Create
+                </button>
+                <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
+                  <span className="sparkle" aria-hidden="true">✨</span>
+                  Create With AI
                 </button>
               </div>
             </form>

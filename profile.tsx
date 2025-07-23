@@ -70,38 +70,38 @@ export default function ProfilePage(): JSX.Element {
         {error && <div className="text-red-600 mb-4">{error}</div>}
         {success && <div className="text-green-600 mb-4">Profile updated!</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block mb-1">Name</label>
+        <div className="form-field">
+          <label htmlFor="name" className="form-label">Name</label>
           <input
             id="name"
             name="name"
             value={profile.name}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="form-input"
             required
           />
         </div>
-        <div>
-          <label htmlFor="email" className="block mb-1">Email</label>
+        <div className="form-field">
+          <label htmlFor="email" className="form-label">Email</label>
           <input
             id="email"
             name="email"
             type="email"
             value={profile.email}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="form-input"
             required
           />
         </div>
-        <div>
-          <label htmlFor="address" className="block mb-1">Address</label>
+        <div className="form-field">
+          <label htmlFor="address" className="form-label">Address</label>
           <textarea
             id="address"
             name="address"
             value={profile.address}
             onChange={handleChange}
             rows={3}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="form-input"
           />
         </div>
         <button
