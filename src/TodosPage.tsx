@@ -146,7 +146,7 @@ export default function TodosPage(): JSX.Element {
         </>
       )}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)} aria-hidden="true">
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
             <span className="flare-line" aria-hidden="true"></span>
             <h2 className="fade-item">Create Todo</h2>
