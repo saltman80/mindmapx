@@ -1633,6 +1633,25 @@ hr {
   margin-bottom: var(--spacing-xs);
 }
 
+/* style for create tiles */
+.create-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 150px;
+}
+
+.create-tile button {
+  margin-top: var(--spacing-md);
+}
+
+.create-help {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
