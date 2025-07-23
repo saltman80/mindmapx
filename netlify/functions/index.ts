@@ -35,6 +35,7 @@ export const handler = async (
 ) => {
   try {
     const token = extractToken(event)
+    console.log('Token:', token)
     if (!token) {
       return {
         statusCode: 401,
@@ -45,12 +46,15 @@ export const handler = async (
     let userId: string
     try {
       const session = verifySession(token)
+      console.log('Session:', session)
       userId = session.userId
-    } catch {
+      if (!userId) throw new Error('Missing userId')
+    } catch (err) {
+      console.error('Auth failure in index.ts:', err)
       return {
         statusCode: 401,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid token' })
+        body: JSON.stringify({ error: 'Invalid session' })
       }
     }
     if (event.httpMethod === "GET") {
@@ -69,14 +73,14 @@ export const handler = async (
           body: JSON.stringify({ error: "Missing request body" }),
         }
       }
-      let payload: unknown
+      let payload: unknown = {}
       try {
-        payload = JSON.parse(event.body)
+        payload = JSON.parse(event.body || '{}')
       } catch {
         return {
           statusCode: 400,
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ error: "Invalid JSON" }),
+          body: JSON.stringify({ error: "Invalid JSON body" }),
         }
       }
       let parsed
