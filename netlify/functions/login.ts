@@ -160,11 +160,10 @@ export const handler = async (
     )
 
     const cookieParts = [
-      `session=${token}`,
+      `token=${token}`,
       'HttpOnly',
       'Path=/',
-      'SameSite=Lax',
-      'Max-Age=3600'
+      'SameSite=Lax'
     ]
 
     if (process.env.NODE_ENV === 'production') {
