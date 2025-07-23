@@ -131,7 +131,7 @@ export default function KanbanBoardsPage(): JSX.Element {
                 <div className="tile-header">
                   <h2>{b.title || 'Board'}</h2>
                   <Link
-                    to="/kanban"
+                    to={`/kanban/${b.id}`}
                     onClick={() =>
                       localStorage.setItem(
                         `board_last_viewed_${b.id}`,
