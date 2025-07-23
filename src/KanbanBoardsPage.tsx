@@ -21,7 +21,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ title: '' })
+  const [form, setForm] = useState({ title: '', description: '' })
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
@@ -46,13 +46,28 @@ export default function KanbanBoardsPage(): JSX.Element {
       await fetch('/.netlify/functions/boards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: form.title }),
+        body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)
-      setForm({ title: '' })
+      setForm({ title: '', description: '' })
       fetchData()
     } catch (err: any) {
       alert(err.message || 'Creation failed')
+    }
+  }
+
+  const handleAiCreate = async (): Promise<void> => {
+    try {
+      await fetch('/.netlify/functions/ai-create-board', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: form.title, description: form.description }),
+      })
+      setShowModal(false)
+      setForm({ title: '', description: '' })
+      fetchData()
+    } catch (err: any) {
+      alert(err.message || 'AI creation failed')
     }
   }
 
@@ -126,14 +141,22 @@ export default function KanbanBoardsPage(): JSX.Element {
             <form onSubmit={handleCreate}>
               <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
                 <label htmlFor="title" className="form-label">Title</label>
-                <input id="title" className="form-input" value={form.title} onChange={e => setForm({ title: e.target.value })} required />
+                <input id="title" className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+              </div>
+              <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
+                <label htmlFor="desc" className="form-label">Description</label>
+                <textarea id="desc" className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
-                <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.2s' }} onClick={() => setShowModal(false)}>
+                <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.2s' }}>
-                  Create
+                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>
+                  Quick Create
+                </button>
+                <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
+                  <span className="sparkle" aria-hidden="true">✨</span>
+                  Create With AI
                 </button>
               </div>
             </form>

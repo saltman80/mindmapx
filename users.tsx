@@ -140,6 +140,7 @@ export default function UsersPage(): JSX.Element {
           value={searchInput}
           onChange={handleSearchChange}
           disabled={loading}
+          className="form-input"
         />
         <button
           onClick={() => handleDeactivateUsers(Array.from(selectedUserIds))}
