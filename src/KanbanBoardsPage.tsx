@@ -52,8 +52,10 @@ export default function KanbanBoardsPage(): JSX.Element {
     try {
       await fetch('/.netlify/functions/boards', {
         method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
+        credentials: 'include', // Required for session cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)
@@ -68,8 +70,10 @@ export default function KanbanBoardsPage(): JSX.Element {
     try {
       await fetch('/.netlify/functions/ai-create-board', {
         method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
+        credentials: 'include', // Required for session cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)

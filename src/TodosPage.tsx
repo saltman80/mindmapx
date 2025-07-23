@@ -54,8 +54,10 @@ export default function TodosPage(): JSX.Element {
     try {
       await fetch('/.netlify/functions/todos', {
         method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
+        credentials: 'include', // Required for session cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)

@@ -56,8 +56,10 @@ export default function MindmapsPage(): JSX.Element {
     try {
       const res = await fetch('/.netlify/functions/index', {
         method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
+        credentials: 'include', // Required for session cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ data: { title: form.title, description: form.description } }),
       })
       const json = await res.json()

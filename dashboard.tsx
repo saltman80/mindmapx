@@ -72,15 +72,19 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         await fetch('/.netlify/functions/index', {
           method: 'POST',
-          credentials: 'include',
-          headers: authHeaders(),
+          credentials: 'include', // Required for session cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
       } else {
         await fetch('/.netlify/functions/todos', {
           method: 'POST',
-          credentials: 'include',
-          headers: authHeaders(),
+          credentials: 'include', // Required for session cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       }
@@ -97,8 +101,10 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
-          credentials: 'include',
-          headers: authHeaders(),
+          credentials: 'include', // Required for session cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             title: form.title,
             description: form.description,
@@ -108,8 +114,10 @@ export default function DashboardPage(): JSX.Element {
       } else {
         await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
-          credentials: 'include',
-          headers: authHeaders(),
+          credentials: 'include', // Required for session cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ prompt: form.description }),
         })
       }
