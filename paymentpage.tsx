@@ -1,3 +1,5 @@
+import { authFetch } from './authFetch'
+
 const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY
 const PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID
 
@@ -18,7 +20,9 @@ const PaymentPage: React.FC = (): JSX.Element => {
     setError(null)
 
     try {
-      const res = await fetch('/.netlify/functions/create-checkout-session', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId: PRICE_ID }),

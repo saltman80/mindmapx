@@ -98,7 +98,11 @@ const LoginPage = (): JSX.Element => {
           throw new Error('Failed to parse server response')
         }
       })
-      .then(() => {
+      .then(data => {
+        const { token } = data as { token?: string }
+        if (token) {
+          localStorage.setItem('token', token)
+        }
         navigate('/dashboard')
       })
       .catch(err => {

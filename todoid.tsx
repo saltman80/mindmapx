@@ -1,5 +1,9 @@
+import { authFetch } from './authFetch'
+
 async function loadTodos(mindmapId: string, signal?: AbortSignal): Promise<Todo[]> {
-  const res = await fetch(`/.netlify/functions/getTodos?mindmapId=${mindmapId}`, { signal })
+  const token = localStorage.getItem('token')
+  if (!token) return []
+  const res = await authFetch(`/.netlify/functions/getTodos?mindmapId=${mindmapId}`, { signal })
   if (!res.ok) {
     const err = await res.text()
     throw new Error(err || 'Failed to load todos')
@@ -9,7 +13,9 @@ async function loadTodos(mindmapId: string, signal?: AbortSignal): Promise<Todo[
 }
 
 async function generateAIPrompt(prompt: string, signal?: AbortSignal): Promise<string> {
-  const res = await fetch(`/.netlify/functions/generateAIPrompt`, {
+  const token = localStorage.getItem('token')
+  if (!token) return ''
+  const res = await authFetch(`/.netlify/functions/generateAIPrompt`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
@@ -81,7 +87,9 @@ export default function TodoPage({ mindmapId }: TodoPageProps) {
     const controller = new AbortController()
     abortControllers.current.push(controller)
     try {
-      const res = await fetch(`/.netlify/functions/createTodo`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/createTodo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mindmapId, title } as TodoInput),
@@ -106,7 +114,9 @@ export default function TodoPage({ mindmapId }: TodoPageProps) {
     const controller = new AbortController()
     abortControllers.current.push(controller)
     try {
-      const res = await fetch(`/.netlify/functions/updateTodo`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/updateTodo`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todo),
@@ -131,7 +141,9 @@ export default function TodoPage({ mindmapId }: TodoPageProps) {
     const controller = new AbortController()
     abortControllers.current.push(controller)
     try {
-      const res = await fetch(`/.netlify/functions/deleteTodo`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/deleteTodo`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),

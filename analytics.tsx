@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react'
+import { authFetch } from './authFetch'
+
 const formatDateInput = (date: Date): string => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -47,7 +50,12 @@ export default function AnalyticsPage(): JSX.Element {
           start: dateRange.start.toISOString(),
           end: dateRange.end.toISOString(),
         })
-        const res = await fetch(`/.netlify/functions/analytics?${params.toString()}`, { signal })
+        const token = localStorage.getItem('token')
+        if (!token) {
+          setLoading(false)
+          return
+        }
+        const res = await authFetch(`/.netlify/functions/analytics?${params.toString()}`, { signal })
         if (!res.ok) {
           const errText = await res.text()
           throw new Error(errText || res.statusText)

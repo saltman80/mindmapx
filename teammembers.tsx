@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { authFetch } from './authFetch'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
 
@@ -24,7 +25,9 @@ export default function TeamMembers() {
 
   async function loadMembers() {
     try {
-      const res = await fetch('/.netlify/functions/team-members')
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/team-members')
       if (!res.ok) throw new Error('Failed to load members')
       const data = await res.json()
       setMembers(data.members)
@@ -37,7 +40,9 @@ export default function TeamMembers() {
     e.preventDefault()
     setError(null)
     try {
-      const res = await fetch('/.netlify/functions/team-members', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/team-members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email }),
