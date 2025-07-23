@@ -69,17 +69,26 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
       if (createType === 'map') {
-        await authFetch('/.netlify/functions/index', {
+        await fetch('/.netlify/functions/index', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
       } else {
-        await authFetch('/.netlify/functions/todos', {
+        await fetch('/.netlify/functions/todos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       }
@@ -94,11 +103,17 @@ export default function DashboardPage(): JSX.Element {
   const handleAiCreate = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
       if (createType === 'map') {
-        await authFetch('/.netlify/functions/ai-create-mindmap', {
+        await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             title: form.title,
             description: form.description,
@@ -106,9 +121,12 @@ export default function DashboardPage(): JSX.Element {
           }),
         })
       } else {
-        await authFetch('/.netlify/functions/ai-create-todo', {
+        await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ prompt: form.description }),
         })
       }

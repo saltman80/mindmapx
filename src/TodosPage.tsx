@@ -52,10 +52,16 @@ export default function TodosPage(): JSX.Element {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
-      await authFetch('/.netlify/functions/todos', {
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
+      await fetch('/.netlify/functions/todos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)
@@ -69,10 +75,16 @@ export default function TodosPage(): JSX.Element {
   const handleAiCreate = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
-      await authFetch('/.netlify/functions/ai-create-todo', {
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
+      await fetch('/.netlify/functions/ai-create-todo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ prompt: form.description }),
       })
       setShowModal(false)

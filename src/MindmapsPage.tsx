@@ -51,10 +51,16 @@ export default function MindmapsPage(): JSX.Element {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
-      const res = await authFetch('/.netlify/functions/index', {
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
+      const res = await fetch('/.netlify/functions/index', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ data: { title: form.title, description: form.description } }),
       })
       const json = await res.json()
@@ -73,10 +79,16 @@ export default function MindmapsPage(): JSX.Element {
   const handleAiCreate = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
-      const res = await authFetch('/.netlify/functions/ai-create-mindmap', {
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
+      const res = await fetch('/.netlify/functions/ai-create-mindmap', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           title: form.title,
           description: form.description,
