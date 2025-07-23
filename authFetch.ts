@@ -9,5 +9,9 @@ export async function authFetch(
     const extra = new Headers(init.headers);
     extra.forEach((value, key) => headers.set(key, value));
   }
-  return fetch(input, { ...init, headers });
+  return fetch(input, {
+    ...init,
+    headers,
+    credentials: init.credentials ?? 'include',
+  });
 }
