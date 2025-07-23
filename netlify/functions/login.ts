@@ -160,7 +160,7 @@ export const handler = async (
     )
 
     const cookieParts = [
-      `token=${token}`,
+      `session=${token}`,
       'HttpOnly',
       'Path=/',
       'SameSite=Lax'

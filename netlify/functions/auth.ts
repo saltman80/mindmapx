@@ -15,7 +15,7 @@ export function extractToken(event: HandlerEvent): string | null {
     return auth.slice(7)
   }
   const cookies = cookie.parse(event.headers.cookie || '')
-  return cookies.token || cookies.session || null
+  return cookies.session || null
 }
 
 export function verifySession(token: string): SessionPayload {
