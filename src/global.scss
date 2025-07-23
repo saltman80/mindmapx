@@ -1518,8 +1518,23 @@ hr {
 }
 
 .dashboard-title {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-xl);
+}
+.dashboard-title .dashboard-logo {
+  height: 60px;
+  vertical-align: middle;
+}
+@media (max-width: 640px) {
+  .dashboard-title {
+    flex-direction: column;
+  }
+  .dashboard-title .dashboard-logo {
+    margin-bottom: var(--spacing-sm);
+  }
 }
 
 .metrics-grid {

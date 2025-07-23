@@ -91,6 +91,7 @@ export default function TodoDashboard() {
 
   return (
     <div className="todo-dashboard">
+  <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos</h1>
       <div className="controls">
         <div className="filters">
           <button disabled={filter === 'all'} onClick={() => handleFilter('all')}>All</button>

@@ -96,7 +96,7 @@ export default function DashboardPage(): JSX.Element {
 
   return (
     <div className="dashboard-page">
-      <h1 className="dashboard-title">Dashboard</h1>
+      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Dashboard</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
       ) : error ? (
