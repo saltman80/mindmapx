@@ -1730,6 +1730,20 @@ hr {
   border-radius: 8px;
 }
 
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 4px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-duration) var(--transition-ease);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-warning);
+}
+
 .tile-header button {
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
