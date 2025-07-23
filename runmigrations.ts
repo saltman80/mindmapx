@@ -96,6 +96,31 @@ export async function runMigrations(): Promise<void> {
       );
     `)
 
+    // Kanban boards table for task organization
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS kanban_boards (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `)
+
+    // Ensure description column exists on todos
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'todos' AND column_name = 'description'
+        ) THEN
+          ALTER TABLE todos ADD COLUMN description TEXT;
+        END IF;
+      END;
+      $$;
+    `)
+
     // Ensure columns used in later indexes exist before index creation. The
     // mindmap_id columns are already created in the SQL migration files, so no
     // additional ALTER TABLE checks are required here.
