@@ -9,6 +9,7 @@ interface MapItem {
   title?: string
   createdAt?: string
   created_at?: string
+  data?: { title?: string; [key: string]: any }
 }
 
 interface TodoItem {
@@ -62,10 +63,10 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       if (createType === 'map') {
-        await fetch('/.netlify/functions/create', {
+        await fetch('/.netlify/functions/index', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
       } else {
         await fetch('/.netlify/functions/todos', {
@@ -170,7 +171,7 @@ export default function DashboardPage(): JSX.Element {
               <ul>
                 {maps.map(m => (
                   <li key={m.id}>
-                    <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
+                    <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
                   </li>
                 ))}
               </ul>

@@ -9,6 +9,7 @@ interface MapItem {
   title?: string
   createdAt?: string
   created_at?: string
+  data?: { title?: string; [key: string]: any }
 }
 
 const getLastViewed = (id: string): number => {
@@ -43,16 +44,16 @@ export default function MindmapsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const res = await fetch('/.netlify/functions/create', {
+      const res = await fetch('/.netlify/functions/index', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ data: { title: form.title, description: form.description } }),
       })
       const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      if (json?.mindMap?.id) {
-        navigate(`/maps/${json.mindMap.id}`)
+      if (json?.id) {
+        navigate(`/maps/${json.id}`)
       } else {
         fetchData()
       }
@@ -129,7 +130,7 @@ export default function MindmapsPage(): JSX.Element {
           {sorted.map(m => (
             <div className="tile" key={m.id}>
               <div className="tile-header">
-                <h2>{m.title || 'Untitled Map'}</h2>
+                <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
                 <Link
                   to={`/maps/${m.id}`}
                   onClick={() =>
