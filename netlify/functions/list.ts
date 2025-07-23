@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import { getClient } from './db-client'
 import { z, ZodError } from 'zod'
-import { extractToken, verifySession } from './auth.js'
+import { extractToken, verifySession } from './auth'
 
 const MAX_PAGE = 100
 
