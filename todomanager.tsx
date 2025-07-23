@@ -1,3 +1,5 @@
+import { authFetch } from './authFetch'
+
 export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
   const [todos, setTodos] = useState<Todo[]>(initialTodos)
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -50,7 +52,9 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     const input: TodoInput = { title: newTitle.trim() }
     if (newDescription.trim()) input.description = newDescription.trim()
     try {
-      const res = await fetch('/.netlify/functions/todos', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input),
@@ -79,7 +83,9 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     abortControllers.current.push(controller)
     if (isMounted.current) { setLoading(true); setError(null) }
     try {
-      const res = await fetch(`/.netlify/functions/todos/${id}`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/todos/${id}`, {
         method: 'DELETE',
         signal: controller.signal
       })
@@ -108,7 +114,9 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     if (isMounted.current) { setLoading(true); setError(null) }
     const updatedCompleted = !todo.completed
     try {
-      const res = await fetch(`/.netlify/functions/todos/${todo.id}`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/todos/${todo.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: updatedCompleted }),
@@ -152,7 +160,9 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     if (editValues.description.trim()) payload.description = editValues.description.trim()
     if (editValues.assigneeId !== undefined) payload.assignee_id = editValues.assigneeId
     try {
-      const res = await fetch(`/.netlify/functions/todos/${id}`, {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch(`/.netlify/functions/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -182,7 +192,9 @@ export default function TodoManager({ todos: initialTodos }: TodoManagerProps) {
     if (isMounted.current) { setLoading(true); setError(null) }
     const ids = Array.from(selectedIds)
     try {
-      const res = await fetch('/.netlify/functions/todos/bulk', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/todos/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids, action: bulkActionType }),

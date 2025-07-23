@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
+import { authFetch } from '../authFetch'
 import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -29,7 +30,12 @@ export default function MindmapsPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/.netlify/functions/index', { credentials: 'include' })
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setLoading(false)
+        return
+      }
+      const res = await authFetch('/.netlify/functions/index', { credentials: 'include' })
       const data = res.ok ? await res.json() : []
       setMaps(Array.isArray(data) ? data : [])
     } catch (err: any) {
@@ -44,7 +50,9 @@ export default function MindmapsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const res = await fetch('/.netlify/functions/index', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/index', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: { title: form.title, description: form.description } }),
@@ -64,7 +72,9 @@ export default function MindmapsPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      const res = await fetch('/.netlify/functions/ai-create-mindmap', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const res = await authFetch('/.netlify/functions/ai-create-mindmap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

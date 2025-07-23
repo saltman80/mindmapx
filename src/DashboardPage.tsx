@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
+import { authFetch } from '../authFetch'
 import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -54,11 +55,16 @@ export default function DashboardPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setLoading(false)
+        return
+      }
       const [mapsRes, todosRes, boardsRes, nodesRes] = await Promise.all([
-        fetch('/.netlify/functions/index', { credentials: 'include' }),
-        fetch('/.netlify/functions/list', { credentials: 'include' }),
-        fetch('/.netlify/functions/boards', { credentials: 'include' }),
-        fetch('/.netlify/functions/node', { credentials: 'include' }),
+        authFetch('/.netlify/functions/index', { credentials: 'include' }),
+        authFetch('/.netlify/functions/list', { credentials: 'include' }),
+        authFetch('/.netlify/functions/boards', { credentials: 'include' }),
+        authFetch('/.netlify/functions/node', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -91,8 +97,10 @@ export default function DashboardPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
+      const token = localStorage.getItem('token')
+      if (!token) return
       if (createType === 'map') {
-        const res = await fetch('/.netlify/functions/index', {
+        const res = await authFetch('/.netlify/functions/index', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
@@ -102,13 +110,13 @@ export default function DashboardPage(): JSX.Element {
           navigate(`/maps/${json.id}`)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/todos', {
+        await authFetch('/.netlify/functions/todos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       } else {
-        await fetch('/.netlify/functions/boards', {
+        await authFetch('/.netlify/functions/boards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title }),
@@ -124,8 +132,10 @@ export default function DashboardPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
+      const token = localStorage.getItem('token')
+      if (!token) return
       if (createType === 'map') {
-        const res = await fetch('/.netlify/functions/ai-create-mindmap', {
+        const res = await authFetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -139,13 +149,13 @@ export default function DashboardPage(): JSX.Element {
           navigate(`/maps/${json.id}`)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/ai-create-todo', {
+        await authFetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: form.description }),
         })
       } else {
-        await fetch('/.netlify/functions/boards', {
+        await authFetch('/.netlify/functions/boards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title }),

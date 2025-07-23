@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
+import { authFetch } from '../authFetch'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -27,7 +28,12 @@ export default function KanbanBoardsPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/.netlify/functions/boards', { credentials: 'include' })
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setLoading(false)
+        return
+      }
+      const res = await authFetch('/.netlify/functions/boards', { credentials: 'include' })
       const json = res.ok ? await res.json() : { boards: [] }
       const list: BoardItem[] = Array.isArray(json) ? json : json.boards || []
       setBoards(list)
@@ -43,7 +49,9 @@ export default function KanbanBoardsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      await fetch('/.netlify/functions/boards', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      await authFetch('/.netlify/functions/boards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: form.title, description: form.description }),
@@ -58,7 +66,9 @@ export default function KanbanBoardsPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      await fetch('/.netlify/functions/ai-create-board', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      await authFetch('/.netlify/functions/ai-create-board', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: form.title, description: form.description }),

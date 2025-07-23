@@ -1,4 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
+import { authFetch } from '../authFetch'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -29,7 +30,12 @@ export default function TodosPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/.netlify/functions/list', { credentials: 'include' })
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setLoading(false)
+        return
+      }
+      const res = await authFetch('/.netlify/functions/list', { credentials: 'include' })
       const json = res.ok ? await res.json() : { data: { todos: [] } }
       const list: TodoItem[] = Array.isArray(json) ? json : json.data?.todos || []
       setTodos(list)
@@ -45,7 +51,9 @@ export default function TodosPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      await fetch('/.netlify/functions/todos', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      await authFetch('/.netlify/functions/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: form.title, description: form.description }),
@@ -60,7 +68,9 @@ export default function TodosPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      await fetch('/.netlify/functions/ai-create-todo', {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      await authFetch('/.netlify/functions/ai-create-todo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: form.description }),

@@ -1,3 +1,5 @@
+import { authFetch } from './authFetch'
+
 const AboutModulePage: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>()
   const [module, setModule] = useState<Module | null>(null)
@@ -20,7 +22,12 @@ const AboutModulePage: React.FC = () => {
 
     const fetchModule = async () => {
       try {
-        const response = await fetch(
+        const token = localStorage.getItem('token')
+        if (!token) {
+          setLoading(false)
+          return
+        }
+        const response = await authFetch(
           `/.netlify/functions/get-module?moduleId=${encodeURIComponent(moduleId)}`,
           { signal: controller.signal }
         )
