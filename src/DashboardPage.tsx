@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
+import { authHeaders } from '../authHeaders'
 import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -105,10 +106,7 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         const res = await fetch('/.netlify/functions/index', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
         const json = await res.json()
@@ -118,19 +116,13 @@ export default function DashboardPage(): JSX.Element {
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/todos', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       } else {
         await fetch('/.netlify/functions/boards', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ title: form.title }),
         })
       }
@@ -152,10 +144,7 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         const res = await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             title: form.title,
             description: form.description,
@@ -169,19 +158,13 @@ export default function DashboardPage(): JSX.Element {
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ prompt: form.description }),
         })
       } else {
         await fetch('/.netlify/functions/boards', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ title: form.title }),
         })
       }

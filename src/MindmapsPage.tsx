@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
+import { authHeaders } from '../authHeaders'
 import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -37,9 +38,7 @@ export default function MindmapsPage(): JSX.Element {
       }
       const res = await fetch('/.netlify/functions/index', {
         credentials: 'include',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders(),
       })
       const data = res.ok ? await res.json() : []
       setMaps(Array.isArray(data) ? data : [])
@@ -62,10 +61,7 @@ export default function MindmapsPage(): JSX.Element {
       }
       const res = await fetch('/.netlify/functions/index', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ data: { title: form.title, description: form.description } }),
       })
       const json = await res.json()
@@ -90,10 +86,7 @@ export default function MindmapsPage(): JSX.Element {
       }
       const res = await fetch('/.netlify/functions/ai-create-mindmap', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders(),
         body: JSON.stringify({
           title: form.title,
           description: form.description,
