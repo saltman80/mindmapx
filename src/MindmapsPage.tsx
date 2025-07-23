@@ -35,7 +35,12 @@ export default function MindmapsPage(): JSX.Element {
         setLoading(false)
         return
       }
-      const res = await authFetch('/.netlify/functions/index', { credentials: 'include' })
+      const res = await fetch('/.netlify/functions/index', {
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       const data = res.ok ? await res.json() : []
       setMaps(Array.isArray(data) ? data : [])
     } catch (err: any) {
