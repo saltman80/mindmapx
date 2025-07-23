@@ -363,7 +363,7 @@ export default function DashboardPage(): JSX.Element {
               <ul className="recent-list">
                 {recentBoards.map(b => (
                   <li key={b.id}>
-                    <Link to="/kanban">{b.title || 'Board'}</Link>
+                    <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
                   </li>
                 ))}
               </ul>

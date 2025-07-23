@@ -7,6 +7,7 @@ import Kanban from '../kanban'
 import MindmapsPage from './MindmapsPage'
 import TodosPage from './TodosPage'
 import KanbanBoardsPage from './KanbanBoardsPage'
+import KanbanBoardPage from './KanbanBoardPage'
 import ProjectWorkspace from '../ProjectWorkspace'
 import MapEditorPage from './MapEditorPage'
 import TodoDetail from '../TodoDetail'
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/mindmaps" element={<MindmapsPage />} />
       <Route path="/todos" element={<TodosPage />} />
       <Route path="/kanban" element={<KanbanBoardsPage />} />
+      <Route path="/kanban/:id" element={<KanbanBoardPage />} />
       <Route path="/maps/:id" element={<MapEditorPage />} />
       <Route path="/workspace" element={<ProjectWorkspace />} />
       <Route path="/todo/:id" element={<TodoDetail />} />
