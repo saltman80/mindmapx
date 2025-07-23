@@ -5,6 +5,13 @@ import { ZodError } from 'zod'
 import { extractToken, verifySession } from './auth'
 import { mapInputSchema } from './validationschemas'
 
+const headers: Record<string, string> = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+}
+
 
 async function getMaps(userId: string) {
   const client = await getClient()
@@ -38,15 +45,15 @@ export const handler = async (
   event: HandlerEvent,
   _context: HandlerContext
 ) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' }
+  }
+
   try {
     const token = extractToken(event)
     console.log('Token:', token)
     if (!token) {
-      return {
-        statusCode: 401,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' })
-      }
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
     }
     let userId: string
     try {
@@ -56,26 +63,19 @@ export const handler = async (
       if (!userId) throw new Error('Missing userId')
     } catch (err) {
       console.error('Auth failure in mindmap.ts:', err)
-      return {
-        statusCode: 401,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid session' })
-      }
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
     }
     if (event.httpMethod === "GET") {
       const maps = await getMaps(userId)
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(maps),
-      }
+      return { statusCode: 200, headers, body: JSON.stringify(maps) }
     }
+
     if (event.httpMethod === "POST") {
       try {
         if (!event.body) {
           return {
             statusCode: 400,
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify({ error: "Missing request body" }),
           }
         }
@@ -85,7 +85,7 @@ export const handler = async (
         } catch {
           return {
             statusCode: 400,
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify({ error: "Invalid JSON body" }),
           }
         }
@@ -104,54 +104,39 @@ export const handler = async (
           if (err instanceof ZodError) {
             return {
               statusCode: 400,
-              headers: { "Content-Type": "application/json" },
+              headers,
               body: JSON.stringify({ error: "Invalid map data", details: err.errors }),
             }
           }
           throw err
         }
         const map = await createMap(userId, parsed.data)
-        return {
-          statusCode: 201,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(map),
-        }
+        return { statusCode: 201, headers, body: JSON.stringify(map) }
       } catch (err: any) {
         console.error('Map creation failed:', err)
         return {
           statusCode: 500,
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({ error: "Map creation failed", details: err.message || String(err) }),
         }
       }
     }
-  const headers: Record<string, string> = {
-    Allow: "GET, POST",
-    "Content-Type": "application/json",
-  }
-  return {
-    statusCode: 405,
-    headers,
-    body: JSON.stringify({ error: "Method not allowed" }),
-  }
+    const allowHeaders: Record<string, string> = { ...headers, Allow: 'GET,POST,OPTIONS' }
+    return {
+      statusCode: 405,
+      headers: allowHeaders,
+      body: JSON.stringify({ error: 'Method not allowed' }),
+    }
   } catch (err: any) {
     if (
       err instanceof JsonWebTokenError ||
       err instanceof TokenExpiredError ||
       err.message === "Unauthorized"
     ) {
-      return {
-        statusCode: 401,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Unauthorized" }),
-      }
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
     }
     console.error("Unhandled error:", err)
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Internal Server Error" }),
-    }
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
   }
 }
 
