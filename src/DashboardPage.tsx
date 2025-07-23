@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -47,6 +47,7 @@ export default function DashboardPage(): JSX.Element {
   const [showModal, setShowModal] = useState(false)
   const [createType, setCreateType] = useState<'map' | 'todo' | 'board'>('map')
   const [form, setForm] = useState({ title: '', description: '' })
+  const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
@@ -90,11 +91,15 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       if (createType === 'map') {
-        await fetch('/.netlify/functions/create', {
+        const res = await fetch('/.netlify/functions/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
         })
+        const json = await res.json()
+        if (json?.mindMap?.id) {
+          navigate(`/maps/${json.mindMap.id}`)
+        }
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/todos', {
           method: 'POST',
@@ -119,7 +124,7 @@ export default function DashboardPage(): JSX.Element {
   const handleAiCreate = async (): Promise<void> => {
     try {
       if (createType === 'map') {
-        await fetch('/.netlify/functions/ai-create-mindmap', {
+        const res = await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -128,6 +133,10 @@ export default function DashboardPage(): JSX.Element {
             prompt: form.description,
           }),
         })
+        const json = await res.json()
+        if (json?.id) {
+          navigate(`/maps/${json.id}`)
+        }
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',

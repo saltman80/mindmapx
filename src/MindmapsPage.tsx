@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -22,6 +22,7 @@ export default function MindmapsPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
+  const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
@@ -42,14 +43,19 @@ export default function MindmapsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      await fetch('/.netlify/functions/create', {
+      const res = await fetch('/.netlify/functions/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.mindMap?.id) {
+        navigate(`/maps/${json.mindMap.id}`)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'Creation failed')
     }
@@ -57,7 +63,7 @@ export default function MindmapsPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      await fetch('/.netlify/functions/ai-create-mindmap', {
+      const res = await fetch('/.netlify/functions/ai-create-mindmap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -66,9 +72,14 @@ export default function MindmapsPage(): JSX.Element {
           prompt: form.description,
         }),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.id) {
+        navigate(`/maps/${json.id}`)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
     }
