@@ -16,7 +16,7 @@ export default function TodoDashboard() {
     setError(null)
     setIsLoadingList(true)
     try {
-      const res = await fetch('/api/todos', { credentials: 'include' })
+      const res = await fetch('/.netlify/functions/todos', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to fetch todos')
       const data = await res.json()
       if (isMounted.current) setTodos(data.todos)
@@ -50,7 +50,7 @@ export default function TodoDashboard() {
     if (ids.length === 0) return
     setIsUpdatingBulk(true)
     try {
-      const res = await fetch('/api/todos/bulk-complete', {
+      const res = await fetch('/.netlify/functions/todos/bulk-complete', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -72,7 +72,7 @@ export default function TodoDashboard() {
     setError(null)
     setIsClearing(true)
     try {
-      const res = await fetch('/api/todos/completed', { method: 'DELETE', credentials: 'include' })
+      const res = await fetch('/.netlify/functions/todos/completed', { method: 'DELETE', credentials: 'include' })
       if (!res.ok) throw new Error('Clear completed failed')
       await loadTodos()
     } catch (err) {

@@ -46,15 +46,15 @@ export default function DashboardPage(): JSX.Element {
       }
       const [mapsRes, todosRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmap', { credentials: 'include' }),
-        authFetch('/.netlify/functions/list', { credentials: 'include' }),
+        authFetch('/.netlify/functions/todos', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
         : []
       const todoJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
         ? await todosRes.json()
-        : { data: { todos: [] } }
-      const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : todoJson.data?.todos || []
+        : []
+      const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : []
       setMaps(Array.isArray(mapsData) ? mapsData : [])
       setTodos(todoList)
     } catch (err: any) {
