@@ -83,44 +83,37 @@ export default function MindmapsPage(): JSX.Element {
       ) : error ? (
         <p className="error">{error}</p>
       ) : (
-        <>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <h3>Total: {maps.length}</h3>
-              <p>Today: {mapDay} Week: {mapWeek}</p>
+        <div className="four-col-grid">
+          <div className="tile">
+            <div className="tile-header">
+              <h2>Create Mind Map</h2>
+              <button onClick={() => setShowModal(true)}>Create</button>
             </div>
           </div>
-          <div className="tiles-grid">
-            <div className="tile">
-              <div className="tile-header">
-                <h2>Create Mind Map</h2>
-                <button onClick={() => setShowModal(true)}>Create</button>
-              </div>
-            </div>
-            <div className="tile">
-              <div className="tile-header">
-                <h2>Your Maps</h2>
-              </div>
-              <ul className="recent-list">
-                {sorted.map(m => (
-                  <li key={m.id}>
-                    <Link
-                      to={`/maps/${m.id}`}
-                      onClick={() =>
-                        localStorage.setItem(
-                          `mindmap_last_viewed_${m.id}`,
-                          Date.now().toString()
-                        )
-                      }
-                    >
-                      {m.title || 'Untitled Map'}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="tile">
+            <h2 className="tile-header">Metrics</h2>
+            <p>Total: {maps.length}</p>
+            <p>Today: {mapDay} Week: {mapWeek}</p>
           </div>
-        </>
+          {sorted.map(m => (
+            <div className="tile" key={m.id}>
+              <div className="tile-header">
+                <h2>{m.title || 'Untitled Map'}</h2>
+                <Link
+                  to={`/maps/${m.id}`}
+                  onClick={() =>
+                    localStorage.setItem(
+                      `mindmap_last_viewed_${m.id}`,
+                      Date.now().toString()
+                    )
+                  }
+                >
+                  Open
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)} aria-hidden="true">

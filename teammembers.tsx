@@ -14,6 +14,14 @@ export default function TeamMembers() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
 
+  async function removeMember(id: string) {
+    setMembers(list => list.filter(m => m.id !== id))
+  }
+
+  async function updateMember(id: string) {
+    console.log('update', id)
+  }
+
   async function loadMembers() {
     try {
       const res = await fetch('/.netlify/functions/team-members')
@@ -51,8 +59,8 @@ export default function TeamMembers() {
     <section className="section relative overflow-hidden">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
+      <h1>Team Members</h1>
       <div className="form-card text-center">
-        <h1 className="text-xl font-bold mb-4">Team Members</h1>
         {error && <div className="text-red-600 mb-2">{error}</div>}
         <form onSubmit={addMember} className="mb-4 flex flex-col gap-2">
           <input
@@ -75,11 +83,20 @@ export default function TeamMembers() {
             Add
           </button>
         </form>
-        <ul className="list-disc pl-5 text-left">
+        <div className="four-col-grid mt-6">
           {members.map(m => (
-            <li key={m.id}>{m.name ? `${m.name} <${m.email}>` : m.email}</li>
+            <div className="tile" key={m.id}>
+              <div className="tile-header">
+                <h2>{m.name || m.email}</h2>
+                <div className="tile-actions">
+                  <button onClick={() => updateMember(m.id)}>Update</button>
+                  <button onClick={() => removeMember(m.id)} className="tile-link">Delete</button>
+                </div>
+              </div>
+              {m.name && <p>{m.email}</p>}
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   )
