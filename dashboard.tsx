@@ -157,7 +157,15 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile">
               <div className="tile-header">
                 <h2>Mind Maps</h2>
-                <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    setCreateType('map')
+                    setShowModal(true)
+                  }}
+                >
+                  Create
+                </button>
               </div>
               <ul>
                 {maps.map(m => (
@@ -170,7 +178,15 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile">
               <div className="tile-header">
                 <h2>Todos</h2>
-                <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    setCreateType('todo')
+                    setShowModal(true)
+                  }}
+                >
+                  Create
+                </button>
               </div>
               <ul>
                 {todos.map(t => (
