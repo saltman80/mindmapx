@@ -98,11 +98,17 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
       if (createType === 'map') {
-        const res = await authFetch('/.netlify/functions/index', {
+        const res = await fetch('/.netlify/functions/index', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
         const json = await res.json()
@@ -110,15 +116,21 @@ export default function DashboardPage(): JSX.Element {
           navigate(`/maps/${json.id}`)
         }
       } else if (createType === 'todo') {
-        await authFetch('/.netlify/functions/todos', {
+        await fetch('/.netlify/functions/todos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       } else {
-        await authFetch('/.netlify/functions/boards', {
+        await fetch('/.netlify/functions/boards', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: form.title }),
         })
       }
@@ -133,11 +145,17 @@ export default function DashboardPage(): JSX.Element {
   const handleAiCreate = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
+      if (!token) {
+        console.warn('No token found in localStorage — cannot create mindmap.')
+        return
+      }
       if (createType === 'map') {
-        const res = await authFetch('/.netlify/functions/ai-create-mindmap', {
+        const res = await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             title: form.title,
             description: form.description,
@@ -149,15 +167,21 @@ export default function DashboardPage(): JSX.Element {
           navigate(`/maps/${json.id}`)
         }
       } else if (createType === 'todo') {
-        await authFetch('/.netlify/functions/ai-create-todo', {
+        await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ prompt: form.description }),
         })
       } else {
-        await authFetch('/.netlify/functions/boards', {
+        await fetch('/.netlify/functions/boards', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: form.title }),
         })
       }
