@@ -1,29 +1,13 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
+import { extractToken, verifySession } from './auth.js'
 
 const mapInputSchema = z.object({
   data: z.record(z.any()),
 })
 
-async function getUserId(headers: { [key: string]: string }): Promise<string> {
-  const authHeader = headers.authorization || headers.Authorization
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new Error("Unauthorized")
-  }
-  const token = authHeader.slice(7)
-  const secret = process.env.JWT_SECRET
-  if (!secret) {
-    console.error("JWT secret not configured")
-    throw new Error("Internal Server Error")
-  }
-  const decoded = verify(token, secret) as { sub?: string }
-  if (!decoded.sub) {
-    throw new Error("Unauthorized")
-  }
-  return decoded.sub
-}
 
 async function getMaps(userId: string) {
   const client = await getClient()
@@ -50,10 +34,25 @@ export const handler = async (
   _context: HandlerContext
 ) => {
   try {
-    const sanitizedHeaders = Object.fromEntries(
-      Object.entries(event.headers).filter(([, value]) => typeof value === 'string')
-    ) as Record<string, string>
-    const userId = await getUserId(sanitizedHeaders)
+    const token = extractToken(event)
+    if (!token) {
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Unauthorized' })
+      }
+    }
+    let userId: string
+    try {
+      const session = verifySession(token)
+      userId = session.userId
+    } catch {
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Invalid token' })
+      }
+    }
     if (event.httpMethod === "GET") {
       const maps = await getMaps(userId)
       return {
