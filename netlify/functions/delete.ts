@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { z } from 'zod'
-import { extractToken, verifySession } from './auth'
+import { extractToken, verifySession } from './auth.js'
 import { createClient } from '@vercel/postgres'
 const dbUrl = process.env.NETLIFY_DATABASE_URL_UNPOOLED
 console.info(

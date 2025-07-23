@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import { extractToken, verifySession } from './auth'
+import { extractToken, verifySession } from './auth.js'
 
 const QuerySchema = z.object({
   mapId: z.string().uuid().optional(),

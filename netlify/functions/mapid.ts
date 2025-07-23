@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 import { z } from 'zod'
 
 const MapDataSchema = z.record(z.unknown())

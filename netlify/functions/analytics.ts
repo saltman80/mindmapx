@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client'
-import { extractToken, verifySession } from './auth'
+import { getClient } from './db-client.js'
+import { extractToken, verifySession } from './auth.js'
 
 const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {

@@ -23,7 +23,7 @@ declare global {
   var _dbClient: Client | undefined
 }
 
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 
 export const handler = async (
   event: HandlerEvent,
