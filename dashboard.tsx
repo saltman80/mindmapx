@@ -45,7 +45,7 @@ export default function DashboardPage(): JSX.Element {
         return
       }
       const [mapsRes, todosRes] = await Promise.all([
-        authFetch('/.netlify/functions/index', { credentials: 'include' }),
+        authFetch('/.netlify/functions/mindmap', { credentials: 'include' }),
         authFetch('/.netlify/functions/list', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
@@ -70,7 +70,7 @@ export default function DashboardPage(): JSX.Element {
     e.preventDefault()
     try {
       if (createType === 'map') {
-        await fetch('/.netlify/functions/index', {
+        await fetch('/.netlify/functions/mindmap', {
           method: 'POST',
           credentials: 'include', // Required for session cookie
           headers: {
