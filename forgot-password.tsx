@@ -21,6 +21,7 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       const response = await fetch('/.netlify/functions/forgot-password', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: trimmedEmail }),
       })
