@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import LoadingSkeleton from './loadingskeleton'
+import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 export default function TodoDashboard() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -90,8 +92,10 @@ export default function TodoDashboard() {
   })
 
   return (
-    <div className="todo-dashboard">
-  <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos</h1>
+    <div className="todo-dashboard relative overflow-hidden">
+      <MindmapArm side="left" />
+      <FaintMindmapBackground className="mindmap-bg-small" />
+      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos</h1>
       <div className="controls">
         <div className="filters">
           <button disabled={filter === 'all'} onClick={() => handleFilter('all')}>All</button>

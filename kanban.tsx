@@ -80,7 +80,7 @@ export default function Kanban(): JSX.Element {
   return (
     <div className="kanban-demo-page">
       <section className="kanban-demo section reveal relative overflow-x-visible">
-        <FaintMindmapBackground />
+        <FaintMindmapBackground className="mindmap-bg-small" />
         <div className="container">
           <div className="max-w-2xl mx-auto mb-8 text-center">
             <h1 className="marketing-text-large">Smooth Kanban Flow</h1>
