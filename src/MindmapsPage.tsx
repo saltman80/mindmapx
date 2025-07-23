@@ -36,7 +36,7 @@ export default function MindmapsPage(): JSX.Element {
         setLoading(false)
         return
       }
-      const res = await fetch('/.netlify/functions/index', {
+      const res = await fetch('/.netlify/functions/mindmap', {
         credentials: 'include',
         headers: authHeaders(),
       })
@@ -54,7 +54,7 @@ export default function MindmapsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const res = await fetch('/.netlify/functions/index', {
+      const res = await fetch('/.netlify/functions/mindmap', {
         method: 'POST',
         credentials: 'include', // Required for session cookie
         headers: {

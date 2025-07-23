@@ -55,7 +55,7 @@ export const handler = async (
       userId = session.userId
       if (!userId) throw new Error('Missing userId')
     } catch (err) {
-      console.error('Auth failure in index.ts:', err)
+      console.error('Auth failure in mindmap.ts:', err)
       return {
         statusCode: 401,
         headers: { 'Content-Type': 'application/json' },
