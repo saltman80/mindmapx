@@ -79,7 +79,7 @@ export const handler = async (
             body: JSON.stringify({ error: "Missing request body" }),
           }
         }
-        let payload: unknown = {}
+        let payload: any = {}
         try {
           payload = JSON.parse(event.body || '{}')
         } catch {
@@ -87,6 +87,14 @@ export const handler = async (
             statusCode: 400,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ error: "Invalid JSON body" }),
+          }
+        }
+        if (!payload.data && payload.title) {
+          payload = {
+            data: {
+              title: payload.title,
+              description: payload.description,
+            },
           }
         }
         let parsed
