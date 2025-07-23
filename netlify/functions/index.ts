@@ -5,24 +5,35 @@ import { z, ZodError } from 'zod'
 import { extractToken, verifySession } from './auth.js'
 
 const mapInputSchema = z.object({
-  data: z.record(z.any()),
+  data: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+  }),
 })
 
 
 async function getMaps(userId: string) {
   const client = await getClient()
   try {
-    const result = await client.query(`SELECT id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt" FROM mindmaps WHERE user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1) ORDER BY created_at DESC`, [userId])
+    const result = await client.query(
+      `SELECT id, user_id AS "userId", title, description, created_at AS "createdAt", updated_at AS "updatedAt" FROM mindmaps WHERE user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1) ORDER BY created_at DESC`,
+      [userId]
+    )
     return result.rows
   } finally {
     client.release()
   }
 }
 
-async function createMap(userId: string, data: unknown) {
+async function createMap(userId: string, data: { title: string; description?: string }) {
   const client = await getClient()
   try {
-    const result = await client.query(`INSERT INTO mindmaps (user_id, data) VALUES ($1, $2) RETURNING id, user_id AS "userId", data, created_at AS "createdAt", updated_at AS "updatedAt"`, [userId, data])
+    const result = await client.query(
+      `INSERT INTO mindmaps (user_id, title, description)
+       VALUES ($1, $2, $3)
+       RETURNING id, user_id AS "userId", title, description, created_at AS "createdAt", updated_at AS "updatedAt"`,
+      [userId, data.title, data.description ?? null]
+    )
     return result.rows[0]
   } finally {
     client.release()
