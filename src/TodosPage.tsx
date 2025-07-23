@@ -122,20 +122,25 @@ export default function TodosPage(): JSX.Element {
       )}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)} aria-hidden="true">
-          <div className="modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
-            <h2>Create Todo</h2>
+          <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+            <span className="flare-line" aria-hidden="true"></span>
+            <h2 className="fade-item">Create Todo</h2>
             <form onSubmit={handleCreate}>
-              <div className="form-group">
-                <label htmlFor="title">Title</label>
-                <input id="title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+              <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
+                <label htmlFor="title" className="form-label">Title</label>
+                <input id="title" className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
               </div>
-              <div className="form-group">
-                <label htmlFor="desc">Description</label>
-                <textarea id="desc" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+              <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
+                <label htmlFor="desc" className="form-label">Description</label>
+                <textarea id="desc" className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
               </div>
               <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit">Create</button>
+                <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>
+                  Create
+                </button>
               </div>
             </form>
           </div>
