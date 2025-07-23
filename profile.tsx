@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
+import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 interface Profile {
   name: string
@@ -55,16 +57,19 @@ export default function ProfilePage(): JSX.Element {
   }
 
   return (
-    <div className="profile-page container mx-auto p-6 max-w-lg">
-      <h1 className="text-2xl font-semibold mb-4">Update Profile</h1>
-      <img
-        src="./assets/profile-header.png"
-        alt="Profile header"
-        className="profile-image w-32 mx-auto mb-4"
-      />
-      {error && <div className="text-red-600 mb-4">{error}</div>}
-      {success && <div className="text-green-600 mb-4">Profile updated!</div>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <section className="section relative overflow-hidden">
+      <MindmapArm side="right" />
+      <FaintMindmapBackground />
+      <div className="form-card text-center profile-page">
+        <h1 className="text-2xl font-semibold mb-4">Update Profile</h1>
+        <img
+          src="./assets/profile-header.png"
+          alt="Profile header"
+          className="profile-image w-32 mx-auto mb-4"
+        />
+        {error && <div className="text-red-600 mb-4">{error}</div>}
+        {success && <div className="text-green-600 mb-4">Profile updated!</div>}
+        <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block mb-1">Name</label>
           <input
@@ -106,7 +111,8 @@ export default function ProfilePage(): JSX.Element {
         >
           {loading ? 'Saving...' : 'Save Profile'}
         </button>
-      </form>
-    </div>
+        </form>
+      </div>
+    </section>
   )
 }

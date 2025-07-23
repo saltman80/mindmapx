@@ -1,6 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
+import FaintMindmapBackground from '../FaintMindmapBackground'
+import MindmapArm from '../MindmapArm'
 
 interface MapItem {
   id: string
@@ -72,7 +74,9 @@ export default function MindmapsPage(): JSX.Element {
   })
 
   return (
-    <div className="list-page">
+    <section className="section relative overflow-hidden list-page">
+      <MindmapArm side="left" />
+      <FaintMindmapBackground className="mindmap-bg-small" />
       <h1>Mind Maps</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
@@ -85,22 +89,37 @@ export default function MindmapsPage(): JSX.Element {
               <h3>Total: {maps.length}</h3>
               <p>Today: {mapDay} Week: {mapWeek}</p>
             </div>
-            <div>
-              <button onClick={() => setShowModal(true)}>Create Map</button>
+          </div>
+          <div className="tiles-grid">
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Create Mind Map</h2>
+                <button onClick={() => setShowModal(true)}>Create</button>
+              </div>
+            </div>
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Your Maps</h2>
+              </div>
+              <ul className="recent-list">
+                {sorted.map(m => (
+                  <li key={m.id}>
+                    <Link
+                      to={`/maps/${m.id}`}
+                      onClick={() =>
+                        localStorage.setItem(
+                          `mindmap_last_viewed_${m.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                    >
+                      {m.title || 'Untitled Map'}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <ul className="tile-list">
-            {sorted.map(m => (
-              <li key={m.id}>
-                <Link
-                  to={`/maps/${m.id}`}
-                  onClick={() => localStorage.setItem(`mindmap_last_viewed_${m.id}`, Date.now().toString())}
-                >
-                  {m.title || 'Untitled Map'}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </>
       )}
       {showModal && (
@@ -110,11 +129,21 @@ export default function MindmapsPage(): JSX.Element {
             <form onSubmit={handleCreate}>
               <div className="form-group">
                 <label htmlFor="title">Title</label>
-                <input id="title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                <input
+                  id="title"
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="desc">Description</label>
-                <textarea id="desc" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+                <textarea
+                  id="desc"
+                  value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })}
+                  rows={3}
+                />
               </div>
               <div className="form-actions">
                 <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
@@ -124,6 +153,6 @@ export default function MindmapsPage(): JSX.Element {
           </div>
         </div>
       )}
-    </div>
+    </section>
   )
 }

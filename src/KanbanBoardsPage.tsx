@@ -1,6 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
+import FaintMindmapBackground from '../FaintMindmapBackground'
+import MindmapArm from '../MindmapArm'
 
 interface BoardItem {
   id: string
@@ -73,7 +75,9 @@ export default function KanbanBoardsPage(): JSX.Element {
   })
 
   return (
-    <div className="list-page">
+    <section className="section relative overflow-hidden list-page">
+      <MindmapArm side="left" />
+      <FaintMindmapBackground className="mindmap-bg-small" />
       <h1>Kanban Boards</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
@@ -86,22 +90,37 @@ export default function KanbanBoardsPage(): JSX.Element {
               <h3>Total: {boards.length}</h3>
               <p>Today: {boardDay} Week: {boardWeek}</p>
             </div>
-            <div>
-              <button onClick={() => setShowModal(true)}>Create Board</button>
+          </div>
+          <div className="tiles-grid">
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Create Board</h2>
+                <button onClick={() => setShowModal(true)}>Create</button>
+              </div>
+            </div>
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Your Boards</h2>
+              </div>
+              <ul className="recent-list">
+                {sorted.map(b => (
+                  <li key={b.id}>
+                    <Link
+                      to="/kanban"
+                      onClick={() =>
+                        localStorage.setItem(
+                          `board_last_viewed_${b.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                    >
+                      {b.title || 'Board'}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <ul className="tile-list">
-            {sorted.map(b => (
-              <li key={b.id}>
-                <Link
-                  to="/kanban"
-                  onClick={() => localStorage.setItem(`board_last_viewed_${b.id}`, Date.now().toString())}
-                >
-                  {b.title || 'Board'}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </>
       )}
       {showModal && (
@@ -121,6 +140,6 @@ export default function KanbanBoardsPage(): JSX.Element {
           </div>
         </div>
       )}
-    </div>
+    </section>
   )
 }

@@ -1,6 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
+import FaintMindmapBackground from '../FaintMindmapBackground'
+import MindmapArm from '../MindmapArm'
 
 interface TodoItem {
   id: string
@@ -75,7 +77,9 @@ export default function TodosPage(): JSX.Element {
   })
 
   return (
-    <div className="list-page">
+    <section className="section relative overflow-hidden list-page">
+      <MindmapArm side="left" />
+      <FaintMindmapBackground className="mindmap-bg-small" />
       <h1>Todos</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
@@ -88,22 +92,37 @@ export default function TodosPage(): JSX.Element {
               <h3>Total: {todos.length}</h3>
               <p>Added Today: {addedDay} Week: {addedWeek}</p>
             </div>
-            <div>
-              <button onClick={() => setShowModal(true)}>Create Todo</button>
+          </div>
+          <div className="tiles-grid">
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Create Todo</h2>
+                <button onClick={() => setShowModal(true)}>Create</button>
+              </div>
+            </div>
+            <div className="tile">
+              <div className="tile-header">
+                <h2>Your Todos</h2>
+              </div>
+              <ul className="recent-list">
+                {sorted.map(t => (
+                  <li key={t.id}>
+                    <Link
+                      to="/todo-demo"
+                      onClick={() =>
+                        localStorage.setItem(
+                          `todo_last_viewed_${t.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                    >
+                      {t.title || t.content}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <ul className="tile-list">
-            {sorted.map(t => (
-              <li key={t.id}>
-                <Link
-                  to="/todo-demo"
-                  onClick={() => localStorage.setItem(`todo_last_viewed_${t.id}`, Date.now().toString())}
-                >
-                  {t.title || t.content}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </>
       )}
       {showModal && (
@@ -127,6 +146,6 @@ export default function TodosPage(): JSX.Element {
           </div>
         </div>
       )}
-    </div>
+    </section>
   )
 }

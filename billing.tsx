@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 interface BillingInfo {
   lastInvoiceDate: string
@@ -66,6 +67,7 @@ export default function BillingPage(): JSX.Element {
 
   return (
     <section className="section relative overflow-hidden">
+      <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card">
       <h1 className="text-2xl font-semibold mb-4">Billing Details</h1>
