@@ -34,7 +34,7 @@ export const handler = async (
 
   try {
     if (event.httpMethod === 'POST') {
-      let data: { title?: string }
+      let data: { title?: string; description?: string }
       try {
         data = JSON.parse(event.body || '{}')
       } catch {
@@ -42,15 +42,16 @@ export const handler = async (
       }
 
       const title = (data.title || '').trim()
+      const description = (data.description || '').trim() || null
       if (!title) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing title' }) }
       }
 
       const result = await client.query(
-        `INSERT INTO kanban_boards (user_id, title) 
-         VALUES ($1, $2) 
-         RETURNING id, title, created_at`,
-        [userId, title]
+        `INSERT INTO kanban_boards (user_id, title, description)
+         VALUES ($1, $2, $3)
+         RETURNING id, title, description, created_at`,
+        [userId, title, description]
       )
 
       return { statusCode: 200, headers, body: JSON.stringify(result.rows[0]) }
@@ -60,8 +61,8 @@ export const handler = async (
       const id = event.queryStringParameters?.id
       if (id) {
         const { rows } = await client.query(
-          `SELECT id, title, created_at 
-             FROM kanban_boards 
+          `SELECT id, title, description, created_at
+           FROM kanban_boards
             WHERE id = $1 AND (user_id = $2 OR user_id IN (
               SELECT user_id FROM team_members WHERE member_id = $2
             ))`,
@@ -75,11 +76,11 @@ export const handler = async (
       }
 
       const { rows } = await client.query(
-        `SELECT id, title, created_at 
-           FROM kanban_boards 
+        `SELECT id, title, description, created_at
+           FROM kanban_boards
           WHERE user_id = $1 OR user_id IN (
             SELECT user_id FROM team_members WHERE member_id = $1
-          ) 
+          )
           ORDER BY created_at DESC`,
         [userId]
       )
