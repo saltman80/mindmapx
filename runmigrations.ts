@@ -49,6 +49,26 @@ export async function runMigrations(): Promise<void> {
       $$;
     `)
 
+    // Ensure title and description columns exist for map metadata
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'title'
+        ) THEN
+          ALTER TABLE mindmaps ADD COLUMN title TEXT;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'description'
+        ) THEN
+          ALTER TABLE mindmaps ADD COLUMN description TEXT;
+        END IF;
+      END;
+      $$;
+    `)
+
     // Ensure the owner_id column exists for older migrations that
     // still reference this column when creating indexes or constraints.
     await client.query(`
