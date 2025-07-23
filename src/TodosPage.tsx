@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
+import { authHeaders } from '../authHeaders'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -58,10 +59,7 @@ export default function TodosPage(): JSX.Element {
       }
       await fetch('/.netlify/functions/todos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
       setShowModal(false)
@@ -81,10 +79,7 @@ export default function TodosPage(): JSX.Element {
       }
       await fetch('/.netlify/functions/ai-create-todo', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ prompt: form.description }),
       })
       setShowModal(false)

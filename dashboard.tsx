@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from './authFetch'
+import { authHeaders } from './authHeaders'
 import { Link } from 'react-router-dom'
 import LoadingSkeleton from './loadingskeleton'
 import FaintMindmapBackground from './FaintMindmapBackground'
@@ -76,19 +77,13 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         await fetch('/.netlify/functions/index', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
       } else {
         await fetch('/.netlify/functions/todos', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
       }
@@ -110,10 +105,7 @@ export default function DashboardPage(): JSX.Element {
       if (createType === 'map') {
         await fetch('/.netlify/functions/ai-create-mindmap', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             title: form.title,
             description: form.description,
@@ -123,10 +115,7 @@ export default function DashboardPage(): JSX.Element {
       } else {
         await fetch('/.netlify/functions/ai-create-todo', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: authHeaders(),
           body: JSON.stringify({ prompt: form.description }),
         })
       }
