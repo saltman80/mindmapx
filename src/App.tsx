@@ -8,6 +8,7 @@ import MindmapsPage from './MindmapsPage'
 import TodosPage from './TodosPage'
 import KanbanBoardsPage from './KanbanBoardsPage'
 import ProjectWorkspace from '../ProjectWorkspace'
+import MapEditorPage from './MapEditorPage'
 import TodoDetail from '../TodoDetail'
 import TeamMembers from '../teammembers'
 import ProfilePage from '../profile'
@@ -38,6 +39,7 @@ function AppRoutes() {
       <Route path="/mindmaps" element={<MindmapsPage />} />
       <Route path="/todos" element={<TodosPage />} />
       <Route path="/kanban" element={<KanbanBoardsPage />} />
+      <Route path="/maps/:id" element={<MapEditorPage />} />
       <Route path="/workspace" element={<ProjectWorkspace />} />
       <Route path="/todo/:id" element={<TodoDetail />} />
       <Route path="/reset-password" element={<ResetPassword />} />
