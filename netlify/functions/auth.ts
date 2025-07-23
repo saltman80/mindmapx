@@ -1,5 +1,6 @@
 import type { HandlerEvent } from '@netlify/functions'
 import jwt from 'jsonwebtoken'
+import cookie from 'cookie'
 
 export interface SessionPayload {
   userId: string
@@ -13,12 +14,8 @@ export function extractToken(event: HandlerEvent): string | null {
   if (auth && auth.startsWith('Bearer ')) {
     return auth.slice(7)
   }
-  const cookie = event.headers.cookie || event.headers.Cookie
-  if (cookie) {
-    const match = cookie.match(/session=([^;]+)/)
-    if (match) return match[1]
-  }
-  return null
+  const cookies = cookie.parse(event.headers.cookie || '')
+  return cookies.token || cookies.session || null
 }
 
 export function verifySession(token: string): SessionPayload {
