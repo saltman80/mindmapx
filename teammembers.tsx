@@ -59,27 +59,37 @@ export default function TeamMembers() {
     <section className="section relative overflow-hidden">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
-      <h1>Team Members</h1>
       <div className="form-card text-center">
+        <h1 className="mb-4">Team Members</h1>
         {error && <div className="text-red-600 mb-2">{error}</div>}
-        <form onSubmit={addMember} className="mb-4 flex flex-col gap-2">
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Name"
-            className="form-input"
-            required
-          />
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Email"
-            className="form-input"
-            required
-          />
-          <button type="submit" className="btn self-center">
+        <form onSubmit={addMember} className="mb-4 space-y-4">
+          <div className="form-field text-left">
+            <label htmlFor="name" className="form-label">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+          <div className="form-field text-left">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+          <button type="submit" className="btn w-full">
             Add
           </button>
         </form>
