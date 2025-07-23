@@ -1,15 +1,9 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
-import { z, ZodError } from 'zod'
+import { ZodError } from 'zod'
 import { extractToken, verifySession } from './auth.js'
-
-const mapInputSchema = z.object({
-  data: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-  }),
-})
+import { mapInputSchema } from './validationschemas.js'
 
 
 async function getMaps(userId: string) {
