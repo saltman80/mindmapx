@@ -60,7 +60,7 @@ export default function MindmapsPage(): JSX.Element {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: { title: form.title, description: form.description } }),
+        body: JSON.stringify({ title: form.title, description: form.description }),
       })
       const json = await res.json()
       setShowModal(false)
