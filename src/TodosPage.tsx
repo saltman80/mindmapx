@@ -36,9 +36,9 @@ export default function TodosPage(): JSX.Element {
         setLoading(false)
         return
       }
-      const res = await authFetch('/.netlify/functions/list', { credentials: 'include' })
-      const json = res.ok ? await res.json() : { data: { todos: [] } }
-      const list: TodoItem[] = Array.isArray(json) ? json : json.data?.todos || []
+      const res = await authFetch('/.netlify/functions/todos', { credentials: 'include' })
+      const json = res.ok ? await res.json() : []
+      const list: TodoItem[] = Array.isArray(json) ? json : []
       setTodos(list)
     } catch (err: any) {
       setError(err.message || 'Failed to load todos')

@@ -15,7 +15,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
     const fetchTodos = async () => {
       try {
         const res = await fetch(
-          `/api/todos?nodeId=${encodeURIComponent(nodeId)}`,
+          `/.netlify/functions/todos?nodeId=${encodeURIComponent(nodeId)}`,
           { signal: controller.signal }
         )
         if (!res.ok) throw new Error(`Error fetching todos: ${res.statusText}`)
@@ -38,7 +38,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
     if (!text) return
     setIsAdding(true)
     try {
-      const res = await fetch('/api/todos', {
+      const res = await fetch('/.netlify/functions/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -61,7 +61,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
     if (!prompt) return
     setIsGenerating(true)
     try {
-      const res = await fetch('/api/todos/generate', {
+      const res = await fetch('/.netlify/functions/ai-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -84,7 +84,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
     if (!text) return
     setIsEditingLoading(true)
     try {
-      const res = await fetch(`/api/todos/${id}`, {
+      const res = await fetch(`/.netlify/functions/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -105,7 +105,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
   const handleDeleteTodo = async (id: string) => {
     setDeletingIds(prev => [...prev, id])
     try {
-      const res = await fetch(`/api/todos/${id}`, { method: 'DELETE', credentials: 'include' })
+      const res = await fetch(`/.netlify/functions/todos/${id}`, { method: 'DELETE', credentials: 'include' })
       if (!res.ok) throw new Error(`Error deleting todo: ${res.statusText}`)
       setTodos(prev => prev.filter(t => t.id !== id))
     } catch (error: any) {
@@ -122,7 +122,7 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
     const newStatus = !todo.completed
     setTogglingIds(prev => [...prev, id])
     try {
-      const res = await fetch(`/api/todos/${id}`, {
+      const res = await fetch(`/.netlify/functions/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
