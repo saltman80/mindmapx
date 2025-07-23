@@ -12,12 +12,16 @@ export class ApiError extends Error {
 }
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const { headers: customHeaders, ...rest } = options;
+  const { headers: customHeaders, credentials, ...rest } = options;
   const headers = new Headers(customHeaders);
   if (rest.body != null) {
     headers.set('Content-Type', 'application/json');
   }
-  const res = await fetch(url, { ...rest, headers });
+  const res = await fetch(url, {
+    ...rest,
+    headers,
+    credentials: credentials ?? 'include',
+  });
   let data: any = undefined;
   if (res.status !== 204) {
     const contentType = res.headers.get('content-type') || '';
