@@ -1568,6 +1568,19 @@ hr {
   gap: var(--spacing-lg);
 }
 
+/* 4 column layout used on list pages */
+.four-col-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+@media (min-width: 1024px) {
+  .four-col-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .tile {
   background-color: var(--color-bg-alt);
   border: 1px solid var(--color-border);

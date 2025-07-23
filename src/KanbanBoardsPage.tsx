@@ -85,13 +85,7 @@ export default function KanbanBoardsPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <h3>Total: {boards.length}</h3>
-              <p>Today: {boardDay} Week: {boardWeek}</p>
-            </div>
-          </div>
-          <div className="tiles-grid">
+          <div className="four-col-grid">
             <div className="tile">
               <div className="tile-header">
                 <h2>Create Board</h2>
@@ -99,27 +93,28 @@ export default function KanbanBoardsPage(): JSX.Element {
               </div>
             </div>
             <div className="tile">
-              <div className="tile-header">
-                <h2>Your Boards</h2>
-              </div>
-              <ul className="recent-list">
-                {sorted.map(b => (
-                  <li key={b.id}>
-                    <Link
-                      to="/kanban"
-                      onClick={() =>
-                        localStorage.setItem(
-                          `board_last_viewed_${b.id}`,
-                          Date.now().toString()
-                        )
-                      }
-                    >
-                      {b.title || 'Board'}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <h2 className="tile-header">Metrics</h2>
+              <p>Total: {boards.length}</p>
+              <p>Today: {boardDay} Week: {boardWeek}</p>
             </div>
+            {sorted.map(b => (
+              <div className="tile" key={b.id}>
+                <div className="tile-header">
+                  <h2>{b.title || 'Board'}</h2>
+                  <Link
+                    to="/kanban"
+                    onClick={() =>
+                      localStorage.setItem(
+                        `board_last_viewed_${b.id}`,
+                        Date.now().toString()
+                      )
+                    }
+                  >
+                    Open
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}

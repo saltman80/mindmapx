@@ -87,13 +87,7 @@ export default function TodosPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <h3>Total: {todos.length}</h3>
-              <p>Added Today: {addedDay} Week: {addedWeek}</p>
-            </div>
-          </div>
-          <div className="tiles-grid">
+          <div className="four-col-grid">
             <div className="tile">
               <div className="tile-header">
                 <h2>Create Todo</h2>
@@ -101,27 +95,28 @@ export default function TodosPage(): JSX.Element {
               </div>
             </div>
             <div className="tile">
-              <div className="tile-header">
-                <h2>Your Todos</h2>
-              </div>
-              <ul className="recent-list">
-                {sorted.map(t => (
-                  <li key={t.id}>
-                    <Link
-                      to="/todo-demo"
-                      onClick={() =>
-                        localStorage.setItem(
-                          `todo_last_viewed_${t.id}`,
-                          Date.now().toString()
-                        )
-                      }
-                    >
-                      {t.title || t.content}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <h2 className="tile-header">Metrics</h2>
+              <p>Total: {todos.length}</p>
+              <p>Added Today: {addedDay} Week: {addedWeek}</p>
             </div>
+            {sorted.map(t => (
+              <div className="tile" key={t.id}>
+                <div className="tile-header">
+                  <h2>{t.title || t.content}</h2>
+                  <Link
+                    to="/todo-demo"
+                    onClick={() =>
+                      localStorage.setItem(
+                        `todo_last_viewed_${t.id}`,
+                        Date.now().toString()
+                      )
+                    }
+                  >
+                    Open
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}
