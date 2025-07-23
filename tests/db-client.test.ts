@@ -1,4 +1,4 @@
-const { getClient } = await import('../netlify/functions/db-client.js')
+const { getClient } = await import('../netlify/functions/db-client.ts')
 
 test('getClient returns same instance', () => {
   const a = getClient()
