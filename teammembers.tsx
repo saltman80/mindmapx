@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 interface Member {
   id: string
@@ -46,35 +48,39 @@ export default function TeamMembers() {
   }, [])
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">Team Members</h1>
-      {error && <div className="text-red-600 mb-2">{error}</div>}
-      <form onSubmit={addMember} className="mb-4 flex flex-col gap-2">
-        <input
-          type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Name"
-          className="border px-2 py-1"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="Email"
-          className="border px-2 py-1"
-          required
-        />
-        <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded self-start">
-          Add
-        </button>
-      </form>
-      <ul className="list-disc pl-5">
-        {members.map(m => (
-          <li key={m.id}>{m.name ? `${m.name} <${m.email}>` : m.email}</li>
-        ))}
-      </ul>
-    </div>
+    <section className="section relative overflow-hidden">
+      <MindmapArm side="right" />
+      <FaintMindmapBackground />
+      <div className="form-card text-center">
+        <h1 className="text-xl font-bold mb-4">Team Members</h1>
+        {error && <div className="text-red-600 mb-2">{error}</div>}
+        <form onSubmit={addMember} className="mb-4 flex flex-col gap-2">
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Name"
+            className="form-input"
+            required
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email"
+            className="form-input"
+            required
+          />
+          <button type="submit" className="btn self-center">
+            Add
+          </button>
+        </form>
+        <ul className="list-disc pl-5 text-left">
+          {members.map(m => (
+            <li key={m.id}>{m.name ? `${m.name} <${m.email}>` : m.email}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
   )
 }

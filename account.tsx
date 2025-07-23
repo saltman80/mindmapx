@@ -1,8 +1,10 @@
 import FaintMindmapBackground from './FaintMindmapBackground'
+import MindmapArm from './MindmapArm'
 
 export default function AccountPage(): JSX.Element {
   return (
     <section className="section relative overflow-hidden">
+      <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center space-y-4">
         <h1 className="text-2xl font-semibold mb-4">Account Settings</h1>
