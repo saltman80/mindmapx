@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
-import { extractToken, verifySession } from './auth.js'
-import { createMindMapSchema } from './validationschemas.js'
+import { getClient } from './db-client'
+import { extractToken, verifySession } from './auth'
+import { createMindMapSchema } from './validationschemas'
 import { z, ZodError } from 'zod'
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET']
 REQUIRED_ENV.forEach((name) => {
