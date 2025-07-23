@@ -66,41 +66,50 @@ export const handler = async (
       }
     }
     if (event.httpMethod === "POST") {
-      if (!event.body) {
-        return {
-          statusCode: 400,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ error: "Missing request body" }),
-        }
-      }
-      let payload: unknown = {}
       try {
-        payload = JSON.parse(event.body || '{}')
-      } catch {
-        return {
-          statusCode: 400,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ error: "Invalid JSON body" }),
-        }
-      }
-      let parsed
-      try {
-        parsed = mapInputSchema.parse(payload)
-      } catch (err: any) {
-        if (err instanceof ZodError) {
+        if (!event.body) {
           return {
             statusCode: 400,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ error: "Invalid map data", details: err.errors }),
+            body: JSON.stringify({ error: "Missing request body" }),
           }
         }
-        throw err
-      }
-      const map = await createMap(userId, parsed.data)
-      return {
-        statusCode: 201,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(map),
+        let payload: unknown = {}
+        try {
+          payload = JSON.parse(event.body || '{}')
+        } catch {
+          return {
+            statusCode: 400,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ error: "Invalid JSON body" }),
+          }
+        }
+        let parsed
+        try {
+          parsed = mapInputSchema.parse(payload)
+        } catch (err: any) {
+          if (err instanceof ZodError) {
+            return {
+              statusCode: 400,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ error: "Invalid map data", details: err.errors }),
+            }
+          }
+          throw err
+        }
+        const map = await createMap(userId, parsed.data)
+        return {
+          statusCode: 201,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(map),
+        }
+      } catch (err: any) {
+        console.error('Map creation failed:', err)
+        return {
+          statusCode: 500,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Map creation failed", details: err.message || String(err) }),
+        }
       }
     }
   const headers: Record<string, string> = {
