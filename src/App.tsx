@@ -71,7 +71,7 @@ function AppLayout() {
     '/account'
   ]
   const isDashboard = dashboardPaths.some(path =>
-    location.pathname.startsWith(path)
+    location.pathname === path || location.pathname.startsWith(path + '/')
   )
 
   return isDashboard ? (
