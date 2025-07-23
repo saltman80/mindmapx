@@ -77,10 +77,10 @@ export default function TodosPage(): JSX.Element {
   })
 
   return (
-    <section className="section relative overflow-hidden list-page">
+    <div className="dashboard-page relative overflow-hidden list-page">
       <MindmapArm side="left" />
       <FaintMindmapBackground className="mindmap-bg-small" />
-      <h1>Todos</h1>
+      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
       ) : error ? (
@@ -146,6 +146,6 @@ export default function TodosPage(): JSX.Element {
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }
