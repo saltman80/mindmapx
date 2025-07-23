@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
-import { extractToken, verifySession } from './auth.js'
+import { getClient } from './db-client'
+import { extractToken, verifySession } from './auth'
 
 const headers: Record<string, string> = {
   'Content-Type': 'application/json',

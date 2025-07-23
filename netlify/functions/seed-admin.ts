@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import { getClient } from './db-client'
 import { hash } from 'bcrypt'
 
 const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env

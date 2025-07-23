@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
-import { getClient } from './db-client.js'
+import { getClient } from './db-client'
 
 const openaiKey = process.env.OPENAI_API_KEY
 if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
