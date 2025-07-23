@@ -22,7 +22,7 @@ const Header = (): JSX.Element => {
     { label: 'About', route: '/about' },
     { label: 'Mindmap', route: '/mindmap-demo' },
     { label: 'Todo', route: '/todo-demo' },
-    { label: 'KanBan', route: '/kanban' },
+    { label: 'KanBan', route: '/kanban-demo' },
     { label: 'Purchase', route: '/purchase' },
   ]
 
