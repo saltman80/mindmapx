@@ -267,12 +267,10 @@ export default function DashboardPage(): JSX.Element {
           </div>
           <div className="tiles-grid">
             <div className="tile" onClick={handleTileClick}>
-              <div className="tile-header">
+              <div className="tile-header tile-header-center">
                 <h2>Mind Maps</h2>
-                <div className="tile-actions">
-                  <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
-                  <Link to="/mindmaps" className="tile-link">Open Mind Maps</Link>
-                </div>
+                <button onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+                <Link to="/mindmaps" className="tile-link">Open Mind Maps</Link>
               </div>
               <ul className="recent-list">
                 {recentMaps.map(m => (
@@ -283,12 +281,10 @@ export default function DashboardPage(): JSX.Element {
               </ul>
             </div>
             <div className="tile" onClick={handleTileClick}>
-              <div className="tile-header">
+              <div className="tile-header tile-header-center">
                 <h2>Todos</h2>
-                <div className="tile-actions">
-                  <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
-                  <Link to="/todos" className="tile-link">Open Todos</Link>
-                </div>
+                <button onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+                <Link to="/todos" className="tile-link">Open Todos</Link>
               </div>
               <ul className="recent-list">
                 {recentTodos.map(t => (
@@ -300,12 +296,10 @@ export default function DashboardPage(): JSX.Element {
               </ul>
             </div>
             <div className="tile" onClick={handleTileClick}>
-              <div className="tile-header">
+              <div className="tile-header tile-header-center">
                 <h2>Kanban Boards</h2>
-                <div className="tile-actions">
-                  <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
-                  <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
-                </div>
+                <button onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
+                <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
               </div>
               <ul className="recent-list">
                 {recentBoards.map(b => (
