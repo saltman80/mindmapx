@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import { getClient } from './db-client'
 import { z } from 'zod'
-import type { Todo } from './types.js'
+import type { Todo } from './types'
 
 type TodoInput = {
   title?: string
