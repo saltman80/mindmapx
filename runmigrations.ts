@@ -102,9 +102,23 @@ export async function runMigrations(): Promise<void> {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
+        description TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+    `)
+
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'kanban_boards' AND column_name = 'description'
+        ) THEN
+          ALTER TABLE kanban_boards ADD COLUMN description TEXT;
+        END IF;
+      END;
+      $$;
     `)
 
     // Ensure description column exists on todos
