@@ -13,6 +13,10 @@ interface Mindmap {
   config?: object
 }
 
+function getSafeArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : []
+}
+
 export default function MapEditorPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
   const [mindmap, setMindmap] = useState<Mindmap | null>(null)
@@ -29,7 +33,10 @@ export default function MapEditorPage(): JSX.Element {
           return
         }
         const json = await res.json()
-        if (!ignore) setMindmap(json.map || json)
+        if (!ignore) {
+          console.log('[MapEditorPage] mindmap response:', json.map || json)
+          setMindmap(json.map || json)
+        }
       })
       .catch(() => {
         if (!ignore) setError(true)
@@ -43,17 +50,8 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
-  const nodes = Array.isArray(mindmap?.nodes)
-    ? mindmap.nodes
-    : Array.isArray(mindmap?.data?.nodes)
-      ? mindmap.data.nodes
-      : []
-
-  const edges = Array.isArray(mindmap?.edges)
-    ? mindmap.edges
-    : Array.isArray(mindmap?.data?.edges)
-      ? mindmap.data.edges
-      : []
+  const nodes = getSafeArray(mindmap?.nodes ?? mindmap?.data?.nodes)
+  const edges = getSafeArray(mindmap?.edges ?? mindmap?.data?.edges)
 
   if (nodes.length === 0 && edges.length === 0) {
     console.log('[mindmap] No nodes or edges found, rendering empty canvas')
