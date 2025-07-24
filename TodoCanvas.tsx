@@ -9,7 +9,7 @@ export default function TodoCanvas({ todos }: { todos: any[] }): JSX.Element {
       {isEmpty ? (
         <>
           <div className="todo-placeholder-list">
-            {Array.from({ length: 10 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <TodoPlaceholder key={i} />
             ))}
           </div>
