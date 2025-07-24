@@ -66,8 +66,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [nodes])
 
-    const safeNodes = Array.isArray(nodes) ? nodes : []
-    const safeEdges = Array.isArray(edges) ? edges : []
+    const safeNodes = useMemo(() => (Array.isArray(nodes) ? nodes : []), [nodes])
+    const safeEdges = useMemo(() => (Array.isArray(edges) ? edges : []), [edges])
+
+    console.log('[MindmapCanvas] rendering nodes:', safeNodes)
+    console.log('[MindmapCanvas] rendering edges:', safeEdges)
 
     const handleMouseMove = useCallback(
       (e: MouseEvent) => {
