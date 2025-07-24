@@ -159,18 +159,64 @@ export default function DashboardPage(): JSX.Element {
             <div className="metric-card">
               <h3 className="metric-title">Mind Maps</h3>
               <div className="metric-value">{maps.length}</div>
-              <p>Today: {mapDay}</p>
-              <p>This Week: {mapWeek}</p>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Today</span>
+                  <span className="value">{mapDay}</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Week</span>
+                  <span className="value">{mapWeek}</span>
+                </div>
+              </div>
             </div>
             <div className="metric-card">
               <h3 className="metric-title">Todos</h3>
               <div className="metric-value">{todos.length}</div>
-              <p>Added Today: {todoAddedDay} Completed: {todoDoneDay}</p>
-              <p>Added Week: {todoAddedWeek} Completed: {todoDoneWeek}</p>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Today Added</span>
+                  <span className="value">{todoAddedDay}</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Today Done</span>
+                  <span className="value">{todoDoneDay}</span>
+                </div>
+              </div>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Week Added</span>
+                  <span className="value">{todoAddedWeek}</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Week Done</span>
+                  <span className="value">{todoDoneWeek}</span>
+                </div>
+              </div>
             </div>
             <div className="metric-card">
               <h3 className="metric-title">Kanban Boards</h3>
               <div className="metric-value">{boards.length}</div>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Today</span>
+                  <span className="value">{boardDay}</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Week</span>
+                  <span className="value">{boardWeek}</span>
+                </div>
+              </div>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Cards Added</span>
+                  <span className="value">0</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Completed</span>
+                  <span className="value">0</span>
+                </div>
+              </div>
               <Link to="/kanban" className="text-blue-600 underline">View Boards</Link>
             </div>
           </div>

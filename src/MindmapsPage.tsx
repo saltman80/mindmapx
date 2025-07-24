@@ -139,7 +139,16 @@ export default function MindmapsPage(): JSX.Element {
             <header className="tile-header"><h2>Metrics</h2></header>
             <section className="tile-body">
               <p>Total: {maps.length}</p>
-              <p>Today: {mapDay} Week: {mapWeek}</p>
+              <div className="metric-detail-grid">
+                <div className="metric-detail">
+                  <span className="label">Today</span>
+                  <span className="value">{mapDay}</span>
+                </div>
+                <div className="metric-detail">
+                  <span className="label">Week</span>
+                  <span className="value">{mapWeek}</span>
+                </div>
+              </div>
             </section>
           </div>
 
