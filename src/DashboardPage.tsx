@@ -6,6 +6,7 @@ import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import Sparkline from './Sparkline'
+import DashboardTile, { DashboardItem } from './DashboardTile'
 
 interface MapItem {
   id: string
@@ -180,12 +181,6 @@ export default function DashboardPage(): JSX.Element {
     }
   }
 
-  const handleTileClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-    const el = e.currentTarget
-    el.classList.remove('clicked')
-    void el.offsetWidth
-    el.classList.add('clicked')
-  }
 
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
@@ -261,6 +256,22 @@ export default function DashboardPage(): JSX.Element {
   const recentTodos = [...todos].sort(dateSort).slice(0, 10)
   const recentBoards = [...boards].sort(dateSort).slice(0, 10)
 
+  const mapItems: DashboardItem[] = recentMaps.map(m => ({
+    id: m.id,
+    label: m.title || 'Untitled Map',
+    link: `/maps/${m.id}`
+  }))
+  const todoItems: DashboardItem[] = recentTodos.map(t => ({
+    id: t.id,
+    label: t.title || t.content || 'Todo',
+    link: '/todo-demo'
+  }))
+  const boardItems: DashboardItem[] = recentBoards.map(b => ({
+    id: b.id,
+    label: b.title || 'Board',
+    link: `/kanban/${b.id}`
+  }))
+
   return (
     <div className="dashboard-page relative overflow-hidden">
       <FaintMindmapBackground className="mindmap-bg-small" />
@@ -273,80 +284,28 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="tiles-grid">
-            <div className="tile create-tile">
-              <header className="tile-header tile-header-center">
-                <h2>Mind Maps</h2>
-                <button
-                  className="btn-primary btn-wide"
-                  onClick={() => {
-                    setCreateType('map')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentMaps.map(m => (
-                    <li key={m.id}>
-                      <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-            <div className="tile create-tile" onClick={handleTileClick}>
-              <header className="tile-header tile-header-center">
-                <h2>Todos</h2>
-                <button
-                  className="btn-primary btn-wide"
-                  onClick={() => {
-                    setCreateType('todo')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/todos" className="tile-link">Open Todos</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentTodos.map(t => (
-                    <li key={t.id}>
-                      <Link to="/todo-demo">{t.title || t.content}</Link>
-                      {t.completed && ' ✓'}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-            <div className="tile create-tile" onClick={handleTileClick}>
-              <header className="tile-header tile-header-center">
-                <h2>Kanban Boards</h2>
-                <button
-                  className="btn-primary btn-wide"
-                  onClick={() => {
-                    setCreateType('board')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentBoards.map(b => (
-                    <li key={b.id}>
-                      <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
+          <div className="dashboard-grid">
+            <DashboardTile
+              icon={<span role="img" aria-label="Mindmap">🧠</span>}
+              title="Mind Maps"
+              onCreate={() => { setCreateType('map'); setShowModal(true) }}
+              items={mapItems}
+              moreLink="/mindmaps"
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Todos">✅</span>}
+              title="Todos"
+              onCreate={() => { setCreateType('todo'); setShowModal(true) }}
+              items={todoItems}
+              moreLink="/todos"
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Kanban">📋</span>}
+              title="Kanban Boards"
+              onCreate={() => { setCreateType('board'); setShowModal(true) }}
+              items={boardItems}
+              moreLink="/kanban"
+            />
           </div>
           <div className="metrics-grid">
             <div className="metric-card">
