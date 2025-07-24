@@ -21,5 +21,5 @@ export default function TodoEditorPage(): JSX.Element {
 
   if (loading) return <p>Loading...</p>
 
-  return <TodoCanvas todos={todos} />
+  return <TodoCanvas initialTodos={todos} />
 }

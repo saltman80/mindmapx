@@ -22,7 +22,7 @@ export default function TodosCanvasPage(): JSX.Element {
   return (
     <div className="dashboard-layout">
       <main className="main-area">
-        <TodoCanvas todos={todo ? [todo] : []} />
+        <TodoCanvas initialTodos={todo ? [todo] : []} />
       </main>
     </div>
   )
