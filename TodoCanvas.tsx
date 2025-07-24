@@ -1,67 +1,34 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import TodoPlaceholder from './TodoPlaceholder'
+import AddTodoButton from './AddTodoButton'
 
-interface Note {
-  id: string
-  text: string
-  author: string
-  date: string
-}
-
-interface Todo {
-  id: string
-  title: string
-  assignee?: string
-  notes: Note[]
-}
-
-export default function TodoCanvas() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [title, setTitle] = useState('')
-  const [assignee, setAssignee] = useState('')
-
-  const addTodo = () => {
-    const t = title.trim()
-    if (!t) return
-    const newTodo: Todo = {
-      id: Date.now().toString(),
-      title: t,
-      assignee: assignee.trim() || undefined,
-      notes: []
-    }
-    setTodos(prev => [...prev, newTodo])
-    setTitle('')
-    setAssignee('')
-  }
-
-  const removeTodo = (id: string) => {
-    setTodos(prev => prev.filter(t => t.id !== id))
-  }
+export default function TodoCanvas({ todos }: { todos: any[] }): JSX.Element {
+  const isEmpty = !Array.isArray(todos) || todos.length === 0
 
   return (
-    <div className="todo-canvas">
-      <div className="todo-form">
-        <input
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          placeholder="Todo title"
-        />
-        <input
-          value={assignee}
-          onChange={e => setAssignee(e.target.value)}
-          placeholder="Assignee"
-        />
-        <button onClick={addTodo}>Add</button>
-      </div>
-      <ul className="todo-list">
-        {todos.map(t => (
-          <li key={t.id} className="todo-item">
-            <Link to={`/todo/${t.id}`}>{t.title}</Link>
-            {t.assignee && <span className="assignee"> - {t.assignee}</span>}
-            <button onClick={() => removeTodo(t.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+    <div className="todo-canvas-wrapper">
+      {isEmpty ? (
+        <>
+          <div className="todo-placeholder-list">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <TodoPlaceholder key={i} />
+            ))}
+          </div>
+          <AddTodoButton />
+        </>
+      ) : (
+        <div className="todo-list">
+          {todos.map(t => (
+            <div key={t.id} className="tile">
+              <header className="tile-header">
+                <h2>{t.title || t.content || 'Untitled'}</h2>
+              </header>
+              <section className="tile-body">
+                <p>{t.content || 'Todo details...'}</p>
+              </section>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
