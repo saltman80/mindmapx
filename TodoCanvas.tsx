@@ -13,7 +13,12 @@ export default function TodoCanvas({ todos }: { todos: any[] }): JSX.Element {
               <TodoPlaceholder key={i} />
             ))}
           </div>
-          <AddTodoButton />
+          <div className="modal-overlay empty-canvas-modal">
+            <div className="modal">
+              <p>No todos yet. Click below to add your first todo!</p>
+              <AddTodoButton />
+            </div>
+          </div>
         </>
       ) : (
         <div className="todo-list">
