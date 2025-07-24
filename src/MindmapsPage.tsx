@@ -14,11 +14,6 @@ interface MapItem {
   data?: { title?: string; [key: string]: any }
 }
 
-const getLastViewed = (id: string): number => {
-  const v = localStorage.getItem(`mindmap_last_viewed_${id}`)
-  return v ? parseInt(v, 10) : 0
-}
-
 export default function MindmapsPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,16 +26,8 @@ export default function MindmapsPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setLoading(false)
-        return
-      }
-      const res = await fetch('/.netlify/functions/mindmaps', {
-        credentials: 'include',
-        headers: authHeaders(),
-      })
-      const data = res.ok ? await res.json() : []
+      const res = await authFetch('/.netlify/functions/mindmaps')
+      const data = await res.json()
       setMaps(Array.isArray(data) ? data : [])
     } catch (err: any) {
       setError(err.message || 'Failed to load maps')
@@ -49,7 +36,12 @@ export default function MindmapsPage(): JSX.Element {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  useEffect(() => {
+    authFetch('/.netlify/functions/mindmaps')
+      .then(res => res.json())
+      .then(setMaps)
+      .catch(() => {})
+  }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
@@ -100,29 +92,15 @@ export default function MindmapsPage(): JSX.Element {
     }
   }
 
-  const now = Date.now()
-  const oneDay = 24 * 60 * 60 * 1000
-  const oneWeek = 7 * oneDay
-  const dayAgo = now - oneDay
-  const weekAgo = now - oneWeek
+  const today = new Date().toDateString()
+  const dayCount = maps.filter(m => new Date(m.created_at || m.createdAt || '').toDateString() === today).length
 
-  const mapDay = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
-  const mapWeek = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
-
-  const sorted = [...maps].sort((a, b) => {
-    const av = getLastViewed(a.id)
-    const bv = getLastViewed(b.id)
-    if (av !== bv) return bv - av
-    const at = new Date(a.createdAt || a.created_at || '').getTime()
-    const bt = new Date(b.createdAt || b.created_at || '').getTime()
-    return bt - at
-  })
 
   return (
     <div className="dashboard-page relative overflow-hidden list-page">
       <MindmapArm side="left" />
       <FaintMindmapBackground className="mindmap-bg-small" />
-      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Mind Maps</h1>
+      <h1 className="dashboard-title">🧠 Mind Maps</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
       ) : error ? (
@@ -139,23 +117,13 @@ export default function MindmapsPage(): JSX.Element {
           <div className="tile">
             <h2 className="tile-header">Metrics</h2>
             <p>Total: {maps.length}</p>
-            <p>Today: {mapDay} Week: {mapWeek}</p>
+            <p>Today: {dayCount}</p>
           </div>
-          {sorted.map(m => (
+          {maps.map(m => (
             <div className="tile" key={m.id}>
               <div className="tile-header">
                 <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
-                <Link
-                  to={`/maps/${m.id}`}
-                  onClick={() =>
-                    localStorage.setItem(
-                      `mindmap_last_viewed_${m.id}`,
-                      Date.now().toString()
-                    )
-                  }
-                >
-                  Open
-                </Link>
+                <Link to={`/maps/${m.id}`}>Open</Link>
               </div>
             </div>
           ))}
