@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { extractToken, verifySession } from './auth'
+import { extractToken, verifySession } from './auth.js'
 import { z } from 'zod'
 
 const headers = {
