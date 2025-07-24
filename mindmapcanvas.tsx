@@ -241,11 +241,25 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       }
     }, [])
 
+    const DOT_SPACING = 50
+    const GRID_SIZE = 500
+    const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
+
+    const containerWidth =
+      typeof width === 'number'
+        ? `${width}px`
+        : width ?? '100vw'
+    const containerHeight =
+      typeof height === 'number'
+        ? `${height}px`
+        : height ?? '100vh'
+
     return (
       <div
         style={{
-          width: width ?? '100%',
-          height: height ?? '100%',
+          width: containerWidth,
+          height: containerHeight,
+          overflow: 'auto',
           touchAction: 'none',
           cursor:
             safeNodes.length === 0 && safeEdges.length === 0
@@ -255,8 +269,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       >
         <svg
           ref={svgRef}
-          width="100%"
-          height="100%"
+          width={CANVAS_SIZE}
+          height={CANVAS_SIZE}
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
@@ -273,7 +287,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               <circle cx="1" cy="1" r="1" fill="#FF6A00" />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#dot-grid)" />
+          <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#dot-grid)" />
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
