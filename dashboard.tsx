@@ -157,19 +157,20 @@ export default function DashboardPage(): JSX.Element {
         <>
           <div className="metrics-grid">
             <div className="metric-card">
-              <h3>Mind Maps</h3>
-              <p>Total: {maps.length}</p>
+              <h3 className="metric-title">Mind Maps</h3>
+              <div className="metric-value">{maps.length}</div>
               <p>Today: {mapDay}</p>
               <p>This Week: {mapWeek}</p>
             </div>
             <div className="metric-card">
-              <h3>Todos</h3>
-              <p>Total: {todos.length}</p>
+              <h3 className="metric-title">Todos</h3>
+              <div className="metric-value">{todos.length}</div>
               <p>Added Today: {todoAddedDay} Completed: {todoDoneDay}</p>
               <p>Added Week: {todoAddedWeek} Completed: {todoDoneWeek}</p>
             </div>
             <div className="metric-card">
-              <h3>Kanban Boards</h3>
+              <h3 className="metric-title">Kanban Boards</h3>
+              <div className="metric-value">{boards.length}</div>
               <Link to="/kanban" className="text-blue-600 underline">View Boards</Link>
             </div>
           </div>
