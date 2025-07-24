@@ -9,6 +9,11 @@
   NODE_ENV = "production"
 
 [[redirects]]
+  from = "/api/maps/:id"
+  to = "/.netlify/functions/mapid"
+  status = 200
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
