@@ -284,7 +284,73 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="create-row">
+          <div className="dashboard-grid">
+            <DashboardTile
+              icon={<span role="img" aria-label="Mindmap">🧠</span>}
+              title="Mind Maps"
+              items={mapItems}
+              moreLink="/mindmaps"
+              metrics={(
+                <>
+                  <div className="metric-value">{maps.length}</div>
+                  <div className="metric-detail-grid">
+                    <div className="metric-detail">
+                      <span className="label">Nodes This Week</span>
+                      <span className="value">{nodesThisWeek}</span>
+                    </div>
+                    <div className="metric-detail">
+                      <span className="label">Last Week</span>
+                      <span className="value">{nodesLastWeek}</span>
+                    </div>
+                  </div>
+                  <Sparkline data={nodeTrend} />
+                </>
+              )}
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Todos">✅</span>}
+              title="Todos"
+              items={todoItems}
+              moreLink="/todos"
+              metrics={(
+                <>
+                  <div className="metric-value">{todos.length}</div>
+                  <div className="metric-detail-grid">
+                    <div className="metric-detail">
+                      <span className="label">Week Added</span>
+                      <span className="value">{todoAddedWeek}</span>
+                    </div>
+                    <div className="metric-detail">
+                      <span className="label">Week Done</span>
+                      <span className="value">{todoDoneWeek}</span>
+                    </div>
+                  </div>
+                  <Sparkline data={todoTrend} />
+                </>
+              )}
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Kanban">📋</span>}
+              title="Kanban Boards"
+              items={boardItems}
+              moreLink="/kanban"
+              metrics={(
+                <>
+                  <div className="metric-value">{boards.length}</div>
+                  <div className="metric-detail-grid">
+                    <div className="metric-detail">
+                      <span className="label">Cards Added</span>
+                      <span className="value">0</span>
+                    </div>
+                    <div className="metric-detail">
+                      <span className="label">Completed</span>
+                      <span className="value">0</span>
+                    </div>
+                  </div>
+                  <Sparkline data={boardTrend} />
+                </>
+              )}
+            />
             <div className="tile create-tile tile-header-center">
               <h2>Create Map</h2>
               <button className="btn-primary btn-wide" onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
@@ -296,73 +362,6 @@ export default function DashboardPage(): JSX.Element {
             <div className="tile create-tile tile-header-center">
               <h2>Create Board</h2>
               <button className="btn-primary btn-wide" onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
-            </div>
-          </div>
-          <div className="dashboard-grid">
-            <DashboardTile
-              icon={<span role="img" aria-label="Mindmap">🧠</span>}
-              title="Mind Maps"
-              items={mapItems}
-              moreLink="/mindmaps"
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Todos">✅</span>}
-              title="Todos"
-              items={todoItems}
-              moreLink="/todos"
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Kanban">📋</span>}
-              title="Kanban Boards"
-              items={boardItems}
-              moreLink="/kanban"
-            />
-          </div>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <h3 className="metric-title">Mind Maps</h3>
-              <div className="metric-value">{maps.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Nodes This Week</span>
-                  <span className="value">{nodesThisWeek}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Last Week</span>
-                  <span className="value">{nodesLastWeek}</span>
-                </div>
-              </div>
-              <Sparkline data={nodeTrend} />
-            </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Todos</h3>
-              <div className="metric-value">{todos.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Week Added</span>
-                  <span className="value">{todoAddedWeek}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week Done</span>
-                  <span className="value">{todoDoneWeek}</span>
-                </div>
-              </div>
-              <Sparkline data={todoTrend} />
-            </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Kanban Boards</h3>
-              <div className="metric-value">{boards.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Cards Added</span>
-                  <span className="value">0</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Completed</span>
-                  <span className="value">0</span>
-                </div>
-              </div>
-              <Sparkline data={boardTrend} />
             </div>
           </div>
         </>

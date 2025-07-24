@@ -11,11 +11,12 @@ interface DashboardTileProps {
   icon?: ReactNode
   title: string
   items?: DashboardItem[]
+  metrics?: ReactNode
   onCreate?: () => void
   moreLink?: string
 }
 
-export default function DashboardTile({ icon, title, items = [], onCreate, moreLink }: DashboardTileProps) {
+export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink }: DashboardTileProps) {
   return (
     <div className="card">
       <header className="card-header">
@@ -31,6 +32,7 @@ export default function DashboardTile({ icon, title, items = [], onCreate, moreL
             </li>
           ))}
         </ul>
+        {metrics && <div className="tile-stats">{metrics}</div>}
       </div>
       <div className="card-footer">
         {onCreate && (
