@@ -13,6 +13,9 @@ interface NodeData {
   x: number
   y: number
   label?: string
+  description?: string
+  parentId?: string | null
+  todoId?: string | null
 }
 
 interface EdgeData {
@@ -26,7 +29,7 @@ interface MindmapCanvasProps {
   edges?: EdgeData[]
   width?: number | string
   height?: number | string
-  onAddNode?: () => void
+  onAddNode?: (node: NodeData) => void
 }
 
 interface MindmapCanvasHandle {
@@ -55,6 +58,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
     const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
     const svgRef = useRef<SVGSVGElement | null>(null)
+    const containerRef = useRef<HTMLDivElement | null>(null)
+    const [showCreate, setShowCreate] = useState(false)
+    const [newName, setNewName] = useState('')
+    const [newDesc, setNewDesc] = useState('')
     const draggingRef = useRef(false)
     const lastMousePos = useRef({ x: 0, y: 0 })
     const pinchRef = useRef<{
@@ -82,6 +89,33 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const addNode = useCallback((node: NodeData) => {
       setNodes(prev => [...prev, node])
     }, [])
+
+    const handleSaveNew = useCallback(() => {
+      if (!containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      const x = CANVAS_SIZE / 2
+      const y = CANVAS_SIZE / 2
+      const tx = rect.width / 2 - x
+      const ty = rect.height / 2 - y
+      setTransform({ x: tx, y: ty, k: 1 })
+      const id = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2)
+      const node: NodeData = {
+        id,
+        x,
+        y,
+        label: newName || 'Root Node',
+        description: newDesc || undefined,
+        parentId: null,
+        todoId: null,
+      }
+      addNode(node)
+      onAddNode && onAddNode(node)
+      setShowCreate(false)
+      setNewName('')
+      setNewDesc('')
+    }, [addNode, onAddNode, newName, newDesc])
 
     const updateNode = useCallback((node: NodeData) => {
       setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
@@ -256,6 +290,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     return (
       <div
+        ref={containerRef}
         style={{
           width: containerWidth,
           height: containerHeight,
@@ -336,10 +371,34 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               <button
                 type="button"
                 className="btn-primary"
-                onClick={() => onAddNode && onAddNode()}
+                onClick={() => setShowCreate(true)}
               >
-                Add Node
+                Create Map Node
               </button>
+            </div>
+          </div>
+        )}
+
+        {showCreate && (
+          <div className="modal-overlay" onClick={() => setShowCreate(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <h2>Create Map Node</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                />
+                <textarea
+                  placeholder="Description (optional)"
+                  value={newDesc}
+                  onChange={e => setNewDesc(e.target.value)}
+                />
+                <button className="btn-primary" onClick={handleSaveNew}>
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -350,4 +409,5 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
 MindmapCanvas.displayName = 'MindmapCanvas'
 
+export type { NodeData }
 export default MindmapCanvas

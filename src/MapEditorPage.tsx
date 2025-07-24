@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import MindmapCanvas from './MindmapCanvas'
+import MindmapCanvas, { NodeData } from './MindmapCanvas'
 import { authFetch } from '../authFetch'
 
 interface Mindmap {
@@ -56,12 +55,11 @@ export default function MapEditorPage(): JSX.Element {
   const nodes = getSafeArray(mindmap?.nodes ?? mindmap?.data?.nodes)
   const edges = getSafeArray(mindmap?.edges ?? mindmap?.data?.edges)
 
-  const handleAddNode = () => {
+  const handleAddNode = (node: NodeData) => {
     setMindmap(prev => {
       if (!prev) return prev
       const arr = getSafeArray(prev.nodes ?? (prev as any).data?.nodes)
-      const newNode = { id: uuidv4(), x: 0, y: 0, label: 'New Node' }
-      return { ...prev, nodes: [...arr, newNode] }
+      return { ...prev, nodes: [...arr, node] }
     })
     setReloadFlag(f => f + 1)
   }
