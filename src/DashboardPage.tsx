@@ -284,16 +284,6 @@ export default function DashboardPage(): JSX.Element {
               <div className="metric-value">{maps.length}</div>
               <div className="metric-detail-grid">
                 <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{mapDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{mapWeek}</span>
-                </div>
-              </div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
                   <span className="label">Nodes This Week</span>
                   <span className="value">{nodesThisWeek}</span>
                 </div>
@@ -322,16 +312,6 @@ export default function DashboardPage(): JSX.Element {
             <div className="metric-card">
               <h3 className="metric-title">Kanban Boards</h3>
               <div className="metric-value">{boards.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{boardDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{boardWeek}</span>
-                </div>
-              </div>
               <div className="metric-detail-grid">
                 <div className="metric-detail">
                   <span className="label">Cards Added</span>

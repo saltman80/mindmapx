@@ -129,16 +129,6 @@ export default function KanbanBoardsPage(): JSX.Element {
                 <p>Total: {boards.length}</p>
                 <div className="metric-detail-grid">
                   <div className="metric-detail">
-                    <span className="label">Today</span>
-                    <span className="value">{boardDay}</span>
-                  </div>
-                  <div className="metric-detail">
-                    <span className="label">Week</span>
-                    <span className="value">{boardWeek}</span>
-                  </div>
-                </div>
-                <div className="metric-detail-grid">
-                  <div className="metric-detail">
                     <span className="label">Cards Added</span>
                     <span className="value">0</span>
                   </div>
