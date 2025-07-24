@@ -23,9 +23,9 @@ export const handler = async (
   try {
     await client.query('BEGIN')
     const res = await client.query(
-      `INSERT INTO mindmaps(id, user_id, title, description, created_at)
-       VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
-      [randomUUID(), data.userId ?? null, title.trim(), description.trim() || null]
+      `INSERT INTO mindmaps(user_id, title, description, created_at)
+       VALUES ($1, $2, $3, NOW()) RETURNING id`,
+      [data.userId ?? null, title.trim(), description.trim() || null]
     )
     const mapId = res.rows[0].id
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
