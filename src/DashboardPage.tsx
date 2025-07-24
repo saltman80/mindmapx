@@ -252,9 +252,9 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
-  const recentMaps = [...maps].sort(dateSort).slice(0, 6)
-  const recentTodos = [...todos].sort(dateSort).slice(0, 6)
-  const recentBoards = [...boards].sort(dateSort).slice(0, 6)
+  const recentMaps = [...maps].sort(dateSort).slice(0, 10)
+  const recentTodos = [...todos].sort(dateSort).slice(0, 10)
+  const recentBoards = [...boards].sort(dateSort).slice(0, 10)
 
   const mapItems: DashboardItem[] = recentMaps.map(m => ({
     id: m.id,
@@ -284,7 +284,30 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="dashboard-grid">
+          <div className="dashboard-metrics-row">
+            <div className="metric-card">
+              <h3 className="metric-title">Maps</h3>
+              <div className="metric-value">{maps.length}</div>
+              <p>Today {mapDay}</p>
+              <p>Week {mapWeek}</p>
+              <Sparkline data={mapTrend} />
+            </div>
+            <div className="metric-card">
+              <h3 className="metric-title">Todos</h3>
+              <div className="metric-value">{todos.length}</div>
+              <p>Today {todoDoneDay}</p>
+              <p>Week {todoDoneWeek}</p>
+              <Sparkline data={todoTrend} />
+            </div>
+            <div className="metric-card">
+              <h3 className="metric-title">Boards</h3>
+              <div className="metric-value">{boards.length}</div>
+              <p>Today {boardDay}</p>
+              <p>Week {boardWeek}</p>
+              <Sparkline data={boardTrend} />
+            </div>
+          </div>
+          <div className="dashboard-tile-grid">
             <DashboardTile
               icon={<span role="img" aria-label="Mindmap">🧠</span>}
               title="Mind Maps"
@@ -305,66 +328,6 @@ export default function DashboardPage(): JSX.Element {
               items={boardItems}
               moreLink="/kanban"
               onCreate={() => { setCreateType('board'); setShowModal(true) }}
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Mindmap">🧠</span>}
-              title="Mind Map Metrics"
-              metrics={(
-                <>
-                  <div className="metric-value">{maps.length}</div>
-                  <div className="metric-detail-grid">
-                    <div className="metric-detail">
-                      <span className="label">Nodes This Week</span>
-                      <span className="value">{nodesThisWeek}</span>
-                    </div>
-                    <div className="metric-detail">
-                      <span className="label">Last Week</span>
-                      <span className="value">{nodesLastWeek}</span>
-                    </div>
-                  </div>
-                  <Sparkline data={nodeTrend} />
-                </>
-              )}
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Todos">✅</span>}
-              title="Todo Metrics"
-              metrics={(
-                <>
-                  <div className="metric-value">{todos.length}</div>
-                  <div className="metric-detail-grid">
-                    <div className="metric-detail">
-                      <span className="label">Week Added</span>
-                      <span className="value">{todoAddedWeek}</span>
-                    </div>
-                    <div className="metric-detail">
-                      <span className="label">Week Done</span>
-                      <span className="value">{todoDoneWeek}</span>
-                    </div>
-                  </div>
-                  <Sparkline data={todoTrend} />
-                </>
-              )}
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Kanban">📋</span>}
-              title="Board Metrics"
-              metrics={(
-                <>
-                  <div className="metric-value">{boards.length}</div>
-                  <div className="metric-detail-grid">
-                    <div className="metric-detail">
-                      <span className="label">Cards Added</span>
-                      <span className="value">0</span>
-                    </div>
-                    <div className="metric-detail">
-                      <span className="label">Completed</span>
-                      <span className="value">0</span>
-                    </div>
-                  </div>
-                  <Sparkline data={boardTrend} />
-                </>
-              )}
             />
           </div>
         </>
