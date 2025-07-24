@@ -1539,9 +1539,15 @@ hr {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-2xl);
+}
+
+@media (min-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .metric-card {
@@ -1616,9 +1622,15 @@ hr {
 
 .tiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
+}
+
+@media (min-width: 768px) {
+  .tiles-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* 4 column layout used on list pages */
@@ -2060,8 +2072,14 @@ hr {
 \n// Dashboard tile redesign
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 // redesigned card styles using brand colors
