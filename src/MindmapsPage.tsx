@@ -137,24 +137,30 @@ export default function MindmapsPage(): JSX.Element {
             <p>Today: {mapDay} Week: {mapWeek}</p>
           </div>
 
-          {sorted.map(m => (
-            <div className="tile" key={m.id}>
-              <div className="tile-header">
-                <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
-                <Link
-                  to={`/maps/${m.id}`}
-                  onClick={() =>
-                    localStorage.setItem(
-                      `mindmap_last_viewed_${m.id}`,
-                      Date.now().toString()
-                    )
-                  }
-                >
-                  Open
-                </Link>
-              </div>
+          {sorted.length === 0 ? (
+            <div className="tile empty">
+              <p>No mind maps found.</p>
             </div>
-          ))}
+          ) : (
+            sorted.map(m => (
+              <div className="tile" key={m.id}>
+                <div className="tile-header">
+                  <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
+                  <Link
+                    to={`/maps/${m.id}`}
+                    onClick={() =>
+                      localStorage.setItem(
+                        `mindmap_last_viewed_${m.id}`,
+                        Date.now().toString()
+                      )
+                    }
+                  >
+                    Open
+                  </Link>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
       {showModal && (
