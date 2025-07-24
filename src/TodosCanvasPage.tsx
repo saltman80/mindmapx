@@ -10,8 +10,12 @@ export default function TodosCanvasPage(): JSX.Element {
   useEffect(() => {
     if (!id) return
     authFetch(`/.netlify/functions/todoid/${id}`)
-      .then(res => res.json())
-      .then(data => setTodo(data))
+      .then(async res => {
+        if (!res.ok) return null
+        const data = await res.json().catch(() => null)
+        return data && !('error' in data) ? data : null
+      })
+      .then(setTodo)
       .catch(() => setTodo(null))
   }, [id])
 
