@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 import OpenAI from 'openai'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'

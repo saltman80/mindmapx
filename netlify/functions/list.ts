@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client'
+import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import { extractToken, verifySession } from './auth'
 

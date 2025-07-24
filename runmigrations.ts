@@ -1,7 +1,7 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { pool, getClient } from './netlify/functions/db-client'
+import { pool, getClient } from './netlify/functions/db-client.js'
 import fs from 'fs'
 import bcrypt from 'bcrypt'
 
