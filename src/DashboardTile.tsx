@@ -18,14 +18,15 @@ interface DashboardTileProps {
 
 export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink }: DashboardTileProps) {
   return (
-    <div className="dashboard-tile">
+    <div className={`dashboard-tile${onCreate ? ' highlight-create' : ''}`}>
       <div className="tile-header">
         {icon && <span className="dashboard-icon">{icon}</span>}
         <h2>{title}</h2>
-        {onCreate && (
-          <button className="btn-primary btn-wide" onClick={onCreate}>Create</button>
+        {moreLink && (
+          <Link to={moreLink} className="tile-link tile-link-corner">
+            See All
+          </Link>
         )}
-        {moreLink && <Link to={moreLink} className="tile-link">See All</Link>}
       </div>
       {items.length > 0 && (
         <ul className="recent-list">
@@ -35,6 +36,13 @@ export default function DashboardTile({ icon, title, items = [], metrics, onCrea
             </li>
           ))}
         </ul>
+      )}
+      {onCreate && (
+        <div className="tile-actions">
+          <button className="btn-primary btn-wide" onClick={onCreate}>
+            Create
+          </button>
+        </div>
       )}
       {metrics && <div className="tile-stats">{metrics}</div>}
     </div>
