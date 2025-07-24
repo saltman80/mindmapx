@@ -8,8 +8,46 @@ import {
   useEffect
 } from 'react'
 
+interface NodeData {
+  id: string
+  x: number
+  y: number
+  label?: string
+}
+
+interface EdgeData {
+  id: string
+  from: string
+  to: string
+}
+
+interface MindmapCanvasProps {
+  nodes?: NodeData[]
+  edges?: EdgeData[]
+  width?: number | string
+  height?: number | string
+  onAddNode?: () => void
+}
+
+interface MindmapCanvasHandle {
+  pan: (dx: number, dy: number) => void
+  zoom: (scale: number, cx?: number, cy?: number) => void
+  addNode: (node: NodeData) => void
+  updateNode: (node: NodeData) => void
+  removeNode: (nodeId: string) => void
+}
+
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
-  ({ nodes: propNodes = [], edges: propEdges = [], width, height }, ref) => {
+  (
+    {
+      nodes: propNodes = [],
+      edges: propEdges = [],
+      width,
+      height,
+      onAddNode,
+    },
+    ref
+  ) => {
     const safePropNodes = Array.isArray(propNodes) ? propNodes : []
     const safePropEdges = Array.isArray(propEdges) ? propEdges : []
 
@@ -208,7 +246,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         style={{
           width: width ?? '100%',
           height: height ?? '100%',
-          touchAction: 'none'
+          touchAction: 'none',
+          cursor:
+            safeNodes.length === 0 && safeEdges.length === 0
+              ? 'pointer'
+              : 'default'
         }}
       >
         <svg
@@ -228,7 +270,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               height="50"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="1" cy="1" r="1" fill="#ccc" />
+              <circle cx="1" cy="1" r="1" fill="#FF6A00" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dot-grid)" />
@@ -273,9 +315,18 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             ))}
           </g>
           {safeNodes.length === 0 && safeEdges.length === 0 && (
-            <text x={100} y={100} fill="#aaa">
-              No nodes yet. Click to start building your map!
-            </text>
+            <foreignObject x="0" y="0" width="100%" height="100%">
+              <div className="empty-map-message">
+                <p>No nodes yet. Click to start building your map!</p>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => onAddNode && onAddNode()}
+                >
+                  Add Node
+                </button>
+              </div>
+            </foreignObject>
           )}
         </svg>
       </div>
