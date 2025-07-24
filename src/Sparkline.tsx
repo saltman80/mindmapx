@@ -28,6 +28,7 @@ export default function Sparkline({
       width="100%"
       height={height}
       viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
     >
       <polyline
         fill="none"
