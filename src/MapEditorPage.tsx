@@ -58,18 +58,12 @@ export default function MapEditorPage(): JSX.Element {
     return () => controller.abort()
   }, [id, reloadFlag])
 
+
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
-  if (safeNodes.length === 0) {
-    return (
-      <div className="empty-message">
-        This map is empty. Add your first node to begin.
-      </div>
-    )
-  }
 
   const edges: EdgeData[] = safeNodes
     .filter(n => n.parentId)
@@ -89,6 +83,7 @@ export default function MapEditorPage(): JSX.Element {
       })
       .catch(() => {})
   }
+
 
   if (safeNodes.length === 0 && edges.length === 0) {
     console.log('[mindmap] No nodes or edges found, rendering empty canvas')
