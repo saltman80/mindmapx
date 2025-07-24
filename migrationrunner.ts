@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { getClient } from './netlify/functions/db-client'
+import { getClient } from './netlify/functions/db-client.js'
 
 async function runMigrations() {
   const client = await getClient()
