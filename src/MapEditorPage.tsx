@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas, { NodeData, EdgeData } from './MindmapCanvas'
 import { authFetch } from '../authFetch'
 
@@ -96,14 +96,32 @@ export default function MapEditorPage(): JSX.Element {
     }).catch(() => {})
   }
 
+  const handleSaveLayout = useCallback(() => {
+    nodes.forEach(n => {
+      fetch(`/.netlify/functions/nodes/${n.id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ x: n.x, y: n.y })
+      }).catch(() => {})
+    })
+  }, [nodes])
+
   return (
     <div className="dashboard-layout">
       <main className="main-area">
+        <button
+          onClick={handleSaveLayout}
+          style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
+        >
+          Save Layout
+        </button>
         <MindmapCanvas
           nodes={nodes}
           edges={edges}
           onAddNode={handleAddNode}
           onMoveNode={handleMoveNode}
+          showMiniMap
         />
       </main>
     </div>
