@@ -1753,26 +1753,25 @@ hr {
 }
 
 .metric-detail {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  background: #ffffff;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #ccc;
   padding: var(--spacing-xs) var(--spacing-sm);
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(6px);
-  color: var(--color-text-inverse);
+  color: #000;
 }
 
 .metric-detail .label {
   display: block;
-  color: rgba(255, 255, 255, 0.7);
+  color: #555;
   font-size: 0.75rem;
 }
 
 .metric-detail .value {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #ffffff;
+  color: #000;
 }
 
 
