@@ -278,6 +278,81 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
+          <div className="tiles-grid">
+            <div className="tile create-tile">
+              <header className="tile-header tile-header-center">
+                <h2>Mind Maps</h2>
+                <button
+                  className="btn-primary btn-wide"
+                  onClick={() => {
+                    setCreateType('map')
+                    setShowModal(true)
+                  }}
+                >
+                  Create
+                </button>
+                <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
+              </header>
+              <section className="tile-body">
+                <ul className="recent-list">
+                  {recentMaps.map(m => (
+                    <li key={m.id}>
+                      <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+            <div className="tile" onClick={handleTileClick}>
+              <header className="tile-header tile-header-center">
+                <h2>Todos</h2>
+                <button
+                  className="btn-primary btn-wide"
+                  onClick={() => {
+                    setCreateType('todo')
+                    setShowModal(true)
+                  }}
+                >
+                  Create
+                </button>
+                <Link to="/todos" className="tile-link">Open Todos</Link>
+              </header>
+              <section className="tile-body">
+                <ul className="recent-list">
+                  {recentTodos.map(t => (
+                    <li key={t.id}>
+                      <Link to="/todo-demo">{t.title || t.content}</Link>
+                      {t.completed && ' ✓'}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+            <div className="tile" onClick={handleTileClick}>
+              <header className="tile-header tile-header-center">
+                <h2>Kanban Boards</h2>
+                <button
+                  className="btn-primary btn-wide"
+                  onClick={() => {
+                    setCreateType('board')
+                    setShowModal(true)
+                  }}
+                >
+                  Create
+                </button>
+                <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
+              </header>
+              <section className="tile-body">
+                <ul className="recent-list">
+                  {recentBoards.map(b => (
+                    <li key={b.id}>
+                      <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+          </div>
           <div className="metrics-grid">
             <div className="metric-card">
               <h3 className="metric-title">Mind Maps</h3>
@@ -323,81 +398,6 @@ export default function DashboardPage(): JSX.Element {
                 </div>
               </div>
               <Sparkline data={boardTrend} />
-            </div>
-          </div>
-          <div className="tiles-grid">
-            <div className="tile create-tile">
-              <header className="tile-header tile-header-center">
-                <h2>Mind Maps</h2>
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-                    setCreateType('map')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentMaps.map(m => (
-                    <li key={m.id}>
-                      <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-            <div className="tile" onClick={handleTileClick}>
-              <header className="tile-header tile-header-center">
-                <h2>Todos</h2>
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-                    setCreateType('todo')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/todos" className="tile-link">Open Todos</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentTodos.map(t => (
-                    <li key={t.id}>
-                      <Link to="/todo-demo">{t.title || t.content}</Link>
-                      {t.completed && ' ✓'}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-            <div className="tile" onClick={handleTileClick}>
-              <header className="tile-header tile-header-center">
-                <h2>Kanban Boards</h2>
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-                    setCreateType('board')
-                    setShowModal(true)
-                  }}
-                >
-                  Create
-                </button>
-                <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
-              </header>
-              <section className="tile-body">
-                <ul className="recent-list">
-                  {recentBoards.map(b => (
-                    <li key={b.id}>
-                      <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
             </div>
           </div>
         </>
