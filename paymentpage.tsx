@@ -20,8 +20,6 @@ const PaymentPage: React.FC = (): JSX.Element => {
     setError(null)
 
     try {
-      const token = localStorage.getItem('token')
-      if (!token) return
       const res = await authFetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

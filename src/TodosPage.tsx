@@ -32,11 +32,6 @@ export default function TodosPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setLoading(false)
-        return
-      }
       const res = await authFetch('/.netlify/functions/todos', { credentials: 'include' })
       const json = res.ok ? await res.json() : []
       const list: TodoItem[] = Array.isArray(json) ? json : []

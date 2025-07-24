@@ -22,11 +22,6 @@ const SaveMapButton: React.FC<SaveMapButtonProps> = ({ serializeMap, mapId, onSa
     controllerRef.current = new AbortController()
     try {
       const payload = { id: mapId, data: serializeMap() }
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setIsSaving(false)
-        return
-      }
       const response = await authFetch('/.netlify/functions/saveMap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

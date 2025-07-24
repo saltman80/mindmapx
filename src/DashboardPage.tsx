@@ -56,11 +56,6 @@ export default function DashboardPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setLoading(false)
-        return
-      }
       const [mapsRes, todosRes, boardsRes, nodesRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmaps', { credentials: 'include' }),
         authFetch('/.netlify/functions/todos', { credentials: 'include' }),

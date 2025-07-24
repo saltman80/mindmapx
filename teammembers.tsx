@@ -24,10 +24,8 @@ export default function TeamMembers() {
   }
 
   async function loadMembers() {
-    try {
-      const token = localStorage.getItem('token')
-      if (!token) return
-      const res = await authFetch('/.netlify/functions/team-members')
+      try {
+        const res = await authFetch('/.netlify/functions/team-members')
       if (!res.ok) throw new Error('Failed to load members')
       const data = await res.json()
       setMembers(data.members)
@@ -39,10 +37,8 @@ export default function TeamMembers() {
   async function addMember(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    try {
-      const token = localStorage.getItem('token')
-      if (!token) return
-      const res = await authFetch('/.netlify/functions/team-members', {
+      try {
+        const res = await authFetch('/.netlify/functions/team-members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email }),
