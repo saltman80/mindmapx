@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import LoadingSkeleton from './loadingskeleton'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
+import Sparkline from './src/Sparkline'
 
 interface MapItem {
   id: string
@@ -170,25 +171,61 @@ export default function DashboardPage(): JSX.Element {
           <div className="dashboard-grid">
             <div className="dashboard-row">
               <div className="metric-tile">
-                <h3>Mind Maps</h3>
-                <div className="metric-circle">{maps.length}</div>
-                <p>Created Today: {mapDay}</p>
-                <p>Created This Week: {mapWeek}</p>
-                <Sparkline data={mapTrend} />
+                <div className="metric-left">
+                  <div className="metric-header">
+                    <div className="metric-circle">{maps.length}</div>
+                    <h3>Mind Maps</h3>
+                  </div>
+                  <Sparkline data={mapTrend} />
+                </div>
+                <div className="metric-right metric-detail-grid">
+                  <div className="metric-detail">
+                    <span className="label">Today</span>
+                    <span className="value">{mapDay}</span>
+                  </div>
+                  <div className="metric-detail">
+                    <span className="label">Week</span>
+                    <span className="value">{mapWeek}</span>
+                  </div>
+                </div>
               </div>
               <div className="metric-tile">
-                <h3>Todos</h3>
-                <div className="metric-circle">{todos.length}</div>
-                <p>Completed Today: {todoDoneDay}</p>
-                <p>Completed This Week: {todoDoneWeek}</p>
-                <Sparkline data={todoTrend} />
+                <div className="metric-left">
+                  <div className="metric-header">
+                    <div className="metric-circle">{todos.length}</div>
+                    <h3>Todos</h3>
+                  </div>
+                  <Sparkline data={todoTrend} />
+                </div>
+                <div className="metric-right metric-detail-grid">
+                  <div className="metric-detail">
+                    <span className="label">Done Today</span>
+                    <span className="value">{todoDoneDay}</span>
+                  </div>
+                  <div className="metric-detail">
+                    <span className="label">Done Week</span>
+                    <span className="value">{todoDoneWeek}</span>
+                  </div>
+                </div>
               </div>
               <div className="metric-tile">
-                <h3>Kanban Boards</h3>
-                <div className="metric-circle">{boards.length}</div>
-                <p>Created Today: {boardDay}</p>
-                <p>Created This Week: {boardWeek}</p>
-                <Sparkline data={boardTrend} />
+                <div className="metric-left">
+                  <div className="metric-header">
+                    <div className="metric-circle">{boards.length}</div>
+                    <h3>Kanban Boards</h3>
+                  </div>
+                  <Sparkline data={boardTrend} />
+                </div>
+                <div className="metric-right metric-detail-grid">
+                  <div className="metric-detail">
+                    <span className="label">Today</span>
+                    <span className="value">{boardDay}</span>
+                  </div>
+                  <div className="metric-detail">
+                    <span className="label">Week</span>
+                    <span className="value">{boardWeek}</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="dashboard-row">

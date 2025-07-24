@@ -1666,10 +1666,9 @@ hr {
   border-radius: 12px;
   padding: var(--spacing-md);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--spacing-sm);
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
   min-height: 120px;
   color: var(--color-text-inverse);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -1689,9 +1688,9 @@ hr {
 
 
 .metric-circle {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 6px;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
   background: linear-gradient(135deg, #0ea5e9, #6366f1);
   color: var(--color-text-inverse);
   font-size: 1.25rem;
@@ -1699,6 +1698,26 @@ hr {
   align-items: center;
   justify-content: center;
   font-weight: 600;
+}
+
+.metric-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.metric-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-xs);
 }
 
 .metric-detail-grid {
@@ -1742,8 +1761,8 @@ hr {
 
 .sparkline {
   width: 100%;
-  height: 24px;
-  margin-left: auto;
+  height: 32px;
+  margin-left: 0;
 }
 
 .tiles-grid {
