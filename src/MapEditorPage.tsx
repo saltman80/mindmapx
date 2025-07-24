@@ -176,8 +176,8 @@ export default function MapEditorPage(): JSX.Element {
           Save Layout
         </button>
         <MindmapCanvas
-          nodes={safeNodes}
-          edges={edges}
+          nodes={Array.isArray(nodes) ? nodes : []}
+          edges={Array.isArray(edges) ? edges : []}
           onAddNode={handleAddNode}
           onMoveNode={handleMoveNode}
           showMiniMap
