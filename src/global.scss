@@ -1597,11 +1597,14 @@ hr {
 }
 
 .tile {
-  background-color: var(--color-bg-alt);
+  background: linear-gradient(135deg, var(--color-bg), var(--color-bg-alt));
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: var(--spacing-lg);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .tile-header {
@@ -1609,6 +1612,12 @@ hr {
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-md);
+}
+
+.tile-body {
+  flex-grow: 1;
+  font-size: 0.9rem;
+  color: var(--color-text);
 }
 
 .tile-actions {
@@ -1641,6 +1650,9 @@ hr {
   justify-content: center;
   text-align: center;
   min-height: 150px;
+  background-color: #fff7ed;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .create-tile button {
@@ -1656,6 +1668,13 @@ hr {
 
 .create-tile button:hover {
   background-color: var(--color-warning);
+}
+
+.ghost-tile {
+  border: 2px dashed var(--color-border);
+  background-color: transparent;
+  min-height: 120px;
+  opacity: 0.5;
 }
 
 .tile-header-center {
