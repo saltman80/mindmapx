@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -26,6 +26,7 @@ export default function TodosPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
+  const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
@@ -52,7 +53,7 @@ export default function TodosPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      await fetch('/.netlify/functions/todos', {
+      const res = await fetch('/.netlify/functions/todos', {
         method: 'POST',
         credentials: 'include', // Required for session cookie
         headers: {
@@ -60,9 +61,14 @@ export default function TodosPage(): JSX.Element {
         },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.id) {
+        setTimeout(() => navigate(`/todo/${json.id}`), 250)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'Creation failed')
     }
@@ -70,15 +76,20 @@ export default function TodosPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      await fetch('/.netlify/functions/ai-create-todo', {
+      const res = await fetch('/.netlify/functions/ai-create-todo', {
         method: 'POST',
         credentials: 'include',
         headers: authHeaders(),
         body: JSON.stringify({ prompt: form.description }),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.id) {
+        setTimeout(() => navigate(`/todo/${json.id}`), 250)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
     }
