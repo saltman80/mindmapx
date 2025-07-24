@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import SidebarNav from './SidebarNav'
 import MindmapCanvas from './MindmapCanvas'
 import { authFetch } from '../authFetch'
 
@@ -75,25 +74,12 @@ export default function MapEditorPage(): JSX.Element {
 
   return (
     <div className="dashboard-layout">
-      <SidebarNav />
-      <main className="main-area" style={{ position: 'relative' }}>
-        <MindmapCanvas nodes={nodes} edges={edges} />
-        {nodes.length === 0 && edges.length === 0 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-            }}
-          >
-            <p>No nodes yet.</p>
-            <button type="button" onClick={handleAddNode} className="btn-primary">
-              Add Node
-            </button>
-          </div>
-        )}
+      <main className="main-area">
+        <MindmapCanvas
+          nodes={nodes}
+          edges={edges}
+          onAddNode={handleAddNode}
+        />
       </main>
     </div>
   )
