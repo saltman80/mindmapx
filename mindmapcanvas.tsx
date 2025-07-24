@@ -69,6 +69,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const [newDesc, setNewDesc] = useState('')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [addParentId, setAddParentId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+  const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
+  const [newTask, setNewTask] = useState('')
+  const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
   const modeRef = useRef<'canvas' | 'node' | null>(null)
     const dragStartRef = useRef({ x: 0, y: 0 })
     const originRef = useRef({ x: 0, y: 0 })
@@ -162,6 +168,61 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setNewName('')
       setNewDesc('')
     }, [addParentId, addNode, nodes, newName, newDesc, onAddNode])
+
+    const openEditModal = useCallback((id: string) => {
+      const node = nodes.find(n => n.id === id)
+      if (!node) return
+      setEditingId(id)
+      setEditTitle(node.label || '')
+      setEditDesc(node.description || '')
+    }, [nodes])
+
+    const handleSaveEdit = useCallback(() => {
+      if (!editingId) return
+      const node = nodes.find(n => n.id === editingId)
+      if (!node) return
+      const updated = { ...node, label: editTitle, description: editDesc }
+      updateNode(updated)
+      setEditingId(null)
+      setEditTitle('')
+      setEditDesc('')
+    }, [editingId, editTitle, editDesc, nodes, updateNode])
+
+    const handleDeleteNode = useCallback((id: string) => {
+      if (!window.confirm('Are you sure you want to delete this node?')) return
+      removeNode(id)
+    }, [removeNode])
+
+    const handleAddTask = useCallback(() => {
+      if (!todoNodeId) return
+      const text = newTask.trim()
+      if (!text) return
+      const taskId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).slice(2)
+      setTodoLists(prev => {
+        const list = prev[todoNodeId] ?? []
+        return { ...prev, [todoNodeId]: [...list, { id: taskId, text, done: false }] }
+      })
+      setNewTask('')
+    }, [todoNodeId, newTask])
+
+    const handleToggleTask = useCallback((taskId: string) => {
+      if (!todoNodeId) return
+      setTodoLists(prev => {
+        const list = prev[todoNodeId] ?? []
+        return {
+          ...prev,
+          [todoNodeId]: list.map(t => t.id === taskId ? { ...t, done: !t.done } : t)
+        }
+      })
+    }, [todoNodeId])
+
+    const handleDeleteTask = useCallback((taskId: string) => {
+      if (!todoNodeId) return
+      setTodoLists(prev => {
+        const list = prev[todoNodeId] ?? []
+        return { ...prev, [todoNodeId]: list.filter(t => t.id !== taskId) }
+      })
+    }, [todoNodeId])
 
     const updateNode = useCallback((node: NodeData) => {
       setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
@@ -454,34 +515,67 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   {node.label}
                 </text>
               )}
+              {todoLists[node.id]?.length ? (
+                <text
+                  fontSize={12 / transform.k}
+                  x={14 / transform.k}
+                  y={14 / transform.k}
+                >
+                  ✓
+                </text>
+              ) : null}
               {hoveredId === node.id && (
                 <g
-                  className="add-child-button"
+                  className="hover-panel"
                   transform={`translate(${20 / transform.k},${-20 / transform.k})`}
                   onPointerDown={e => e.stopPropagation()}
-                  onClick={e => {
-                    e.stopPropagation()
-                    setHoveredId(null)
-                    setAddParentId(node.id)
-                    setNewName('')
-                    setNewDesc('')
-                  }}
                 >
-                  <circle
-                    r={8 / transform.k}
-                    fill="orange"
-                    stroke="#000"
-                    strokeWidth={1 / transform.k}
-                  />
-                  <text
-                    textAnchor="middle"
-                    dy=".35em"
-                    fontSize={10 / transform.k}
-                    pointerEvents="none"
-                    fill="#000"
+                  <g
+                    transform="translate(0,0)"
+                    onClick={e => {
+                      e.stopPropagation()
+                      setHoveredId(null)
+                      setAddParentId(node.id)
+                      setNewName('')
+                      setNewDesc('')
+                    }}
                   >
-                    +
-                  </text>
+                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">+</text>
+                  </g>
+                  <g
+                    transform={`translate(${18 / transform.k},0)`}
+                    onClick={e => {
+                      e.stopPropagation()
+                      setHoveredId(null)
+                      openEditModal(node.id)
+                    }}
+                  >
+                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">✏️</text>
+                  </g>
+                  <g
+                    transform={`translate(${36 / transform.k},0)`}
+                    onClick={e => {
+                      e.stopPropagation()
+                      setHoveredId(null)
+                      handleDeleteNode(node.id)
+                    }}
+                  >
+                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">🗑️</text>
+                  </g>
+                  <g
+                    transform={`translate(${54 / transform.k},0)`}
+                    onClick={e => {
+                      e.stopPropagation()
+                      setHoveredId(null)
+                      setTodoNodeId(node.id)
+                    }}
+                  >
+                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">✓</text>
+                  </g>
                 </g>
               )}
               </g>
@@ -562,6 +656,52 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   Add Node
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+        {editingId && (
+          <div className="modal-overlay" onClick={() => setEditingId(null)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <h2>Edit Node</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  placeholder="Title"
+                />
+                <textarea
+                  value={editDesc}
+                  onChange={e => setEditDesc(e.target.value)}
+                  placeholder="Notes"
+                />
+                <button className="btn-primary" onClick={handleSaveEdit}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {todoNodeId && (
+          <div className="modal-overlay" onClick={() => setTodoNodeId(null)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <h2>To-Do List</h2>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <input
+                  type="text"
+                  value={newTask}
+                  onChange={e => setNewTask(e.target.value)}
+                  placeholder="New task"
+                />
+                <button onClick={handleAddTask}>Add</button>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {(todoLists[todoNodeId] || []).map(t => (
+                  <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <input type="checkbox" checked={t.done} onChange={() => handleToggleTask(t.id)} />
+                    <span style={{ textDecoration: t.done ? 'line-through' : 'none', flexGrow: 1 }}>{t.text}</span>
+                    <button onClick={() => handleDeleteTask(t.id)}>x</button>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         )}
