@@ -21,6 +21,7 @@ export default function MapEditorPage(): JSX.Element {
   const [mindmap, setMindmap] = useState<Mindmap | null>(null)
   const [error, setError] = useState(false)
   const [reloadFlag, setReloadFlag] = useState(0)
+  const [nodes, setNodes] = useState<NodeData[]>([])
 
   useEffect(() => {
     if (!id) return
@@ -49,6 +50,19 @@ export default function MapEditorPage(): JSX.Element {
     }
   }, [id, reloadFlag])
 
+  useEffect(() => {
+    if (!id) return
+    const controller = new AbortController()
+    fetch(`/.netlify/functions/nodes?mindmapId=${id}`, { credentials: 'include', signal: controller.signal })
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        if (!Array.isArray(data)) return
+        setNodes(data)
+      })
+      .catch(() => {})
+    return () => controller.abort()
+  }, [id, reloadFlag])
+
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
@@ -56,12 +70,18 @@ export default function MapEditorPage(): JSX.Element {
   const edges = getSafeArray(mindmap?.edges ?? mindmap?.data?.edges)
 
   const handleAddNode = (node: NodeData) => {
-    setMindmap(prev => {
-      if (!prev) return prev
-      const arr = getSafeArray(prev.nodes ?? (prev as any).data?.nodes)
-      return { ...prev, nodes: [...arr, node] }
+    if (!id) return
+    fetch('/.netlify/functions/nodes', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...node, mindmapId: id })
     })
-    setReloadFlag(f => f + 1)
+      .then(res => res.json())
+      .then(data => {
+        setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
+      })
+      .catch(() => {})
   }
 
   if (nodes.length === 0 && edges.length === 0) {
@@ -70,6 +90,15 @@ export default function MapEditorPage(): JSX.Element {
 
   console.log('mapData:', mindmap)
 
+  const handleMoveNode = (node: NodeData) => {
+    fetch(`/.netlify/functions/nodes/${node.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ x: node.x, y: node.y })
+    }).catch(() => {})
+  }
+
   return (
     <div className="dashboard-layout">
       <main className="main-area">
@@ -77,6 +106,7 @@ export default function MapEditorPage(): JSX.Element {
           nodes={nodes}
           edges={edges}
           onAddNode={handleAddNode}
+          onMoveNode={handleMoveNode}
         />
       </main>
     </div>
