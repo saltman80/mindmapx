@@ -10,8 +10,11 @@ import {
 
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   ({ nodes: propNodes = [], edges: propEdges = [], width, height }, ref) => {
-    const [nodes, setNodes] = useState<NodeData[]>(() => propNodes)
-    const [edges, setEdges] = useState<EdgeData[]>(() => propEdges)
+    const safePropNodes = Array.isArray(propNodes) ? propNodes : []
+    const safePropEdges = Array.isArray(propEdges) ? propEdges : []
+
+    const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
+    const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
     const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
     const svgRef = useRef<SVGSVGElement | null>(null)
     const draggingRef = useRef(false)
@@ -62,6 +65,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       nodes.forEach(n => map.set(n.id, n))
       return map
     }, [nodes])
+
+    const safeNodes = Array.isArray(nodes) ? nodes : []
+    const safeEdges = Array.isArray(edges) ? edges : []
 
     const handleMouseMove = useCallback(
       (e: MouseEvent) => {
@@ -226,7 +232,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
-            {(edges || []).map(edge => {
+            {safeEdges.map(edge => {
               const from = nodeMap.get(edge.from)
               const to = nodeMap.get(edge.to)
               if (!from || !to) return null
@@ -242,7 +248,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 />
               )
             })}
-            {(nodes || []).map(node => (
+            {safeNodes.map(node => (
               <g key={node.id} transform={`translate(${node.x},${node.y})`}>
                 <circle
                   r={20 / transform.k}
