@@ -62,7 +62,9 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
-  const edges: EdgeData[] = nodes
+  const safeNodes = Array.isArray(nodes) ? nodes : []
+
+  const edges: EdgeData[] = safeNodes
     .filter(n => n.parentId)
     .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
 

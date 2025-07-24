@@ -63,23 +63,28 @@ export default function DashboardPage(): JSX.Element {
         authFetch('/.netlify/functions/boards', { credentials: 'include' }),
         authFetch('/.netlify/functions/node', { credentials: 'include' }),
       ])
-      const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
+      const mapsJson = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
         : []
-      const todoJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
+      const mapsList: MapItem[] = Array.isArray(mapsJson) ? mapsJson : mapsJson.maps || []
+
+      const todosJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
         ? await todosRes.json()
         : []
-      const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : []
+      const todosList: TodoItem[] = Array.isArray(todosJson) ? todosJson : todosJson.todos || []
+
       const boardsJson = boardsRes.ok && boardsRes.headers.get('content-type')?.includes('application/json')
         ? await boardsRes.json()
-        : { boards: [] }
+        : []
       const boardsList: BoardItem[] = Array.isArray(boardsJson) ? boardsJson : boardsJson.boards || []
+
       const nodesJson = nodesRes.ok && nodesRes.headers.get('content-type')?.includes('application/json')
         ? await nodesRes.json()
-        : { nodes: [] }
+        : []
       const nodesList: NodeItem[] = Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes || []
-      setMaps(Array.isArray(mapsData) ? mapsData : [])
-      setTodos(todoList)
+
+      setMaps(mapsList)
+      setTodos(todosList)
       setBoards(boardsList)
       setNodes(nodesList)
     } catch (err: any) {
@@ -189,58 +194,63 @@ export default function DashboardPage(): JSX.Element {
   const weekAgo = now - oneWeek
   const twoWeekAgo = now - 2 * oneWeek
 
-  const mapDay = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
-  const mapWeek = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
+  const safeMapArray = Array.isArray(maps) ? maps : []
+  const safeTodoArray = Array.isArray(todos) ? todos : []
+  const safeBoardArray = Array.isArray(boards) ? boards : []
+  const safeNodeArray = Array.isArray(nodes) ? nodes : []
 
-  const nodesThisWeek = nodes.filter(n => new Date(n.createdAt || n.created_at || '').getTime() > weekAgo).length
-  const nodesLastWeek = nodes.filter(n => {
+  const mapDay = safeMapArray.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
+  const mapWeek = safeMapArray.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
+
+  const nodesThisWeek = safeNodeArray.filter(n => new Date(n.createdAt || n.created_at || '').getTime() > weekAgo).length
+  const nodesLastWeek = safeNodeArray.filter(n => {
     const t = new Date(n.createdAt || n.created_at || '').getTime()
     return t > twoWeekAgo && t <= weekAgo
   }).length
 
-  const todoAddedDay = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
-  const todoAddedWeek = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
-  const todoDoneDay = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
-  const todoDoneWeek = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
+  const todoAddedDay = safeTodoArray.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
+  const todoAddedWeek = safeTodoArray.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
+  const todoDoneDay = safeTodoArray.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
+  const todoDoneWeek = safeTodoArray.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
 
-  const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
-  const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
+  const boardDay = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
+  const boardWeek = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
 
-  const mapTrend = Array.from({ length: 14 }, (_v, i) => {
+  const mapTrend = Array.from({ length: 14 }, (_, i) => {
     const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
-    return maps.filter(m => {
+    return safeMapArray.filter(m => {
       const t = new Date(m.createdAt || m.created_at || '').getTime()
       return t >= start.getTime() && t < end
     }).length
   })
 
-  const todoTrend = Array.from({ length: 14 }, (_v, i) => {
+  const todoTrend = Array.from({ length: 14 }, (_, i) => {
     const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
-    return todos.filter(t => {
+    return safeTodoArray.filter(t => {
       const t1 = new Date(t.updatedAt || t.updated_at || '').getTime()
       return t.completed && t1 >= start.getTime() && t1 < end
     }).length
   })
 
-  const boardTrend = Array.from({ length: 14 }, (_v, i) => {
+  const boardTrend = Array.from({ length: 14 }, (_, i) => {
     const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
-    return boards.filter(b => {
+    return safeBoardArray.filter(b => {
       const t2 = new Date(b.createdAt || b.created_at || '').getTime()
       return t2 >= start.getTime() && t2 < end
     }).length
   })
 
-  const nodeTrend = Array.from({ length: 14 }, (_v, i) => {
+  const nodeTrend = Array.from({ length: 14 }, (_, i) => {
     const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
-    return nodes.filter(n => {
+    return safeNodeArray.filter(n => {
       const tn = new Date(n.createdAt || n.created_at || '').getTime()
       return tn >= start.getTime() && tn < end
     }).length
@@ -252,9 +262,9 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
-  const recentMaps = [...maps].sort(dateSort).slice(0, 10)
-  const recentTodos = [...todos].sort(dateSort).slice(0, 10)
-  const recentBoards = [...boards].sort(dateSort).slice(0, 10)
+  const recentMaps = [...safeMapArray].sort(dateSort).slice(0, 10)
+  const recentTodos = [...safeTodoArray].sort(dateSort).slice(0, 10)
+  const recentBoards = [...safeBoardArray].sort(dateSort).slice(0, 10)
 
   const mapItems: DashboardItem[] = recentMaps.map(m => ({
     id: m.id,
