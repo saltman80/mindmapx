@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import MindmapCanvas from '../mindmapcanvas'
 
 interface NodeData {
   id: string
@@ -36,6 +37,29 @@ export default function MapEditorPage(): JSX.Element {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [trigger, setTrigger] = useState(0)
+  interface CanvasNode { id: string; x: number; y: number; label?: string }
+  interface CanvasEdge { id: string; from: string; to: string }
+  const [canvasNodes, setCanvasNodes] = useState<CanvasNode[]>([])
+  const [canvasEdges, setCanvasEdges] = useState<CanvasEdge[]>([])
+
+  useEffect(() => {
+    if (!map) return
+    const nodes = map.nodes.map((n, i) => ({
+      id: n.id,
+      x: i * 120,
+      y: 100,
+      label: n.content
+    }))
+    const edges = map.nodes
+      .filter(n => n.parentId)
+      .map(n => ({
+        id: `${n.parentId}-${n.id}`,
+        from: n.parentId as string,
+        to: n.id
+      }))
+    setCanvasNodes(nodes)
+    setCanvasEdges(edges)
+  }, [map])
 
   useEffect(() => {
     if (!mapId) return
@@ -109,6 +133,7 @@ export default function MapEditorPage(): JSX.Element {
           />
         </label>
       </div>
+      <MindmapCanvas nodes={canvasNodes} edges={canvasEdges} width={800} height={600} />
       <button onClick={() => addNode()} disabled={saving}>Add Root Node</button>
       <ul>
         {map.nodes.map(node => (
