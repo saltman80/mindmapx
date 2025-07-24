@@ -105,7 +105,7 @@ export default function DashboardPage(): JSX.Element {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ title: form.title, description: form.description }),
+          body: JSON.stringify({ data: { title: form.title, description: form.description } }),
         })
         const json = await res.json()
         if (json?.id) {
