@@ -86,6 +86,19 @@ export async function runMigrations(): Promise<void> {
     `)
 
     await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'data'
+        ) THEN
+          ALTER TABLE mindmaps ADD COLUMN data JSONB DEFAULT '{}'::jsonb;
+        END IF;
+      END;
+      $$;
+    `)
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS nodes (
         id          UUID PRIMARY KEY,
         mindmap_id  UUID NOT NULL REFERENCES mindmaps(id),
