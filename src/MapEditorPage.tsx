@@ -6,8 +6,15 @@ import { authFetch } from '../authFetch'
 
 interface Mindmap {
   id: string
-  title: string
+  title?: string
   description?: string
+  nodes?: unknown[]
+  edges?: unknown[]
+  data?: {
+    nodes?: unknown[]
+    edges?: unknown[]
+    [key: string]: any
+  }
   config?: object
 }
 
@@ -20,7 +27,7 @@ export default function MapEditorPage(): JSX.Element {
     if (!id) return
     let ignore = false
 
-    authFetch(`/.netlify/functions/mindmaps?id=${id}`)
+    authFetch(`/api/maps/${id}`)
       .then(async res => {
         if (!res.ok) {
           if (!ignore) setError(true)
@@ -41,11 +48,24 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
+  const nodes = Array.isArray(mindmap.nodes)
+    ? mindmap.nodes
+    : Array.isArray(mindmap.data?.nodes)
+      ? (mindmap.data?.nodes as unknown[])
+      : []
+  const edges = Array.isArray(mindmap.edges)
+    ? mindmap.edges
+    : Array.isArray(mindmap.data?.edges)
+      ? (mindmap.data?.edges as unknown[])
+      : []
+
+  console.log('mapData:', mindmap)
+
   return (
     <div className="dashboard-layout">
       <SidebarNav />
       <main className="main-area">
-        <MindmapCanvas mindmap={mindmap} />
+        <MindmapCanvas nodes={nodes} edges={edges} />
       </main>
     </div>
   )
