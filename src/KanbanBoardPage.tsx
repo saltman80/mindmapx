@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import KanbanCanvas from '../KanbanCanvas'
 import { authFetch } from '../authFetch'
+import SidebarNav from './SidebarNav'
 
 interface BoardItem {
   id: string
@@ -33,9 +34,12 @@ export default function KanbanBoardPage(): JSX.Element {
   if (!boardId) return <div>No board specified</div>
 
   return (
-    <div className="kanban-board-page">
-      <h1>{board?.title || 'Kanban Board'}</h1>
-      <KanbanCanvas />
+    <div className="dashboard-layout">
+      <SidebarNav />
+      <main className="main-area kanban-board-page">
+        <h1>{board?.title || 'Kanban Board'}</h1>
+        <KanbanCanvas />
+      </main>
     </div>
   )
 }
