@@ -2025,3 +2025,32 @@ hr {
 .empty-canvas-modal p {
   margin-bottom: 1rem;
 }
+.team-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+}
+
+.form-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2.5rem;
+}
+
+.placeholder-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.placeholder-tile {
+  width: 100px;
+  height: 160px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  opacity: 0.4;
+}
