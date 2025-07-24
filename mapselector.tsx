@@ -1,3 +1,15 @@
+import { useState, useEffect } from 'react'
+
+interface MapInfo {
+  id: string | number
+  name: string
+}
+
+interface MapSelectorProps {
+  selectedMapId: MapInfo['id'] | null
+  onSelectMap: (id: MapInfo['id']) => void
+}
+
 const MapSelector: React.FC<MapSelectorProps> = ({ selectedMapId, onSelectMap }) => {
   const [maps, setMaps] = useState<MapInfo[]>([])
   const [loading, setLoading] = useState(true)
