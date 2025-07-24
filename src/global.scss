@@ -1656,11 +1656,11 @@ hr {
 }
 
 .dashboard-tile .tile-header h2 {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .dashboard-tile .tile-header .tile-link-corner {
@@ -1675,6 +1675,7 @@ hr {
 .dashboard-tile .tile-actions {
   display: flex;
   justify-content: center;
+  text-align: center;
   margin-top: var(--spacing-sm);
 }
 
@@ -1952,6 +1953,11 @@ hr {
 .btn-wide {
   padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 1rem;
+}
+
+.btn-plus {
+  margin-right: var(--spacing-xs);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
@@ -2269,6 +2275,7 @@ hr {
 .dashboard-icon {
   font-size: 2rem;
   filter: grayscale(100%);
+  margin-right: var(--spacing-xs);
 }
 
 .card-body {

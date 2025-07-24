@@ -40,6 +40,7 @@ export default function DashboardTile({ icon, title, items = [], metrics, onCrea
       {onCreate && (
         <div className="tile-actions">
           <button className="btn-primary btn-wide" onClick={onCreate}>
+            <span className="btn-plus" aria-hidden="true">+</span>
             Create
           </button>
         </div>
