@@ -45,7 +45,6 @@ export default function DashboardPage(): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [boards, setBoards] = useState<BoardItem[]>([])
   const [nodes, setNodes] = useState<NodeItem[]>([])
-  const [recentMindmaps, setRecentMindmaps] = useState<MapItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -96,23 +95,6 @@ export default function DashboardPage(): JSX.Element {
 
   useEffect(() => { fetchData() }, [])
 
-  useEffect(() => {
-    authFetch('/.netlify/functions/mindmaps')
-      .then(async res => {
-        try {
-          const json = await res.json()
-          if (Array.isArray(json)) return json
-          if (Array.isArray((json as any).maps)) return (json as any).maps
-          return []
-        } catch {
-          return []
-        }
-      })
-      .then(setRecentMindmaps)
-      .catch(() => {
-        setRecentMindmaps([])
-      })
-  }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
@@ -280,6 +262,7 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
+  const recentMaps = [...maps].sort(dateSort).slice(0, 5)
   const recentTodos = [...todos].sort(dateSort).slice(0, 10)
   const recentBoards = [...boards].sort(dateSort).slice(0, 10)
 
@@ -334,7 +317,7 @@ export default function DashboardPage(): JSX.Element {
                 <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
               </div>
               <ul className="recent-list">
-                {recentMindmaps.slice(0, 5).map(m => (
+                {recentMaps.map(m => (
                   <li key={m.id}>
                     <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
                   </li>
