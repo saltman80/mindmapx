@@ -51,7 +51,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
 
       const result = await client.query(
-        `INSERT INTO mindmaps (user_id, title, description, config) VALUES ($1, $2, $3, '{}'::jsonb)
+        `INSERT INTO mindmaps (user_id, title, description, config)
+         VALUES ($1, $2, $3, '{}'::jsonb)
          RETURNING id, title, description, created_at`,
         [userId, parsed.data.title, parsed.data.description]
       )
