@@ -10,11 +10,6 @@ interface Mindmap {
   description?: string
   nodes?: unknown[]
   edges?: unknown[]
-  data?: {
-    nodes?: unknown[]
-    edges?: unknown[]
-    [key: string]: any
-  }
   config?: object
 }
 
@@ -48,16 +43,12 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
-  const nodes = Array.isArray(mindmap?.nodes)
-    ? mindmap.nodes
-    : Array.isArray(mindmap?.data?.nodes)
-      ? mindmap.data.nodes
-      : []
-  const edges = Array.isArray(mindmap?.edges)
-    ? mindmap.edges
-    : Array.isArray(mindmap?.data?.edges)
-      ? mindmap.data.edges
-      : []
+  const nodes = Array.isArray(mindmap?.nodes) ? mindmap.nodes : []
+  const edges = Array.isArray(mindmap?.edges) ? mindmap.edges : []
+
+  if (nodes.length === 0 && edges.length === 0) {
+    console.log('[mindmap] No nodes or edges found, rendering empty canvas')
+  }
 
   console.log('mapData:', mindmap)
 
