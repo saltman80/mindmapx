@@ -382,6 +382,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           height: containerHeight,
           overflow: 'auto',
           touchAction: 'none',
+          position: 'relative',
           cursor:
             safeNodes.length === 0 && safeEdges.length === 0
               ? 'pointer'
@@ -460,6 +461,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   onPointerDown={e => e.stopPropagation()}
                   onClick={e => {
                     e.stopPropagation()
+                    setHoveredId(null)
                     setAddParentId(node.id)
                     setNewName('')
                     setNewDesc('')
@@ -486,6 +488,21 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             ))}
           </g>
         </svg>
+        <div
+          className="zoom-controls"
+          style={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            zIndex: 10,
+          }}
+        >
+          <button type="button" onClick={() => zoom(1.1)}>+</button>
+          <button type="button" onClick={() => zoom(0.9)}>-</button>
+        </div>
         {safeNodes.length === 0 && safeEdges.length === 0 && (
           <div className="modal-overlay empty-canvas-modal">
             <div className="modal">
