@@ -115,24 +115,24 @@ export default function KanbanBoardsPage(): JSX.Element {
         <> 
           <div className="four-col-grid">
             <div className="tile create-tile">
-              <div className="tile-header"><h2>Create Board</h2></div>
-              <div className="tile-body">
+              <header className="tile-header"><h2>Create Board</h2></header>
+              <section className="tile-body">
                 <p className="create-help">Click Create to manually add or use AI to get started.</p>
                 <button className="btn-primary" onClick={() => setShowModal(true)}>
                   Create
                 </button>
-              </div>
+              </section>
             </div>
             <div className="tile">
-              <div className="tile-header"><h2>Metrics</h2></div>
-              <div className="tile-body">
+              <header className="tile-header"><h2>Metrics</h2></header>
+              <section className="tile-body">
                 <p>Total: {boards.length}</p>
                 <p>Today: {boardDay} Week: {boardWeek}</p>
-              </div>
+              </section>
             </div>
             {sorted.map(b => (
               <div className="tile" key={b.id}>
-                <div className="tile-header">
+                <header className="tile-header">
                   <h2>{b.title || 'Board'}</h2>
                   <Link
                     to={`/kanban/${b.id}`}
@@ -145,10 +145,10 @@ export default function KanbanBoardsPage(): JSX.Element {
                   >
                     Open
                   </Link>
-                </div>
-                <div className="tile-body">
+                </header>
+                <section className="tile-body">
                   <p>Board details coming soon...</p>
-                </div>
+                </section>
               </div>
             ))}
             {Array.from({ length: 10 }).map((_v, i) => (

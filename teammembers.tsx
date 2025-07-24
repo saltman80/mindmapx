@@ -101,14 +101,16 @@ export default function TeamMembers() {
         <div className="four-col-grid mt-6">
           {members.map(m => (
             <div className="tile" key={m.id}>
-              <div className="tile-header">
+              <header className="tile-header">
                 <h2>{m.name || m.email}</h2>
                 <div className="tile-actions">
                   <button onClick={() => updateMember(m.id)}>Update</button>
                   <button onClick={() => removeMember(m.id)} className="tile-link">Delete</button>
                 </div>
-              </div>
-              {m.name && <p>{m.email}</p>}
+              </header>
+              <section className="tile-body">
+                {m.name && <p>{m.email}</p>}
+              </section>
             </div>
           ))}
         </div>
