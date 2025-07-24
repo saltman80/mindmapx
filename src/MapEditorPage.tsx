@@ -3,6 +3,30 @@ import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas, { NodeData, EdgeData } from './MindmapCanvas'
 import { authFetch } from '../authFetch'
 
+function FirstNodeModal({ onCreate }: { onCreate: (label: string) => void }) {
+  const [label, setLabel] = useState('')
+  return (
+    <div className="modal-overlay">
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <h2>Create Your First Node</h2>
+        <input
+          type="text"
+          className="form-input"
+          value={label}
+          onChange={e => setLabel(e.target.value)}
+          placeholder="Node title"
+          required
+        />
+        <div style={{ marginTop: '1rem' }}>
+          <button className="btn-primary" onClick={() => onCreate(label)}>
+            Create Node
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface Mindmap {
   id: string
   title?: string
@@ -18,6 +42,8 @@ export default function MapEditorPage(): JSX.Element {
   const [error, setError] = useState(false)
   const [reloadFlag, setReloadFlag] = useState(0)
   const [nodes, setNodes] = useState<NodeData[]>([])
+  const [showFirstNodeModal, setShowFirstNodeModal] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -58,6 +84,11 @@ export default function MapEditorPage(): JSX.Element {
     return () => controller.abort()
   }, [id, reloadFlag])
 
+  useEffect(() => {
+    if (nodes.length >= 0) setLoaded(true)
+    if (nodes.length === 0) setShowFirstNodeModal(true)
+  }, [nodes])
+
 
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
@@ -82,6 +113,30 @@ export default function MapEditorPage(): JSX.Element {
         setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
       })
       .catch(() => {})
+  }
+
+  const handleCreateFirstNode = (label: string) => {
+    if (!id) return
+    const newNode = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      label,
+      parentId: null,
+    }
+    fetch('/.netlify/functions/nodes', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newNode, mindmapId: id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        setNodes(prev => [...prev, { ...newNode, id: data.id } as NodeData])
+        setShowFirstNodeModal(false)
+      })
+      .catch(err => {
+        console.error('[CreateFirstNode] Failed to create node', err)
+      })
   }
 
 
@@ -127,6 +182,9 @@ export default function MapEditorPage(): JSX.Element {
           onMoveNode={handleMoveNode}
           showMiniMap
         />
+        {loaded && nodes.length === 0 && showFirstNodeModal && (
+          <FirstNodeModal onCreate={handleCreateFirstNode} />
+        )}
       </main>
     </div>
   )
