@@ -1720,6 +1720,17 @@ hr {
   gap: var(--spacing-xs);
 }
 
+.dashboard-page .metric-left,
+.dashboard-page .metric-right {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.dashboard-page .metric-right.metric-detail-grid {
+  grid-template-columns: 1fr;
+  justify-items: end;
+}
+
 .metric-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1756,6 +1767,7 @@ hr {
 .metric-detail .value {
   font-weight: 600;
   font-size: 0.9rem;
+  color: var(--color-text);
 }
 
 
