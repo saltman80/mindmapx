@@ -302,7 +302,7 @@ export default function DashboardPage(): JSX.Element {
             </div>
           </div>
           <div className="tiles-grid">
-            <div className="tile">
+            <div className="tile create-tile">
               <div className="tile-header tile-header-center">
                 <h2>Mind Maps</h2>
                 <button
@@ -316,13 +316,15 @@ export default function DashboardPage(): JSX.Element {
                 </button>
                 <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
               </div>
-              <ul className="recent-list">
-                {recentMaps.map(m => (
-                  <li key={m.id}>
-                    <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
-                  </li>
-                ))}
-              </ul>
+              <div className="tile-body">
+                <ul className="recent-list">
+                  {recentMaps.map(m => (
+                    <li key={m.id}>
+                      <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header tile-header-center">
@@ -338,14 +340,16 @@ export default function DashboardPage(): JSX.Element {
                 </button>
                 <Link to="/todos" className="tile-link">Open Todos</Link>
               </div>
-              <ul className="recent-list">
-                {recentTodos.map(t => (
-                  <li key={t.id}>
-                    <Link to="/todo-demo">{t.title || t.content}</Link>
-                    {t.completed && ' ✓'}
-                  </li>
-                ))}
-              </ul>
+              <div className="tile-body">
+                <ul className="recent-list">
+                  {recentTodos.map(t => (
+                    <li key={t.id}>
+                      <Link to="/todo-demo">{t.title || t.content}</Link>
+                      {t.completed && ' ✓'}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <div className="tile" onClick={handleTileClick}>
               <div className="tile-header tile-header-center">
@@ -361,13 +365,15 @@ export default function DashboardPage(): JSX.Element {
                 </button>
                 <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
               </div>
-              <ul className="recent-list">
-                {recentBoards.map(b => (
-                  <li key={b.id}>
-                    <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
-                  </li>
-                ))}
-              </ul>
+              <div className="tile-body">
+                <ul className="recent-list">
+                  {recentBoards.map(b => (
+                    <li key={b.id}>
+                      <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </>

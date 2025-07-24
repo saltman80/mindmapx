@@ -125,16 +125,22 @@ export default function MindmapsPage(): JSX.Element {
       ) : (
         <div className="four-col-grid">
           <div className="tile create-tile">
-            <h2>Create Mind Map</h2>
-            <p className="create-help">Click Create to manually add or use AI to get started.</p>
-            <button className="btn-primary" onClick={() => setShowModal(true)}>
-              Create
-            </button>
+            <div className="tile-header">
+              <h2>Create Mind Map</h2>
+            </div>
+            <div className="tile-body">
+              <p className="create-help">Click Create to manually add or use AI to get started.</p>
+              <button className="btn-primary" onClick={() => setShowModal(true)}>
+                Create
+              </button>
+            </div>
           </div>
           <div className="tile">
-            <h2 className="tile-header">Metrics</h2>
-            <p>Total: {maps.length}</p>
-            <p>Today: {mapDay} Week: {mapWeek}</p>
+            <div className="tile-header"><h2>Metrics</h2></div>
+            <div className="tile-body">
+              <p>Total: {maps.length}</p>
+              <p>Today: {mapDay} Week: {mapWeek}</p>
+            </div>
           </div>
 
           {sorted.length === 0 ? (
@@ -158,9 +164,15 @@ export default function MindmapsPage(): JSX.Element {
                     Open
                   </Link>
                 </div>
+                <div className="tile-body">
+                  <p>{m.data?.description || 'Map details coming soon...'}</p>
+                </div>
               </div>
             ))
           )}
+          {Array.from({ length: 10 }).map((_v, i) => (
+            <div className="tile ghost-tile" key={`ghost-${i}`}></div>
+          ))}
         </div>
       )}
       {showModal && (
