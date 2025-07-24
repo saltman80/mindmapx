@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import MindmapCanvas, { NodeData } from './MindmapCanvas'
+import MindmapCanvas, { NodeData, EdgeData } from './MindmapCanvas'
 import { authFetch } from '../authFetch'
 
 interface Mindmap {
@@ -10,10 +10,6 @@ interface Mindmap {
   nodes?: unknown[]
   edges?: unknown[]
   config?: object
-}
-
-function getSafeArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : []
 }
 
 export default function MapEditorPage(): JSX.Element {
@@ -66,8 +62,9 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
-  const nodes = getSafeArray(mindmap?.nodes ?? mindmap?.data?.nodes)
-  const edges = getSafeArray(mindmap?.edges ?? mindmap?.data?.edges)
+  const edges: EdgeData[] = nodes
+    .filter(n => n.parentId)
+    .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
