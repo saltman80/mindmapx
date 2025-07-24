@@ -28,6 +28,14 @@ export default function DashboardTile({ icon, title, items = [], metrics, onCrea
           </Link>
         )}
       </div>
+      {onCreate && (
+        <div className="tile-actions">
+          <button className="btn-primary btn-wide" onClick={onCreate}>
+            <span className="btn-plus" aria-hidden="true">+</span>
+            Create
+          </button>
+        </div>
+      )}
       {items.length > 0 && (
         <ul className="recent-list">
           {items.map(item => (
@@ -36,14 +44,6 @@ export default function DashboardTile({ icon, title, items = [], metrics, onCrea
             </li>
           ))}
         </ul>
-      )}
-      {onCreate && (
-        <div className="tile-actions">
-          <button className="btn-primary btn-wide" onClick={onCreate}>
-            <span className="btn-plus" aria-hidden="true">+</span>
-            Create
-          </button>
-        </div>
       )}
       {metrics && <div className="tile-stats">{metrics}</div>}
     </div>
