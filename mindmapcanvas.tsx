@@ -65,6 +65,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const [showCreate, setShowCreate] = useState(false)
+
+    useEffect(() => {
+      if (Array.isArray(nodes) && nodes.length === 0) {
+        setShowCreate(true)
+      }
+    }, [nodes])
     const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
@@ -597,7 +603,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <button type="button" onClick={() => zoom(1.1)}>+</button>
           <button type="button" onClick={() => zoom(0.9)}>-</button>
         </div>
-        {safeNodes.length === 0 && safeEdges.length === 0 && (
+        {safeNodes.length === 0 && safeEdges.length === 0 && !showCreate && (
           <div className="modal-overlay empty-canvas-modal">
             <div className="modal">
               <p>No nodes yet. Click below to start building your map!</p>
