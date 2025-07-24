@@ -115,24 +115,24 @@ export default function TodosPage(): JSX.Element {
         <> 
           <div className="four-col-grid">
             <div className="tile create-tile">
-              <div className="tile-header"><h2>Create Todo</h2></div>
-              <div className="tile-body">
+              <header className="tile-header"><h2>Create Todo</h2></header>
+              <section className="tile-body">
                 <p className="create-help">Click Create to manually add or use AI to get started.</p>
                 <button className="btn-primary" onClick={() => setShowModal(true)}>
                   Create
                 </button>
-              </div>
+              </section>
             </div>
             <div className="tile">
-              <div className="tile-header"><h2>Metrics</h2></div>
-              <div className="tile-body">
+              <header className="tile-header"><h2>Metrics</h2></header>
+              <section className="tile-body">
                 <p>Total: {todos.length}</p>
                 <p>Added Today: {addedDay} Week: {addedWeek}</p>
-              </div>
+              </section>
             </div>
             {sorted.map(t => (
               <div className="tile" key={t.id}>
-                <div className="tile-header">
+                <header className="tile-header">
                   <h2>{t.title || t.content}</h2>
                   <Link
                     to="/todo-demo"
@@ -145,10 +145,10 @@ export default function TodosPage(): JSX.Element {
                   >
                     Open
                   </Link>
-                </div>
-                <div className="tile-body">
+                </header>
+                <section className="tile-body">
                   <p>{t.content || 'Todo details coming soon...'}</p>
-                </div>
+                </section>
               </div>
             ))}
             {Array.from({ length: 10 }).map((_v, i) => (

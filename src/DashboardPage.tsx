@@ -303,7 +303,7 @@ export default function DashboardPage(): JSX.Element {
           </div>
           <div className="tiles-grid">
             <div className="tile create-tile">
-              <div className="tile-header tile-header-center">
+              <header className="tile-header tile-header-center">
                 <h2>Mind Maps</h2>
                 <button
                   className="btn-primary"
@@ -315,8 +315,8 @@ export default function DashboardPage(): JSX.Element {
                   Create
                 </button>
                 <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
-              </div>
-              <div className="tile-body">
+              </header>
+              <section className="tile-body">
                 <ul className="recent-list">
                   {recentMaps.map(m => (
                     <li key={m.id}>
@@ -324,10 +324,10 @@ export default function DashboardPage(): JSX.Element {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             </div>
             <div className="tile" onClick={handleTileClick}>
-              <div className="tile-header tile-header-center">
+              <header className="tile-header tile-header-center">
                 <h2>Todos</h2>
                 <button
                   className="btn-primary"
@@ -339,8 +339,8 @@ export default function DashboardPage(): JSX.Element {
                   Create
                 </button>
                 <Link to="/todos" className="tile-link">Open Todos</Link>
-              </div>
-              <div className="tile-body">
+              </header>
+              <section className="tile-body">
                 <ul className="recent-list">
                   {recentTodos.map(t => (
                     <li key={t.id}>
@@ -349,10 +349,10 @@ export default function DashboardPage(): JSX.Element {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             </div>
             <div className="tile" onClick={handleTileClick}>
-              <div className="tile-header tile-header-center">
+              <header className="tile-header tile-header-center">
                 <h2>Kanban Boards</h2>
                 <button
                   className="btn-primary"
@@ -364,8 +364,8 @@ export default function DashboardPage(): JSX.Element {
                   Create
                 </button>
                 <Link to="/kanban" className="tile-link">Open Kanban Boards</Link>
-              </div>
-              <div className="tile-body">
+              </header>
+              <section className="tile-body">
                 <ul className="recent-list">
                   {recentBoards.map(b => (
                     <li key={b.id}>
@@ -373,7 +373,7 @@ export default function DashboardPage(): JSX.Element {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             </div>
           </div>
         </>

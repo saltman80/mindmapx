@@ -175,7 +175,7 @@ export default function DashboardPage(): JSX.Element {
           </div>
           <div className="tiles-grid">
             <div className="tile">
-              <div className="tile-header">
+              <header className="tile-header">
                 <h2>Mind Maps</h2>
                 <button
                   className="btn-primary"
@@ -186,17 +186,19 @@ export default function DashboardPage(): JSX.Element {
                 >
                   Create
                 </button>
-              </div>
-              <ul>
-                {maps.map(m => (
-                  <li key={m.id}>
-                    <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
-                  </li>
-                ))}
-              </ul>
+              </header>
+              <section className="tile-body">
+                <ul>
+                  {maps.map(m => (
+                    <li key={m.id}>
+                      <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </div>
             <div className="tile">
-              <div className="tile-header">
+              <header className="tile-header">
                 <h2>Todos</h2>
                 <button
                   className="btn-primary"
@@ -207,20 +209,26 @@ export default function DashboardPage(): JSX.Element {
                 >
                   Create
                 </button>
-              </div>
-              <ul>
-                {todos.map(t => (
-                  <li key={t.id}>
-                    {t.title || t.content}
-                    {t.mindmap_id && <span className="text-sm text-gray-500"> (Map: {t.mindmap_id})</span>}
-                    {t.completed && ' ✓'}
-                  </li>
-                ))}
-              </ul>
+              </header>
+              <section className="tile-body">
+                <ul>
+                  {todos.map(t => (
+                    <li key={t.id}>
+                      {t.title || t.content}
+                      {t.mindmap_id && <span className="text-sm text-gray-500"> (Map: {t.mindmap_id})</span>}
+                      {t.completed && ' ✓'}
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </div>
             <div className="tile">
-              <h2>Kanban Boards</h2>
-              <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
+              <header className="tile-header">
+                <h2>Kanban Boards</h2>
+              </header>
+              <section className="tile-body">
+                <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
+              </section>
             </div>
           </div>
         </>
