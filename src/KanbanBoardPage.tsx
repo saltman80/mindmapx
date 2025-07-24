@@ -12,33 +12,24 @@ interface BoardItem {
 
 export default function KanbanBoardPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
-  const boardId = id || ''
-  const [board, setBoard] = useState<BoardItem | null>(null)
+  const [boardData, setBoardData] = useState<any>(null)
 
   useEffect(() => {
-    if (!boardId) return
-    let ignore = false
-    authFetch(`/.netlify/functions/boards?id=${boardId}`)
-      .then(async res => {
-        if (!ignore && res.ok) {
-          const json = await res.json()
-          setBoard(json.board || null)
-        }
+    if (!id) return
+    authFetch(`/.netlify/functions/boards?id=${id}`)
+      .then(res => res.json())
+      .then(data => setBoardData(data))
+      .catch(err => {
+        console.error('Error loading kanban board', err)
+        setBoardData(null)
       })
-      .catch(() => {})
-    return () => {
-      ignore = true
-    }
-  }, [boardId])
-
-  if (!boardId) return <div>No board specified</div>
+  }, [id])
 
   return (
     <div className="dashboard-layout">
       <SidebarNav />
-      <main className="main-area kanban-board-page">
-        <h1>{board?.title || 'Kanban Board'}</h1>
-        <KanbanCanvas />
+      <main className="main-area">
+        <KanbanCanvas boardData={boardData} />
       </main>
     </div>
   )
