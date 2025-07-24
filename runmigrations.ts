@@ -26,7 +26,7 @@ export async function runMigrations(): Promise<void> {
     // reference them do not fail on a fresh database.
     await client.query(`
       CREATE TABLE IF NOT EXISTS mindmaps (
-        id          UUID PRIMARY KEY,
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         title       TEXT NOT NULL,
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
