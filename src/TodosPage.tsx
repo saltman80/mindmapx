@@ -127,7 +127,16 @@ export default function TodosPage(): JSX.Element {
               <header className="tile-header"><h2>Metrics</h2></header>
               <section className="tile-body">
                 <p>Total: {todos.length}</p>
-                <p>Added Today: {addedDay} Week: {addedWeek}</p>
+                <div className="metric-detail-grid">
+                  <div className="metric-detail">
+                    <span className="label">Today</span>
+                    <span className="value">{addedDay}</span>
+                  </div>
+                  <div className="metric-detail">
+                    <span className="label">Week</span>
+                    <span className="value">{addedWeek}</span>
+                  </div>
+                </div>
               </section>
             </div>
             {sorted.map(t => (
