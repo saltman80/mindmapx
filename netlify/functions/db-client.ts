@@ -1,4 +1,4 @@
-import { Pool } from 'pg'
+import { Pool, PoolClient } from 'pg'
 
 const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL } = process.env
 const connectionString = LOCAL_DB || NETLIFY_DATABASE_URL
@@ -17,7 +17,6 @@ export const pool = new Pool({
     process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 })
 
-export async function getClient() {
+export async function getClient(): Promise<PoolClient> {
   return pool.connect()
 }
-
