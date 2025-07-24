@@ -177,6 +177,7 @@ export default function DashboardPage(): JSX.Element {
                     <h3>Mind Maps</h3>
                   </div>
                   <Sparkline data={mapTrend} />
+                  <span className="trend-label">Week Trend</span>
                 </div>
                 <div className="metric-right metric-detail-grid">
                   <div className="metric-detail">
@@ -196,6 +197,7 @@ export default function DashboardPage(): JSX.Element {
                     <h3>Todos</h3>
                   </div>
                   <Sparkline data={todoTrend} />
+                  <span className="trend-label">Week Trend</span>
                 </div>
                 <div className="metric-right metric-detail-grid">
                   <div className="metric-detail">
@@ -215,6 +217,7 @@ export default function DashboardPage(): JSX.Element {
                     <h3>Kanban Boards</h3>
                   </div>
                   <Sparkline data={boardTrend} />
+                  <span className="trend-label">Week Trend</span>
                 </div>
                 <div className="metric-right metric-detail-grid">
                   <div className="metric-detail">

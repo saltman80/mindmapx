@@ -25,7 +25,7 @@ export default function Sparkline({
   return (
     <svg
       className="sparkline"
-      width={width}
+      width="100%"
       height={height}
       viewBox={`0 0 ${width} ${height}`}
     >
