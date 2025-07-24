@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS todos (
   title TEXT NOT NULL,
   description TEXT,
   status todo_status NOT NULL DEFAULT 'pending',
-  due_at TIMESTAMPTZ,
+  due_date TIMESTAMPTZ,
   ai_generated BOOLEAN NOT NULL DEFAULT FALSE,
   ai_status todo_ai_status,
   ai_response JSONB,
@@ -55,11 +55,44 @@ CREATE TABLE IF NOT EXISTS todos (
 
 COMMIT;
 
-CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
-CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
-CREATE INDEX IF NOT EXISTS idx_todos_node_id ON todos(node_id);
-CREATE INDEX IF NOT EXISTS idx_todos_due_at ON todos(due_at);
-CREATE INDEX IF NOT EXISTS idx_todos_user_id_status ON todos(user_id, status);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'user_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'mindmap_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_todos_mindmap_id ON todos(mindmap_id);
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'node_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_todos_node_id ON todos(node_id);
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'due_date'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_todos_due_date ON todos(due_date);
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'todos' AND column_name = 'status'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_todos_user_id_status ON todos(user_id, status);
+  END IF;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION refresh_todos_updated_at() RETURNS TRIGGER AS $$
 BEGIN
