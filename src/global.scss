@@ -1672,7 +1672,7 @@ hr {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  aspect-ratio: 1;
+  aspect-ratio: 16 / 10;
 }
 
 .tile-header {
@@ -1718,7 +1718,7 @@ hr {
   justify-content: center;
   text-align: center;
   min-height: 150px;
-  aspect-ratio: 1;
+  aspect-ratio: 16 / 10;
   background-color: #fff7ed;
   border: 1px solid var(--color-warning);
   box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
@@ -1742,6 +1742,7 @@ hr {
   border: 2px dashed var(--color-border);
   background-color: transparent;
   min-height: 120px;
+  aspect-ratio: 16 / 10;
   opacity: 0.5;
 }
 
@@ -2086,8 +2087,8 @@ hr {
 }
 
 .placeholder-tile {
-  width: 100px;
-  height: 160px;
+  width: 160px;
+  height: 100px;
   border: 2px dashed #ddd;
   border-radius: 8px;
   opacity: 0.4;
@@ -2124,7 +2125,7 @@ hr {
   transition: transform var(--transition-duration) var(--transition-ease);
   display: flex;
   flex-direction: column;
-  aspect-ratio: 1;
+  aspect-ratio: 16 / 10;
 }
 
 .card:hover {
