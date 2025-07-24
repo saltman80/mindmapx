@@ -1617,11 +1617,47 @@ hr {
   gap: var(--spacing-sm);
 }
 
-.dashboard-tile.highlight-create {
-  background-color: rgba(255, 248, 236, 0.8);
-  border-color: #fbd8a8;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
-  backdrop-filter: blur(6px);
+.dashboard-tile.can-create {
+  background-color: rgba(255, 248, 236, 0.5);
+  border-color: var(--color-warning);
+  border-style: dashed;
+}
+
+.dashboard-tile .tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+.dashboard-tile .tile-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.dashboard-tile .tile-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.dashboard-tile .tile-link {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.dashboard-tile .tile-footer {
+  margin-top: auto;
+  text-align: center;
+}
+.dashboard-tile .btn-create {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 4px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  cursor: pointer;
+  transition: background-color var(--transition-duration) var(--transition-ease);
+}
+.dashboard-tile .btn-create:hover {
+  background-color: var(--color-warning);
 }
 
 .metric-tile {
@@ -1651,39 +1687,6 @@ hr {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.dashboard-tile .tile-header {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--spacing-sm);
-  padding-right: var(--spacing-lg);
-}
-
-.dashboard-tile .tile-header h2 {
-  font-size: 1.75rem;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.dashboard-tile .tile-header .tile-link-corner {
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 0.8rem;
-  color: var(--color-primary);
-  text-decoration: underline;
-}
-
-.dashboard-tile .tile-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin-top: 50px;
-}
 
 .metric-circle {
   width: 2.5rem;
