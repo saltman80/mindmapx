@@ -113,11 +113,15 @@ export default function TeamMembers() {
               </section>
             </div>
           ))}
-          {Array.from({ length: Math.max(0, 3 - members.length) }).map((_, i) => (
+        </div>
+      </div>
+      {members.length < 3 && (
+        <div className="four-col-grid mt-6">
+          {Array.from({ length: 3 - members.length }).map((_, i) => (
             <div className="tile ghost-tile" key={`ghost-${i}`}></div>
           ))}
         </div>
-      </div>
+      )}
     </section>
   )
 }
