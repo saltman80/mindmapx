@@ -118,6 +118,7 @@ export default function TeamMembers() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </section>
   )
