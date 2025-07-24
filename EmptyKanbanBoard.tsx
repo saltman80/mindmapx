@@ -1,7 +1,11 @@
 import KanbanLane from './KanbanLane'
 
-export default function EmptyKanbanBoard() {
-  const lanes = ['To Do', 'In Progress', 'Done']
+interface Props {
+  lanes?: string[]
+  onCreateBoard?: () => void
+}
+
+export default function EmptyKanbanBoard({ lanes = ['To Do', 'In Progress', 'Done'], onCreateBoard }: Props) {
 
   return (
     <>
@@ -12,8 +16,19 @@ export default function EmptyKanbanBoard() {
       </div>
       <div className="modal-overlay empty-canvas-modal">
         <div className="modal">
-          <p>No cards yet. Click below to add your first card!</p>
-          <button className="btn-primary">Add Card</button>
+          {onCreateBoard ? (
+            <>
+              <p>No board found. Click below to create one.</p>
+              <button className="btn-primary" onClick={onCreateBoard}>
+                Create Board
+              </button>
+            </>
+          ) : (
+            <>
+              <p>No cards yet. Click below to add your first card!</p>
+              <button className="btn-primary">Add Card</button>
+            </>
+          )}
         </div>
       </div>
     </>
