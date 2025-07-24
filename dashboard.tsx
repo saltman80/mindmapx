@@ -26,9 +26,17 @@ interface TodoItem {
   updated_at?: string
 }
 
+interface BoardItem {
+  id: string
+  title?: string
+  createdAt?: string
+  created_at?: string
+}
+
 export default function DashboardPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
   const [todos, setTodos] = useState<TodoItem[]>([])
+  const [boards, setBoards] = useState<BoardItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -44,9 +52,10 @@ export default function DashboardPage(): JSX.Element {
         setLoading(false)
         return
       }
-      const [mapsRes, todosRes] = await Promise.all([
+      const [mapsRes, todosRes, boardsRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmaps', { credentials: 'include' }),
         authFetch('/.netlify/functions/todos', { credentials: 'include' }),
+        authFetch('/.netlify/functions/boards', { credentials: 'include' }),
       ])
       const mapsData = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -54,9 +63,14 @@ export default function DashboardPage(): JSX.Element {
       const todoJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
         ? await todosRes.json()
         : []
+      const boardsJson = boardsRes.ok && boardsRes.headers.get('content-type')?.includes('application/json')
+        ? await boardsRes.json()
+        : { boards: [] }
       const todoList: TodoItem[] = Array.isArray(todoJson) ? todoJson : []
+      const boardsList: BoardItem[] = Array.isArray(boardsJson) ? boardsJson : boardsJson.boards || []
       setMaps(Array.isArray(mapsData) ? mapsData : [])
       setTodos(todoList)
+      setBoards(boardsList)
     } catch (err: any) {
       setError(err.message || 'Failed to load data')
     } finally {
@@ -142,6 +156,9 @@ export default function DashboardPage(): JSX.Element {
   const todoAddedWeek = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
   const todoDoneDay = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
   const todoDoneWeek = todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
+
+  const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
+  const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
 
   return (
     <div className="dashboard-page relative overflow-hidden">
