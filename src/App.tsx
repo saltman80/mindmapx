@@ -12,6 +12,7 @@ import ProjectWorkspace from '../ProjectWorkspace'
 import MapEditorPage from './MapEditorPage'
 import TodoEditorPage from './TodoEditorPage'
 import TodoDetail from '../TodoDetail'
+import TodosCanvasPage from './TodosCanvasPage'
 import TeamMembers from '../teammembers'
 import ProfilePage from '../profile'
 import BillingPage from '../billing'
@@ -45,6 +46,7 @@ function AppRoutes() {
       <Route path="/maps/:id" element={<MapEditorPage />} />
       <Route path="/workspace" element={<ProjectWorkspace />} />
       <Route path="/todo/:id" element={<TodoDetail />} />
+      <Route path="/todos/:id" element={<TodosCanvasPage />} />
       <Route path="/todo-canvas" element={<TodoEditorPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
