@@ -144,7 +144,7 @@ export default function TodosPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{t.title || t.content}</h2>
                   <Link
-                    to="/todo-demo"
+                    to={`/todo/${t.id}`}
                     onClick={() =>
                       localStorage.setItem(
                         `todo_last_viewed_${t.id}`,
