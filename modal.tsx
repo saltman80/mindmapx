@@ -1,3 +1,7 @@
+import React, { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import FocusTrap from 'focus-trap-react'
+
 let openModalCount = 0
 let originalOverflow = ''
 
