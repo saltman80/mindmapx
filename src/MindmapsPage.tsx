@@ -55,7 +55,7 @@ export default function MindmapsPage(): JSX.Element {
       setShowModal(false)
       setForm({ title: '', description: '' })
       if (json?.id) {
-        navigate(`/maps/${json.id}`)
+        setTimeout(() => navigate(`/maps/${json.id}`), 250)
       } else {
         fetchData()
       }
@@ -80,7 +80,7 @@ export default function MindmapsPage(): JSX.Element {
       setShowModal(false)
       setForm({ title: '', description: '' })
       if (json?.id) {
-        navigate(`/maps/${json.id}`)
+        setTimeout(() => navigate(`/maps/${json.id}`), 250)
       } else {
         fetchData()
       }

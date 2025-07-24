@@ -62,6 +62,21 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
     // ✅ Handle GET
     if (event.httpMethod === 'GET') {
+      const id = event.queryStringParameters?.id
+
+      if (id) {
+        const result = await client.query(
+          `SELECT id, title, description, created_at FROM mindmaps WHERE id = $1 AND user_id = $2`,
+          [id, userId]
+        )
+
+        if (result.rowCount === 0) {
+          return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+        }
+
+        return { statusCode: 200, headers, body: JSON.stringify({ map: result.rows[0] }) }
+      }
+
       const result = await client.query(
         `SELECT id, title, description, created_at FROM mindmaps
          WHERE user_id = $1

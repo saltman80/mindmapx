@@ -34,7 +34,9 @@ export default function MapEditorPage(): JSX.Element {
           if (!ignore) setError(true)
           return
         }
+        console.log('Map fetch response:', res.status)
         const json = await res.json()
+        console.log('Map JSON:', json)
         if (!ignore) {
           console.log('[MapEditorPage] mindmap response:', json.map || json)
           setMindmap(json.map || json)
