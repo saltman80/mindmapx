@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import TodoCanvas from '../TodoCanvas'
 import { authFetch } from '../authFetch'
-import SidebarNav from './SidebarNav'
 
 export default function TodosCanvasPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
@@ -18,7 +17,6 @@ export default function TodosCanvasPage(): JSX.Element {
 
   return (
     <div className="dashboard-layout">
-      <SidebarNav />
       <main className="main-area">
         <TodoCanvas todos={todo ? [todo] : []} />
       </main>
