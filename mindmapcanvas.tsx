@@ -64,9 +64,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const [showCreate, setShowCreate] = useState(false)
     const [newName, setNewName] = useState('')
     const [newDesc, setNewDesc] = useState('')
-    const draggingRef = useRef(false)
-    const lastMousePos = useRef({ x: 0, y: 0 })
+    const modeRef = useRef<'canvas' | 'node' | null>(null)
+    const dragStartRef = useRef({ x: 0, y: 0 })
+    const originRef = useRef({ x: 0, y: 0 })
     const dragNodeIdRef = useRef<string | null>(null)
+    const nodeOriginRef = useRef<{ x: number; y: number } | null>(null)
     const pinchRef = useRef<{
       initialDistance: number
       initialCenter: { x: number; y: number }
@@ -147,43 +149,81 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     console.log('[MindmapCanvas] rendering nodes:', safeNodes)
     console.log('[MindmapCanvas] rendering edges:', safeEdges)
 
-    const handleMouseMove = useCallback(
-      (e: MouseEvent) => {
-        if (!draggingRef.current) return
+    const handlePointerMove = useCallback(
+      (e: PointerEvent) => {
+        if (!modeRef.current) return
         e.preventDefault()
-        const dx = e.clientX - lastMousePos.current.x
-        const dy = e.clientY - lastMousePos.current.y
-        lastMousePos.current = { x: e.clientX, y: e.clientY }
-        pan(dx, dy)
+        const dx = e.clientX - dragStartRef.current.x
+        const dy = e.clientY - dragStartRef.current.y
+        if (modeRef.current === 'canvas') {
+          setTransform({
+            x: originRef.current.x + dx,
+            y: originRef.current.y + dy,
+            k: transform.k,
+          })
+        } else if (
+          modeRef.current === 'node' &&
+          dragNodeIdRef.current &&
+          nodeOriginRef.current
+        ) {
+          const scaledDx = dx / transform.k
+          const scaledDy = dy / transform.k
+          setNodes(prev =>
+            prev.map(n =>
+              n.id === dragNodeIdRef.current
+                ? { ...n, x: nodeOriginRef.current!.x + scaledDx, y: nodeOriginRef.current!.y + scaledDy }
+                : n
+            )
+          )
+        }
       },
-      [pan]
+      [transform.k]
     )
 
-    const handleMouseUp = useCallback(() => {
-      draggingRef.current = false
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }, [handleMouseMove])
-
-    const handleMouseDown = useCallback(
-      (e: React.MouseEvent) => {
-        e.preventDefault()
-        draggingRef.current = true
-        lastMousePos.current = { x: e.clientX, y: e.clientY }
-        window.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('mouseup', handleMouseUp)
+    const handlePointerUp = useCallback(
+      (e: PointerEvent) => {
+        if (modeRef.current === 'node' && dragNodeIdRef.current) {
+          const node = nodes.find(n => n.id === dragNodeIdRef.current)
+          if (node && onMoveNode) onMoveNode(node)
+        }
+        modeRef.current = null
+        dragNodeIdRef.current = null
+        nodeOriginRef.current = null
+        svgRef.current?.releasePointerCapture(e.pointerId)
+        window.removeEventListener('pointermove', handlePointerMove)
+        window.removeEventListener('pointerup', handlePointerUp)
       },
-      [handleMouseMove, handleMouseUp]
+      [nodes, onMoveNode, handlePointerMove]
+    )
+
+    const handlePointerDown = useCallback(
+      (e: React.PointerEvent<SVGSVGElement>) => {
+        const target = (e.target as HTMLElement).closest('.mindmap-node') as HTMLElement | null
+        dragStartRef.current = { x: e.clientX, y: e.clientY }
+        if (target) {
+          const id = target.getAttribute('data-id')
+          if (!id) return
+          modeRef.current = 'node'
+          dragNodeIdRef.current = id
+          const node = nodes.find(n => n.id === id)
+          if (node) nodeOriginRef.current = { x: node.x, y: node.y }
+        } else {
+          modeRef.current = 'canvas'
+          originRef.current = { x: transform.x, y: transform.y }
+        }
+        svgRef.current?.setPointerCapture(e.pointerId)
+        window.addEventListener('pointermove', handlePointerMove)
+        window.addEventListener('pointerup', handlePointerUp)
+      },
+      [nodes, transform, handlePointerMove, handlePointerUp]
     )
 
     useEffect(() => {
       return () => {
-        window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('mouseup', handleMouseUp)
-        window.removeEventListener('mousemove', handleNodeDrag)
-        window.removeEventListener('mouseup', handleNodeUp)
+        window.removeEventListener('pointermove', handlePointerMove)
+        window.removeEventListener('pointerup', handlePointerUp)
       }
-    }, [handleMouseMove, handleMouseUp, handleNodeDrag, handleNodeUp])
+    }, [handlePointerMove, handlePointerUp])
 
     const handleWheel = useCallback(
       (e: React.WheelEvent<SVGSVGElement>) => {
@@ -198,45 +238,19 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       [zoom]
     )
 
-    const handleNodeDrag = useCallback((e: MouseEvent) => {
-      if (!dragNodeIdRef.current) return
-      e.preventDefault()
-      const dx = (e.clientX - lastMousePos.current.x) / transform.k
-      const dy = (e.clientY - lastMousePos.current.y) / transform.k
-      lastMousePos.current = { x: e.clientX, y: e.clientY }
-      setNodes(prev =>
-        prev.map(n => (n.id === dragNodeIdRef.current ? { ...n, x: n.x + dx, y: n.y + dy } : n))
-      )
-    }, [transform.k])
-
-    const handleNodeUp = useCallback(() => {
-      if (dragNodeIdRef.current) {
-        const node = nodes.find(n => n.id === dragNodeIdRef.current)
-        if (node && onMoveNode) onMoveNode(node)
-      }
-      dragNodeIdRef.current = null
-      window.removeEventListener('mousemove', handleNodeDrag)
-      window.removeEventListener('mouseup', handleNodeUp)
-    }, [nodes, onMoveNode, handleNodeDrag])
-
-    const startNodeDrag = useCallback((id: string, e: React.MouseEvent) => {
-      e.stopPropagation()
-      dragNodeIdRef.current = id
-      lastMousePos.current = { x: e.clientX, y: e.clientY }
-      window.addEventListener('mousemove', handleNodeDrag)
-      window.addEventListener('mouseup', handleNodeUp)
-    }, [handleNodeDrag, handleNodeUp])
+    // touch handlers kept for pinch-zoom support
 
     const handleTouchStart = useCallback(
       (e: React.TouchEvent<SVGSVGElement>) => {
         if (!svgRef.current) return
         if (e.touches.length === 1) {
           e.preventDefault()
-          draggingRef.current = true
-          lastMousePos.current = {
+          modeRef.current = 'canvas'
+          dragStartRef.current = {
             x: e.touches[0].clientX,
-            y: e.touches[0].clientY
+            y: e.touches[0].clientY,
           }
+          originRef.current = { x: transform.x, y: transform.y }
         } else if (e.touches.length === 2) {
           e.preventDefault()
           const rect = svgRef.current.getBoundingClientRect()
@@ -264,16 +278,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handleTouchMove = useCallback(
       (e: React.TouchEvent<SVGSVGElement>) => {
         if (!svgRef.current) return
-        if (e.touches.length === 1 && draggingRef.current) {
+        if (e.touches.length === 1 && modeRef.current === 'canvas') {
           e.preventDefault()
           const touch = e.touches[0]
-          const dx = touch.clientX - lastMousePos.current.x
-          const dy = touch.clientY - lastMousePos.current.y
-          lastMousePos.current = {
-            x: touch.clientX,
-            y: touch.clientY
-          }
-          pan(dx, dy)
+          const dx = touch.clientX - dragStartRef.current.x
+          const dy = touch.clientY - dragStartRef.current.y
+          setTransform({ x: originRef.current.x + dx, y: originRef.current.y + dy, k: transform.k })
         } else if (e.touches.length === 2 && pinchRef.current) {
           e.preventDefault()
           const rect = svgRef.current.getBoundingClientRect()
@@ -297,12 +307,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           setTransform({ x: newX, y: newY, k: newK })
         }
       },
-      [pan]
+      [transform.k]
     )
 
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {
       if (e.touches.length < 1) {
-        draggingRef.current = false
+        modeRef.current = null
       }
       if (e.touches.length < 2) {
         pinchRef.current = null
@@ -341,7 +351,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
           onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
+          onPointerDown={handlePointerDown}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -379,8 +389,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             {safeNodes.map(node => (
               <g
                 key={node.id}
+                className="mindmap-node"
+                data-id={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onMouseDown={e => startNodeDrag(node.id, e)}
               >
                 <circle
                   r={20 / transform.k}
