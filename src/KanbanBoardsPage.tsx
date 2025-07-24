@@ -30,11 +30,6 @@ export default function KanbanBoardsPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setLoading(false)
-        return
-      }
       const res = await authFetch('/.netlify/functions/boards', { credentials: 'include' })
       const json = res.ok ? await res.json() : { boards: [] }
       const list: BoardItem[] = Array.isArray(json) ? json : json.boards || []

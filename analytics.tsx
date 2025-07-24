@@ -50,11 +50,6 @@ export default function AnalyticsPage(): JSX.Element {
           start: dateRange.start.toISOString(),
           end: dateRange.end.toISOString(),
         })
-        const token = localStorage.getItem('token')
-        if (!token) {
-          setLoading(false)
-          return
-        }
         const res = await authFetch(`/.netlify/functions/analytics?${params.toString()}`, { signal })
         if (!res.ok) {
           const errText = await res.text()
