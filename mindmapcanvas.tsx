@@ -329,9 +329,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             ))}
           </g>
           {safeNodes.length === 0 && safeEdges.length === 0 && (
-            <foreignObject x="0" y="0" width="100%" height="100%">
-              <div className="empty-map-message">
-                <p>No nodes yet. Click to start building your map!</p>
+            <div className="modal-overlay empty-canvas-modal">
+              <div className="modal">
+                <p>No nodes yet. Click below to start building your map!</p>
                 <button
                   type="button"
                   className="btn-primary"
@@ -340,7 +340,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   Add Node
                 </button>
               </div>
-            </foreignObject>
+            </div>
           )}
         </svg>
       </div>

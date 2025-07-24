@@ -1998,3 +1998,20 @@ hr {
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* Empty canvas modal */
+.empty-canvas-modal .modal {
+  background: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .empty-canvas-modal .modal {
+  background: rgba(17, 24, 39, 0.95);
+}
+
+.empty-canvas-modal p {
+  margin-bottom: 1rem;
+}
