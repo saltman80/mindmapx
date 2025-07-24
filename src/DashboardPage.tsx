@@ -45,6 +45,7 @@ export default function DashboardPage(): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [boards, setBoards] = useState<BoardItem[]>([])
   const [nodes, setNodes] = useState<NodeItem[]>([])
+  const [recentMindmaps, setRecentMindmaps] = useState<MapItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -94,6 +95,13 @@ export default function DashboardPage(): JSX.Element {
   }
 
   useEffect(() => { fetchData() }, [])
+
+  useEffect(() => {
+    authFetch('/.netlify/functions/mindmaps')
+      .then(res => res.json())
+      .then(setRecentMindmaps)
+      .catch(() => {})
+  }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
@@ -261,7 +269,6 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
-  const recentMaps = [...maps].sort(dateSort).slice(0, 10)
   const recentTodos = [...todos].sort(dateSort).slice(0, 10)
   const recentBoards = [...boards].sort(dateSort).slice(0, 10)
 
@@ -301,7 +308,7 @@ export default function DashboardPage(): JSX.Element {
             </div>
           </div>
           <div className="tiles-grid">
-            <div className="tile" onClick={handleTileClick}>
+            <div className="tile">
               <div className="tile-header tile-header-center">
                 <h2>Mind Maps</h2>
                 <button
@@ -313,12 +320,12 @@ export default function DashboardPage(): JSX.Element {
                 >
                   Create
                 </button>
-                <Link to="/mindmaps" className="tile-link">Open Mind Maps</Link>
+                <Link to="/mindmaps" className="tile-link">Open Mindmaps</Link>
               </div>
               <ul className="recent-list">
-                {recentMaps.map(m => (
+                {recentMindmaps.slice(0, 5).map(m => (
                   <li key={m.id}>
-                    <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
+                    <Link to={`/maps/${m.id}`}>{m.title || 'Untitled Map'}</Link>
                   </li>
                 ))}
               </ul>
