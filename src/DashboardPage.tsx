@@ -252,9 +252,9 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
-  const recentMaps = [...maps].sort(dateSort).slice(0, 5)
-  const recentTodos = [...todos].sort(dateSort).slice(0, 10)
-  const recentBoards = [...boards].sort(dateSort).slice(0, 10)
+  const recentMaps = [...maps].sort(dateSort).slice(0, 6)
+  const recentTodos = [...todos].sort(dateSort).slice(0, 6)
+  const recentBoards = [...boards].sort(dateSort).slice(0, 6)
 
   const mapItems: DashboardItem[] = recentMaps.map(m => ({
     id: m.id,
@@ -290,6 +290,25 @@ export default function DashboardPage(): JSX.Element {
               title="Mind Maps"
               items={mapItems}
               moreLink="/mindmaps"
+              onCreate={() => { setCreateType('map'); setShowModal(true) }}
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Todos">✅</span>}
+              title="Todos"
+              items={todoItems}
+              moreLink="/todos"
+              onCreate={() => { setCreateType('todo'); setShowModal(true) }}
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Kanban">📋</span>}
+              title="Kanban Boards"
+              items={boardItems}
+              moreLink="/kanban"
+              onCreate={() => { setCreateType('board'); setShowModal(true) }}
+            />
+            <DashboardTile
+              icon={<span role="img" aria-label="Mindmap">🧠</span>}
+              title="Mind Map Metrics"
               metrics={(
                 <>
                   <div className="metric-value">{maps.length}</div>
@@ -309,9 +328,7 @@ export default function DashboardPage(): JSX.Element {
             />
             <DashboardTile
               icon={<span role="img" aria-label="Todos">✅</span>}
-              title="Todos"
-              items={todoItems}
-              moreLink="/todos"
+              title="Todo Metrics"
               metrics={(
                 <>
                   <div className="metric-value">{todos.length}</div>
@@ -331,9 +348,7 @@ export default function DashboardPage(): JSX.Element {
             />
             <DashboardTile
               icon={<span role="img" aria-label="Kanban">📋</span>}
-              title="Kanban Boards"
-              items={boardItems}
-              moreLink="/kanban"
+              title="Board Metrics"
               metrics={(
                 <>
                   <div className="metric-value">{boards.length}</div>
@@ -351,18 +366,6 @@ export default function DashboardPage(): JSX.Element {
                 </>
               )}
             />
-            <div className="tile create-tile tile-header-center">
-              <h2>Create Map</h2>
-              <button className="btn-primary btn-wide" onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
-            </div>
-            <div className="tile create-tile tile-header-center">
-              <h2>Create Todo</h2>
-              <button className="btn-primary btn-wide" onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
-            </div>
-            <div className="tile create-tile tile-header-center">
-              <h2>Create Board</h2>
-              <button className="btn-primary btn-wide" onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
-            </div>
           </div>
         </>
       )}
