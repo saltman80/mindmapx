@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { verifySignature } from './stripeclient'
+import { verifySignature } from './stripeclient.js'
 import Stripe from 'stripe'
 import type { Client } from 'pg'
 const stripeSecret = process.env.STRIPE_SECRET_KEY

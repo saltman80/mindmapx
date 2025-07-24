@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import { extractToken, verifySession } from './auth'
+import { extractToken, verifySession } from './auth.js'
 const querySchema = z.object({
   id: z.string().uuid().optional(),
   skip: z.preprocess(val => val ? parseInt(val as string, 10) : undefined, z.number().int().nonnegative().optional()),

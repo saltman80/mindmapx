@@ -1,8 +1,8 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { extractToken, verifySession } from './auth'
+import { extractToken, verifySession } from './auth.js'
 import { ZodError } from 'zod'
-import { mapInputSchema } from './validationschemas'
+import { mapInputSchema } from './validationschemas.js'
 
 export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
   const headers = {
