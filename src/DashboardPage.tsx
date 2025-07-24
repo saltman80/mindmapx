@@ -98,9 +98,20 @@ export default function DashboardPage(): JSX.Element {
 
   useEffect(() => {
     authFetch('/.netlify/functions/mindmaps')
-      .then(res => res.json())
+      .then(async res => {
+        try {
+          const json = await res.json()
+          if (Array.isArray(json)) return json
+          if (Array.isArray((json as any).maps)) return (json as any).maps
+          return []
+        } catch {
+          return []
+        }
+      })
       .then(setRecentMindmaps)
-      .catch(() => {})
+      .catch(() => {
+        setRecentMindmaps([])
+      })
   }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
