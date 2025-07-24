@@ -48,15 +48,15 @@ export default function MapEditorPage(): JSX.Element {
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
 
-  const nodes = Array.isArray(mindmap.nodes)
+  const nodes = Array.isArray(mindmap?.nodes)
     ? mindmap.nodes
-    : Array.isArray(mindmap.data?.nodes)
-      ? (mindmap.data?.nodes as unknown[])
+    : Array.isArray(mindmap?.data?.nodes)
+      ? mindmap.data.nodes
       : []
-  const edges = Array.isArray(mindmap.edges)
+  const edges = Array.isArray(mindmap?.edges)
     ? mindmap.edges
-    : Array.isArray(mindmap.data?.edges)
-      ? (mindmap.data?.edges as unknown[])
+    : Array.isArray(mindmap?.data?.edges)
+      ? mindmap.data.edges
       : []
 
   console.log('mapData:', mindmap)

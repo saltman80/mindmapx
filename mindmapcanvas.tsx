@@ -226,7 +226,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
-            {edges.map(edge => {
+            {(edges || []).map(edge => {
               const from = nodeMap.get(edge.from)
               const to = nodeMap.get(edge.to)
               if (!from || !to) return null
@@ -242,7 +242,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 />
               )
             })}
-            {nodes.map(node => (
+            {(nodes || []).map(node => (
               <g key={node.id} transform={`translate(${node.x},${node.y})`}>
                 <circle
                   r={20 / transform.k}
