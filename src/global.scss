@@ -1677,7 +1677,13 @@ hr {
 
 // widen sparkline width specifically within dashboard metric tiles
 .metric-tile .sparkline {
-  width: 50%;
+  width: 100%;
+}
+
+.trend-label {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .metric-tile h3 {
