@@ -60,10 +60,11 @@ export default function TeamMembers() {
     <section className="section relative overflow-hidden">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
-      <div className="form-card text-center">
-        <h1 className="mb-4">Team Members</h1>
-        {error && <div className="text-red-600 mb-2">{error}</div>}
-        <form onSubmit={addMember} className="mb-4 space-y-4">
+      <div className="team-page">
+        <div className="form-container text-center">
+          <h1 className="mb-4">Team Members</h1>
+          {error && <div className="text-red-600 mb-2">{error}</div>}
+          <form onSubmit={addMember} className="mb-4 space-y-4">
           <div className="form-field text-left">
             <label htmlFor="name" className="form-label">
               Name
@@ -110,14 +111,14 @@ export default function TeamMembers() {
             </div>
           ))}
         </div>
+        {members.length < 3 && (
+          <div className="placeholder-row">
+            {Array.from({ length: 3 - members.length }).map((_, i) => (
+              <div className="placeholder-tile" key={`ghost-${i}`}></div>
+            ))}
+          </div>
+        )}
       </div>
-      {members.length < 3 && (
-        <div className="four-col-grid mt-6">
-          {Array.from({ length: 3 - members.length }).map((_, i) => (
-            <div className="tile ghost-tile" key={`ghost-${i}`}></div>
-          ))}
-        </div>
-      )}
     </section>
   )
 }
