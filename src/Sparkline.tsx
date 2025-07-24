@@ -11,7 +11,7 @@ export default function Sparkline({
   data,
   width = 100,
   height = 40,
-  color = '#0a84ff',
+  color = '#38bdf8',
 }: SparklineProps) {
   const max = Math.max(...data, 1)
   const points = data
@@ -32,7 +32,8 @@ export default function Sparkline({
       <polyline
         fill="none"
         stroke={color}
-        strokeWidth="2"
+        strokeWidth="3"
+        strokeLinecap="round"
         points={points}
       />
     </svg>
