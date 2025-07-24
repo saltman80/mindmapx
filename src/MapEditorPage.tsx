@@ -27,7 +27,7 @@ export default function MapEditorPage(): JSX.Element {
     if (!id) return
     let ignore = false
 
-    authFetch(`/api/maps/${id}`)
+    authFetch(`/.netlify/functions/mindmaps?id=${id}`)
       .then(async res => {
         if (!res.ok) {
           if (!ignore) setError(true)
