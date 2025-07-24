@@ -303,7 +303,7 @@ export default function DashboardPage(): JSX.Element {
                 </ul>
               </section>
             </div>
-            <div className="tile" onClick={handleTileClick}>
+            <div className="tile create-tile" onClick={handleTileClick}>
               <header className="tile-header tile-header-center">
                 <h2>Todos</h2>
                 <button
@@ -328,7 +328,7 @@ export default function DashboardPage(): JSX.Element {
                 </ul>
               </section>
             </div>
-            <div className="tile" onClick={handleTileClick}>
+            <div className="tile create-tile" onClick={handleTileClick}>
               <header className="tile-header tile-header-center">
                 <h2>Kanban Boards</h2>
                 <button
