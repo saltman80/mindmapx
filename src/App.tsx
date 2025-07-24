@@ -10,6 +10,7 @@ import KanbanBoardsPage from './KanbanBoardsPage'
 import KanbanBoardPage from './KanbanBoardPage'
 import ProjectWorkspace from '../ProjectWorkspace'
 import MapEditorPage from './MapEditorPage'
+import TodoEditorPage from './TodoEditorPage'
 import TodoDetail from '../TodoDetail'
 import TeamMembers from '../teammembers'
 import ProfilePage from '../profile'
@@ -44,6 +45,7 @@ function AppRoutes() {
       <Route path="/maps/:id" element={<MapEditorPage />} />
       <Route path="/workspace" element={<ProjectWorkspace />} />
       <Route path="/todo/:id" element={<TodoDetail />} />
+      <Route path="/todo-canvas" element={<TodoEditorPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
@@ -71,7 +73,8 @@ function AppLayout() {
     '/profile',
     '/billing',
     '/account',
-    '/maps'
+    '/maps',
+    '/todo-canvas'
   ]
   const isDashboard = dashboardPaths.some(path =>
     location.pathname === path || location.pathname.startsWith(path + '/')
