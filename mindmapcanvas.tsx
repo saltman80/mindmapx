@@ -9,7 +9,7 @@ import {
 } from 'react'
 
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
-  ({ nodes: propNodes, edges: propEdges, width, height }, ref) => {
+  ({ nodes: propNodes = [], edges: propEdges = [], width, height }, ref) => {
     const [nodes, setNodes] = useState<NodeData[]>(() => propNodes)
     const [edges, setEdges] = useState<EdgeData[]>(() => propEdges)
     const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
