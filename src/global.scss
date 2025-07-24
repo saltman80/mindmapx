@@ -2106,10 +2106,16 @@ hr {
 
 .todo-placeholder-list {
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+}
+
+.todo-list {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .add-todo-button-wrapper {
