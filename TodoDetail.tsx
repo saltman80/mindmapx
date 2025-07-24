@@ -24,6 +24,10 @@ export default function TodoDetail() {
     setError(null)
     authFetch(`/.netlify/functions/todoid/${id}`)
       .then(async res => {
+        if (res.status === 403) {
+          setError('You must be signed in to view this to-do list.')
+          return null
+        }
         if (!res.ok) throw new Error('Failed to load todo')
         const json = await res.json()
         setTodo(json)

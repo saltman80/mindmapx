@@ -63,6 +63,14 @@ export default function MapEditorPage(): JSX.Element {
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
+  if (safeNodes.length === 0) {
+    return (
+      <div className="empty-message">
+        This map is empty. Add your first node to begin.
+      </div>
+    )
+  }
+
   const edges: EdgeData[] = safeNodes
     .filter(n => n.parentId)
     .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
@@ -82,7 +90,7 @@ export default function MapEditorPage(): JSX.Element {
       .catch(() => {})
   }
 
-  if (nodes.length === 0 && edges.length === 0) {
+  if (safeNodes.length === 0 && edges.length === 0) {
     console.log('[mindmap] No nodes or edges found, rendering empty canvas')
   }
 
@@ -98,7 +106,7 @@ export default function MapEditorPage(): JSX.Element {
   }
 
   const handleSaveLayout = useCallback(() => {
-    nodes.forEach(n => {
+    safeNodes.forEach(n => {
       fetch(`/.netlify/functions/nodes/${n.id}`, {
         method: 'PATCH',
         credentials: 'include',
@@ -106,7 +114,7 @@ export default function MapEditorPage(): JSX.Element {
         body: JSON.stringify({ x: n.x, y: n.y })
       }).catch(() => {})
     })
-  }, [nodes])
+  }, [safeNodes])
 
   return (
     <div className="dashboard-layout">
@@ -118,7 +126,7 @@ export default function MapEditorPage(): JSX.Element {
           Save Layout
         </button>
         <MindmapCanvas
-          nodes={nodes}
+          nodes={safeNodes}
           edges={edges}
           onAddNode={handleAddNode}
           onMoveNode={handleMoveNode}

@@ -113,9 +113,11 @@ export const handler = async (
     const identity = context.clientContext?.identity
     if (!identity || !identity.sub) {
       return {
-        statusCode: 401,
+        statusCode: 403,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' }),
+        body: JSON.stringify({
+          error: 'You must be signed in to access this to-do item.'
+        }),
       }
     }
     const userId = identity.sub
