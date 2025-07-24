@@ -1615,6 +1615,11 @@ hr {
   gap: var(--spacing-sm);
 }
 
+.dashboard-tile.highlight-create {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+}
+
 .metric-tile {
   background: linear-gradient(135deg, #e0e7ff, #f8fafc);
   border: 1px solid #cbd5e1;
@@ -1640,10 +1645,12 @@ hr {
 }
 
 .dashboard-tile .tile-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: var(--spacing-sm);
+  padding-right: var(--spacing-lg);
 }
 
 .dashboard-tile .tile-header h2 {
@@ -1654,14 +1661,19 @@ hr {
   gap: var(--spacing-xs);
 }
 
-.dashboard-tile .tile-header .btn-primary {
-  margin-left: auto;
-}
-
-.dashboard-tile .tile-header .tile-link {
+.dashboard-tile .tile-header .tile-link-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-size: 0.8rem;
   color: var(--color-primary);
   text-decoration: underline;
+}
+
+.dashboard-tile .tile-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
 }
 
 .metric-circle {
