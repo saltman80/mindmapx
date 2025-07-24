@@ -2058,3 +2058,55 @@ hr {
   border-radius: 8px;
   opacity: 0.4;
 }
+\n// Dashboard tile redesign
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: #fffdf9;
+  border: 1px solid #ffb84d;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-header {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-create {
+  margin: 1rem 0;
+  background: #007bff;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.recent-links {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-links li {
+  margin-bottom: 0.5rem;
+}
+
+.recent-links a {
+  color: #007bff;
+  text-decoration: none;
+}
