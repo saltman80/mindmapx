@@ -117,7 +117,7 @@ export default function MindmapsPage(): JSX.Element {
     <div className="dashboard-page relative overflow-hidden list-page">
       <MindmapArm side="left" />
       <FaintMindmapBackground className="mindmap-bg-small" />
-      <h1 className="dashboard-title">🧠 Mind Maps</h1>
+      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Mind Maps</h1>
       {loading ? (
         <LoadingSkeleton count={3} />
       ) : error ? (

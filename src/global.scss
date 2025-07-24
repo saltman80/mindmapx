@@ -1525,7 +1525,8 @@ hr {
   margin-bottom: var(--spacing-xl);
 }
 .dashboard-title .dashboard-logo {
-  height: 60px;
+  height: auto;
+  width: 75px;
   vertical-align: middle;
 }
 @media (max-width: 640px) {
@@ -1551,11 +1552,16 @@ hr {
 }
 
 .dashboard-metrics-row {
-  display: flex;
+  display: grid;
   gap: 2rem;
   padding: 2rem 1rem;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .dashboard-metrics-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .metric-card {
