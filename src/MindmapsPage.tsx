@@ -37,10 +37,7 @@ export default function MindmapsPage(): JSX.Element {
   }
 
   useEffect(() => {
-    authFetch('/.netlify/functions/mindmaps')
-      .then(res => res.json())
-      .then(setMaps)
-      .catch(() => {})
+    fetchData()
   }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
@@ -92,8 +89,28 @@ export default function MindmapsPage(): JSX.Element {
     }
   }
 
-  const today = new Date().toDateString()
-  const dayCount = maps.filter(m => new Date(m.created_at || m.createdAt || '').toDateString() === today).length
+  const getLastViewed = (id: string): number => {
+    const v = localStorage.getItem(`mindmap_last_viewed_${id}`)
+    return v ? parseInt(v, 10) : 0
+  }
+
+  const now = Date.now()
+  const oneDay = 24 * 60 * 60 * 1000
+  const oneWeek = 7 * oneDay
+  const dayAgo = now - oneDay
+  const weekAgo = now - oneWeek
+
+  const mapDay = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > dayAgo).length
+  const mapWeek = maps.filter(m => new Date(m.createdAt || m.created_at || '').getTime() > weekAgo).length
+
+  const sorted = [...maps].sort((a, b) => {
+    const av = getLastViewed(a.id)
+    const bv = getLastViewed(b.id)
+    if (av !== bv) return bv - av
+    const at = new Date(a.createdAt || a.created_at || '').getTime()
+    const bt = new Date(b.createdAt || b.created_at || '').getTime()
+    return bt - at
+  })
 
 
   return (
@@ -117,13 +134,24 @@ export default function MindmapsPage(): JSX.Element {
           <div className="tile">
             <h2 className="tile-header">Metrics</h2>
             <p>Total: {maps.length}</p>
-            <p>Today: {dayCount}</p>
+            <p>Today: {mapDay} Week: {mapWeek}</p>
           </div>
-          {maps.map(m => (
+
+          {sorted.map(m => (
             <div className="tile" key={m.id}>
               <div className="tile-header">
                 <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
-                <Link to={`/maps/${m.id}`}>Open</Link>
+                <Link
+                  to={`/maps/${m.id}`}
+                  onClick={() =>
+                    localStorage.setItem(
+                      `mindmap_last_viewed_${m.id}`,
+                      Date.now().toString()
+                    )
+                  }
+                >
+                  Open
+                </Link>
               </div>
             </div>
           ))}
