@@ -34,7 +34,7 @@ export const handler = async (
 
   try {
     if (event.httpMethod === 'POST') {
-      let data: { title?: string; description?: string }
+      let data: { title?: string; description?: string; nodeId?: string; todoId?: string }
       try {
         data = JSON.parse(event.body || '{}')
       } catch {
@@ -43,6 +43,8 @@ export const handler = async (
 
       const title = (data.title || '').trim()
       const description = (data.description || '').trim() || null
+      const nodeId = data.nodeId || null
+      const todoId = data.todoId || null
       if (!title) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing title' }) }
       }
@@ -54,7 +56,14 @@ export const handler = async (
         [userId, title, description]
       )
 
-      return { statusCode: 200, headers, body: JSON.stringify(result.rows[0]) }
+      const boardId = result.rows[0].id
+      await client.query(
+        `INSERT INTO canvas_links (node_id, todo_id, board_id)
+         VALUES ($1, $2, $3)`,
+        [nodeId, todoId, boardId]
+      )
+
+      return { statusCode: 200, headers, body: JSON.stringify({ ...result.rows[0], boardId }) }
     }
 
     if (event.httpMethod === 'GET') {

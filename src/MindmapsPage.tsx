@@ -129,7 +129,7 @@ export default function MindmapsPage(): JSX.Element {
               <h2>Create Mind Map</h2>
             </header>
             <section className="tile-body">
-              <p className="create-help">Click Create to manually add or use AI to get started.</p>
+              <p className="create-help">Click Create to Start</p>
               <button className="btn-primary" onClick={() => setShowModal(true)}>
                 Create
               </button>

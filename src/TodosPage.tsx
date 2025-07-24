@@ -123,7 +123,7 @@ export default function TodosPage(): JSX.Element {
             <div className="tile create-tile">
               <header className="tile-header"><h2>Create Todo</h2></header>
               <section className="tile-body">
-                <p className="create-help">Click Create to manually add or use AI to get started.</p>
+                <p className="create-help">Click Create to Start</p>
                 <button className="btn-primary" onClick={() => setShowModal(true)}>
                   Create
                 </button>
