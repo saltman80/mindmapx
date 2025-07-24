@@ -19,7 +19,7 @@ export default function DashboardTile({ icon, title, items = [], onCreate, moreL
   return (
     <div className="card">
       <header className="card-header">
-        {icon}
+        {icon && <span className="dashboard-icon">{icon}</span>}
         {title}
       </header>
       <div className="card-body">

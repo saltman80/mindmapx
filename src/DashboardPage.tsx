@@ -284,25 +284,36 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
+          <div className="create-row">
+            <div className="tile create-tile tile-header-center">
+              <h2>Create Map</h2>
+              <button className="btn-primary btn-wide" onClick={() => { setCreateType('map'); setShowModal(true) }}>Create</button>
+            </div>
+            <div className="tile create-tile tile-header-center">
+              <h2>Create Todo</h2>
+              <button className="btn-primary btn-wide" onClick={() => { setCreateType('todo'); setShowModal(true) }}>Create</button>
+            </div>
+            <div className="tile create-tile tile-header-center">
+              <h2>Create Board</h2>
+              <button className="btn-primary btn-wide" onClick={() => { setCreateType('board'); setShowModal(true) }}>Create</button>
+            </div>
+          </div>
           <div className="dashboard-grid">
             <DashboardTile
               icon={<span role="img" aria-label="Mindmap">🧠</span>}
               title="Mind Maps"
-              onCreate={() => { setCreateType('map'); setShowModal(true) }}
               items={mapItems}
               moreLink="/mindmaps"
             />
             <DashboardTile
               icon={<span role="img" aria-label="Todos">✅</span>}
               title="Todos"
-              onCreate={() => { setCreateType('todo'); setShowModal(true) }}
               items={todoItems}
               moreLink="/todos"
             />
             <DashboardTile
               icon={<span role="img" aria-label="Kanban">📋</span>}
               title="Kanban Boards"
-              onCreate={() => { setCreateType('board'); setShowModal(true) }}
               items={boardItems}
               moreLink="/kanban"
             />
