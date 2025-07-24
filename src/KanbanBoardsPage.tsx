@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -24,6 +24,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
+  const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
@@ -50,7 +51,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      await fetch('/.netlify/functions/boards', {
+      const res = await fetch('/.netlify/functions/boards', {
         method: 'POST',
         credentials: 'include', // Required for session cookie
         headers: {
@@ -58,9 +59,14 @@ export default function KanbanBoardsPage(): JSX.Element {
         },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.id) {
+        navigate(`/kanban/${json.id}`)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'Creation failed')
     }
@@ -68,7 +74,7 @@ export default function KanbanBoardsPage(): JSX.Element {
 
   const handleAiCreate = async (): Promise<void> => {
     try {
-      await fetch('/.netlify/functions/ai-create-board', {
+      const res = await fetch('/.netlify/functions/ai-create-board', {
         method: 'POST',
         credentials: 'include', // Required for session cookie
         headers: {
@@ -76,9 +82,14 @@ export default function KanbanBoardsPage(): JSX.Element {
         },
         body: JSON.stringify({ title: form.title, description: form.description }),
       })
+      const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      fetchData()
+      if (json?.id) {
+        navigate(`/kanban/${json.id}`)
+      } else {
+        fetchData()
+      }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
     }

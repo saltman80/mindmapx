@@ -65,7 +65,7 @@ export default function TodosPage(): JSX.Element {
       setShowModal(false)
       setForm({ title: '', description: '' })
       if (json?.id) {
-        setTimeout(() => navigate(`/todo/${json.id}`), 250)
+        setTimeout(() => navigate(`/todos/${json.id}`), 250)
       } else {
         fetchData()
       }
@@ -86,7 +86,7 @@ export default function TodosPage(): JSX.Element {
       setShowModal(false)
       setForm({ title: '', description: '' })
       if (json?.id) {
-        setTimeout(() => navigate(`/todo/${json.id}`), 250)
+        setTimeout(() => navigate(`/todos/${json.id}`), 250)
       } else {
         fetchData()
       }
@@ -155,7 +155,7 @@ export default function TodosPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{t.title || t.content}</h2>
                   <Link
-                    to={`/todo/${t.id}`}
+                    to={`/todos/${t.id}`}
                     onClick={() =>
                       localStorage.setItem(
                         `todo_last_viewed_${t.id}`,
