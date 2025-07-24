@@ -110,7 +110,7 @@ export default function DashboardPage(): JSX.Element {
         })
         const json = await res.json()
         if (json?.id) {
-          navigate(`/maps/${json.id}`)
+          setTimeout(() => navigate(`/maps/${json.id}`), 250)
         }
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/todos', {
@@ -156,7 +156,7 @@ export default function DashboardPage(): JSX.Element {
         })
         const json = await res.json()
         if (json?.id) {
-          navigate(`/maps/${json.id}`)
+          setTimeout(() => navigate(`/maps/${json.id}`), 250)
         }
       } else if (createType === 'todo') {
         await fetch('/.netlify/functions/ai-create-todo', {
