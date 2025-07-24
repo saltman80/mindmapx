@@ -328,21 +328,21 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               </g>
             ))}
           </g>
-          {safeNodes.length === 0 && safeEdges.length === 0 && (
-            <div className="modal-overlay empty-canvas-modal">
-              <div className="modal">
-                <p>No nodes yet. Click below to start building your map!</p>
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={() => onAddNode && onAddNode()}
-                >
-                  Add Node
-                </button>
-              </div>
-            </div>
-          )}
         </svg>
+        {safeNodes.length === 0 && safeEdges.length === 0 && (
+          <div className="modal-overlay empty-canvas-modal">
+            <div className="modal">
+              <p>No nodes yet. Click below to start building your map!</p>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => onAddNode && onAddNode()}
+              >
+                Add Node
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
