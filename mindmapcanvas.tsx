@@ -272,6 +272,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               </g>
             ))}
           </g>
+          {safeNodes.length === 0 && safeEdges.length === 0 && (
+            <text x={100} y={100} fill="#aaa">
+              No nodes yet. Click to start building your map!
+            </text>
+          )}
         </svg>
       </div>
     )
