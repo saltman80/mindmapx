@@ -70,7 +70,8 @@ function AppLayout() {
     '/team-members',
     '/profile',
     '/billing',
-    '/account'
+    '/account',
+    '/maps'
   ]
   const isDashboard = dashboardPaths.some(path =>
     location.pathname === path || location.pathname.startsWith(path + '/')
