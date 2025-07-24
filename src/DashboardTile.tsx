@@ -18,30 +18,25 @@ interface DashboardTileProps {
 
 export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink }: DashboardTileProps) {
   return (
-    <div className="card">
-      <header className="card-header">
+    <div className="tile">
+      <div className="tile-header-center">
         {icon && <span className="dashboard-icon">{icon}</span>}
-        {title}
-      </header>
-      <div className="card-body">
-        {items.length > 0 && <div className="card-subtitle">Recent</div>}
-        <ul className="recent-links">
+        <h2>{title}</h2>
+        {onCreate && (
+          <button className="btn-primary btn-wide" onClick={onCreate}>Create</button>
+        )}
+        {moreLink && <Link to={moreLink} className="tile-link">See All</Link>}
+      </div>
+      {items.length > 0 && (
+        <ul className="recent-list">
           {items.map(item => (
             <li key={item.id}>
               <Link to={item.link}>{item.label}</Link>
             </li>
           ))}
         </ul>
-        {metrics && <div className="tile-stats">{metrics}</div>}
-      </div>
-      <div className="card-footer">
-        {onCreate && (
-          <button className="btn-create" onClick={onCreate}>Create</button>
-        )}
-        {moreLink && (
-          <Link to={moreLink} className="card-more">See All</Link>
-        )}
-      </div>
+      )}
+      {metrics && <div className="tile-stats">{metrics}</div>}
     </div>
   )
 }

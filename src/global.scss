@@ -1550,23 +1550,39 @@ hr {
   }
 }
 
-.metric-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: var(--spacing-lg);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(8px);
-  text-align: center;
+.dashboard-metrics-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1rem;
   justify-content: space-between;
-  min-height: 200px;
+  flex-wrap: wrap;
+}
+
+.metric-card {
+  background: #fffdf9;
+  border: 1px solid #ffa500;
+  border-radius: 12px;
+  flex: 1 1 28%;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  text-align: left;
+}
+
+.metric-card .metric-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card .metric-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ff8400;
 }
 
 .metric-card p {
-  margin: 0 0 var(--spacing-xs);
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
 }
 
 .metric-detail-grid {
@@ -1607,25 +1623,6 @@ hr {
   font-size: 0.9rem;
 }
 
-.metric-title {
-  margin-bottom: var(--spacing-md);
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.metric-value {
-  width: 70px;
-  height: 70px;
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-md);
-}
 
 .sparkline {
   width: 100%;
@@ -1749,20 +1746,24 @@ hr {
 }
 
 .tile-header-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
-.tile-header-center button {
-  margin-top: var(--spacing-sm);
+.tile-header-center h2 {
+  margin-bottom: 0.5rem;
+}
+
+.tile-header-center .btn-primary {
+  display: block;
+  margin: 0.5rem auto;
 }
 
 .tile-header-center .tile-link {
-  margin-top: 50px;
-  font-size: 0.85rem;
-  color: var(--color-primary);
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #007aff;
   text-decoration: underline;
 }
 
@@ -2092,23 +2093,23 @@ hr {
   opacity: 0.4;
 }
 \n// Dashboard tile redesign
-.dashboard-grid {
+.dashboard-tile-grid {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  grid-template-columns: 1fr;
+  margin: 2rem 0;
+  padding: 1rem;
 }
 
-@media (min-width: 768px) {
-  .dashboard-grid {
+@media (max-width: 900px) {
+  .dashboard-tile-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    grid-auto-rows: 1fr;
+@media (max-width: 600px) {
+  .dashboard-tile-grid {
+    grid-template-columns: 1fr;
   }
 }
 
