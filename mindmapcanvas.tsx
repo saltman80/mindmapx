@@ -7,6 +7,7 @@ import {
   useMemo,
   useEffect
 } from 'react'
+import MiniMap from './MiniMap'
 
 interface NodeData {
   id: string
@@ -31,6 +32,7 @@ interface MindmapCanvasProps {
   height?: number | string
   onAddNode?: (node: NodeData) => void
   onMoveNode?: (node: NodeData) => void
+  showMiniMap?: boolean
 }
 
 interface MindmapCanvasHandle {
@@ -50,6 +52,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       height,
       onAddNode,
       onMoveNode,
+      showMiniMap = false,
     },
     ref
   ) => {
@@ -544,6 +547,23 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               </div>
             </div>
           </div>
+        )}
+        {showMiniMap && (
+          <MiniMap
+            nodes={safeNodes}
+            edges={safeEdges}
+            transform={transform}
+            onNavigate={(x, y) => {
+              if (!containerRef.current) return
+              const cw = containerRef.current.clientWidth
+              const ch = containerRef.current.clientHeight
+              setTransform(prev => ({
+                x: cw / 2 - x * prev.k,
+                y: ch / 2 - y * prev.k,
+                k: prev.k,
+              }))
+            }}
+          />
         )}
       </div>
     )
