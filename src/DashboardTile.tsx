@@ -18,8 +18,8 @@ interface DashboardTileProps {
 
 export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink }: DashboardTileProps) {
   return (
-    <div className="tile">
-      <div className="tile-header-center">
+    <div className="dashboard-tile">
+      <div className="tile-header">
         {icon && <span className="dashboard-icon">{icon}</span>}
         <h2>{title}</h2>
         {onCreate && (

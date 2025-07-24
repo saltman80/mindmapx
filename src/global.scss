@@ -1591,6 +1591,67 @@ hr {
   font-size: 0.9rem;
 }
 
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.dashboard-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.dashboard-tile,
+.metric-tile {
+  background: #fffdf8;
+  border: 1px solid #ffa500;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dashboard-tile .tile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dashboard-tile .tile-header h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-tile .tile-header .btn-primary {
+  margin: 0.5rem 0;
+}
+
+.dashboard-tile .tile-header .tile-link {
+  font-size: 0.9rem;
+  color: #007aff;
+  text-decoration: underline;
+}
+
+.metric-circle {
+  margin: 0.75rem 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffa500;
+  color: #fff;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
 .metric-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

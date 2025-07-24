@@ -284,51 +284,53 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="dashboard-metrics-row">
-            <div className="metric-card">
-              <h3 className="metric-title">Maps</h3>
-              <div className="metric-value">{maps.length}</div>
-              <p>Today {mapDay}</p>
-              <p>Week {mapWeek}</p>
-              <Sparkline data={mapTrend} />
+          <div className="dashboard-grid">
+            <div className="dashboard-row">
+              <div className="metric-tile">
+                <h3>Mind Maps</h3>
+                <div className="metric-circle">{maps.length}</div>
+                <p>Created Today: {mapDay}</p>
+                <p>Created This Week: {mapWeek}</p>
+                <Sparkline data={mapTrend} />
+              </div>
+              <div className="metric-tile">
+                <h3>Todos</h3>
+                <div className="metric-circle">{todos.length}</div>
+                <p>Completed Today: {todoDoneDay}</p>
+                <p>Completed This Week: {todoDoneWeek}</p>
+                <Sparkline data={todoTrend} />
+              </div>
+              <div className="metric-tile">
+                <h3>Kanban Boards</h3>
+                <div className="metric-circle">{boards.length}</div>
+                <p>Created Today: {boardDay}</p>
+                <p>Created This Week: {boardWeek}</p>
+                <Sparkline data={boardTrend} />
+              </div>
             </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Todos</h3>
-              <div className="metric-value">{todos.length}</div>
-              <p>Today {todoDoneDay}</p>
-              <p>Week {todoDoneWeek}</p>
-              <Sparkline data={todoTrend} />
+            <div className="dashboard-row">
+              <DashboardTile
+                icon={<span role="img" aria-label="Mindmap">🧠</span>}
+                title="Mind Maps"
+                items={mapItems}
+                moreLink="/mindmaps"
+                onCreate={() => { setCreateType('map'); setShowModal(true) }}
+              />
+              <DashboardTile
+                icon={<span role="img" aria-label="Todos">✅</span>}
+                title="Todos"
+                items={todoItems}
+                moreLink="/todos"
+                onCreate={() => { setCreateType('todo'); setShowModal(true) }}
+              />
+              <DashboardTile
+                icon={<span role="img" aria-label="Kanban">📋</span>}
+                title="Kanban Boards"
+                items={boardItems}
+                moreLink="/kanban"
+                onCreate={() => { setCreateType('board'); setShowModal(true) }}
+              />
             </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Boards</h3>
-              <div className="metric-value">{boards.length}</div>
-              <p>Today {boardDay}</p>
-              <p>Week {boardWeek}</p>
-              <Sparkline data={boardTrend} />
-            </div>
-          </div>
-          <div className="dashboard-tile-grid">
-            <DashboardTile
-              icon={<span role="img" aria-label="Mindmap">🧠</span>}
-              title="Mind Maps"
-              items={mapItems}
-              moreLink="/mindmaps"
-              onCreate={() => { setCreateType('map'); setShowModal(true) }}
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Todos">✅</span>}
-              title="Todos"
-              items={todoItems}
-              moreLink="/todos"
-              onCreate={() => { setCreateType('todo'); setShowModal(true) }}
-            />
-            <DashboardTile
-              icon={<span role="img" aria-label="Kanban">📋</span>}
-              title="Kanban Boards"
-              items={boardItems}
-              moreLink="/kanban"
-              onCreate={() => { setCreateType('board'); setShowModal(true) }}
-            />
           </div>
         </>
       )}

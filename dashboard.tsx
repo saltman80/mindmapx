@@ -167,73 +167,32 @@ export default function DashboardPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <h3 className="metric-title">Mind Maps</h3>
-              <div className="metric-value">{maps.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{mapDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{mapWeek}</span>
-                </div>
+          <div className="dashboard-grid">
+            <div className="dashboard-row">
+              <div className="metric-tile">
+                <h3>Mind Maps</h3>
+                <div className="metric-circle">{maps.length}</div>
+                <p>Created Today: {mapDay}</p>
+                <p>Created This Week: {mapWeek}</p>
+                <Sparkline data={mapTrend} />
+              </div>
+              <div className="metric-tile">
+                <h3>Todos</h3>
+                <div className="metric-circle">{todos.length}</div>
+                <p>Completed Today: {todoDoneDay}</p>
+                <p>Completed This Week: {todoDoneWeek}</p>
+                <Sparkline data={todoTrend} />
+              </div>
+              <div className="metric-tile">
+                <h3>Kanban Boards</h3>
+                <div className="metric-circle">{boards.length}</div>
+                <p>Created Today: {boardDay}</p>
+                <p>Created This Week: {boardWeek}</p>
+                <Sparkline data={boardTrend} />
               </div>
             </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Todos</h3>
-              <div className="metric-value">{todos.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today Added</span>
-                  <span className="value">{todoAddedDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Today Done</span>
-                  <span className="value">{todoDoneDay}</span>
-                </div>
-              </div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Week Added</span>
-                  <span className="value">{todoAddedWeek}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week Done</span>
-                  <span className="value">{todoDoneWeek}</span>
-                </div>
-              </div>
-            </div>
-            <div className="metric-card">
-              <h3 className="metric-title">Kanban Boards</h3>
-              <div className="metric-value">{boards.length}</div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{boardDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{boardWeek}</span>
-                </div>
-              </div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Cards Added</span>
-                  <span className="value">0</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Completed</span>
-                  <span className="value">0</span>
-                </div>
-              </div>
-              <Link to="/kanban" className="text-blue-600 underline">View Boards</Link>
-            </div>
-          </div>
-          <div className="tiles-grid">
-            <div className="tile">
+            <div className="dashboard-row">
+            <div className="dashboard-tile">
               <header className="tile-header">
                 <h2>Mind Maps</h2>
                 <button
@@ -256,7 +215,7 @@ export default function DashboardPage(): JSX.Element {
                 </ul>
               </section>
             </div>
-            <div className="tile">
+            <div className="dashboard-tile">
               <header className="tile-header">
                 <h2>Todos</h2>
                 <button
@@ -281,13 +240,14 @@ export default function DashboardPage(): JSX.Element {
                 </ul>
               </section>
             </div>
-            <div className="tile">
+            <div className="dashboard-tile">
               <header className="tile-header">
                 <h2>Kanban Boards</h2>
               </header>
               <section className="tile-body">
                 <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
               </section>
+            </div>
             </div>
           </div>
         </>
