@@ -10,7 +10,8 @@ This project uses Netlify Functions and a Neon database. SQL migration files are
    ```bash
    npm install --include=dev
    ```
-2. Run database migrations (requires a configured Neon connection):
+2. Run database migrations (requires a configured Neon connection). This command
+   automatically compiles the migration scripts before executing them:
    ```bash
    npm run migrate
    ```
