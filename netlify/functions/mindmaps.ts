@@ -63,13 +63,21 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     // ✅ Handle GET
     if (event.httpMethod === 'GET') {
       const result = await client.query(
-        `SELECT id, title, description, created_at FROM mindmaps
+        `SELECT id, title, description, created_at, data FROM mindmaps
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [userId]
       )
 
-      return { statusCode: 200, headers, body: JSON.stringify(result.rows) }
+      const maps = result.rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        created_at: row.created_at,
+        data: row.data ?? { nodes: [], edges: [] },
+      }))
+
+      return { statusCode: 200, headers, body: JSON.stringify(maps) }
     }
 
     // ❌ No other method allowed
