@@ -52,8 +52,7 @@ export default function MapEditorPage(): JSX.Element {
     fetch(`/.netlify/functions/nodes?mindmapId=${id}`, { credentials: 'include', signal: controller.signal })
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
-        if (!Array.isArray(data)) return
-        setNodes(data)
+        setNodes(Array.isArray(data) ? data : [])
       })
       .catch(() => {})
     return () => controller.abort()
