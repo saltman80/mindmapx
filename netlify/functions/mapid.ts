@@ -79,7 +79,13 @@ async function getMap(mapId: string): Promise<{ id: string; data: MapData; creat
   try {
     const res = await client.query('SELECT id, data, created_at, updated_at FROM mindmaps WHERE id = $1', [mapId])
     const count = res.rowCount ?? 0
-    return count > 0 ? res.rows[0] : null
+    if (count === 0) return null
+    const row = res.rows[0]
+    if (row.created_at instanceof Date) row.created_at = row.created_at.toISOString()
+    else row.created_at = new Date(row.created_at).toISOString()
+    if (row.updated_at instanceof Date) row.updated_at = row.updated_at.toISOString()
+    else if (row.updated_at) row.updated_at = new Date(row.updated_at).toISOString()
+    return row
   } finally {
     client.release()
   }
@@ -93,7 +99,13 @@ async function updateMap(mapId: string, data: MapData): Promise<{ id: string; da
       [mapId, data]
     )
     const count = res.rowCount ?? 0
-    return count > 0 ? res.rows[0] : null
+    if (count === 0) return null
+    const row = res.rows[0]
+    if (row.created_at instanceof Date) row.created_at = row.created_at.toISOString()
+    else row.created_at = new Date(row.created_at).toISOString()
+    if (row.updated_at instanceof Date) row.updated_at = row.updated_at.toISOString()
+    else if (row.updated_at) row.updated_at = new Date(row.updated_at).toISOString()
+    return row
   } finally {
     client.release()
   }
