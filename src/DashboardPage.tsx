@@ -7,39 +7,16 @@ import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import Sparkline from './Sparkline'
 import DashboardTile, { DashboardItem } from './DashboardTile'
-
-interface MapItem {
-  id: string
-  title?: string
-  createdAt?: string
-  created_at?: string
-  data?: { title?: string; [key: string]: any }
-}
-
-interface TodoItem {
-  id: string
-  title?: string
-  content?: string
-  completed?: boolean
-  mindmap_id?: string
-  createdAt?: string
-  created_at?: string
-  updatedAt?: string
-  updated_at?: string
-}
-
-interface BoardItem {
-  id: string
-  title?: string
-  createdAt?: string
-  created_at?: string
-}
-
-interface NodeItem {
-  id: string
-  createdAt?: string
-  created_at?: string
-}
+import {
+  MapItem,
+  TodoItem,
+  BoardItem,
+  NodeItem,
+  validateMaps,
+  validateTodos,
+  validateBoards,
+  validateNodes,
+} from './apiValidators'
 
 export default function DashboardPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
@@ -66,27 +43,27 @@ export default function DashboardPage(): JSX.Element {
       const mapsJson = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
         : []
-      const mapsList: MapItem[] = Array.isArray(mapsJson) ? mapsJson : mapsJson.maps || []
+      const mapsList = validateMaps(Array.isArray(mapsJson) ? mapsJson : mapsJson.maps)
 
       const todosJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
         ? await todosRes.json()
         : []
-      const todosList: TodoItem[] = Array.isArray(todosJson) ? todosJson : todosJson.todos || []
+      const todosList = validateTodos(Array.isArray(todosJson) ? todosJson : todosJson.todos)
 
       const boardsJson = boardsRes.ok && boardsRes.headers.get('content-type')?.includes('application/json')
         ? await boardsRes.json()
         : []
-      const boardsList: BoardItem[] = Array.isArray(boardsJson) ? boardsJson : boardsJson.boards || []
+      const boardsList = validateBoards(Array.isArray(boardsJson) ? boardsJson : boardsJson.boards)
 
       const nodesJson = nodesRes.ok && nodesRes.headers.get('content-type')?.includes('application/json')
         ? await nodesRes.json()
         : []
-      const nodesList: NodeItem[] = Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes || []
+      const nodesList = validateNodes(Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes)
 
-      setMaps(mapsList)
-      setTodos(todosList)
-      setBoards(boardsList)
-      setNodes(nodesList)
+      setMaps(Array.isArray(mapsList) ? mapsList : [])
+      setTodos(Array.isArray(todosList) ? todosList : [])
+      setBoards(Array.isArray(boardsList) ? boardsList : [])
+      setNodes(Array.isArray(nodesList) ? nodesList : [])
     } catch (err: any) {
       setError(err.message || 'Failed to load data')
     } finally {
@@ -266,21 +243,27 @@ export default function DashboardPage(): JSX.Element {
   const recentTodos = [...safeTodoArray].sort(dateSort).slice(0, 10)
   const recentBoards = [...safeBoardArray].sort(dateSort).slice(0, 10)
 
-  const mapItems: DashboardItem[] = recentMaps.map(m => ({
-    id: m.id,
-    label: m.title || 'Untitled Map',
-    link: `/maps/${m.id}`
-  }))
-  const todoItems: DashboardItem[] = recentTodos.map(t => ({
-    id: t.id,
-    label: t.title || t.content || 'Todo',
-    link: '/todo-demo'
-  }))
-  const boardItems: DashboardItem[] = recentBoards.map(b => ({
-    id: b.id,
-    label: b.title || 'Board',
-    link: `/kanban/${b.id}`
-  }))
+  const mapItems: DashboardItem[] = Array.isArray(recentMaps)
+    ? recentMaps.map(m => ({
+        id: m.id,
+        label: m.title || 'Untitled Map',
+        link: `/maps/${m.id}`,
+      }))
+    : []
+  const todoItems: DashboardItem[] = Array.isArray(recentTodos)
+    ? recentTodos.map(t => ({
+        id: t.id,
+        label: t.title || t.content || 'Todo',
+        link: '/todo-demo',
+      }))
+    : []
+  const boardItems: DashboardItem[] = Array.isArray(recentBoards)
+    ? recentBoards.map(b => ({
+        id: b.id,
+        label: b.title || 'Board',
+        link: `/kanban/${b.id}`,
+      }))
+    : []
 
   return (
     <div className="dashboard-page relative overflow-hidden">
