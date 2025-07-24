@@ -40,10 +40,18 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const mapId = event.queryStringParameters?.mindmapId
       if (!mapId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'mindmapId required' }) }
       const { rows } = await client.query(
-        `SELECT id, parent_id, data FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
+        `SELECT id, parent_id, x, y, label, description, todo_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
         [mapId]
       )
-      const nodes = rows.map(r => ({ id: r.id, parentId: r.parent_id, ...(r.data || {}) }))
+      const nodes = rows.map(r => ({
+        id: r.id,
+        parentId: r.parent_id,
+        x: r.x,
+        y: r.y,
+        label: r.label ?? undefined,
+        description: r.description ?? undefined,
+        todoId: r.todo_id ?? undefined,
+      }))
       return { statusCode: 200, headers, body: JSON.stringify(nodes) }
     }
 
@@ -57,8 +65,16 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
       const id = payload as any && (payload as any).id ? (payload as any).id : crypto.randomUUID()
       await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, data) VALUES ($1,$2,$3,$4)`,
-        [id, payload.mindmapId, payload.parentId ?? null, JSON.stringify({ x: payload.x, y: payload.y, label: payload.label, description: payload.description })]
+        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        [
+          id,
+          payload.mindmapId,
+          payload.parentId ?? null,
+          payload.x,
+          payload.y,
+          payload.label ?? null,
+          payload.description ?? null,
+        ]
       )
       return { statusCode: 201, headers, body: JSON.stringify({ id }) }
     }
@@ -74,10 +90,41 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
-      const { rows } = await client.query('SELECT data FROM nodes WHERE id=$1', [nodeId])
-      if (rows.length === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
-      const data = { ...(rows[0].data || {}), ...payload }
-      await client.query('UPDATE nodes SET data=$2 WHERE id=$1', [nodeId, JSON.stringify(data)])
+      const fields: string[] = []
+      const values: any[] = [nodeId]
+      let idx = 2
+      if (payload.x !== undefined) {
+        fields.push(`x=$${idx}`)
+        values.push(payload.x)
+        idx++
+      }
+      if (payload.y !== undefined) {
+        fields.push(`y=$${idx}`)
+        values.push(payload.y)
+        idx++
+      }
+      if (payload.label !== undefined) {
+        fields.push(`label=$${idx}`)
+        values.push(payload.label)
+        idx++
+      }
+      if (payload.description !== undefined) {
+        fields.push(`description=$${idx}`)
+        values.push(payload.description)
+        idx++
+      }
+      if (payload.parentId !== undefined) {
+        fields.push(`parent_id=$${idx}`)
+        values.push(payload.parentId)
+        idx++
+      }
+      if (fields.length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'No fields to update' }) }
+      }
+      const result = await client.query(`UPDATE nodes SET ${fields.join(', ')} WHERE id=$1`, values)
+      if (result.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+      }
       return { statusCode: 200, headers, body: JSON.stringify({ id: nodeId }) }
     }
 
