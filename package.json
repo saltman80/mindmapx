@@ -12,7 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "compile:migrations": "tsc -p tsconfig.migrations.json",
-    "migrate": "npm run compile:migrations && node dist/runmigrations.js",
+    "migrate": "npm run compile:migrations && node dist/migrationrunner.js",
     "test": "node --test"
   },
   "dependencies": {
