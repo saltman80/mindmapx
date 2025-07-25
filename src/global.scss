@@ -2354,29 +2354,38 @@ hr {
   color: #666;
 }
 
-.kanban-lanes {
+/* Kanban board layout */
+.kanban-board {
   display: flex;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 60px);
   overflow-x: auto;
+  background: #f4f5f7;
+  padding: 16px;
 }
 
 .lane {
-  flex: 1;
-  min-width: 250px;
-  background: #f7f8fa;
-  border-right: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  min-width: 280px;
+  margin-right: 16px;
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  max-height: 100%;
 }
 
 .card {
-  background: white;
+  background: #fff;
+  border: 1px solid #dfe1e6;
+  border-radius: 6px;
   padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
@@ -2395,6 +2404,28 @@ hr {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.card-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  z-index: 1000;
+}
+
+.comment {
+  margin-bottom: 0.5rem;
+}
+
+.comment span {
+  font-size: 0.75rem;
+  color: #666;
 }
 
 /* Empty canvas modal */

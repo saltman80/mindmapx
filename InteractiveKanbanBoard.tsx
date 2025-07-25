@@ -1,9 +1,5 @@
 import { useState } from 'react'
-
-interface Card {
-  id: string
-  title: string
-}
+import CardModal, { Card } from './CardModal'
 
 interface Lane {
   id: string
@@ -30,6 +26,7 @@ export default function InteractiveKanbanBoard({
   const [boardDescription] = useState(
     description || 'Organize tasks across lanes'
   )
+  const [selected, setSelected] = useState<{ laneId: string; card: Card } | null>(null)
 
   const addLane = () => {
     const id = `lane-${Date.now()}`
@@ -37,7 +34,7 @@ export default function InteractiveKanbanBoard({
   }
 
   const addCard = (laneId: string) => {
-    const newCard = { id: `card-${Date.now()}`, title: '' }
+    const newCard: Card = { id: `card-${Date.now()}`, title: '', comments: [] }
     setLanes(lanes.map(l =>
       l.id === laneId ? { ...l, cards: [...l.cards, newCard] } : l
     ))
@@ -57,13 +54,13 @@ export default function InteractiveKanbanBoard({
     setLanes(lanes.map(l => (l.id === laneId ? { ...l, title } : l)))
   }
 
-  const updateCard = (laneId: string, cardId: string, title: string) => {
+  const updateCard = (laneId: string, updatedCard: Card) => {
     setLanes(prev =>
       prev.map(l =>
         l.id === laneId
           ? {
               ...l,
-              cards: l.cards.map(c => (c.id === cardId ? { ...c, title } : c)),
+              cards: l.cards.map(c => (c.id === updatedCard.id ? updatedCard : c)),
             }
           : l
       )
@@ -101,6 +98,7 @@ export default function InteractiveKanbanBoard({
             onAddCard={addCard}
             onUpdateTitle={updateTitle}
             onUpdateCard={updateCard}
+            onCardClick={(laneId, card) => setSelected({ laneId, card })}
             onDragStart={handleDragStart}
             onDrop={handleDrop}
           />
@@ -112,6 +110,13 @@ export default function InteractiveKanbanBoard({
           </button>
         </div>
       </div>
+      <CardModal
+        card={selected?.card || null}
+        onClose={() => setSelected(null)}
+        onSave={card => {
+          if (selected) updateCard(selected.laneId, card)
+        }}
+      />
     </div>
   )
 }
@@ -121,7 +126,8 @@ interface LaneProps {
   laneIndex: number
   onAddCard: (laneId: string) => void
   onUpdateTitle: (laneId: string, title: string) => void
-  onUpdateCard: (laneId: string, cardId: string, title: string) => void
+  onUpdateCard: (laneId: string, card: Card) => void
+  onCardClick: (laneId: string, card: Card) => void
   onDragStart: (
     e: React.DragEvent<HTMLDivElement>,
     laneIndex: number,
@@ -130,7 +136,7 @@ interface LaneProps {
   onDrop: (e: React.DragEvent<HTMLDivElement>, laneIndex: number) => void
 }
 
-function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onUpdateCard, onDragStart, onDrop }: LaneProps) {
+function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onDragStart, onDrop }: LaneProps) {
   const [editing, setEditing] = useState(false)
   const [tempTitle, setTempTitle] = useState(lane.title)
   const [editingCardId, setEditingCardId] = useState<string | null>(null)
@@ -148,7 +154,10 @@ function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onUpdateCard, onDragS
 
   const saveCard = () => {
     if (editingCardId) {
-      onUpdateCard(lane.id, editingCardId, tempCardTitle)
+      const existing = lane.cards.find(c => c.id === editingCardId)
+      if (existing) {
+        onUpdateCard(lane.id, { ...existing, title: tempCardTitle })
+      }
     }
     setEditingCardId(null)
     setTempCardTitle('')
@@ -182,6 +191,7 @@ function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onUpdateCard, onDragS
           className="card"
           draggable
           onDragStart={e => onDragStart(e, laneIndex, i)}
+          onClick={() => onCardClick(lane.id, card)}
         >
           {editingCardId === card.id ? (
             <div className="card-edit">
