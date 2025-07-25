@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z } from 'zod'
 import type { Todo } from './types.js'
+import { extractToken, verifySession } from './auth.js'
 
 type TodoInput = {
   title?: string
@@ -107,25 +108,30 @@ async function deleteTodo(todoId: string, userId: string): Promise<void> {
 
 export const handler = async (
   event: HandlerEvent,
-  context: HandlerContext
+  _context: HandlerContext
 ) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
   try {
-    const identity = context.clientContext?.identity
-    if (!identity || !identity.sub) {
-      return {
-        statusCode: 403,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          error: 'You must be signed in to access this to-do item.'
-        }),
-      }
+    const token = extractToken(event)
+    if (!token) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
     }
-    const userId = identity.sub
+    let userId: string
+    try {
+      const session = verifySession(token)
+      userId = session.userId
+      if (!userId) throw new Error('Missing userId')
+    } catch (err) {
+      console.error('Auth failure in todoid.ts:', err)
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
+    }
     const todoId = (event.path || '').split('/').pop()!
     if (!todoId) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ error: 'Missing todoId' }),
       }
     }
@@ -134,7 +140,7 @@ export const handler = async (
         const todo = await getTodo(todoId, userId)
         return {
           statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify(todo),
         }
       }
@@ -145,7 +151,7 @@ export const handler = async (
         } catch {
           return {
             statusCode: 400,
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ error: 'Invalid JSON' }),
           }
         }
@@ -153,14 +159,14 @@ export const handler = async (
         if (!parseResult.success) {
           return {
             statusCode: 400,
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ error: parseResult.error.errors.map(e => e.message).join(', ') }),
           }
         }
         const updated = await updateTodo(todoId, parseResult.data, userId)
         return {
           statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify(updated),
         }
       }
@@ -172,13 +178,13 @@ export const handler = async (
         }
       }
       default:
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
+        const allowHeaders: Record<string, string> = {
+          ...headers,
           Allow: 'GET, PUT, DELETE',
         }
         return {
           statusCode: 405,
-          headers,
+          headers: allowHeaders,
           body: JSON.stringify({ error: 'Method Not Allowed' }),
         }
       }
@@ -186,14 +192,14 @@ export const handler = async (
     if (err.message === 'NotFound') {
       return {
         statusCode: 404,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ error: 'Todo not found' }),
       }
     }
     console.error(err)
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ error: 'Internal Server Error' }),
     }
   }
