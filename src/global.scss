@@ -1675,6 +1675,14 @@ hr {
   backdrop-filter: blur(8px);
 }
 
+/* compact variant used on list pages */
+.metric-tile.simple {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: auto;
+}
+
 // widen sparkline width specifically within dashboard metric tiles
 .metric-tile .sparkline {
   width: 100%;
@@ -1723,6 +1731,11 @@ hr {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+}
+
+.metric-header.stacked {
+  flex-direction: column;
+  align-items: center;
 }
 
 .metric-right {
