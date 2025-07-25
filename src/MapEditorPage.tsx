@@ -92,6 +92,7 @@ export default function MapEditorPage(): JSX.Element {
 
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
+  // Validate shape of loaded mindmap
   if (!mindmap?.id) {
     return <div>Error: This map is missing or invalid.</div>
   }
