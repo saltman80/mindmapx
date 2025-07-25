@@ -106,8 +106,8 @@ const Modal: React.FC<ModalProps> = ({
     <FocusTrap>
       <div className="fixed inset-0 z-50">
         <div className="modal-backdrop" onClick={onClose} />
-        <div
-          className="modal-content overflow-y-auto"
+          <div
+            className="modal-content modal-container overflow-y-auto"
           role="dialog"
           aria-modal="true"
           tabIndex={-1}

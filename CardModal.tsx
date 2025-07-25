@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Modal from './modal'
 import { v4 as uuid } from 'uuid'
 
@@ -41,6 +41,20 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
   const [assignee, setAssignee] = useState(card?.assignee || '')
   const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([])
 
+  const isDirty = useMemo(() => {
+    if (!card) return false
+    const baseComments = card.comments || []
+    return (
+      title !== card.title ||
+      description !== (card.description || '') ||
+      dueDate !== (card.dueDate || '') ||
+      priority !== (card.priority || 'low') ||
+      status !== (card.status || 'open') ||
+      assignee !== (card.assignee || '') ||
+      JSON.stringify(comments) !== JSON.stringify(baseComments)
+    )
+  }, [card, title, description, dueDate, priority, status, assignee, comments])
+
   useEffect(() => {
     if (card) {
       setTitle(card.title)
@@ -70,9 +84,14 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
       createdAt: new Date().toISOString(),
       author: currentUser?.name || 'Anon'
     }
-    setComments([...comments, comment])
+    setComments(prev => [...prev, comment])
     setNewComment('')
   }
+
+  const sortedComments = useMemo(
+    () => [...comments].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+    [comments]
+  )
 
   const save = () => {
     if (!card) return
@@ -86,16 +105,17 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
       status,
       assignee,
     })
+    alert('Card saved successfully.')
     onClose()
   }
 
   return (
     <Modal isOpen={!!card} onClose={onClose} ariaLabel="Edit card">
-      {card && (
-        <div className="card-modal">
+        {card && (
+          <div className="modal-container card-modal">
           <h2 className="mb-2 text-lg font-semibold">Edit Card</h2>
 
-          <section className="card-section">
+          <section className="modal-section">
             <h3 className="section-title">Card Details</h3>
             <label>
               Title
@@ -103,7 +123,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="input"
+                className="input-styled"
               />
             </label>
 
@@ -112,7 +132,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
               <textarea
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                className="textarea"
+                className="textarea-styled"
               />
             </label>
 
@@ -122,7 +142,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
                 <select
                   value={status}
                   onChange={e => setStatus(e.target.value as Card['status'])}
-                  className="select"
+                  className="input-styled"
                 >
                   <option value="open">Open</option>
                   <option value="done">Done</option>
@@ -135,7 +155,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
                   type="date"
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
-                  className="input"
+                  className="input-styled"
                 />
               </div>
 
@@ -146,7 +166,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
                   onChange={e =>
                     setPriority(e.target.value as Card['priority'])
                   }
-                  className="select"
+                  className="input-styled"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -159,7 +179,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
                 <select
                   value={assignee}
                   onChange={e => setAssignee(e.target.value)}
-                  className="select"
+                  className="input-styled"
                 >
                   <option value="">Unassigned</option>
                   {teamMembers.map(m => (
@@ -173,9 +193,9 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
           </section>
 
           {(card.todoId || card.mindmapId) && (
-            <section className="card-section">
+            <section className="modal-section">
               <h3 className="section-title">Linked Elements</h3>
-              <div className="card-links">
+              <div className="linked-section">
                 {card.todoId && (
                   <span>
                     🔗 Linked ToDo:{' '}
@@ -191,10 +211,10 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
             </section>
           )}
 
-          <section className="card-section">
+          <section className="modal-section">
             <h3 className="section-title">Comments</h3>
             <div>
-              {comments.map(c => (
+              {sortedComments.map(c => (
                 <div key={c.id} className="comment">
                   <strong>{c.author}</strong>
                   <p>{c.text}</p>
@@ -208,18 +228,19 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
               <textarea
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
-                className="textarea"
+                className="textarea-styled"
               />
             </label>
 
-            <div className="card-actions">
-              <button onClick={handleAddComment} className="button orange">
-                Post
-              </button>
-              <button onClick={save} className="button blue">
-                Save
-              </button>
-            </div>
+              <div className="card-actions">
+                <button onClick={handleAddComment} className="btn-post">
+                  Post
+                </button>
+                <button onClick={onClose} className="btn-cancel">Cancel</button>
+                <button onClick={save} className="btn-save" disabled={!isDirty}>
+                  Save
+                </button>
+              </div>
           </section>
         </div>
       )}
