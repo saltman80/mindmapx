@@ -39,32 +39,49 @@ interface Mindmap {
 export default function MapEditorPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
   const [mindmap, setMindmap] = useState<Mindmap | null>(null)
-  const [error, setError] = useState(false)
+  const [mapError, setMapError] = useState<string | null>(null)
+  const [nodesError, setNodesError] = useState<string | null>(null)
+  const [loadingMap, setLoadingMap] = useState(true)
+  const [loadingNodes, setLoadingNodes] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(0)
   const [nodes, setNodes] = useState<NodeData[]>([])
   const [showFirstNodeModal, setShowFirstNodeModal] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
+  const handleReload = useCallback(() => setReloadFlag(p => p + 1), [])
+
   useEffect(() => {
     if (!id) return
     let ignore = false
+    setLoadingMap(true)
+    setMapError(null)
 
     authFetch(`/.netlify/functions/mapid/${id}`)
       .then(async res => {
+        console.log('[MapEditorPage] map fetch status:', res.status)
         if (!res.ok) {
-          if (!ignore) setError(true)
-          return
+          if (!ignore) setMapError(`Failed to load map: ${res.status}`)
+          return null
         }
-        console.log('Map fetch response:', res.status)
-        const json = await res.json()
-        console.log('Map JSON:', json)
-        if (!ignore) {
-          console.log('[MapEditorPage] mindmap response:', json.map || json)
-          setMindmap(json.map || json)
+        const json = await res.json().catch(err => {
+          console.error('[MapEditorPage] invalid JSON for map', err)
+          return null
+        })
+        if (!json) return null
+        const mapData = json.map || json
+        if (typeof mapData === 'object' && mapData !== null) {
+          console.log('[MapEditorPage] mindmap response:', mapData)
+          if (!ignore) setMindmap(mapData as Mindmap)
+        } else if (!ignore) {
+          setMapError('Invalid map data')
         }
       })
-      .catch(() => {
-        if (!ignore) setError(true)
+      .catch(err => {
+        console.error('[MapEditorPage] map fetch error:', err)
+        if (!ignore) setMapError('Network error while loading map')
+      })
+      .finally(() => {
+        if (!ignore) setLoadingMap(false)
       })
 
     return () => {
@@ -75,33 +92,48 @@ export default function MapEditorPage(): JSX.Element {
   useEffect(() => {
     if (!id) return
     const controller = new AbortController()
+    setLoadingNodes(true)
+    setNodesError(null)
 
     fetch(`/.netlify/functions/nodes?mindmapId=${id}`, {
       credentials: 'include',
       signal: controller.signal
     })
       .then(async res => {
+        console.log('[MapEditorPage] nodes fetch status:', res.status)
         if (!res.ok) {
-          console.error('[nodes] fetch failed:', res.status)
+          setNodesError(`Failed to load nodes: ${res.status}`)
           setNodes([])
           return
         }
-        const data = await res.json()
+        const data = await res.json().catch(err => {
+          console.error('[MapEditorPage] invalid JSON for nodes', err)
+          return null
+        })
         console.log('[nodes] data:', data)
-        setNodes(Array.isArray(data) ? data : [])
+        if (Array.isArray(data)) {
+          setNodes(data)
+        } else {
+          setNodes([])
+          setNodesError('Invalid nodes data')
+        }
       })
       .catch(err => {
         console.error('[nodes] fetch error:', err)
         setNodes([])
+        setNodesError('Network error while loading nodes')
       })
+      .finally(() => setLoadingNodes(false))
 
     return () => controller.abort()
   }, [id, reloadFlag])
 
   useEffect(() => {
-    if (nodes.length >= 0) setLoaded(true)
-    if (nodes.length === 0) setShowFirstNodeModal(true)
-  }, [nodes])
+    if (!loadingMap && !loadingNodes) {
+      setLoaded(true)
+      if (nodes.length === 0) setShowFirstNodeModal(true)
+    }
+  }, [loadingMap, loadingNodes, nodes])
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
@@ -116,8 +148,18 @@ export default function MapEditorPage(): JSX.Element {
     })
   }, [safeNodes])
 
-  if (error) return <div>Error loading map.</div>
-  if (!mindmap) return <div>Loading...</div>
+  if (loadingMap || loadingNodes) {
+    return <div>Loading mind map...</div>
+  }
+
+  if (mapError)
+    return (
+      <div>
+        <div>Error loading map: {mapError}</div>
+        <button onClick={handleReload}>Retry</button>
+      </div>
+    )
+  if (!mindmap) return <div>Map not found.</div>
   if (!mindmap?.id) return <div>Invalid map.</div>
 
 
@@ -198,6 +240,12 @@ export default function MapEditorPage(): JSX.Element {
           onMoveNode={handleMoveNode}
           showMiniMap
         />
+        {nodesError && (
+          <div className="error">
+            {nodesError}{' '}
+            <button onClick={handleReload}>Retry</button>
+          </div>
+        )}
         {loaded && nodes.length === 0 && showFirstNodeModal && (
           <FirstNodeModal onCreate={handleCreateFirstNode} />
         )}
