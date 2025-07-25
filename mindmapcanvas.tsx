@@ -182,6 +182,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditDesc(node.description || '')
     }, [Array.isArray(nodes) ? nodes : []])
 
+    const updateNode = useCallback((node: NodeData) => {
+      console.log('[MindmapCanvas] updateNode', node)
+      setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
+    }, [])
+
+    const removeNode = useCallback((nodeId: string) => {
+      console.log('[MindmapCanvas] removeNode', nodeId)
+      setNodes(prev => prev.filter(n => n.id !== nodeId))
+      setEdges(prev => prev.filter(e => e.from !== nodeId && e.to !== nodeId))
+    }, [])
+
     const handleSaveEdit = useCallback(() => {
       console.log('[MindmapCanvas] handleSaveEdit')
       if (!editingId) return
@@ -233,17 +244,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         return { ...prev, [todoNodeId]: list.filter(t => t.id !== taskId) }
       })
     }, [todoNodeId])
-
-    const updateNode = useCallback((node: NodeData) => {
-      console.log('[MindmapCanvas] updateNode', node)
-      setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
-    }, [])
-
-    const removeNode = useCallback((nodeId: string) => {
-      console.log('[MindmapCanvas] removeNode', nodeId)
-      setNodes(prev => prev.filter(n => n.id !== nodeId))
-      setEdges(prev => prev.filter(e => e.from !== nodeId && e.to !== nodeId))
-    }, [])
 
     useImperativeHandle(
       ref,
