@@ -177,7 +177,7 @@ export default function MindmapsPage(): JSX.Element {
                   <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
                   <div className="tile-actions">
                     <button
-                      className="btn btn-primary btn-wide"
+                      className="btn btn-primary"
                       onClick={() => {
                         localStorage.setItem(
                           `mindmap_last_viewed_${m.id}`,
