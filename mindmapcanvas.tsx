@@ -240,7 +240,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [Array.isArray(nodes) ? nodes : []])
 
-    console.log('[MindmapCanvas] rendering with nodes:', safeNodes)
+    console.log('[MindmapCanvas] rendering with nodes:', nodes)
 
     const handlePointerMove = useCallback(
       (e: PointerEvent) => {
@@ -465,7 +465,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
-            {safeEdges.map(edge => {
+            {Array.isArray(safeEdges) && safeEdges.map(edge => {
               const from = nodeMap.get(edge.from)
               const to = nodeMap.get(edge.to)
               if (!from || !to) return null
@@ -481,7 +481,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 />
               )
             })}
-            {safeNodes.map(node => (
+            {Array.isArray(safeNodes) && safeNodes.map(node => (
               <g
                 key={node.id}
                 className="mindmap-node"
@@ -685,7 +685,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 <button onClick={handleAddTask}>Add</button>
               </div>
               <ul style={{ listStyle: 'none', padding: 0 }}>
-                {(todoLists[todoNodeId] || []).map(t => (
+                {Array.isArray(todoLists[todoNodeId]) &&
+                  todoLists[todoNodeId]!.map(t => (
                   <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <input type="checkbox" checked={t.done} onChange={() => handleToggleTask(t.id)} />
                     <span style={{ textDecoration: t.done ? 'line-through' : 'none', flexGrow: 1 }}>{t.text}</span>

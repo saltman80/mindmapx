@@ -36,7 +36,7 @@ const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }
       onPointerDown={handlePointerDown}
     >
       <g transform={`scale(${scale})`}>
-        {safeEdges.map(edge => {
+        {Array.isArray(safeEdges) && safeEdges.map(edge => {
           const from = safeNodes.find(n => n.id === edge.from)
           const to = safeNodes.find(n => n.id === edge.to)
           if (!from || !to) return null
@@ -50,7 +50,7 @@ const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }
             />
           )
         })}
-        {safeNodes.map(node => (
+        {Array.isArray(safeNodes) && safeNodes.map(node => (
           <circle key={node.id} cx={node.x} cy={node.y} r={5} fill="orange" />
         ))}
       </g>
