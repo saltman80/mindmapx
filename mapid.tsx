@@ -63,9 +63,10 @@ export default function MapPage({ mapId }: { mapId: string }): JSX.Element {
   const handleNodeUpdate = useCallback((node: NodeData) => {
     setMap(prev => {
       if (!prev) return prev
+      const safeNodes = Array.isArray(prev.nodes) ? prev.nodes : []
       return {
         ...prev,
-        nodes: prev.nodes.map(n => (n.id === node.id ? node : n)),
+        nodes: safeNodes.map(n => (n.id === node.id ? node : n)),
       }
     })
   }, [])
@@ -73,9 +74,10 @@ export default function MapPage({ mapId }: { mapId: string }): JSX.Element {
   const handleNodeDelete = useCallback((nodeId: string) => {
     setMap(prev => {
       if (!prev) return prev
+      const safeNodes = Array.isArray(prev.nodes) ? prev.nodes : []
       return {
         ...prev,
-        nodes: prev.nodes.filter(n => n.id !== nodeId),
+        nodes: safeNodes.filter(n => n.id !== nodeId),
       }
     })
   }, [])
@@ -126,24 +128,26 @@ export default function MapPage({ mapId }: { mapId: string }): JSX.Element {
         Add Root Node
       </button>
       <ul>
-        {map.nodes.map(node => (
-          <li key={node.id}>
-            <input
-              type="text"
-              value={node.content}
-              onChange={e =>
-                handleNodeUpdate({ ...node, content: e.target.value })
-              }
-              disabled={saving}
-            />
-            <button onClick={() => handleNodeAdd(node.id)} disabled={saving}>
-              Add Child
-            </button>
-            <button onClick={() => handleNodeDelete(node.id)} disabled={saving}>
-              Delete
-            </button>
-          </li>
-        ))}
+        {Array.isArray(map.nodes)
+          ? map.nodes.map(node => (
+              <li key={node.id}>
+                <input
+                  type="text"
+                  value={node.content}
+                  onChange={e =>
+                    handleNodeUpdate({ ...node, content: e.target.value })
+                  }
+                  disabled={saving}
+                />
+                <button onClick={() => handleNodeAdd(node.id)} disabled={saving}>
+                  Add Child
+                </button>
+                <button onClick={() => handleNodeDelete(node.id)} disabled={saving}>
+                  Delete
+                </button>
+              </li>
+            ))
+          : null}
       </ul>
       <button onClick={saveMap} disabled={saving}>
         {saving ? 'Saving...' : 'Save Map'}

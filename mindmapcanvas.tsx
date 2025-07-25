@@ -176,7 +176,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setAddParentId(null)
       setNewName('')
       setNewDesc('')
-    }, [addParentId, addNode, nodes, newName, newDesc, onAddNode])
+    }, [addParentId, addNode, Array.isArray(nodes) ? nodes : [], newName, newDesc, onAddNode])
 
     const openEditModal = useCallback((id: string) => {
       const node = safeNodes.find(n => n.id === id)
@@ -184,7 +184,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditingId(id)
       setEditTitle(node.label || '')
       setEditDesc(node.description || '')
-    }, [nodes])
+    }, [Array.isArray(nodes) ? nodes : []])
 
     const handleSaveEdit = useCallback(() => {
       if (!editingId) return
@@ -195,7 +195,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditingId(null)
       setEditTitle('')
       setEditDesc('')
-    }, [editingId, editTitle, editDesc, nodes, updateNode])
+    }, [editingId, editTitle, editDesc, Array.isArray(nodes) ? nodes : [], updateNode])
 
     const handleDeleteNode = useCallback((id: string) => {
       if (!window.confirm('Are you sure you want to delete this node?')) return
@@ -250,9 +250,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const nodeMap = useMemo(() => {
       const map = new Map<string, NodeData>()
-      nodes.forEach(n => map.set(n.id, n))
+      const arr = Array.isArray(nodes) ? nodes : []
+      arr.forEach(n => map.set(n.id, n))
       return map
-    }, [nodes])
+    }, [Array.isArray(nodes) ? nodes : []])
 
     console.log('[MindmapCanvas] rendering nodes:', safeNodes)
     console.log('[MindmapCanvas] rendering edges:', safeEdges)
@@ -301,7 +302,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         window.removeEventListener('pointermove', handlePointerMove)
         window.removeEventListener('pointerup', handlePointerUp)
       },
-      [nodes, onMoveNode, handlePointerMove]
+      [Array.isArray(nodes) ? nodes : [], onMoveNode, handlePointerMove]
     )
 
     const handlePointerDown = useCallback(
@@ -324,7 +325,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         window.addEventListener('pointermove', handlePointerMove)
         window.addEventListener('pointerup', handlePointerUp)
       },
-      [nodes, transform, handlePointerMove, handlePointerUp]
+      [Array.isArray(nodes) ? nodes : [], transform, handlePointerMove, handlePointerUp]
     )
 
     useEffect(() => {
