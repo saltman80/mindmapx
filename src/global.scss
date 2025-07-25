@@ -2487,11 +2487,12 @@ hr {
   background: rgba(0, 0, 0, 0.05);
 }
 
+
 .card {
   background: #fff;
   border: 1px solid #eee;
-  border-radius: 6px;
-  padding: 14px;
+  border-radius: 12px;
+  padding: 1rem;
   margin-bottom: 12px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
@@ -2500,6 +2501,88 @@ hr {
 .card:hover {
   transform: scale(1.02);
   box-shadow: 0 6px 14px rgba(255, 167, 38, 0.15);
+}
+
+.card-overdue {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.priority-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.priority-low {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-assignee {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-due {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.badge-due.overdue {
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+.card-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-edit {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background: #e68a20;
+}
+
+.btn-comments {
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-comments:hover {
+  background: #fff7ed;
 }
 
 .card-header {

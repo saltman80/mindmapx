@@ -28,6 +28,12 @@ interface Props {
   description?: string
 }
 
+const isOverdue = (date: string) => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return new Date(date) < today
+}
+
 export default function InteractiveKanbanBoard({
   title,
   description,
@@ -324,12 +330,22 @@ function Lane({
                   ref={providedCard.innerRef}
                   {...providedCard.draggableProps}
                   {...providedCard.dragHandleProps}
-                  className="card"
+                  className={`card ${
+                    card.dueDate && isOverdue(card.dueDate) ? 'card-overdue' : ''
+                  }`}
                 >
-                  <p>{card.title || 'New Card'}</p>
-                  {card.dueDate && (
-                    <div className="card-meta">Due: {card.dueDate}</div>
-                  )}
+                  <p className="card-title">{card.title || 'New Card'}</p>
+                  <div className="card-badges">
+                    {card.priority && (
+                      <span className={`badge priority-${card.priority}`}>🔺 {card.priority.charAt(0).toUpperCase() + card.priority.slice(1)}</span>
+                    )}
+                    {card.assignee && (
+                      <span className="badge badge-assignee">👤 {card.assignee}</span>
+                    )}
+                    {card.dueDate && (
+                      <span className={`badge badge-due ${isOverdue(card.dueDate) ? 'overdue' : ''}`}>📅 {card.dueDate}</span>
+                    )}
+                  </div>
                   {card.todoId && (
                     <div className="todo-link">
                       🔗 <a href={`/todo/${card.todoListId}`}>From Todo List</a>
@@ -338,15 +354,15 @@ function Lane({
                       )}
                     </div>
                   )}
-                  <div className="flex justify-end gap-2 mt-2">
+                  <div className="card-buttons">
                     <button
-                      className="btn-secondary"
+                      className="btn-edit"
                       onClick={() => onEditCard(lane.id, card)}
                     >
                       ✏️ Edit
                     </button>
                     <button
-                      className="btn-secondary"
+                      className="btn-comments"
                       onClick={() => onShowComments(lane.id, card)}
                     >
                       💬 Comments
