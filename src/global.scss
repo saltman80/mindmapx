@@ -1863,6 +1863,10 @@ hr {
   text-decoration: underline;
 }
 
+.delete-link {
+  color: var(--color-error);
+}
+
 .recent-list {
   list-style: none;
   padding: 0;
