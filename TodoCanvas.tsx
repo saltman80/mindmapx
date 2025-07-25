@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import TodoPlaceholder from './TodoPlaceholder'
-import AddTodoButton from './AddTodoButton'
+import Modal from './modal'
 
 export interface TodoItem {
   id: string
@@ -23,6 +23,9 @@ export default function TodoCanvas({
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const isEmpty = todos.length === 0
+  const [showModal, setShowModal] = useState(isEmpty)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
 
   const handleCreateTodo = (data: { title: string; description: string }) => {
     const newTodo: TodoItem = {
@@ -33,6 +36,9 @@ export default function TodoCanvas({
       kanbanId,
     }
     setTodos(prev => [newTodo, ...prev])
+    setShowModal(false)
+    setTitle('')
+    setDescription('')
   }
 
   return (
@@ -44,12 +50,40 @@ export default function TodoCanvas({
               <TodoPlaceholder key={i} />
             ))}
           </div>
-          <div className="modal-overlay empty-canvas-modal">
-            <div className="modal">
-              <p>No todos yet. Click below to add your first todo!</p>
-              <AddTodoButton onCreate={handleCreateTodo} />
-            </div>
-          </div>
+          <Modal isOpen={showModal} onClose={() => setShowModal(false)} ariaLabel="Create todo">
+            <form
+              onSubmit={e => {
+                e.preventDefault()
+                handleCreateTodo({ title, description })
+              }}
+              className="todo-form"
+            >
+              <h2>Create Todo</h2>
+              <input
+                type="text"
+                className="form-input"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Name"
+                required
+              />
+              <textarea
+                className="form-input"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Description (optional)"
+                style={{ marginTop: '0.5rem' }}
+              />
+              <div className="form-actions" style={{ marginTop: '1rem' }}>
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Save
+                </button>
+              </div>
+            </form>
+          </Modal>
         </>
       ) : (
         <div className="todo-list">
