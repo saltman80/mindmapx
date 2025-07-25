@@ -36,18 +36,29 @@ export default function InteractiveKanbanBoard({
 
   const addLane = () => {
     const id = `lane-${Date.now()}`
-    setLanes([...lanes, { id, title: 'New Lane', cards: [] }])
+    setLanes(prev => [...prev, { id, title: 'New Lane', cards: [] }])
   }
 
   const removeLane = (laneId: string) => {
+    const lane = lanes.find(l => l.id === laneId)
+    if (lane?.title === 'Done') {
+      alert('Cannot rename or delete the Done column.')
+      return
+    }
     setLanes(prev => prev.filter(l => l.id !== laneId))
   }
 
   const addCard = (laneId: string) => {
-    const newCard: Card = { id: `card-${Date.now()}`, title: '', comments: [] }
-    setLanes(lanes.map(l =>
-      l.id === laneId ? { ...l, cards: [...l.cards, newCard] } : l
-    ))
+    const newCard: Card = {
+      id: `card-${Date.now()}`,
+      title: '',
+      comments: [],
+      status: 'open',
+      priority: 'low',
+    }
+    setLanes(prev =>
+      prev.map(l => (l.id === laneId ? { ...l, cards: [...l.cards, newCard] } : l))
+    )
   }
 
   const moveCard = (
@@ -64,7 +75,9 @@ export default function InteractiveKanbanBoard({
       const cardIndex = fromLane.cards.findIndex(c => c.id === id)
       if (cardIndex === -1) return prev
       const [card] = fromLane.cards.splice(cardIndex, 1)
-      toLane.cards.splice(destIndex, 0, card)
+      const updatedCard =
+        toLane.title === 'Done' ? { ...card, status: 'done' } : card
+      toLane.cards.splice(destIndex, 0, updatedCard)
       return copy
     })
   }
@@ -81,6 +94,15 @@ export default function InteractiveKanbanBoard({
   }
 
   const updateTitle = (laneId: string, title: string) => {
+    const lane = lanes.find(l => l.id === laneId)
+    if (lane?.title === 'Done') {
+      alert('Cannot rename or delete the Done column.')
+      return
+    }
+    if (title === 'Done') {
+      alert('Cannot create another Done column.')
+      return
+    }
     setLanes(lanes.map(l => (l.id === laneId ? { ...l, title } : l)))
   }
 
@@ -262,17 +284,28 @@ function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRem
                     </div>
                   ) : (
                     <>
-                      <div className="card-header">
-                        <span
-                          className="edit-icon"
-                          onClick={() => startEditCard(card)}
-                        >
-                          ✎
-                        </span>
-                      </div>
-                      <p>{card.title || 'New Card'}</p>
-                    </>
+                  <div className="card-header">
+                    <span
+                      className="edit-icon"
+                      onClick={() => startEditCard(card)}
+                    >
+                      ✎
+                    </span>
+                  </div>
+                  <p>{card.title || 'New Card'}</p>
+                  {card.dueDate && (
+                    <div className="card-meta">Due: {card.dueDate}</div>
                   )}
+                  {card.todoId && (
+                    <div className="todo-link">
+                      🔗 <a href={`/todo/${card.todoListId}`}>From Todo List</a>
+                      {card.mindmapId && (
+                        <> + <a href={`/maps/${card.mindmapId}`}>Mindmap</a></>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
                 </div>
               )}
             </Draggable>
