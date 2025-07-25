@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -176,24 +176,28 @@ export default function MindmapsPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
                   <div className="tile-actions">
-                    <Link
-                      to={`/maps/${m.id}`}
-                      onClick={() =>
+                    <button
+                      className="btn btn-primary btn-wide"
+                      onClick={() => {
                         localStorage.setItem(
                           `mindmap_last_viewed_${m.id}`,
                           Date.now().toString()
                         )
-                      }
-                      className="tile-link"
+                        navigate(`/maps/${m.id}`)
+                      }}
                     >
                       Open
-                    </Link>
-                    <button
+                    </button>
+                    <a
+                      href="#"
                       className="tile-link delete-link"
-                      onClick={() => handleDelete(m.id)}
+                      onClick={e => {
+                        e.preventDefault()
+                        handleDelete(m.id)
+                      }}
                     >
                       Delete
-                    </button>
+                    </a>
                   </div>
                 </header>
                 <section className="tile-body">
