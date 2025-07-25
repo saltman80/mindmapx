@@ -188,9 +188,9 @@ export default function InteractiveKanbanBoard({
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
-            <div className="kanban-scroll-container" ref={autoScrollRightRef}>
+            <div className="scroll-container" ref={autoScrollRightRef}>
               <div
-                className="kanban-lane-wrapper"
+                className="kanban-board"
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
@@ -201,7 +201,6 @@ export default function InteractiveKanbanBoard({
                         ref={providedLane.innerRef}
                         {...providedLane.draggableProps}
                         className="lane-wrapper"
-                        style={{ minWidth: '250px', maxWidth: '250px' }}
                       >
                         <div {...providedLane.dragHandleProps} className="lane">
                           <Lane
@@ -224,7 +223,7 @@ export default function InteractiveKanbanBoard({
                   </Draggable>
                 ))}
                 {provided.placeholder}
-                <div className="lane add-lane" onClick={addLane}>
+                <div className="lane kanban-lane add-lane" onClick={addLane}>
                   <button className="add-lane-button">+ Add Lane</button>
                 </div>
               </div>
@@ -288,7 +287,9 @@ function Lane({
     <Droppable droppableId={lane.id} type="CARD">
       {provided => (
         <div
-          className={`lane ${lane.title.toLowerCase() === 'done' ? 'done' : ''}`}
+          className={`lane kanban-lane ${
+            lane.title.toLowerCase() === 'done' ? 'done' : ''
+          }`}
           ref={provided.innerRef}
           {...provided.droppableProps}
         >

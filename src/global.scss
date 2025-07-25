@@ -53,6 +53,12 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 html {
   font-family: var(--font-sans);
   font-size: 100%;
@@ -62,7 +68,6 @@ html {
 }
 
 body {
-  min-height: 100vh;
   font-family: 'Inter', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -70,7 +75,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scrollbar-width: thin;
-  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1022,11 +1026,10 @@ hr {
 .kanban-board {
   display: flex;
   flex-direction: row;
-  gap: 16px;
-  padding: 24px;
-  height: calc(100vh - 80px);
-  overflow-x: auto;
-  background: linear-gradient(180deg, #e6ebf1 0%, #f9fafc 100%);
+  align-items: flex-start;
+  gap: 1rem;
+  min-width: max-content;
+  padding-bottom: 2rem;
 }
 
 .kanban-lane {
@@ -1036,6 +1039,9 @@ hr {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  flex-shrink: 0;
+  width: 300px;
+  max-height: 100%;
 }
 
 @media (max-width: 640px) {
@@ -2296,7 +2302,8 @@ hr {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
-  min-width: 250px;
+  width: 300px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -2413,49 +2420,37 @@ hr {
 }
 
 
-.kanban-scroll-container {
-  overflow-x: auto;
-  overflow-y: hidden;
+
+.scroll-container {
   width: 100%;
-  height: calc(100vh - 80px);
-  margin-top: 16px;
+  height: calc(100vh - 130px);
+  overflow-x: auto;
+  overflow-y: auto;
   padding: 0 1rem;
-  scroll-behavior: smooth;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.kanban-scroll-container::-webkit-scrollbar {
-  display: none;
 }
 
-.kanban-lane-wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  min-width: max-content;
-  align-items: flex-start;
-  flex-wrap: nowrap;
-}
-.lane-wrapper {
-  min-width: 250px;
-  max-width: 250px;
-  margin-right: 1rem;
+.scroll-container::-webkit-scrollbar {
+  height: 6px;
 }
 
-/* Kanban board layout */
 .kanban-board {
   display: flex;
-  gap: 20px;
-  padding: 24px;
-  height: calc(100vh - 80px);
-  background: linear-gradient(to bottom, #fff, #fafafa);
-  overflow-x: auto;
+  flex-direction: row;
   align-items: flex-start;
+  gap: 1rem;
+  min-width: max-content;
+  padding-bottom: 2rem;
+}
+
+.kanban-lane {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 300px;
+  max-height: 100%;
 }
 
 .lane {
-  min-width: 250px;
-  max-width: 250px;
   flex-shrink: 0;
   background: #ffffff;
   border-radius: 6px;
