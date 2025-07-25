@@ -342,8 +342,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         dragNodeIdRef.current = null
         nodeOriginRef.current = null
         svgRef.current?.releasePointerCapture(e.pointerId)
-        window.removeEventListener('pointermove', handlePointerMove)
-        window.removeEventListener('pointerup', handlePointerUp)
       },
       [Array.isArray(nodes) ? nodes : [], onMoveNode, handlePointerMove]
     )
@@ -368,18 +366,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           setSelectedId(null)
         }
         svgRef.current?.setPointerCapture(e.pointerId)
-        window.addEventListener('pointermove', handlePointerMove)
-        window.addEventListener('pointerup', handlePointerUp)
       },
       [Array.isArray(nodes) ? nodes : [], transform, handlePointerMove, handlePointerUp]
     )
 
-    useEffect(() => {
-      return () => {
-        window.removeEventListener('pointermove', handlePointerMove)
-        window.removeEventListener('pointerup', handlePointerUp)
-      }
-    }, [handlePointerMove, handlePointerUp])
 
     const handleWheel = useCallback(
       (e: React.WheelEvent<SVGSVGElement>) => {
@@ -520,11 +510,24 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           height={CANVAS_SIZE}
           onWheel={handleWheel}
           onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
+          <defs>
+            <pattern
+              id="grid-dots"
+              width={DOT_SPACING}
+              height={DOT_SPACING}
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="1" cy="1" r="1" fill="#ddd" />
+            </pattern>
+          </defs>
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="#fff" />
+          <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#grid-dots)" />
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
@@ -562,8 +565,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   modeRef.current = 'node'
                   nodeOriginRef.current = { x: node.x, y: node.y }
                   svgRef.current?.setPointerCapture(e.pointerId)
-                  window.addEventListener('pointermove', handlePointerMove)
-                  window.addEventListener('pointerup', handlePointerUp)
                 }}
               >
                 <circle
@@ -662,21 +663,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               </div>
             ) : null
           )}
-        <div
-          className="zoom-controls"
-          style={{
-            position: 'absolute',
-            top: 10,
-            left: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            zIndex: 10,
-          }}
-        >
-          <button type="button" onClick={() => zoom(1.1)}>+</button>
-          <button type="button" onClick={() => zoom(0.9)}>-</button>
-        </div>
         {showCreate && (
           <div className="modal-overlay" onClick={() => setShowCreate(false)}>
             <div className="modal" onClick={e => e.stopPropagation()}>
