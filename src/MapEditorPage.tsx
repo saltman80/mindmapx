@@ -112,8 +112,12 @@ export default function MapEditorPage(): JSX.Element {
           return null
         })
         console.log('[nodes] data:', data)
-        const validNodes = Array.isArray(data) ? data : []
-        if (!Array.isArray(data)) {
+        const validNodes = Array.isArray(data?.nodes)
+          ? data.nodes
+          : Array.isArray(data)
+            ? data
+            : []
+        if (!Array.isArray(data?.nodes) && !Array.isArray(data)) {
           setNodesError('Invalid nodes data')
         }
         setNodes(validNodes)
