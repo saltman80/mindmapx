@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import TodoPlaceholder from './TodoPlaceholder'
-import Modal from './modal'
+import { useState, useRef, useEffect } from 'react'
 
 export interface TodoItem {
   id: string
@@ -22,18 +20,21 @@ export default function TodoCanvas({
   kanbanId,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
-  const isEmpty = todos.length === 0
-  const [showModal, setShowModal] = useState(isEmpty)
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleCreateTodo = async (data: { title: string; description: string }) => {
+  useEffect(() => {
+    if (adding) inputRef.current?.focus()
+  }, [adding])
+
+  const handleCreateTodo = async (title: string) => {
     try {
       const res = await fetch('/.netlify/functions/todos', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: data.title, description: data.description }),
+        body: JSON.stringify({ title, description: '' }),
       })
       if (!res.ok) throw new Error('Failed to save todo')
       const created: TodoItem = await res.json()
@@ -41,10 +42,6 @@ export default function TodoCanvas({
     } catch (err) {
       console.error(err)
       alert('Failed to create todo')
-    } finally {
-      setShowModal(false)
-      setTitle('')
-      setDescription('')
     }
   }
 
@@ -53,67 +50,70 @@ export default function TodoCanvas({
       {todos.length > 0 && (
         <header className="todo-header">
           <h1>{todos[0].title}</h1>
-          {todos[0].description && <p className="todo-description">{todos[0].description}</p>}
+          {todos[0].description && (
+            <p className="todo-description">{todos[0].description}</p>
+          )}
         </header>
       )}
-      {isEmpty ? (
-        <>
-          <div className="todo-placeholder-list">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <TodoPlaceholder key={i} />
-            ))}
+      <div className="todo-list">
+        {todos.map(t => (
+          <div key={t.id} className="tile">
+            <header className="tile-header">
+              <h2>{t.title}</h2>
+            </header>
+            {t.description && (
+              <section className="tile-body">
+                <p>{t.description}</p>
+              </section>
+            )}
           </div>
-          <Modal isOpen={showModal} onClose={() => setShowModal(false)} ariaLabel="Create todo">
+        ))}
+        {adding && (
+          <>
             <form
               onSubmit={e => {
                 e.preventDefault()
-                handleCreateTodo({ title, description })
+                const text = newTitle.trim()
+                if (!text) return
+                handleCreateTodo(text).then(() => setNewTitle(''))
               }}
-              className="todo-form"
+              className="todo-add-form"
             >
-              <h2>Create Todo</h2>
               <input
+                ref={inputRef}
                 type="text"
                 className="form-input"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="Name"
-                required
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+                placeholder="New todo"
               />
-              <textarea
-                className="form-input"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="Description (optional)"
-                style={{ marginTop: '0.5rem' }}
-              />
-              <div className="form-actions" style={{ marginTop: '1rem' }}>
-                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  Save
-                </button>
-              </div>
+              <button type="submit" className="btn-primary">
+                Add
+              </button>
             </form>
-          </Modal>
-        </>
-      ) : (
-        <div className="todo-list">
-          {todos.map(t => (
-            <div key={t.id} className="tile">
-              <header className="tile-header">
-                <h2>{t.title}</h2>
-              </header>
-              {t.description && (
-                <section className="tile-body">
-                  <p>{t.description}</p>
-                </section>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+            <button
+              type="button"
+              className="done-adding-link"
+              onClick={() => {
+                setAdding(false)
+                setNewTitle('')
+              }}
+            >
+              done adding todos
+            </button>
+          </>
+        )}
+        {!adding && (
+          <button
+            type="button"
+            className="todo-add-circle"
+            onClick={() => setAdding(true)}
+            aria-label="Add todo"
+          >
+            +
+          </button>
+        )}
+      </div>
     </div>
   )
 }
