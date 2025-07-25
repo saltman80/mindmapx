@@ -6,6 +6,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd'
 import CardModal, { Card } from './CardModal'
+import CommentsModal from './CommentsModal'
 
 const colorPalette = [
   '#FFA726', '#FFB74D', '#FFCA28', '#FFD54F', '#FFEE58', '#FFF176',
@@ -41,7 +42,8 @@ export default function InteractiveKanbanBoard({
   const [boardDescription] = useState(
     description || 'Organize tasks across lanes'
   )
-  const [selected, setSelected] = useState<{ laneId: string; card: Card } | null>(null)
+  const [editing, setEditing] = useState<{ laneId: string; card: Card } | null>(null)
+  const [commenting, setCommenting] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
 
   const sortedLanes = [
@@ -201,8 +203,11 @@ export default function InteractiveKanbanBoard({
                             onAddCard={addCard}
                             onUpdateTitle={updateTitle}
                             onUpdateCard={updateCard}
-                            onCardClick={(laneId, card) =>
-                              setSelected({ laneId, card })
+                            onEditCard={(laneId, card) =>
+                              setEditing({ laneId, card })
+                            }
+                            onShowComments={(laneId, card) =>
+                              setCommenting({ laneId, card })
                             }
                             onRemoveLane={removeLane}
                           />
@@ -221,10 +226,24 @@ export default function InteractiveKanbanBoard({
         </Droppable>
       </DragDropContext>
       <CardModal
-        card={selected?.card || null}
-        onClose={() => setSelected(null)}
+        card={editing?.card || null}
+        onClose={() => setEditing(null)}
         onSave={card => {
-          if (selected) updateCard(selected.laneId, card)
+          if (editing) updateCard(editing.laneId, card)
+        }}
+      />
+      <CommentsModal
+        card={commenting?.card || null}
+        onClose={() => setCommenting(null)}
+        onAdd={comment => {
+          if (commenting) {
+            const updated = {
+              ...commenting.card,
+              comments: [...(commenting.card.comments || []), comment],
+            }
+            updateCard(commenting.laneId, updated)
+            setCommenting({ laneId: commenting.laneId, card: updated })
+          }
         }}
       />
     </div>
@@ -237,33 +256,25 @@ interface LaneProps {
   onAddCard: (laneId: string) => void
   onUpdateTitle: (laneId: string, title: string) => void
   onUpdateCard: (laneId: string, card: Card) => void
-  onCardClick: (laneId: string, card: Card) => void
+  onEditCard: (laneId: string, card: Card) => void
+  onShowComments: (laneId: string, card: Card) => void
   onRemoveLane: (laneId: string) => void
 }
 
-function Lane({ lane, index, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRemoveLane }: LaneProps) {
+function Lane({
+  lane,
+  index,
+  onAddCard,
+  onUpdateTitle,
+  onUpdateCard,
+  onEditCard,
+  onShowComments,
+  onRemoveLane,
+}: LaneProps) {
   const [tempTitle, setTempTitle] = useState(lane.title)
-  const [editingCardId, setEditingCardId] = useState<string | null>(null)
-  const [tempCardTitle, setTempCardTitle] = useState('')
 
   const save = () => {
     onUpdateTitle(lane.id, tempTitle)
-  }
-
-  const startEditCard = (card: Card) => {
-    setEditingCardId(card.id)
-    setTempCardTitle(card.title)
-  }
-
-  const saveCard = () => {
-    if (editingCardId) {
-      const existing = lane.cards.find(c => c.id === editingCardId)
-      if (existing) {
-        onUpdateCard(lane.id, { ...existing, title: tempCardTitle })
-      }
-    }
-    setEditingCardId(null)
-    setTempCardTitle('')
   }
 
   return (
@@ -305,29 +316,7 @@ function Lane({ lane, index, onAddCard, onUpdateTitle, onUpdateCard, onCardClick
                   {...providedCard.draggableProps}
                   {...providedCard.dragHandleProps}
                   className="card"
-                  onClick={() => onCardClick(lane.id, card)}
                 >
-                  {editingCardId === card.id ? (
-                    <div className="card-edit">
-                      <input
-                        value={tempCardTitle}
-                        onChange={e => setTempCardTitle(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && saveCard()}
-                      />
-                      <button onClick={saveCard} aria-label="Save" className="save-btn">
-                        ✓
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                  <div className="card-header">
-                    <span
-                      className="edit-icon"
-                      onClick={() => startEditCard(card)}
-                    >
-                      ✎
-                    </span>
-                  </div>
                   <p>{card.title || 'New Card'}</p>
                   {card.dueDate && (
                     <div className="card-meta">Due: {card.dueDate}</div>
@@ -340,8 +329,20 @@ function Lane({ lane, index, onAddCard, onUpdateTitle, onUpdateCard, onCardClick
                       )}
                     </div>
                   )}
-                </>
-              )}
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button
+                      className="btn-secondary"
+                      onClick={() => onEditCard(lane.id, card)}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => onShowComments(lane.id, card)}
+                    >
+                      💬 Comments
+                    </button>
+                  </div>
                 </div>
               )}
             </Draggable>
