@@ -1696,7 +1696,7 @@ hr {
 
 .metric-tile h3 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: var(--color-text-inverse);
 }
 
@@ -1718,6 +1718,14 @@ hr {
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  margin: 0.5rem auto;
+}
+
+.metric-total {
+  margin-top: -0.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
 }
 
 .metric-left {
