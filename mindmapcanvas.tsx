@@ -325,9 +325,18 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handlePointerUp = useCallback(
       (e: PointerEvent) => {
         console.log('[MindmapCanvas] handlePointerUp')
-        if (modeRef.current === 'node' && dragNodeIdRef.current) {
+        if (
+          modeRef.current === 'node' &&
+          dragNodeIdRef.current &&
+          nodeOriginRef.current
+        ) {
           const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
-          if (node && onMoveNode) onMoveNode(node)
+          if (
+            node &&
+            (node.x !== nodeOriginRef.current.x || node.y !== nodeOriginRef.current.y)
+          ) {
+            onMoveNode && onMoveNode(node)
+          }
         }
         modeRef.current = null
         dragNodeIdRef.current = null
@@ -515,17 +524,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <defs>
-            <pattern
-              id="dot-grid"
-              width="50"
-              height="50"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="1" cy="1" r="1" fill="#FF6A00" />
-            </pattern>
-          </defs>
-          <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#dot-grid)" />
+          <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="#fff" />
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
