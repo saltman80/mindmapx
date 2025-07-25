@@ -135,11 +135,15 @@ export default function InteractiveKanbanBoard({
 
   return (
     <div className="kanban-canvas">
+      <div className="kanban-header">
+        <h1 className="kanban-title">{boardTitle}</h1>
+        <p className="kanban-description">{boardDescription}</p>
+      </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
             <div
-              className="kanban-lanes"
+              className="kanban-board"
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
@@ -169,10 +173,7 @@ export default function InteractiveKanbanBoard({
               ))}
               {provided.placeholder}
               <div className="lane add-lane" onClick={addLane}>
-                <button className="btn-primary">
-                  <span className="btn-plus" aria-hidden="true">+</span>
-                  Add Lane
-                </button>
+                <button className="add-lane-button">+ Add Lane</button>
               </div>
             </div>
           )}
@@ -199,14 +200,12 @@ interface LaneProps {
 }
 
 function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRemoveLane }: LaneProps) {
-  const [editing, setEditing] = useState(false)
   const [tempTitle, setTempTitle] = useState(lane.title)
   const [editingCardId, setEditingCardId] = useState<string | null>(null)
   const [tempCardTitle, setTempCardTitle] = useState('')
 
   const save = () => {
     onUpdateTitle(lane.id, tempTitle)
-    setEditing(false)
   }
 
   const startEditCard = (card: Card) => {
@@ -229,38 +228,22 @@ function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRem
     <Droppable droppableId={lane.id} type="CARD">
       {provided => (
         <div className="lane" ref={provided.innerRef} {...provided.droppableProps}>
-          {editing ? (
-            <div className="lane-title-edit">
-              <input
-                value={tempTitle}
-                onChange={e => setTempTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && save()}
-              />
-              <button onClick={save} aria-label="Save" className="save-btn">
-                ✓
-              </button>
-              <button
-                onClick={() => onRemoveLane(lane.id)}
-                aria-label="Delete"
-                className="save-btn"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <header>
-              <h3 className="lane-title" onClick={() => setEditing(true)}>
-                {lane.title}
-              </h3>
-              <button
-                onClick={() => onRemoveLane(lane.id)}
-                aria-label="Delete"
-                className="delete-lane"
-              >
-                🗑
-              </button>
-            </header>
-          )}
+          <div className="lane-header">
+            <input
+              className="lane-title-input"
+              value={tempTitle}
+              onChange={e => setTempTitle(e.target.value)}
+              onBlur={save}
+              onKeyDown={e => e.key === 'Enter' && save()}
+            />
+            <button
+              className="lane-delete"
+              onClick={() => onRemoveLane(lane.id)}
+              aria-label="Delete"
+            >
+              ✖
+            </button>
+          </div>
           {lane.cards.map((card, i) => (
             <Draggable key={card.id} draggableId={card.id} index={i}>
               {providedCard => (
@@ -312,7 +295,7 @@ function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRem
           ))}
           {provided.placeholder}
           <button className="btn-secondary" onClick={() => onAddCard(lane.id)}>
-            Add Card
+            + Add Card
           </button>
         </div>
       )}
