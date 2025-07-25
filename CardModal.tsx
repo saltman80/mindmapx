@@ -12,6 +12,7 @@ export interface Comment {
 export interface Card {
   id: string
   title: string
+  description?: string
   comments?: Comment[]
   dueDate?: string
   priority?: 'low' | 'medium' | 'high'
@@ -31,6 +32,7 @@ interface Props {
 
 export default function CardModal({ card, onClose, onSave, currentUser }: Props) {
   const [title, setTitle] = useState(card?.title || '')
+  const [description, setDescription] = useState(card?.description || '')
   const [comments, setComments] = useState<Comment[]>(card?.comments || [])
   const [newComment, setNewComment] = useState('')
   const [dueDate, setDueDate] = useState(card?.dueDate || '')
@@ -42,6 +44,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
   useEffect(() => {
     if (card) {
       setTitle(card.title)
+      setDescription(card.description || '')
       setComments(card.comments || [])
       setDueDate(card.dueDate || '')
       setPriority(card.priority || 'low')
@@ -76,6 +79,7 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
     onSave({
       ...card,
       title,
+      description,
       comments,
       dueDate,
       priority,
@@ -87,72 +91,126 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
 
   return (
     <Modal isOpen={!!card} onClose={onClose} ariaLabel="Edit card">
-      <div className="card-modal">
-        <h2>Edit Card</h2>
-        <input
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          className="w-full border p-2 mb-4"
-        />
-        <label className="block mb-1">Due Date</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={e => setDueDate(e.target.value)}
-          className="w-full border p-2 mb-4"
-        />
-        <label className="block mb-1">Priority</label>
-        <select
-          value={priority}
-          onChange={e => setPriority(e.target.value as Card['priority'])}
-          className="w-full border p-2 mb-4"
-        >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-        <label className="block mb-1">Status</label>
-        <select
-          value={status}
-          onChange={e => setStatus(e.target.value as Card['status'])}
-          className="w-full border p-2 mb-4"
-        >
-          <option value="open">Open</option>
-          <option value="done">Done</option>
-        </select>
-        <label className="block mb-1">Assignee</label>
-        <select
-          value={assignee}
-          onChange={e => setAssignee(e.target.value)}
-          className="w-full border p-2 mb-4"
-        >
-          <option value="">Unassigned</option>
-          {teamMembers.map(m => (
-            <option key={m.id} value={m.id}>
-              {m.name}
-            </option>
-          ))}
-        </select>
-        <div className="mb-4">
-          {comments.map(c => (
-            <div key={c.id} className="comment">
-              <strong>{c.author}</strong>
-              <p>{c.text}</p>
-              <span>{new Date(c.createdAt).toLocaleString()}</span>
+      {card && (
+        <div className="card-modal">
+          <h2>Edit Card</h2>
+
+          {card.todoId && (
+            <div className="card-links">
+              <span>
+                🔗 Linked to <a href={`/todo/${card.todoListId}`}>Todo List</a>
+              </span>
+              {card.mindmapId && (
+                <span>
+                  {' '} & <a href={`/maps/${card.mindmapId}`}>Mindmap</a>
+                </span>
+              )}
             </div>
-          ))}
+          )}
+
+          <label>
+            Title
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className="input"
+            />
+          </label>
+
+          <label>
+            Description
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              className="textarea"
+            />
+          </label>
+
+          <div className="card-meta-grid">
+            <div>
+              <label>Status</label>
+              <select
+                value={status}
+                onChange={e => setStatus(e.target.value as Card['status'])}
+                className="select"
+              >
+                <option value="open">Open</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Due Date</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={e => setDueDate(e.target.value)}
+                className="input"
+              />
+            </div>
+
+            <div>
+              <label>Priority</label>
+              <select
+                value={priority}
+                onChange={e =>
+                  setPriority(e.target.value as Card['priority'])
+                }
+                className="select"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Assignee</label>
+              <select
+                value={assignee}
+                onChange={e => setAssignee(e.target.value)}
+                className="select"
+              >
+                <option value="">Unassigned</option>
+                {teamMembers.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            {comments.map(c => (
+              <div key={c.id} className="comment">
+                <strong>{c.author}</strong>
+                <p>{c.text}</p>
+                <span>{new Date(c.createdAt).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+
+          <label>
+            Comment
+            <textarea
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              className="textarea"
+            />
+          </label>
+
+          <div className="card-actions">
+            <button onClick={handleAddComment} className="button orange">
+              Post
+            </button>
+            <button onClick={save} className="button blue">
+              Save
+            </button>
+          </div>
         </div>
-        <textarea
-          className="w-full border p-2 mb-2"
-          placeholder="Add a comment..."
-          value={newComment}
-          onChange={e => setNewComment(e.target.value)}
-        />
-        <div className="flex justify-end gap-2">
-          <button onClick={handleAddComment} className="btn-secondary">Post</button>
-          <button onClick={save} className="btn-primary">Save</button>
-        </div>
-      </div>
+      )}
     </Modal>
   )
 }
