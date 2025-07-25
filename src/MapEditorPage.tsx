@@ -169,7 +169,9 @@ export default function MapEditorPage(): JSX.Element {
     console.log('[mindmap] No nodes or edges found, rendering empty canvas')
   }
 
-  console.log('mapData:', mindmap)
+  if (typeof mindmap === 'object' && mindmap !== null) {
+    console.log('mapData:', { id: mindmap.id, title: mindmap.title })
+  }
 
   const handleMoveNode = (node: NodeData) => {
     fetch(`/.netlify/functions/nodes/${node.id}`, {
