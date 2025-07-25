@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
-import MindmapCanvas, { NodeData, EdgeData } from './MindmapCanvas'
+import MindmapCanvas from './MindmapCanvas'
+import type { NodeData, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
 
 function FirstNodeModal({ onCreate }: { onCreate: (label: string) => void }) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { NodeData, EdgeData } from './mindmapcanvas'
+import type { NodeData, EdgeData } from './mindmapTypes'
 
 const CANVAS_SIZE = 50 * 500
 const MINIMAP_SIZE = 150

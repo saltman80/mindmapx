@@ -8,22 +8,7 @@ import {
   useEffect
 } from 'react'
 import MiniMap from './MiniMap'
-
-interface NodeData {
-  id: string
-  x: number
-  y: number
-  label?: string
-  description?: string
-  parentId?: string | null
-  todoId?: string | null
-}
-
-interface EdgeData {
-  id: string
-  from: string
-  to: string
-}
+import type { NodeData, EdgeData } from './mindmapTypes'
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -255,8 +240,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [Array.isArray(nodes) ? nodes : []])
 
-    console.log('[MindmapCanvas] rendering nodes:', safeNodes)
-    console.log('[MindmapCanvas] rendering edges:', safeEdges)
+    console.log('[MindmapCanvas] rendering with nodes:', safeNodes)
 
     const handlePointerMove = useCallback(
       (e: PointerEvent) => {
@@ -736,5 +720,5 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
 MindmapCanvas.displayName = 'MindmapCanvas'
 
-export type { NodeData, EdgeData }
+export type { NodeData, EdgeData } from './mindmapTypes'
 export default MindmapCanvas
