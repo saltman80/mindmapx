@@ -165,7 +165,7 @@ export default function KanbanBoardsPage(): JSX.Element {
                   <h2>{b.title || 'Board'}</h2>
                   <div className="tile-actions">
                     <button
-                      className="btn btn-primary btn-wide"
+                      className="btn btn-primary"
                       onClick={() => {
                         localStorage.setItem(
                           `board_last_viewed_${b.id}`,

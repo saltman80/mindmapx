@@ -165,7 +165,7 @@ export default function TodosPage(): JSX.Element {
                   <h2>{t.title || t.content}</h2>
                   <div className="tile-actions">
                     <button
-                      className="btn btn-primary btn-wide"
+                      className="btn btn-primary"
                       onClick={() => {
                         localStorage.setItem(
                           `todo_last_viewed_${t.id}`,
