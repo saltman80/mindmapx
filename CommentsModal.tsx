@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
 import { v4 as uuid } from 'uuid'
 import type { Card, Comment } from './CardModal'
@@ -12,6 +12,7 @@ interface Props {
 
 export default function CommentsModal({ card, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
+  const feedRef = useRef<HTMLDivElement>(null)
 
   if (!card) return null
 
@@ -27,37 +28,59 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
     setText('')
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      add()
+    }
+  }
+
+  useEffect(() => {
+    const el = feedRef.current
+    if (!el) return
+    el.scrollTop = el.scrollHeight
+  }, [card?.comments])
+
+  const highlightMentions = (text: string) => {
+    return text.split(/(\@[\w-]+)/g).map((part, idx) => {
+      if (/^@/.test(part)) {
+        return (
+          <span key={idx} className="mention">
+            {part}
+          </span>
+        )
+      }
+      return <span key={idx}>{part}</span>
+    })
+  }
+
   return (
     <Modal isOpen={!!card} onClose={onClose} ariaLabel={`Comments for ${card.title}`}>
       <div className="comment-modal">
         <h2 className="mb-2 text-lg font-semibold">Comments for "{card.title}"</h2>
-        <div className="comment-list">
-          {(card.comments || []).map((c, idx) => {
+        <div className="comment-feed" ref={feedRef}>
+          {(card.comments || []).map(c => {
             const isMine = c.author === currentUser?.name
             const name = isMine ? 'Me' : c.author || 'Anon'
             return (
-              <div key={c.id} className="comment">
-                <div className="text-sm font-semibold">{name}</div>
-                <div className="text-sm">{c.text}</div>
-                <div className="text-xs text-gray-500">
-                  {new Date(c.createdAt).toLocaleString()}
+              <div key={c.id} className={`comment-bubble ${isMine ? 'me' : 'other'} fade-item`}>
+                <div className="comment-meta">
+                  <span>{name}</span>
+                  <span className="timestamp">{new Date(c.createdAt).toLocaleString()}</span>
                 </div>
+                <div className="comment-text">{highlightMentions(c.text)}</div>
               </div>
             )
           })}
         </div>
-        <div style={{ marginTop: '1rem' }}>
+        <div className="comment-input-bar">
           <textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            className="textarea-styled w-full"
+            placeholder="Type a comment..."
+            onKeyDown={handleKeyDown}
           />
-          <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
-            <button onClick={onClose} className="btn-secondary">Cancel</button>
-            <button onClick={add} className="btn-primary" disabled={!text.trim()}>
-              Post Comment
-            </button>
-          </div>
+          <button className="send-button" onClick={add} disabled={!text.trim()}>Send</button>
         </div>
       </div>
     </Modal>
