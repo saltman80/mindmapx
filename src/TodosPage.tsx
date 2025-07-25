@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -164,24 +164,28 @@ export default function TodosPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{t.title || t.content}</h2>
                   <div className="tile-actions">
-                    <Link
-                      to={`/todos/${t.id}`}
-                      onClick={() =>
+                    <button
+                      className="btn btn-primary btn-wide"
+                      onClick={() => {
                         localStorage.setItem(
                           `todo_last_viewed_${t.id}`,
                           Date.now().toString()
                         )
-                      }
-                      className="tile-link"
+                        navigate(`/todos/${t.id}`)
+                      }}
                     >
                       Open
-                    </Link>
-                    <button
+                    </button>
+                    <a
+                      href="#"
                       className="tile-link delete-link"
-                      onClick={() => handleDelete(t.id)}
+                      onClick={e => {
+                        e.preventDefault()
+                        handleDelete(t.id)
+                      }}
                     >
                       Delete
-                    </button>
+                    </a>
                   </div>
                 </header>
                 <section className="tile-body">

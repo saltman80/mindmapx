@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -164,24 +164,28 @@ export default function KanbanBoardsPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{b.title || 'Board'}</h2>
                   <div className="tile-actions">
-                    <Link
-                      to={`/kanban/${b.id}`}
-                      onClick={() =>
+                    <button
+                      className="btn btn-primary btn-wide"
+                      onClick={() => {
                         localStorage.setItem(
                           `board_last_viewed_${b.id}`,
                           Date.now().toString()
                         )
-                      }
-                      className="tile-link"
+                        navigate(`/kanban/${b.id}`)
+                      }}
                     >
                       Open
-                    </Link>
-                    <button
+                    </button>
+                    <a
+                      href="#"
                       className="tile-link delete-link"
-                      onClick={() => handleDelete(b.id)}
+                      onClick={e => {
+                        e.preventDefault()
+                        handleDelete(b.id)
+                      }}
                     >
                       Delete
-                    </button>
+                    </a>
                   </div>
                 </header>
                 <section className="tile-body">

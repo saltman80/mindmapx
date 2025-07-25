@@ -1863,6 +1863,10 @@ hr {
   text-decoration: underline;
 }
 
+.tile-actions .btn {
+  margin-top: var(--spacing-xs);
+}
+
 .delete-link {
   color: var(--color-error);
 }
