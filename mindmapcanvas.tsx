@@ -342,6 +342,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handlePointerDown = useCallback(
       (e: React.PointerEvent<SVGSVGElement>) => {
         console.log('[MindmapCanvas] handlePointerDown')
+        e.stopPropagation()
         if ((e.target as HTMLElement).closest('.add-child-button')) return
         const target = (e.target as HTMLElement).closest('.mindmap-node') as HTMLElement | null
         dragStartRef.current = { x: e.clientX, y: e.clientY }
@@ -488,6 +489,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     return (
       <div
         ref={containerRef}
+        onPointerDown={() => {
+          setSelectedId(null)
+          modeRef.current = null
+        }}
         style={{
           width: containerWidth,
           height: containerHeight,
