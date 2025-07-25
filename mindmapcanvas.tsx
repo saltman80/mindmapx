@@ -10,6 +10,8 @@ import {
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData } from './mindmapTypes'
 
+console.log('[MindmapCanvas] Component loaded')
+
 interface MindmapCanvasProps {
   nodes?: NodeData[]
   edges?: EdgeData[]
