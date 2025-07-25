@@ -2339,6 +2339,58 @@ hr {
   line-height: 1;
 }
 
+/* New Kanban board styles */
+.kanban-header {
+  padding: 24px;
+  border-bottom: 1px solid #ddd;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.kanban-header .description {
+  font-size: 14px;
+  color: #666;
+}
+
+.kanban-lanes {
+  display: flex;
+  height: calc(100vh - 100px);
+  overflow-x: auto;
+}
+
+.lane {
+  flex: 1;
+  min-width: 250px;
+  background: #f7f8fa;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.card {
+  background: white;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.card-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.edit-icon {
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
 .add-lane {
   display: flex;
   align-items: center;

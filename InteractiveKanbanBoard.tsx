@@ -37,10 +37,9 @@ export default function InteractiveKanbanBoard({
   }
 
   const addCard = (laneId: string) => {
-    const title = prompt('Card title')
-    if (!title) return
+    const newCard = { id: `card-${Date.now()}`, title: '' }
     setLanes(lanes.map(l =>
-      l.id === laneId ? { ...l, cards: [...l.cards, { id: `card-${Date.now()}`, title }] } : l
+      l.id === laneId ? { ...l, cards: [...l.cards, newCard] } : l
     ))
   }
 
@@ -56,6 +55,19 @@ export default function InteractiveKanbanBoard({
 
   const updateTitle = (laneId: string, title: string) => {
     setLanes(lanes.map(l => (l.id === laneId ? { ...l, title } : l)))
+  }
+
+  const updateCard = (laneId: string, cardId: string, title: string) => {
+    setLanes(prev =>
+      prev.map(l =>
+        l.id === laneId
+          ? {
+              ...l,
+              cards: l.cards.map(c => (c.id === cardId ? { ...c, title } : c)),
+            }
+          : l
+      )
+    )
   }
 
   const handleDragStart = (
@@ -80,11 +92,7 @@ export default function InteractiveKanbanBoard({
 
   return (
     <div className="kanban-canvas">
-      <header style={{ marginBottom: '1rem', textAlign: 'center' }}>
-        <h2>{boardTitle}</h2>
-        <p>{boardDescription}</p>
-      </header>
-      <div className="kanban-board">
+      <div className="kanban-lanes">
         {lanes.map((lane, i) => (
           <Lane
             key={lane.id}
@@ -92,11 +100,12 @@ export default function InteractiveKanbanBoard({
             laneIndex={i}
             onAddCard={addCard}
             onUpdateTitle={updateTitle}
+            onUpdateCard={updateCard}
             onDragStart={handleDragStart}
             onDrop={handleDrop}
           />
         ))}
-        <div className="kanban-lane add-lane" onClick={addLane}>
+        <div className="lane add-lane" onClick={addLane}>
           <button className="btn-primary">
             <span className="btn-plus" aria-hidden="true">+</span>
             Add Lane
@@ -112,6 +121,7 @@ interface LaneProps {
   laneIndex: number
   onAddCard: (laneId: string) => void
   onUpdateTitle: (laneId: string, title: string) => void
+  onUpdateCard: (laneId: string, cardId: string, title: string) => void
   onDragStart: (
     e: React.DragEvent<HTMLDivElement>,
     laneIndex: number,
@@ -120,18 +130,33 @@ interface LaneProps {
   onDrop: (e: React.DragEvent<HTMLDivElement>, laneIndex: number) => void
 }
 
-function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onDragStart, onDrop }: LaneProps) {
+function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onUpdateCard, onDragStart, onDrop }: LaneProps) {
   const [editing, setEditing] = useState(false)
   const [tempTitle, setTempTitle] = useState(lane.title)
+  const [editingCardId, setEditingCardId] = useState<string | null>(null)
+  const [tempCardTitle, setTempCardTitle] = useState('')
 
   const save = () => {
     onUpdateTitle(lane.id, tempTitle)
     setEditing(false)
   }
 
+  const startEditCard = (card: Card) => {
+    setEditingCardId(card.id)
+    setTempCardTitle(card.title)
+  }
+
+  const saveCard = () => {
+    if (editingCardId) {
+      onUpdateCard(lane.id, editingCardId, tempCardTitle)
+    }
+    setEditingCardId(null)
+    setTempCardTitle('')
+  }
+
   return (
     <div
-      className="kanban-lane"
+      className="lane"
       onDragOver={e => e.preventDefault()}
       onDrop={e => onDrop(e, laneIndex)}
     >
@@ -154,11 +179,34 @@ function Lane({ lane, laneIndex, onAddCard, onUpdateTitle, onDragStart, onDrop }
       {lane.cards.map((card, i) => (
         <div
           key={card.id}
-          className="kanban-card"
+          className="card"
           draggable
           onDragStart={e => onDragStart(e, laneIndex, i)}
         >
-          {card.title}
+          {editingCardId === card.id ? (
+            <div className="card-edit">
+              <input
+                value={tempCardTitle}
+                onChange={e => setTempCardTitle(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && saveCard()}
+              />
+              <button onClick={saveCard} aria-label="Save" className="save-btn">
+                ✓
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="card-header">
+                <span
+                  className="edit-icon"
+                  onClick={() => startEditCard(card)}
+                >
+                  ✎
+                </span>
+              </div>
+              <p>{card.title || 'New Card'}</p>
+            </>
+          )}
         </div>
       ))}
       <button className="btn-secondary" onClick={() => onAddCard(lane.id)}>
