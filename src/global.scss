@@ -2,15 +2,16 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Fira Code', monospace;
 
-  --color-primary: #0a84ff;
+  --color-primary: #FFA726;
+  --color-primary-light: #FFCC80;
   --color-secondary: #1e1e1e;
-  --color-accent: #30d158;
+  --color-accent: #FB8C00;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #64d2ff;
 
-  --color-bg: #ffffff;
+  --color-bg: #FDF9F4;
   --color-bg-alt: #f2f2f7;
   --color-surface: #ffffff;
   --color-border: #e5e5ea;
@@ -62,6 +63,7 @@ html {
 
 body {
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
@@ -2365,53 +2367,86 @@ hr {
 /* Kanban board layout */
 .kanban-board {
   display: flex;
-  height: calc(100vh - 60px);
+  gap: 20px;
+  padding: 24px;
+  height: calc(100vh - 100px);
+  background: var(--color-bg);
   overflow-x: auto;
-  background: #f4f5f7;
-  padding: 16px;
+  align-items: flex-start;
 }
 
 .lane {
-  background: #fff;
-  border: 1px solid #e2e4e9;
-  border-radius: 10px;
+  background: #ffffff;
+  border-radius: 12px;
+  border-top: 6px solid var(--color-primary);
   min-width: 280px;
-  max-height: 100%;
+  margin-right: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   position: relative;
-  transition: all 0.2s ease-in-out;
 }
-.lane::after {
-  content: "";
+.lane:not(:last-child)::after {
+  content: '';
   position: absolute;
-  right: -8px;
+  right: -10px;
   top: 0;
   bottom: 0;
   width: 1px;
-  background: #ccc;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #dfe1e6;
-  border-radius: 8px;
-  margin: 8px 12px;
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(255, 167, 38, 0.1);
+  transition: transform 0.2s;
 }
 
 .card:hover {
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transform: scale(1.02);
+  box-shadow: 0 6px 14px rgba(255, 167, 38, 0.15);
 }
 
 .card-header {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 8px;
+}
+
+.priority {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  color: white;
+}
+
+.priority.high {
+  background: #e53935;
+}
+.priority.medium {
+  background: #fbc02d;
+}
+.priority.low {
+  background: #43a047;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+}
+
+.card-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
 }
 
 .edit-icon {
