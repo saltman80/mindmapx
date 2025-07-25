@@ -227,22 +227,32 @@ function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRem
   return (
     <Droppable droppableId={lane.id} type="CARD">
       {provided => (
-        <div className="lane" ref={provided.innerRef} {...provided.droppableProps}>
+        <div
+          className={`lane ${lane.title.toLowerCase() === 'done' ? 'done' : ''}`}
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
           <div className="lane-header">
-            <input
-              className="lane-title-input"
-              value={tempTitle}
-              onChange={e => setTempTitle(e.target.value)}
-              onBlur={save}
-              onKeyDown={e => e.key === 'Enter' && save()}
-            />
-            <button
-              className="lane-delete"
-              onClick={() => onRemoveLane(lane.id)}
-              aria-label="Delete"
-            >
-              ✖
-            </button>
+            {lane.title.toLowerCase() === 'done' ? (
+              <h3 className="lane-title">{lane.title}</h3>
+            ) : (
+              <>
+                <input
+                  className="lane-title-input"
+                  value={tempTitle}
+                  onChange={e => setTempTitle(e.target.value)}
+                  onBlur={save}
+                  onKeyDown={e => e.key === 'Enter' && save()}
+                />
+                <button
+                  className="lane-delete"
+                  onClick={() => onRemoveLane(lane.id)}
+                  aria-label="Delete"
+                >
+                  ✖
+                </button>
+              </>
+            )}
           </div>
           {lane.cards.map((card, i) => (
             <Draggable key={card.id} draggableId={card.id} index={i}>
