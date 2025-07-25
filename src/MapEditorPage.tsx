@@ -75,12 +75,26 @@ export default function MapEditorPage(): JSX.Element {
   useEffect(() => {
     if (!id) return
     const controller = new AbortController()
-    fetch(`/.netlify/functions/nodes?mindmapId=${id}`, { credentials: 'include', signal: controller.signal })
-      .then(res => (res.ok ? res.json() : []))
-      .then(data => {
+
+    fetch(`/.netlify/functions/nodes?mindmapId=${id}`, {
+      credentials: 'include',
+      signal: controller.signal
+    })
+      .then(async res => {
+        if (!res.ok) {
+          console.error('[nodes] fetch failed:', res.status)
+          setNodes([])
+          return
+        }
+        const data = await res.json()
+        console.log('[nodes] data:', data)
         setNodes(Array.isArray(data) ? data : [])
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error('[nodes] fetch error:', err)
+        setNodes([])
+      })
+
     return () => controller.abort()
   }, [id, reloadFlag])
 

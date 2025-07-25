@@ -1,5 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import type { PoolClient } from 'pg'
 import { extractToken, verifySession } from './auth.js'
 
 interface NodePayload {
@@ -19,23 +20,26 @@ const headers = {
 }
 
 export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers, body: '' }
-  }
-
-  const token = extractToken(event)
-  if (!token) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
-
-  let userId: string
+  let client: PoolClient | null = null
   try {
-    const session = verifySession(token) as { userId: string }
-    userId = session.userId
-  } catch {
-    return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
-  }
+    if (event.httpMethod === 'OPTIONS') {
+      return { statusCode: 204, headers, body: '' }
+    }
 
-  const client = await getClient()
-  try {
+    const token = extractToken(event)
+    if (!token) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
+    }
+
+    let userId: string
+    try {
+      const session = verifySession(token) as { userId: string }
+      userId = session.userId
+    } catch {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
+    }
+
+    client = await getClient()
     if (event.httpMethod === 'GET') {
       const mapId = event.queryStringParameters?.mindmapId
       if (!mapId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'mindmapId required' }) }
@@ -130,9 +134,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) }
   } catch (err) {
-    console.error('nodes handler error', err)
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
+    console.error('[nodes] error:', err)
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Internal server error in /nodes' })
+    }
   } finally {
-    client.release()
+    if (client) {
+      try {
+        client.release()
+      } catch (releaseErr) {
+        console.error('[nodes] release error:', releaseErr)
+      }
+    }
   }
 }
