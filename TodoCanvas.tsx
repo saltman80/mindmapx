@@ -20,7 +20,7 @@ export default function TodoCanvas({
   kanbanId,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState(initialTodos.length === 0)
   const [newTitle, setNewTitle] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -53,9 +53,13 @@ export default function TodoCanvas({
           {todos[0].description && (
             <p className="todo-description">{todos[0].description}</p>
           )}
+          <h2 className="todo-title-below">{todos[0].title}</h2>
         </header>
       )}
       <div className="todo-list">
+        {todos.length === 0 && (
+          <p className="todo-empty-message">Add a new todo to get started.</p>
+        )}
         {todos.map(t => (
           <div key={t.id} className="tile">
             <header className="tile-header">
