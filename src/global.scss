@@ -2383,7 +2383,7 @@ hr {
   overflow-y: hidden;
   width: 100%;
   height: calc(100vh - 150px);
-  padding: 16px;
+  padding: 0;
   scroll-behavior: smooth;
 }
 
@@ -2417,6 +2417,12 @@ hr {
   flex-direction: column;
   height: 100%;
   position: relative;
+}
+.lane-header-bar {
+  height: 5px;
+  width: 100%;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 .lane:not(:last-child)::after {
   content: '';

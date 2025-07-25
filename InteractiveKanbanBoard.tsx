@@ -7,6 +7,15 @@ import {
 } from 'react-beautiful-dnd'
 import CardModal, { Card } from './CardModal'
 
+const colorPalette = [
+  '#FFA726', '#FFB74D', '#FFCA28', '#FFD54F', '#FFEE58', '#FFF176',
+  '#D4E157', '#AED581', '#81C784', '#66BB6A', '#26A69A', '#4DD0E1',
+  '#29B6F6', '#42A5F5', '#5C6BC0', '#7E57C2', '#8E24AA', '#9C27B0',
+  '#AB47BC', '#EC407A', '#FF7043', '#8D6E63', '#78909C', '#90A4AE',
+  '#A1887F', '#B0BEC5', '#C5CAE9', '#B39DDB', '#CFD8DC', '#E1BEE7'
+]
+const columnColor = (i: number) => colorPalette[i % colorPalette.length]
+
 interface Lane {
   id: string
   title: string
@@ -35,9 +44,18 @@ export default function InteractiveKanbanBoard({
   const [selected, setSelected] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
 
+  const sortedLanes = [
+    ...lanes.filter(l => l.title !== 'Done'),
+    lanes.find(l => l.title === 'Done'),
+  ].filter(Boolean) as Lane[]
+
   const addLane = () => {
     const id = `lane-${Date.now()}`
-    setLanes(prev => [...prev, { id, title: 'New Lane', cards: [] }])
+    setLanes(prev => {
+      const done = prev.find(l => l.title === 'Done')
+      const others = prev.filter(l => l.title !== 'Done')
+      return done ? [...others, { id, title: 'New Lane', cards: [] }, done] : [...prev, { id, title: 'New Lane', cards: [] }]
+    })
   }
 
   const removeLane = (laneId: string) => {
@@ -90,7 +108,9 @@ export default function InteractiveKanbanBoard({
       if (index === -1) return prev
       const [lane] = copy.splice(index, 1)
       copy.splice(to, 0, lane)
-      return copy
+      const withoutDone = copy.filter(l => l.title !== 'Done')
+      const done = copy.find(l => l.title === 'Done')
+      return done ? [...withoutDone, done] : withoutDone
     })
   }
 
@@ -131,6 +151,9 @@ export default function InteractiveKanbanBoard({
 
     if (!destination) return
 
+    const draggedLane = lanes.find(l => l.id === draggableId)
+    if (type === 'COLUMN' && draggedLane?.title === 'Done') return
+
     if (type === 'CARD') {
       moveCard(draggableId, source.droppableId, destination.droppableId, destination.index)
     }
@@ -155,8 +178,8 @@ export default function InteractiveKanbanBoard({
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                {lanes.map((lane, i) => (
-                  <Draggable key={lane.id} draggableId={lane.id} index={i}>
+                {sortedLanes.map((lane, i) => (
+                  <Draggable key={lane.id} draggableId={lane.id} index={i} isDragDisabled={lane.title === 'Done'}>
                     {providedLane => (
                       <div
                         ref={providedLane.innerRef}
@@ -166,6 +189,7 @@ export default function InteractiveKanbanBoard({
                         <div {...providedLane.dragHandleProps} className="lane">
                           <Lane
                             lane={lane}
+                            index={i}
                             onAddCard={addCard}
                             onUpdateTitle={updateTitle}
                             onUpdateCard={updateCard}
@@ -201,6 +225,7 @@ export default function InteractiveKanbanBoard({
 
 interface LaneProps {
   lane: Lane
+  index: number
   onAddCard: (laneId: string) => void
   onUpdateTitle: (laneId: string, title: string) => void
   onUpdateCard: (laneId: string, card: Card) => void
@@ -208,7 +233,7 @@ interface LaneProps {
   onRemoveLane: (laneId: string) => void
 }
 
-function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRemoveLane }: LaneProps) {
+function Lane({ lane, index, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRemoveLane }: LaneProps) {
   const [tempTitle, setTempTitle] = useState(lane.title)
   const [editingCardId, setEditingCardId] = useState<string | null>(null)
   const [tempCardTitle, setTempCardTitle] = useState('')
@@ -241,6 +266,7 @@ function Lane({ lane, onAddCard, onUpdateTitle, onUpdateCard, onCardClick, onRem
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
+          <div className="lane-header-bar" style={{ backgroundColor: columnColor(index) }} />
           <div className="lane-header">
             {lane.title.toLowerCase() === 'done' ? (
               <h3 className="lane-title">{lane.title}</h3>
