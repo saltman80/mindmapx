@@ -2312,6 +2312,39 @@ hr {
   cursor: pointer;
 }
 
+.lane-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lane-title-edit input {
+  flex: 1;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.save-btn {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.add-lane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Empty canvas modal */
 .empty-canvas-modal .modal {
   background: var(--color-surface);
