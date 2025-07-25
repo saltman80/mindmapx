@@ -109,6 +109,37 @@ export async function runMigrations(): Promise<void> {
       );
     `)
 
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'x'
+        ) THEN
+          ALTER TABLE nodes ADD COLUMN x INTEGER;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'y'
+        ) THEN
+          ALTER TABLE nodes ADD COLUMN y INTEGER;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'label'
+        ) THEN
+          ALTER TABLE nodes ADD COLUMN label TEXT;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'description'
+        ) THEN
+          ALTER TABLE nodes ADD COLUMN description TEXT;
+        END IF;
+      END;
+      $$;
+    `)
+
     // Kanban boards table for task organization
     await client.query(`
       CREATE TABLE IF NOT EXISTS kanban_boards (
