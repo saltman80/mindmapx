@@ -155,11 +155,16 @@ export default function MapEditorPage(): JSX.Element {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...node, mindmapId: id })
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`Failed to create node: ${res.status}`)
+        }
+        const data = await res.json()
         setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error('[handleAddNode] error', err)
+      })
   }
 
   const handleCreateFirstNode = (label: string) => {
@@ -176,8 +181,11 @@ export default function MapEditorPage(): JSX.Element {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...newNode, mindmapId: id })
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`Failed to create node: ${res.status}`)
+        }
+        const data = await res.json()
         setNodes(prev => [...prev, { ...newNode, id: data.id } as NodeData])
         setShowFirstNodeModal(false)
       })
