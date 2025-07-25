@@ -144,6 +144,7 @@ export default function MapEditorPage(): JSX.Element {
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
   const handleSaveLayout = useCallback(() => {
+    if (!Array.isArray(safeNodes)) return
     safeNodes.forEach(n => {
       fetch(`/.netlify/functions/nodes/${n.id}`, {
         method: 'PATCH',
@@ -159,10 +160,12 @@ export default function MapEditorPage(): JSX.Element {
   if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
 
-  const edges: EdgeData[] = safeNodes
-    .filter(n => n.parentId)
-    .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
-    .filter(edge => edge.from && edge.to)
+  const edges: EdgeData[] = Array.isArray(safeNodes)
+    ? safeNodes
+        .filter(n => n.parentId)
+        .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
+        .filter(edge => edge.from && edge.to)
+    : []
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
@@ -250,6 +253,12 @@ export default function MapEditorPage(): JSX.Element {
           {nodesError && (
             <div className="error">
               {nodesError}{' '}
+              <button onClick={handleReload}>Retry</button>
+            </div>
+          )}
+          {mapError && (
+            <div className="error">
+              {mapError}{' '}
               <button onClick={handleReload}>Retry</button>
             </div>
           )}
