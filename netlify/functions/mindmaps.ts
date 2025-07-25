@@ -94,6 +94,21 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       return { statusCode: 200, headers, body: JSON.stringify(maps) }
     }
 
+    if (event.httpMethod === 'DELETE') {
+      const id = event.queryStringParameters?.id
+      if (!id) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing id' }) }
+      }
+      const result = await client.query(
+        'DELETE FROM mindmaps WHERE id = $1 AND user_id = $2',
+        [id, userId]
+      )
+      if (result.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+      }
+      return { statusCode: 204, headers, body: '' }
+    }
+
     // ❌ No other method allowed
     return {
       statusCode: 405,

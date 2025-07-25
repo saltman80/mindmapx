@@ -90,6 +90,20 @@ export default function TodosPage(): JSX.Element {
     }
   }
 
+  const handleDelete = async (id: string): Promise<void> => {
+    if (!confirm('Delete this todo?')) return
+    try {
+      const res = await fetch(`/.netlify/functions/todos/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Failed to delete')
+      setTodos(prev => prev.filter(t => t.id !== id))
+    } catch (err: any) {
+      alert(err.message || 'Delete failed')
+    }
+  }
+
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
   const oneWeek = 7 * oneDay
@@ -149,17 +163,26 @@ export default function TodosPage(): JSX.Element {
               <div className="tile" key={t.id}>
                 <header className="tile-header">
                   <h2>{t.title || t.content}</h2>
-                  <Link
-                    to={`/todos/${t.id}`}
-                    onClick={() =>
-                      localStorage.setItem(
-                        `todo_last_viewed_${t.id}`,
-                        Date.now().toString()
-                      )
-                    }
-                  >
-                    Open
-                  </Link>
+                  <div className="tile-actions">
+                    <Link
+                      to={`/todos/${t.id}`}
+                      onClick={() =>
+                        localStorage.setItem(
+                          `todo_last_viewed_${t.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                      className="tile-link"
+                    >
+                      Open
+                    </Link>
+                    <button
+                      className="tile-link delete-link"
+                      onClick={() => handleDelete(t.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </header>
                 <section className="tile-body">
                   <p>{t.content || 'Todo details coming soon...'}</p>

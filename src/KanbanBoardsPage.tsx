@@ -90,6 +90,20 @@ export default function KanbanBoardsPage(): JSX.Element {
     }
   }
 
+  const handleDelete = async (id: string): Promise<void> => {
+    if (!confirm('Delete this board?')) return
+    try {
+      const res = await fetch(`/.netlify/functions/boards?id=${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Failed to delete')
+      setBoards(prev => prev.filter(b => b.id !== id))
+    } catch (err: any) {
+      alert(err.message || 'Delete failed')
+    }
+  }
+
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
   const oneWeek = 7 * oneDay
@@ -149,17 +163,26 @@ export default function KanbanBoardsPage(): JSX.Element {
               <div className="tile" key={b.id}>
                 <header className="tile-header">
                   <h2>{b.title || 'Board'}</h2>
-                  <Link
-                    to={`/kanban/${b.id}`}
-                    onClick={() =>
-                      localStorage.setItem(
-                        `board_last_viewed_${b.id}`,
-                        Date.now().toString()
-                      )
-                    }
-                  >
-                    Open
-                  </Link>
+                  <div className="tile-actions">
+                    <Link
+                      to={`/kanban/${b.id}`}
+                      onClick={() =>
+                        localStorage.setItem(
+                          `board_last_viewed_${b.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                      className="tile-link"
+                    >
+                      Open
+                    </Link>
+                    <button
+                      className="tile-link delete-link"
+                      onClick={() => handleDelete(b.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </header>
                 <section className="tile-body">
                   <p>Board details coming soon...</p>

@@ -89,6 +89,20 @@ export default function MindmapsPage(): JSX.Element {
     }
   }
 
+  const handleDelete = async (id: string): Promise<void> => {
+    if (!confirm('Delete this mind map?')) return
+    try {
+      const res = await fetch(`/.netlify/functions/mindmaps?id=${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Failed to delete')
+      setMaps(prev => prev.filter(m => m.id !== id))
+    } catch (err: any) {
+      alert(err.message || 'Delete failed')
+    }
+  }
+
   const getLastViewed = (id: string): number => {
     const v = localStorage.getItem(`mindmap_last_viewed_${id}`)
     return v ? parseInt(v, 10) : 0
@@ -161,17 +175,26 @@ export default function MindmapsPage(): JSX.Element {
               <div className="tile" key={m.id}>
                 <header className="tile-header">
                   <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
-                  <Link
-                    to={`/maps/${m.id}`}
-                    onClick={() =>
-                      localStorage.setItem(
-                        `mindmap_last_viewed_${m.id}`,
-                        Date.now().toString()
-                      )
-                    }
-                  >
-                    Open
-                  </Link>
+                  <div className="tile-actions">
+                    <Link
+                      to={`/maps/${m.id}`}
+                      onClick={() =>
+                        localStorage.setItem(
+                          `mindmap_last_viewed_${m.id}`,
+                          Date.now().toString()
+                        )
+                      }
+                      className="tile-link"
+                    >
+                      Open
+                    </Link>
+                    <button
+                      className="tile-link delete-link"
+                      onClick={() => handleDelete(m.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </header>
                 <section className="tile-body">
                   <p>{m.data?.description || 'Map details coming soon...'}</p>
