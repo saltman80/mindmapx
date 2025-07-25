@@ -43,7 +43,7 @@ const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }
           return (
             <path
               key={edge.id}
-              d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${(from.y + to.y) / 2 - 40} ${to.x},${to.y}`}
+              d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${(from.y + to.y) / 2 + (to.y > from.y ? 40 : -40)} ${to.x},${to.y}`}
               fill="none"
               stroke="#ccc"
               strokeWidth={1}
