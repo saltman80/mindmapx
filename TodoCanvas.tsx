@@ -27,22 +27,35 @@ export default function TodoCanvas({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
-  const handleCreateTodo = (data: { title: string; description: string }) => {
-    const newTodo: TodoItem = {
-      id: Date.now().toString(),
-      title: data.title,
-      description: data.description,
-      nodeId,
-      kanbanId,
+  const handleCreateTodo = async (data: { title: string; description: string }) => {
+    try {
+      const res = await fetch('/.netlify/functions/todos', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: data.title, description: data.description }),
+      })
+      if (!res.ok) throw new Error('Failed to save todo')
+      const created: TodoItem = await res.json()
+      setTodos(prev => [created, ...prev])
+    } catch (err) {
+      console.error(err)
+      alert('Failed to create todo')
+    } finally {
+      setShowModal(false)
+      setTitle('')
+      setDescription('')
     }
-    setTodos(prev => [newTodo, ...prev])
-    setShowModal(false)
-    setTitle('')
-    setDescription('')
   }
 
   return (
     <div className="todo-canvas-wrapper">
+      {todos.length > 0 && (
+        <header className="todo-header">
+          <h1>{todos[0].title}</h1>
+          {todos[0].description && <p className="todo-description">{todos[0].description}</p>}
+        </header>
+      )}
       {isEmpty ? (
         <>
           <div className="todo-placeholder-list">
