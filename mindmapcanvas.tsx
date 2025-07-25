@@ -65,7 +65,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [nodes])
     const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [addParentId, setAddParentId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
@@ -325,6 +325,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         } else {
           modeRef.current = 'canvas'
           originRef.current = { x: transform.x, y: transform.y }
+          setSelectedId(null)
         }
         svgRef.current?.setPointerCapture(e.pointerId)
         window.addEventListener('pointermove', handlePointerMove)
@@ -509,8 +510,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 className="mindmap-node"
                 data-id={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onMouseEnter={() => setHoveredId(node.id)}
-                onMouseLeave={() => setHoveredId(h => (h === node.id ? null : h))}
+                onClick={e => {
+                  e.stopPropagation()
+                  setSelectedId(node.id)
+                }}
               >
                 <circle
                   r={20 / transform.k}
@@ -537,57 +540,67 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   ✓
                 </text>
               ) : null}
-              {hoveredId === node.id && (
+              {selectedId === node.id && (
                 <g
                   className="hover-panel"
                   transform={`translate(${20 / transform.k},${-20 / transform.k})`}
                   onPointerDown={e => e.stopPropagation()}
                 >
+                  <rect
+                    x={-4 / transform.k}
+                    y={-4 / transform.k}
+                    width={88 / transform.k}
+                    height={88 / transform.k}
+                    fill="#fff"
+                    stroke="#000"
+                    strokeWidth={1 / transform.k}
+                    rx={4 / transform.k}
+                  />
                   <g
                     transform="translate(0,0)"
                     onClick={e => {
                       e.stopPropagation()
-                      setHoveredId(null)
+                      setSelectedId(null)
                       setAddParentId(node.id)
                       setNewName('')
                       setNewDesc('')
                     }}
                   >
-                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">+</text>
+                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">+</text>
                   </g>
                   <g
-                    transform={`translate(${18 / transform.k},0)`}
+                    transform={`translate(${40 / transform.k},0)`}
                     onClick={e => {
                       e.stopPropagation()
-                      setHoveredId(null)
+                      setSelectedId(null)
                       openEditModal(node.id)
                     }}
                   >
-                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">✏️</text>
+                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">✏️</text>
                   </g>
                   <g
-                    transform={`translate(${36 / transform.k},0)`}
+                    transform={`translate(0,${40 / transform.k})`}
                     onClick={e => {
                       e.stopPropagation()
-                      setHoveredId(null)
+                      setSelectedId(null)
                       handleDeleteNode(node.id)
                     }}
                   >
-                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">🗑️</text>
+                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">🗑️</text>
                   </g>
                   <g
-                    transform={`translate(${54 / transform.k},0)`}
+                    transform={`translate(${40 / transform.k},${40 / transform.k})`}
                     onClick={e => {
                       e.stopPropagation()
-                      setHoveredId(null)
+                      setSelectedId(null)
                       setTodoNodeId(node.id)
                     }}
                   >
-                    <circle r={8 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={10 / transform.k} pointerEvents="none">✓</text>
+                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
+                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">✓</text>
                   </g>
                 </g>
               )}
@@ -610,21 +623,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <button type="button" onClick={() => zoom(1.1)}>+</button>
           <button type="button" onClick={() => zoom(0.9)}>-</button>
         </div>
-        {safeNodes.length === 0 && safeEdges.length === 0 && !showCreate && (
-          <div className="modal-overlay empty-canvas-modal">
-            <div className="modal">
-              <p>No nodes yet. Click below to start building your map!</p>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => setShowCreate(true)}
-              >
-                Create Map Node
-              </button>
-            </div>
-          </div>
-        )}
-
         {showCreate && (
           <div className="modal-overlay" onClick={() => setShowCreate(false)}>
             <div className="modal" onClick={e => e.stopPropagation()}>
