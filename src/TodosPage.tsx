@@ -147,6 +147,7 @@ export default function TodosPage(): JSX.Element {
               <div className="metric-header stacked">
                 <h3>Metrics</h3>
                 <div className="metric-circle">{todos.length}</div>
+                <p className="metric-total">total</p>
               </div>
               <div className="metric-detail-grid">
                 <div className="metric-detail">
