@@ -73,19 +73,25 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const dragStartRef = useRef({ x: 0, y: 0 })
     const originRef = useRef({ x: 0, y: 0 })
     const dragNodeIdRef = useRef<string | null>(null)
-    const nodeOriginRef = useRef<{ x: number; y: number } | null>(null)
-    const pinchRef = useRef<{
-      initialDistance: number
-      initialCenter: { x: number; y: number }
-      initialTransform: { x: number; y: number; k: number }
-    } | null>(null)
+  const nodeOriginRef = useRef<{ x: number; y: number } | null>(null)
+  const pinchRef = useRef<{
+    initialDistance: number
+    initialCenter: { x: number; y: number }
+    initialTransform: { x: number; y: number; k: number }
+  } | null>(null)
+
+  const DOT_SPACING = 50
+  const GRID_SIZE = 500
+  const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 
     const pan = useCallback((dx: number, dy: number) => {
+      console.log('[MindmapCanvas] pan', dx, dy)
       setTransform(prev => ({ x: prev.x + dx, y: prev.y + dy, k: prev.k }))
     }, [])
 
     const zoom = useCallback(
       (scale: number, centerX = 0, centerY = 0) => {
+        console.log('[MindmapCanvas] zoom', scale, centerX, centerY)
         setTransform(prev => {
           const newK = prev.k * scale
           const x = (prev.x - centerX) * scale + centerX
@@ -97,6 +103,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     )
 
     const addNode = useCallback((node: NodeData) => {
+      console.log('[MindmapCanvas] addNode', node)
       setNodes(prev => [...prev, node])
       if (node.parentId) {
         const edgeId =
@@ -109,6 +116,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [])
 
     const handleSaveNew = useCallback(() => {
+      console.log('[MindmapCanvas] handleSaveNew')
       if (!containerRef.current) return
       const rect = containerRef.current.getBoundingClientRect()
       const x = CANVAS_SIZE / 2
@@ -136,6 +144,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [addNode, onAddNode, newName, newDesc])
 
     const handleAddChild = useCallback(() => {
+      console.log('[MindmapCanvas] handleAddChild')
       if (!addParentId) return
       const parent = safeNodes.find(n => n.id === addParentId)
       if (!parent) {
@@ -164,6 +173,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [addParentId, addNode, Array.isArray(nodes) ? nodes : [], newName, newDesc, onAddNode])
 
     const openEditModal = useCallback((id: string) => {
+      console.log('[MindmapCanvas] openEditModal', id)
       const node = safeNodes.find(n => n.id === id)
       if (!node) return
       setEditingId(id)
@@ -172,6 +182,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [Array.isArray(nodes) ? nodes : []])
 
     const handleSaveEdit = useCallback(() => {
+      console.log('[MindmapCanvas] handleSaveEdit')
       if (!editingId) return
       const node = safeNodes.find(n => n.id === editingId)
       if (!node) return
@@ -183,11 +194,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [editingId, editTitle, editDesc, Array.isArray(nodes) ? nodes : [], updateNode])
 
     const handleDeleteNode = useCallback((id: string) => {
+      console.log('[MindmapCanvas] handleDeleteNode', id)
       if (!window.confirm('Are you sure you want to delete this node?')) return
       removeNode(id)
     }, [removeNode])
 
     const handleAddTask = useCallback(() => {
+      console.log('[MindmapCanvas] handleAddTask for', todoNodeId)
       if (!todoNodeId) return
       const text = newTask.trim()
       if (!text) return
@@ -200,6 +213,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [todoNodeId, newTask])
 
     const handleToggleTask = useCallback((taskId: string) => {
+      console.log('[MindmapCanvas] handleToggleTask', taskId)
       if (!todoNodeId) return
       setTodoLists(prev => {
         const list = prev[todoNodeId] ?? []
@@ -211,6 +225,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [todoNodeId])
 
     const handleDeleteTask = useCallback((taskId: string) => {
+      console.log('[MindmapCanvas] handleDeleteTask', taskId)
       if (!todoNodeId) return
       setTodoLists(prev => {
         const list = prev[todoNodeId] ?? []
@@ -219,10 +234,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [todoNodeId])
 
     const updateNode = useCallback((node: NodeData) => {
+      console.log('[MindmapCanvas] updateNode', node)
       setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
     }, [])
 
     const removeNode = useCallback((nodeId: string) => {
+      console.log('[MindmapCanvas] removeNode', nodeId)
       setNodes(prev => prev.filter(n => n.id !== nodeId))
       setEdges(prev => prev.filter(e => e.from !== nodeId && e.to !== nodeId))
     }, [])
@@ -240,10 +257,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [Array.isArray(nodes) ? nodes : []])
 
-    console.log('[MindmapCanvas] rendering with nodes:', nodes)
+    console.log('[MindmapCanvas] rendering with nodes:', nodes, 'edges:', edges)
 
     const handlePointerMove = useCallback(
       (e: PointerEvent) => {
+        console.log('[MindmapCanvas] handlePointerMove')
         if (!modeRef.current) return
         e.preventDefault()
         const dx = e.clientX - dragStartRef.current.x
@@ -275,6 +293,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handlePointerUp = useCallback(
       (e: PointerEvent) => {
+        console.log('[MindmapCanvas] handlePointerUp')
         if (modeRef.current === 'node' && dragNodeIdRef.current) {
           const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
           if (node && onMoveNode) onMoveNode(node)
@@ -291,6 +310,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handlePointerDown = useCallback(
       (e: React.PointerEvent<SVGSVGElement>) => {
+        console.log('[MindmapCanvas] handlePointerDown')
         if ((e.target as HTMLElement).closest('.add-child-button')) return
         const target = (e.target as HTMLElement).closest('.mindmap-node') as HTMLElement | null
         dragStartRef.current = { x: e.clientX, y: e.clientY }
@@ -321,6 +341,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleWheel = useCallback(
       (e: React.WheelEvent<SVGSVGElement>) => {
+        console.log('[MindmapCanvas] handleWheel', e.deltaY)
         e.preventDefault()
         if (!svgRef.current) return
         const rect = svgRef.current.getBoundingClientRect()
@@ -336,6 +357,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleTouchStart = useCallback(
       (e: React.TouchEvent<SVGSVGElement>) => {
+        console.log('[MindmapCanvas] handleTouchStart')
         if (!svgRef.current) return
         if (e.touches.length === 1) {
           e.preventDefault()
@@ -371,6 +393,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleTouchMove = useCallback(
       (e: React.TouchEvent<SVGSVGElement>) => {
+        console.log('[MindmapCanvas] handleTouchMove')
         if (!svgRef.current) return
         if (e.touches.length === 1 && modeRef.current === 'canvas') {
           e.preventDefault()
@@ -405,6 +428,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     )
 
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+      console.log('[MindmapCanvas] handleTouchEnd')
       if (e.touches.length < 1) {
         modeRef.current = null
       }
@@ -413,9 +437,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       }
     }, [])
 
-    const DOT_SPACING = 50
-    const GRID_SIZE = 500
-    const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 
     const containerWidth =
       typeof width === 'number'
@@ -703,6 +724,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             edges={safeEdges}
             transform={transform}
             onNavigate={(x, y) => {
+              console.log('[MindmapCanvas] MiniMap navigate', x, y)
               if (!containerRef.current) return
               const cw = containerRef.current.clientWidth
               const ch = containerRef.current.clientHeight
