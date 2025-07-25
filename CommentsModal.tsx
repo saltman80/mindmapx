@@ -29,29 +29,35 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
 
   return (
     <Modal isOpen={!!card} onClose={onClose} ariaLabel={`Comments for ${card.title}`}>
-      <div className="modal-container max-w-xl p-6 mx-auto bg-white shadow-lg rounded">
-        <h2 className="mb-4 text-lg font-semibold">Comments for "{card.title}"</h2>
-        <div className="space-y-4 max-h-60 overflow-y-auto mb-4">
-          {(card.comments || []).map(c => (
-            <div key={c.id} className="p-2 border rounded">
-              <div className="text-sm font-semibold">{c.author}</div>
-              <div className="text-sm">{c.text}</div>
-              <div className="text-xs text-gray-500">
-                {new Date(c.createdAt).toLocaleString()}
+      <div className="comment-modal">
+        <h2 className="mb-2 text-lg font-semibold">Comments for "{card.title}"</h2>
+        <div className="comment-list">
+          {(card.comments || []).map((c, idx) => {
+            const isMine = c.author === currentUser?.name
+            const name = isMine ? 'Me' : c.author || 'Anon'
+            return (
+              <div key={c.id} className="comment">
+                <div className="text-sm font-semibold">{name}</div>
+                <div className="text-sm">{c.text}</div>
+                <div className="text-xs text-gray-500">
+                  {new Date(c.createdAt).toLocaleString()}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
-        <textarea
-          value={text}
-          onChange={e => setText(e.target.value)}
-          className="textarea-styled w-full mb-4"
-        />
-        <div className="flex justify-end space-x-2">
-          <button onClick={onClose} className="btn-cancel">Cancel</button>
-          <button onClick={add} className="btn-post" disabled={!text.trim()}>
-            Post Comment
-          </button>
+        <div style={{ marginTop: '1rem' }}>
+          <textarea
+            value={text}
+            onChange={e => setText(e.target.value)}
+            className="textarea-styled w-full"
+          />
+          <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+            <button onClick={onClose} className="btn-secondary">Cancel</button>
+            <button onClick={add} className="btn-primary" disabled={!text.trim()}>
+              Post Comment
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
