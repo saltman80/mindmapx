@@ -138,7 +138,7 @@ export default function MindmapsPage(): JSX.Element {
         <p className="error">{error}</p>
       ) : (
         <div className="four-col-grid">
-          <div className="tile create-tile">
+          <div className="dashboard-tile create-tile">
             <header className="tile-header">
               <h2>Create Mind Map</h2>
             </header>
@@ -149,7 +149,7 @@ export default function MindmapsPage(): JSX.Element {
               </button>
             </section>
           </div>
-          <div className="tile">
+          <div className="metric-tile">
             <header className="tile-header"><h2>Metrics</h2></header>
             <section className="tile-body">
               <p>Total: {maps.length}</p>
@@ -167,12 +167,12 @@ export default function MindmapsPage(): JSX.Element {
           </div>
 
           {sorted.length === 0 ? (
-            <div className="tile empty">
+            <div className="dashboard-tile empty">
               <p>No mind maps found.</p>
             </div>
           ) : (
             sorted.map(m => (
-              <div className="tile" key={m.id}>
+              <div className="dashboard-tile open-tile" key={m.id}>
                 <header className="tile-header">
                   <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
                   <div className="tile-actions">
@@ -207,7 +207,7 @@ export default function MindmapsPage(): JSX.Element {
             ))
           )}
           {Array.from({ length: 10 }).map((_v, i) => (
-            <div className="tile ghost-tile" key={`ghost-${i}`}></div>
+            <div className="dashboard-tile ghost-tile" key={`ghost-${i}`}></div>
           ))}
         </div>
       )}
