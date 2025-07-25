@@ -175,7 +175,7 @@ export default function InteractiveKanbanBoard({
     <div className="kanban-canvas">
       <header className="kanban-header">
         <div className="header-left">
-          <div className="kanban-icon" />
+          <div className="kanban-icon" aria-hidden="true">🗂️</div>
           <div>
             <h1 className="kanban-title">{boardTitle}</h1>
             <p className="kanban-description">{boardDescription}</p>
