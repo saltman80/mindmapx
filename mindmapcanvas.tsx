@@ -201,13 +201,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const updateNode = useCallback((node: NodeData) => {
       console.log('[MindmapCanvas] updateNode', node)
-      setNodes(prev => prev.map(n => (n.id === node.id ? { ...n, ...node } : n)))
+      setNodes(prev =>
+        Array.isArray(prev)
+          ? prev.map(n => (n.id === node.id ? { ...n, ...node } : n))
+          : prev
+      )
     }, [])
 
     const removeNode = useCallback((nodeId: string) => {
       console.log('[MindmapCanvas] removeNode', nodeId)
-      setNodes(prev => prev.filter(n => n.id !== nodeId))
-      setEdges(prev => prev.filter(e => e.from !== nodeId && e.to !== nodeId))
+      setNodes(prev => (Array.isArray(prev) ? prev.filter(n => n.id !== nodeId) : prev))
+      setEdges(prev => (Array.isArray(prev) ? prev.filter(e => e.from !== nodeId && e.to !== nodeId) : prev))
     }, [])
 
     const handleSaveEdit = useCallback(() => {
@@ -298,11 +302,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           const scaledDx = dx / transform.k
           const scaledDy = dy / transform.k
           setNodes(prev =>
-            prev.map(n =>
-              n.id === dragNodeIdRef.current
-                ? { ...n, x: nodeOriginRef.current!.x + scaledDx, y: nodeOriginRef.current!.y + scaledDy }
-                : n
-            )
+            Array.isArray(prev)
+              ? prev.map(n =>
+                  n.id === dragNodeIdRef.current
+                    ? {
+                        ...n,
+                        x: nodeOriginRef.current!.x + scaledDx,
+                        y: nodeOriginRef.current!.y + scaledDy,
+                      }
+                    : n
+                )
+              : prev
           )
         }
       },

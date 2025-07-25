@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas from './MindmapCanvas'
 import type { NodeData, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
+import LoadingSpinner from '../loadingspinner'
 
 interface Mindmap {
   id: string
@@ -28,7 +29,7 @@ export default function MapEditorPage(): JSX.Element {
   const [loadingMap, setLoadingMap] = useState(true)
   const [loadingNodes, setLoadingNodes] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(0)
-  const [nodes, setNodes] = useState<NodeData[]>([])
+  const [nodes, setNodes] = useState<NodeData[] | null>(null)
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 })
   const [loaded, setLoaded] = useState(false)
 
@@ -111,12 +112,11 @@ export default function MapEditorPage(): JSX.Element {
           return null
         })
         console.log('[nodes] data:', data)
-        if (Array.isArray(data)) {
-          setNodes(data)
-        } else {
-          setNodes([])
+        const validNodes = Array.isArray(data) ? data : []
+        if (!Array.isArray(data)) {
           setNodesError('Invalid nodes data')
         }
+        setNodes(validNodes)
       })
       .catch(err => {
         console.error('[nodes] fetch error:', err)
@@ -151,7 +151,7 @@ export default function MapEditorPage(): JSX.Element {
   }, [safeNodes])
 
   if (error) return <div>Error loading map.</div>
-  if (!loaded) return <div>Loading mind map...</div>
+  if (nodes === null || !loaded) return <LoadingSpinner />
   if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
 
@@ -236,6 +236,13 @@ export default function MapEditorPage(): JSX.Element {
             onTransformChange={handleTransformChange}
             showMiniMap
           />
+          {safeNodes.length === 0 && (
+            <div className="modal-overlay empty-canvas-modal">
+              <div className="modal">
+                <p>This map has no nodes yet. Click + to get started.</p>
+              </div>
+            </div>
+          )}
           {nodesError && (
             <div className="error">
               {nodesError}{' '}
