@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   DragDropContext,
   Droppable,
@@ -33,6 +33,7 @@ export default function InteractiveKanbanBoard({
     description || 'Organize tasks across lanes'
   )
   const [selected, setSelected] = useState<{ laneId: string; card: Card } | null>(null)
+  const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
 
   const addLane = () => {
     const id = `lane-${Date.now()}`
@@ -119,6 +120,12 @@ export default function InteractiveKanbanBoard({
     )
   }
 
+  useEffect(() => {
+    if (autoScrollRightRef.current) {
+      autoScrollRightRef.current.scrollLeft = autoScrollRightRef.current.scrollWidth;
+    }
+  }, [lanes.length]);
+
   const handleDragEnd = (result: DropResult) => {
     const { source, destination, draggableId, type } = result
 
@@ -142,38 +149,40 @@ export default function InteractiveKanbanBoard({
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
-            <div
-              className="kanban-board"
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {lanes.map((lane, i) => (
-                <Draggable key={lane.id} draggableId={lane.id} index={i}>
-                  {providedLane => (
-                    <div
-                      ref={providedLane.innerRef}
-                      {...providedLane.draggableProps}
-                      className="lane-wrapper"
-                    >
-                      <div {...providedLane.dragHandleProps} className="lane">
-                        <Lane
-                          lane={lane}
-                          onAddCard={addCard}
-                          onUpdateTitle={updateTitle}
-                          onUpdateCard={updateCard}
-                          onCardClick={(laneId, card) =>
-                            setSelected({ laneId, card })
-                          }
-                          onRemoveLane={removeLane}
-                        />
+            <div className="kanban-scroll-container" ref={autoScrollRightRef}>
+              <div
+                className="kanban-lane-wrapper"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {lanes.map((lane, i) => (
+                  <Draggable key={lane.id} draggableId={lane.id} index={i}>
+                    {providedLane => (
+                      <div
+                        ref={providedLane.innerRef}
+                        {...providedLane.draggableProps}
+                        className="lane-wrapper"
+                      >
+                        <div {...providedLane.dragHandleProps} className="lane">
+                          <Lane
+                            lane={lane}
+                            onAddCard={addCard}
+                            onUpdateTitle={updateTitle}
+                            onUpdateCard={updateCard}
+                            onCardClick={(laneId, card) =>
+                              setSelected({ laneId, card })
+                            }
+                            onRemoveLane={removeLane}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-              <div className="lane add-lane" onClick={addLane}>
-                <button className="add-lane-button">+ Add Lane</button>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+                <div className="lane add-lane" onClick={addLane}>
+                  <button className="add-lane-button">+ Add Lane</button>
+                </div>
               </div>
             </div>
           )}

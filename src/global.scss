@@ -2378,6 +2378,23 @@ hr {
   margin: 0;
 }
 
+.kanban-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  height: calc(100vh - 150px);
+  padding: 16px;
+  scroll-behavior: smooth;
+}
+
+.kanban-lane-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  min-width: max-content;
+  align-items: flex-start;
+}
+
 /* Kanban board layout */
 .kanban-board {
   display: flex;
@@ -2390,15 +2407,15 @@ hr {
 }
 
 .lane {
-  background: #ffffff;
-  border-radius: 8px;
-  border-top: 6px solid var(--color-primary);
   min-width: 280px;
-  margin-right: 20px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  max-width: 280px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
+  height: 100%;
   position: relative;
 }
 .lane:not(:last-child)::after {
