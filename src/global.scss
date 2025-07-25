@@ -1009,13 +1009,13 @@ hr {
 }
 
 .kanban-board {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 1fr));
-  gap: var(--spacing-lg);
-  justify-items: stretch;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 24px;
+  height: calc(100vh - 80px);
+  overflow-x: auto;
+  background: linear-gradient(180deg, #e6ebf1 0%, #f9fafc 100%);
 }
 
 .kanban-lane {
@@ -2341,17 +2341,25 @@ hr {
 
 /* New Kanban board styles */
 .kanban-header {
-  padding: 24px;
+  padding: 24px 32px;
+  background: #f9fafc;
   border-bottom: 1px solid #ddd;
-  background: white;
   position: sticky;
   top: 0;
   z-index: 10;
+  backdrop-filter: blur(6px);
 }
 
-.kanban-header .description {
+.kanban-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.kanban-description {
   font-size: 14px;
   color: #666;
+  margin: 0;
 }
 
 /* Kanban board layout */
@@ -2364,27 +2372,40 @@ hr {
 }
 
 .lane {
-  background: white;
+  background: #fff;
+  border: 1px solid #e2e4e9;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-  margin: 0 8px;
-  width: 280px;
+  min-width: 280px;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+.lane::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #ccc;
 }
 
 .card {
-  border-radius: 6px;
-  background: #fff;
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  margin: 8px 12px;
   padding: 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .card:hover {
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
 .card-header {
@@ -2403,6 +2424,44 @@ hr {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.lane-header {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lane-title-input {
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+}
+
+.lane-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.add-lane-button {
+  background: #1d72f3;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin-left: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-lane-button:hover {
+  background: #145dcc;
 }
 
 .card-modal {
