@@ -2432,6 +2432,7 @@ hr {
   background: rgba(20, 20, 20, 0.8);
   backdrop-filter: blur(6px);
   box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+  pointer-events: none;
 }
 
 .node-toolbox-button {
@@ -2447,6 +2448,7 @@ hr {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.2s;
+  pointer-events: auto;
 }
 
 .node-toolbox-button:hover {

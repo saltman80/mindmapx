@@ -611,11 +611,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   transform: `translate(-50%, -100%) scale(${1 / transform.k})`,
                   transformOrigin: 'top left',
                   zIndex: 5,
+                  pointerEvents: 'none',
                 }}
-                onPointerDown={e => e.stopPropagation()}
               >
                 <div
                   className="node-toolbox-button"
+                  style={{ pointerEvents: 'auto' }}
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
@@ -628,6 +629,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </div>
                 <div
                   className="node-toolbox-button"
+                  style={{ pointerEvents: 'auto' }}
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
@@ -638,6 +640,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </div>
                 <div
                   className="node-toolbox-button"
+                  style={{ pointerEvents: 'auto' }}
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
@@ -648,6 +651,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </div>
                 <div
                   className="node-toolbox-button"
+                  style={{ pointerEvents: 'auto' }}
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
