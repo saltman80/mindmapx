@@ -10,6 +10,10 @@ import {
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData } from './mindmapTypes'
 
+const DOT_SPACING = 50
+const GRID_SIZE = 500
+const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
+
 interface MindmapCanvasProps {
   nodes?: NodeData[]
   edges?: EdgeData[]
@@ -80,9 +84,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     initialTransform: { x: number; y: number; k: number }
   } | null>(null)
 
-  const DOT_SPACING = 50
-  const GRID_SIZE = 500
-  const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 
     const pan = useCallback((dx: number, dy: number) => {
       console.log('[MindmapCanvas] pan', dx, dy)
