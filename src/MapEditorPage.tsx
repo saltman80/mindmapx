@@ -144,7 +144,7 @@ export default function MapEditorPage(): JSX.Element {
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
   const handleSaveLayout = useCallback(() => {
-    if (!Array.isArray(safeNodes)) return
+    if (!Array.isArray(safeNodes) || !mindmap?.id) return
     safeNodes.forEach(n => {
       fetch(`/.netlify/functions/nodes/${n.id}`, {
         method: 'PATCH',
@@ -153,7 +153,13 @@ export default function MapEditorPage(): JSX.Element {
         body: JSON.stringify({ x: n.x, y: n.y })
       }).catch(() => {})
     })
-  }, [safeNodes])
+    fetch(`/.netlify/functions/update/mindmap/${mindmap.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: { ...(mindmap.config || {}), transform } })
+    }).catch(() => {})
+  }, [safeNodes, mindmap, transform])
 
   const edges: EdgeData[] = Array.isArray(safeNodes)
     ? safeNodes
@@ -209,16 +215,8 @@ export default function MapEditorPage(): JSX.Element {
       setMindmap(prev =>
         prev ? { ...prev, config: { ...(prev.config || {}), transform: t } } : prev
       )
-      if (mindmap?.id) {
-        fetch(`/.netlify/functions/update/mindmap/${mindmap.id}`, {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ config: { ...(mindmap.config || {}), transform: t } })
-        }).catch(() => {})
-      }
     },
-    [mindmap]
+    []
   )
 
   if (error) return <div>Error loading map.</div>
