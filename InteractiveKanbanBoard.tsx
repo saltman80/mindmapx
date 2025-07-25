@@ -11,15 +11,25 @@ interface Lane {
   cards: Card[]
 }
 
-export default function InteractiveKanbanBoard() {
+interface Props {
+  title?: string
+  description?: string
+}
+
+export default function InteractiveKanbanBoard({
+  title,
+  description,
+}: Props) {
   const [lanes, setLanes] = useState<Lane[]>([
     { id: 'lane-1', title: 'New', cards: [] },
     { id: 'lane-2', title: 'In-Progress', cards: [] },
     { id: 'lane-3', title: 'Reviewing', cards: [] },
-    { id: 'lane-4', title: 'Done', cards: [] }
+    { id: 'lane-4', title: 'Done', cards: [] },
   ])
-  const [boardTitle] = useState('Kanban Board')
-  const [boardDescription] = useState('Organize tasks across lanes')
+  const [boardTitle] = useState(title || 'Kanban Board')
+  const [boardDescription] = useState(
+    description || 'Organize tasks across lanes'
+  )
 
   const addLane = () => {
     const id = `lane-${Date.now()}`
