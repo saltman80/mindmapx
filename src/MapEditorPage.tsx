@@ -241,6 +241,7 @@ export default function MapEditorPage(): JSX.Element {
             initialTransform={transform}
             onTransformChange={handleTransformChange}
             showMiniMap
+            mindmapId={mindmap.id}
           />
           {safeNodes.length === 0 && null}
           {nodesError && (

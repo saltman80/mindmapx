@@ -67,20 +67,24 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
-      const id = payload as any && (payload as any).id ? (payload as any).id : crypto.randomUUID()
-      await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      const result = await client.query(
+        `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id`,
         [
-          id,
           payload.mindmapId,
-          payload.parentId ?? null,
           payload.x,
           payload.y,
           payload.label ?? null,
           payload.description ?? null,
+          payload.parentId ?? null,
         ]
       )
-      return { statusCode: 201, headers, body: JSON.stringify({ id }) }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ id: result.rows[0].id })
+      }
     }
 
     if (event.httpMethod === 'PUT' || event.httpMethod === 'PATCH') {
