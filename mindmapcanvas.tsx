@@ -437,7 +437,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       if (e.touches.length < 2) {
         pinchRef.current = null
       }
-    }, [])
+      if (dragNodeIdRef.current && modeRef.current === 'node') {
+        const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
+        if (node && onMoveNode) onMoveNode(node)
+      }
+      dragNodeIdRef.current = null
+      nodeOriginRef.current = null
+    }, [Array.isArray(nodes) ? nodes : [], onMoveNode])
 
 
     const containerWidth =
