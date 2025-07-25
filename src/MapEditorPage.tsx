@@ -39,6 +39,7 @@ interface Mindmap {
 export default function MapEditorPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
   const [mindmap, setMindmap] = useState<Mindmap | null>(null)
+  const [error, setError] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
   const [nodesError, setNodesError] = useState<string | null>(null)
   const [loadingMap, setLoadingMap] = useState(true)
@@ -60,25 +61,31 @@ export default function MapEditorPage(): JSX.Element {
       .then(async res => {
         console.log('[MapEditorPage] map fetch status:', res.status)
         if (!res.ok) {
-          if (!ignore) setMapError(`Failed to load map: ${res.status}`)
-          return null
+          if (!ignore) {
+            setError(true)
+            setMapError(`Failed to load map: ${res.status}`)
+          }
+          return
         }
         const json = await res.json().catch(err => {
           console.error('[MapEditorPage] invalid JSON for map', err)
           return null
         })
-        if (!json) return null
-        const mapData = json.map || json
-        if (typeof mapData === 'object' && mapData !== null) {
-          console.log('[MapEditorPage] mindmap response:', mapData)
-          if (!ignore) setMindmap(mapData as Mindmap)
-        } else if (!ignore) {
-          setMapError('Invalid map data')
+        if (!ignore) {
+          const mapData = json?.map || json
+          if (mapData && typeof mapData === 'object') {
+            setMindmap(mapData as Mindmap)
+          } else {
+            setMindmap({ id: id!, title: 'Untitled Map' })
+          }
         }
       })
       .catch(err => {
         console.error('[MapEditorPage] map fetch error:', err)
-        if (!ignore) setMapError('Network error while loading map')
+        if (!ignore) {
+          setError(true)
+          setMapError('Network error while loading map')
+        }
       })
       .finally(() => {
         if (!ignore) setLoadingMap(false)
@@ -102,6 +109,7 @@ export default function MapEditorPage(): JSX.Element {
       .then(async res => {
         console.log('[MapEditorPage] nodes fetch status:', res.status)
         if (!res.ok) {
+          setError(true)
           setNodesError(`Failed to load nodes: ${res.status}`)
           setNodes([])
           return
@@ -120,12 +128,15 @@ export default function MapEditorPage(): JSX.Element {
       })
       .catch(err => {
         console.error('[nodes] fetch error:', err)
+        setError(true)
         setNodes([])
         setNodesError('Network error while loading nodes')
       })
       .finally(() => setLoadingNodes(false))
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+    }
   }, [id, reloadFlag])
 
   useEffect(() => {
@@ -148,24 +159,15 @@ export default function MapEditorPage(): JSX.Element {
     })
   }, [safeNodes])
 
-  if (loadingMap || loadingNodes) {
-    return <div>Loading mind map...</div>
-  }
-
-  if (mapError)
-    return (
-      <div>
-        <div>Error loading map: {mapError}</div>
-        <button onClick={handleReload}>Retry</button>
-      </div>
-    )
-  if (!mindmap) return <div>Map not found.</div>
-  if (!mindmap?.id) return <div>Invalid map.</div>
+  if (error) return <div>Error loading map.</div>
+  if (!loaded) return <div>Loading mind map...</div>
+  if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
 
   const edges: EdgeData[] = safeNodes
     .filter(n => n.parentId)
     .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
+    .filter(edge => edge.from && edge.to)
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
@@ -224,32 +226,37 @@ export default function MapEditorPage(): JSX.Element {
     }).catch(() => {})
   }
 
-  return (
-    <div className="dashboard-layout">
-      <main className="main-area">
-        <button
-          onClick={handleSaveLayout}
-          style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
-        >
-          Save Layout
-        </button>
-        <MindmapCanvas
-          nodes={Array.isArray(nodes) ? nodes : []}
-          edges={Array.isArray(edges) ? edges : []}
-          onAddNode={handleAddNode}
-          onMoveNode={handleMoveNode}
-          showMiniMap
-        />
-        {nodesError && (
-          <div className="error">
-            {nodesError}{' '}
-            <button onClick={handleReload}>Retry</button>
-          </div>
-        )}
-        {loaded && nodes.length === 0 && showFirstNodeModal && (
-          <FirstNodeModal onCreate={handleCreateFirstNode} />
-        )}
-      </main>
-    </div>
-  )
+  try {
+    return (
+      <div className="dashboard-layout">
+        <main className="main-area">
+          <button
+            onClick={handleSaveLayout}
+            style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
+          >
+            Save Layout
+          </button>
+          <MindmapCanvas
+            nodes={Array.isArray(nodes) ? nodes : []}
+            edges={Array.isArray(edges) ? edges : []}
+            onAddNode={handleAddNode}
+            onMoveNode={handleMoveNode}
+            showMiniMap
+          />
+          {nodesError && (
+            <div className="error">
+              {nodesError}{' '}
+              <button onClick={handleReload}>Retry</button>
+            </div>
+          )}
+          {loaded && nodes.length === 0 && showFirstNodeModal && (
+            <FirstNodeModal onCreate={handleCreateFirstNode} />
+          )}
+        </main>
+      </div>
+    )
+  } catch (err) {
+    console.error('Error rendering MapEditorPage:', err)
+    return <div>Error rendering mind map. Please refresh the page.</div>
+  }
 }
