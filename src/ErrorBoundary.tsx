@@ -20,9 +20,9 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
     console.error('Caught in ErrorBoundary:', error)
-    this.setState({ hasError: true, error })
+    this.setState({ hasError: true })
   }
 
   reset() {
@@ -33,10 +33,7 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div role="alert" style={{ padding: '1rem', textAlign: 'center' }}>
-          <p>Oops! Something went wrong loading the mind map. Please try again.</p>
-          <button onClick={this.reset} style={{ marginTop: '1rem' }}>
-            Try again
-          </button>
+          Oops! Something went wrong loading the mind map. Please try again.
         </div>
       )
     }
