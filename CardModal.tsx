@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
 import Modal from './modal'
-import { v4 as uuid } from 'uuid'
 
 export interface Comment {
   id: string
@@ -34,7 +33,6 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
   const [title, setTitle] = useState(card?.title || '')
   const [description, setDescription] = useState(card?.description || '')
   const [comments, setComments] = useState<Comment[]>(card?.comments || [])
-  const [newComment, setNewComment] = useState('')
   const [dueDate, setDueDate] = useState(card?.dueDate || '')
   const [priority, setPriority] = useState<Card['priority']>(card?.priority || 'low')
   const [status, setStatus] = useState<Card['status']>(card?.status || 'open')
@@ -76,17 +74,6 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
       .catch(() => {})
   }, [])
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return
-    const comment: Comment = {
-      id: uuid(),
-      text: newComment,
-      createdAt: new Date().toISOString(),
-      author: currentUser?.name || 'Anon'
-    }
-    setComments(prev => [...prev, comment])
-    setNewComment('')
-  }
 
   const sortedComments = useMemo(
     () => [...comments].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
@@ -223,24 +210,12 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
               ))}
             </div>
 
-            <label>
-              Comment
-              <textarea
-                value={newComment}
-                onChange={e => setNewComment(e.target.value)}
-                className="textarea-styled"
-              />
-            </label>
-
-              <div className="card-actions">
-                <button onClick={handleAddComment} className="btn-post">
-                  Post
-                </button>
-                <button onClick={onClose} className="btn-cancel">Cancel</button>
-                <button onClick={save} className="btn-save" disabled={!isDirty}>
-                  Save
-                </button>
-              </div>
+            <div className="card-actions">
+              <button onClick={onClose} className="btn-cancel">Cancel</button>
+              <button onClick={save} className="btn-save" disabled={!isDirty}>
+                Save
+              </button>
+            </div>
           </section>
         </div>
       )}

@@ -3035,3 +3035,54 @@ hr {
   color: var(--color-text-muted);
   margin-bottom: 0.25rem;
 }
+
+/* Comment modal styles */
+.comment-modal {
+  background: #fff;
+  width: 600px;
+  max-width: 90%;
+  height: 75vh;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.comment-list {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
+}
+
+.comment-list .comment:nth-child(even) {
+  background-color: #f8f8f8;
+}
+
+.comment-list .comment:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.comment {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.comment-modal .btn-primary {
+  background: #ff6a00;
+  border: none;
+  padding: 8px 16px;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.comment-modal .btn-secondary {
+  background: #e0e0e0;
+  border: none;
+  padding: 8px 16px;
+  margin-right: 8px;
+  border-radius: 6px;
+}
