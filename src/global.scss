@@ -2416,8 +2416,13 @@ hr {
   overflow-y: hidden;
   width: 100%;
   height: calc(100vh - 100px);
-  padding: 0;
+  padding: 0 1rem;
   scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.kanban-scroll-container::-webkit-scrollbar {
+  display: none;
 }
 
 .kanban-lane-wrapper {
@@ -2426,6 +2431,12 @@ hr {
   gap: 16px;
   min-width: max-content;
   align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.lane-wrapper {
+  min-width: 250px;
+  max-width: 250px;
+  margin-right: 1rem;
 }
 
 /* Kanban board layout */
@@ -2440,8 +2451,8 @@ hr {
 }
 
 .lane {
-  min-width: 280px;
-  max-width: 280px;
+  min-width: 250px;
+  max-width: 250px;
   flex-shrink: 0;
   background: #ffffff;
   border-radius: 6px;
@@ -2456,6 +2467,15 @@ hr {
   width: 100%;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
+}
+.done-bar {
+  background-color: #3b82f6;
+}
+.in-progress-bar {
+  background-color: #10b981;
+}
+.other-bar {
+  background-color: #f59e0b;
 }
 .lane:not(:last-child)::after {
   content: '';

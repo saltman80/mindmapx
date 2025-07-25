@@ -195,6 +195,7 @@ export default function InteractiveKanbanBoard({
                         ref={providedLane.innerRef}
                         {...providedLane.draggableProps}
                         className="lane-wrapper"
+                        style={{ minWidth: '250px', maxWidth: '250px' }}
                       >
                         <div {...providedLane.dragHandleProps} className="lane">
                           <Lane
@@ -285,7 +286,15 @@ function Lane({
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
-          <div className="lane-header-bar" style={{ backgroundColor: columnColor(index) }} />
+          <div
+            className={`lane-header-bar ${
+              lane.title === 'Done'
+                ? 'done-bar'
+                : lane.title === 'In-Progress'
+                ? 'in-progress-bar'
+                : 'other-bar'
+            }`}
+          />
           <div className="lane-header">
             {lane.title.toLowerCase() === 'done' ? (
               <h3 className="lane-title">{lane.title}</h3>
