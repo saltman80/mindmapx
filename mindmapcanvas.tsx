@@ -30,7 +30,6 @@ interface MindmapCanvasProps {
 
 interface MindmapCanvasHandle {
   pan: (dx: number, dy: number) => void
-  zoom: (scale: number, cx?: number, cy?: number) => void
   addNode: (node: NodeData) => void
   updateNode: (node: NodeData) => void
   removeNode: (nodeId: string) => void
@@ -92,11 +91,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const modeRef = useRef<'canvas' | null>(null)
   const dragStartRef = useRef({ x: 0, y: 0 })
   const originRef = useRef({ x: 0, y: 0 })
-  const pinchRef = useRef<{
-    initialDistance: number
-    initialCenter: { x: number; y: number }
-    initialTransform: { x: number; y: number; k: number }
-  } | null>(null)
 
   const handleNodeClick = useCallback((id: string) => {
     setSelectedId(prev => (prev === id ? null : id))
@@ -108,18 +102,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setTransform(prev => ({ x: prev.x + dx, y: prev.y + dy, k: prev.k }))
     }, [])
 
-    const zoom = useCallback(
-      (scale: number, centerX = 0, centerY = 0) => {
-        console.log('[MindmapCanvas] zoom', scale, centerX, centerY)
-        setTransform(prev => {
-          const newK = prev.k * scale
-          const x = (prev.x - centerX) * scale + centerX
-          const y = (prev.y - centerY) * scale + centerY
-          return { x, y, k: newK }
-        })
-      },
-      []
-    )
 
     const addNode = useCallback((node: NodeData) => {
       console.log('[MindmapCanvas] addNode', node)
@@ -269,8 +251,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     useImperativeHandle(
       ref,
-      () => ({ pan, zoom, addNode, updateNode, removeNode }),
-      [pan, zoom, addNode, updateNode, removeNode]
+      () => ({ pan, addNode, updateNode, removeNode }),
+      [pan, addNode, updateNode, removeNode]
     )
 
     const nodeMap = useMemo(() => {
@@ -321,21 +303,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     )
 
 
-    const handleWheel = useCallback(
-      (e: React.WheelEvent<SVGSVGElement>) => {
-        console.log('[MindmapCanvas] handleWheel', e.deltaY)
-        e.preventDefault()
-        if (!svgRef.current) return
-        const rect = svgRef.current.getBoundingClientRect()
-        const cx = e.clientX - rect.left
-        const cy = e.clientY - rect.top
-        const scale = e.deltaY < 0 ? 1.1 : 0.9
-        zoom(scale, cx, cy)
-      },
-      [zoom]
-    )
+    const handleWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
+      console.log('[MindmapCanvas] handleWheel', e.deltaY)
+      // Prevent page scrolling when the user scrolls over the canvas
+      e.preventDefault()
+    }, [])
 
-    // touch handlers kept for pinch-zoom support
+    // touch handlers for panning only
 
     const handleTouchStart = useCallback(
       (e: React.TouchEvent<SVGSVGElement>) => {
@@ -349,25 +323,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             y: e.touches[0].clientY,
           }
           originRef.current = { x: transform.x, y: transform.y }
-        } else if (e.touches.length === 2) {
-          e.preventDefault()
-          const rect = svgRef.current.getBoundingClientRect()
-          const t1 = e.touches[0]
-          const t2 = e.touches[1]
-          const x1 = t1.clientX - rect.left
-          const y1 = t1.clientY - rect.top
-          const x2 = t2.clientX - rect.left
-          const y2 = t2.clientY - rect.top
-          const dx = x2 - x1
-          const dy = y2 - y1
-          const initialDistance = Math.hypot(dx, dy)
-          const centerX = (x1 + x2) / 2
-          const centerY = (y1 + y2) / 2
-          pinchRef.current = {
-            initialDistance,
-            initialCenter: { x: centerX, y: centerY },
-            initialTransform: { ...transform }
-          }
         }
       },
       [transform]
@@ -383,27 +338,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           const dx = touch.clientX - dragStartRef.current.x
           const dy = touch.clientY - dragStartRef.current.y
           setTransform({ x: originRef.current.x + dx, y: originRef.current.y + dy, k: transform.k })
-        } else if (e.touches.length === 2 && pinchRef.current) {
-          e.preventDefault()
-          const rect = svgRef.current.getBoundingClientRect()
-          const t1 = e.touches[0]
-          const t2 = e.touches[1]
-          const x1 = t1.clientX - rect.left
-          const y1 = t1.clientY - rect.top
-          const x2 = t2.clientX - rect.left
-          const y2 = t2.clientY - rect.top
-          const dx = x2 - x1
-          const dy = y2 - y1
-          const distance = Math.hypot(dx, dy)
-          const { initialDistance, initialCenter, initialTransform } = pinchRef.current
-          const scaleFactor = distance / initialDistance
-          const cx = initialCenter.x
-          const cy = initialCenter.y
-          const { x: ix, y: iy, k: ik } = initialTransform
-          const newK = ik * scaleFactor
-          const newX = (ix - cx) * scaleFactor + cx
-          const newY = (iy - cy) * scaleFactor + cy
-          setTransform({ x: newX, y: newY, k: newK })
         }
       },
       [transform.k]
@@ -414,9 +348,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       if (e.touches.length < 1) {
         modeRef.current = null
       }
-      if (e.touches.length < 2) {
-        pinchRef.current = null
-      }
+      // ignore multi-touch end events
     }, [])
 
 
@@ -439,7 +371,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         style={{
           width: containerWidth,
           height: containerHeight,
-          overflow: 'auto',
+          overflow: 'hidden',
           touchAction: 'none',
           position: 'relative',
           cursor:
