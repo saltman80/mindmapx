@@ -103,15 +103,22 @@ export default function MapEditorPage(): JSX.Element {
     if (nodes.length === 0) setShowFirstNodeModal(true)
   }, [nodes])
 
-
-  if (error) return <div>Error loading map. Failed to load map: 404</div>
-  if (!mindmap) return <div>Loading mind map...</div>
-  // Validate shape of loaded mindmap
-  if (!mindmap?.id) {
-    return <div>Error: This map is missing or invalid.</div>
-  }
-
   const safeNodes = Array.isArray(nodes) ? nodes : []
+
+  const handleSaveLayout = useCallback(() => {
+    safeNodes.forEach(n => {
+      fetch(`/.netlify/functions/nodes/${n.id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ x: n.x, y: n.y })
+      }).catch(() => {})
+    })
+  }, [safeNodes])
+
+  if (error) return <div>Error loading map.</div>
+  if (!mindmap) return <div>Loading...</div>
+  if (!mindmap?.id) return <div>Invalid map.</div>
 
 
   const edges: EdgeData[] = safeNodes
@@ -172,17 +179,6 @@ export default function MapEditorPage(): JSX.Element {
       body: JSON.stringify({ x: node.x, y: node.y })
     }).catch(() => {})
   }
-
-  const handleSaveLayout = useCallback(() => {
-    safeNodes.forEach(n => {
-      fetch(`/.netlify/functions/nodes/${n.id}`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x: n.x, y: n.y })
-      }).catch(() => {})
-    })
-  }, [safeNodes])
 
   return (
     <div className="dashboard-layout">
