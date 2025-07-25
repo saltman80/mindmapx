@@ -5,7 +5,7 @@ interface Props {
 }
 
 export default function KanbanCanvas({ boardData }: Props) {
-  const title = boardData?.title
-  const description = boardData?.description
+  const { title, description } =
+    boardData || { title: 'Kanban Board', description: '' }
   return <InteractiveKanbanBoard title={title} description={description} />
 }
