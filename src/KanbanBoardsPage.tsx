@@ -134,7 +134,7 @@ export default function KanbanBoardsPage(): JSX.Element {
       ) : (
         <> 
           <div className="four-col-grid">
-            <div className="tile create-tile">
+            <div className="dashboard-tile create-tile">
               <header className="tile-header"><h2>Create Board</h2></header>
               <section className="tile-body">
                 <p className="create-help">Click Create to Start</p>
@@ -143,7 +143,7 @@ export default function KanbanBoardsPage(): JSX.Element {
                 </button>
               </section>
             </div>
-              <div className="tile">
+              <div className="metric-tile">
                 <header className="tile-header"><h2>Metrics</h2></header>
                 <section className="tile-body">
                   <p>Total: {boards.length}</p>
@@ -160,7 +160,7 @@ export default function KanbanBoardsPage(): JSX.Element {
                 </section>
               </div>
             {sorted.map(b => (
-              <div className="tile" key={b.id}>
+              <div className="dashboard-tile open-tile" key={b.id}>
                 <header className="tile-header">
                   <h2>{b.title || 'Board'}</h2>
                   <div className="tile-actions">
@@ -194,7 +194,7 @@ export default function KanbanBoardsPage(): JSX.Element {
               </div>
             ))}
             {Array.from({ length: 10 }).map((_v, i) => (
-              <div className="tile ghost-tile" key={`ghost-${i}`}></div>
+              <div className="dashboard-tile ghost-tile" key={`ghost-${i}`}></div>
             ))}
           </div>
         </>

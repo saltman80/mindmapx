@@ -1927,6 +1927,12 @@ hr {
   opacity: 0.5;
 }
 
+/* tiles that contain an open button */
+.open-tile {
+  border: 1px dashed #fbd8a8;
+  background: linear-gradient(135deg, #f8f8f8, #fff8ec);
+}
+
 .tile-header-center {
   text-align: center;
   margin-bottom: 1rem;
