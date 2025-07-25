@@ -147,6 +147,13 @@ export default function InteractiveKanbanBoard({
       )
     )
   }
+  const removeCard = (laneId: string, cardId: string) => {
+    setLanes(prev =>
+      prev.map(l =>
+        l.id === laneId ? { ...l, cards: l.cards.filter(c => c.id !== cardId) } : l
+      )
+    )
+  }
 
   useEffect(() => {
     if (autoScrollRightRef.current) {
@@ -236,6 +243,9 @@ export default function InteractiveKanbanBoard({
         onClose={() => setEditing(null)}
         onSave={card => {
           if (editing) updateCard(editing.laneId, card)
+        }}
+        onDelete={card => {
+          if (editing) removeCard(editing.laneId, card.id)
         }}
       />
       <CommentsModal

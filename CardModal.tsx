@@ -26,13 +26,19 @@ interface Props {
   card: Card | null
   onClose: () => void
   onSave: (card: Card) => void
+  onDelete: (card: Card) => void
   currentUser?: { name: string }
 }
 
-export default function CardModal({ card, onClose, onSave, currentUser }: Props) {
+export default function CardModal({
+  card,
+  onClose,
+  onSave,
+  onDelete,
+  currentUser,
+}: Props) {
   const [title, setTitle] = useState(card?.title || '')
   const [description, setDescription] = useState(card?.description || '')
-  const [comments, setComments] = useState<Comment[]>(card?.comments || [])
   const [dueDate, setDueDate] = useState(card?.dueDate || '')
   const [priority, setPriority] = useState<Card['priority']>(card?.priority || 'low')
   const [status, setStatus] = useState<Card['status']>(card?.status || 'open')
@@ -41,23 +47,20 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
 
   const isDirty = useMemo(() => {
     if (!card) return false
-    const baseComments = card.comments || []
     return (
       title !== card.title ||
       description !== (card.description || '') ||
       dueDate !== (card.dueDate || '') ||
       priority !== (card.priority || 'low') ||
       status !== (card.status || 'open') ||
-      assignee !== (card.assignee || '') ||
-      JSON.stringify(comments) !== JSON.stringify(baseComments)
+      assignee !== (card.assignee || '')
     )
-  }, [card, title, description, dueDate, priority, status, assignee, comments])
+  }, [card, title, description, dueDate, priority, status, assignee])
 
   useEffect(() => {
     if (card) {
       setTitle(card.title)
       setDescription(card.description || '')
-      setComments(card.comments || [])
       setDueDate(card.dueDate || '')
       setPriority(card.priority || 'low')
       setStatus(card.status || 'open')
@@ -75,10 +78,6 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
   }, [])
 
 
-  const sortedComments = useMemo(
-    () => [...comments].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
-    [comments]
-  )
 
   const save = () => {
     if (!card) return
@@ -86,7 +85,6 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
       ...card,
       title,
       description,
-      comments,
       dueDate,
       priority,
       status,
@@ -94,6 +92,14 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
     })
     alert('Card saved successfully.')
     onClose()
+  }
+
+  const handleDelete = () => {
+    if (!card) return
+    if (window.confirm('Delete this card?')) {
+      onDelete(card)
+      onClose()
+    }
   }
 
   return (
@@ -198,25 +204,14 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
             </section>
           )}
 
-          <section className="modal-section">
-            <h3 className="section-title">Comments</h3>
-            <div>
-              {sortedComments.map(c => (
-                <div key={c.id} className="comment">
-                  <strong>{c.author}</strong>
-                  <p>{c.text}</p>
-                  <span>{new Date(c.createdAt).toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="card-actions">
-              <button onClick={onClose} className="btn-cancel">Cancel</button>
-              <button onClick={save} className="btn-save" disabled={!isDirty}>
-                Save
-              </button>
-            </div>
-          </section>
+          <div className="card-actions">
+            <button className="btn-danger" onClick={handleDelete}>🗑️ Delete</button>
+            <div style={{ flexGrow: 1 }} />
+            <button onClick={onClose} className="btn-cancel">Cancel</button>
+            <button onClick={save} className="btn-save" disabled={!isDirty}>
+              Save
+            </button>
+          </div>
         </div>
       )}
     </Modal>
