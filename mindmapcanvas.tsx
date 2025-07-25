@@ -26,6 +26,7 @@ interface MindmapCanvasProps {
   initialTransform?: { x: number; y: number; k: number }
   onTransformChange?: (t: { x: number; y: number; k: number }) => void
   showMiniMap?: boolean
+  mindmapId: string
 }
 
 interface MindmapCanvasHandle {
@@ -47,6 +48,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       initialTransform = { x: 0, y: 0, k: 1 },
       onTransformChange,
       showMiniMap = false,
+      mindmapId,
     },
     ref
   ) => {
@@ -124,33 +126,44 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       }
     }, [])
 
-    const handleSaveNew = useCallback(() => {
-      console.log('[MindmapCanvas] handleSaveNew')
+    const handleSaveNewNode = () => {
       if (!containerRef.current) return
+
       const rect = containerRef.current.getBoundingClientRect()
       const x = CANVAS_SIZE / 2
       const y = CANVAS_SIZE / 2
       const tx = rect.width / 2 - x
       const ty = rect.height / 2 - y
+
       setTransform({ x: tx, y: ty, k: 1 })
-      const id = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : Math.random().toString(36).slice(2)
-      const node: NodeData = {
-        id,
+
+      const node = {
         x,
         y,
-        label: newName || 'Root Node',
-        description: newDesc || undefined,
+        label: newName || 'New Node',
+        description: newDesc || '',
         parentId: null,
-        todoId: null,
+        mindmapId: mindmapId,
       }
-      addNode(node)
-      onAddNode && onAddNode(node)
-      setShowCreate(false)
-      setNewName('')
-      setNewDesc('')
-    }, [addNode, onAddNode, newName, newDesc])
+
+      fetch('/.netlify/functions/nodes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(node),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (!data?.id) throw new Error('Node insert failed')
+          setNodes(prev => [...prev, { ...node, id: data.id }])
+          setNewName('')
+          setNewDesc('')
+          setShowCreate(false)
+        })
+        .catch(err => {
+          console.error('[Save New Node] Failed to save node:', err)
+        })
+    }
 
     const handleAddChild = useCallback(() => {
       console.log('[MindmapCanvas] handleAddChild')
@@ -563,7 +576,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   value={newDesc}
                   onChange={e => setNewDesc(e.target.value)}
                 />
-                <button className="btn-primary" onClick={handleSaveNew}>
+                <button className="btn-primary" onClick={handleSaveNewNode}>
                   Save
                 </button>
               </div>

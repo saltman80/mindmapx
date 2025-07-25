@@ -20,7 +20,13 @@ export default function ProjectWorkspace() {
         <button onClick={() => setTab('kanban')}>Kanban</button>
       </div>
       {tab === 'mindmap' && (
-        <MindmapCanvas nodes={initialNodes} edges={initialEdges} width={600} height={400} />
+        <MindmapCanvas
+          nodes={initialNodes}
+          edges={initialEdges}
+          width={600}
+          height={400}
+          mindmapId="demo"
+        />
       )}
       {tab === 'todo' && <TodoCanvas />}
       {tab === 'kanban' && <KanbanCanvas />}
