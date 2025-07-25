@@ -143,21 +143,21 @@ export default function KanbanBoardsPage(): JSX.Element {
                 </button>
               </section>
             </div>
-              <div className="metric-tile">
-                <header className="tile-header"><h2>Metrics</h2></header>
-                <section className="tile-body">
-                  <p>Total: {boards.length}</p>
-                  <div className="metric-detail-grid">
-                    <div className="metric-detail">
-                      <span className="label">Today</span>
-                      <span className="value">{boardDay}</span>
-                    </div>
-                    <div className="metric-detail">
-                      <span className="label">Week</span>
-                      <span className="value">{boardWeek}</span>
-                    </div>
+              <div className="metric-tile simple">
+                <div className="metric-header stacked">
+                  <h3>Metrics</h3>
+                  <div className="metric-circle">{boards.length}</div>
+                </div>
+                <div className="metric-detail-grid">
+                  <div className="metric-detail">
+                    <span className="label">Today</span>
+                    <span className="value">{boardDay}</span>
                   </div>
-                </section>
+                  <div className="metric-detail">
+                    <span className="label">Week</span>
+                    <span className="value">{boardWeek}</span>
+                  </div>
+                </div>
               </div>
             {sorted.map(b => (
               <div className="dashboard-tile open-tile" key={b.id}>

@@ -149,21 +149,21 @@ export default function MindmapsPage(): JSX.Element {
               </button>
             </section>
           </div>
-          <div className="metric-tile">
-            <header className="tile-header"><h2>Metrics</h2></header>
-            <section className="tile-body">
-              <p>Total: {maps.length}</p>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{mapDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{mapWeek}</span>
-                </div>
+          <div className="metric-tile simple">
+            <div className="metric-header stacked">
+              <h3>Metrics</h3>
+              <div className="metric-circle">{maps.length}</div>
+            </div>
+            <div className="metric-detail-grid">
+              <div className="metric-detail">
+                <span className="label">Today</span>
+                <span className="value">{mapDay}</span>
               </div>
-            </section>
+              <div className="metric-detail">
+                <span className="label">Week</span>
+                <span className="value">{mapWeek}</span>
+              </div>
+            </div>
           </div>
 
           {sorted.length === 0 ? (
