@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas from './MindmapCanvas'
 import type { NodeData, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
-import FirstNodeModal from '../components/FirstNodeModal'
 import LoadingSpinner from '../loadingspinner'
 
 interface Mindmap {
@@ -245,24 +244,7 @@ export default function MapEditorPage(): JSX.Element {
             onTransformChange={handleTransformChange}
             showMiniMap
           />
-          {safeNodes.length === 0 && (
-            <FirstNodeModal
-              onCreate={label => {
-                const node: NodeData = {
-                  id:
-                    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-                      ? crypto.randomUUID()
-                      : Math.random().toString(36).slice(2),
-                  x: 100,
-                  y: 100,
-                  label,
-                  parentId: null,
-                  todoId: null,
-                }
-                handleAddNode(node)
-              }}
-            />
-          )}
+          {safeNodes.length === 0 && null}
           {nodesError && (
             <div className="error">
               {nodesError}{' '}
