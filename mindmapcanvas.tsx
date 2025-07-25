@@ -73,6 +73,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
   const [newTask, setNewTask] = useState('')
   const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
   const modeRef = useRef<'canvas' | 'node' | null>(null)
     const dragStartRef = useRef({ x: 0, y: 0 })
     const originRef = useRef({ x: 0, y: 0 })
@@ -520,6 +521,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   e.stopPropagation()
                   setSelectedId(node.id)
                 }}
+                onMouseEnter={() => setHoveredId(node.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onTouchStart={() => setSelectedId(node.id)}
               >
                 <circle
                   r={20 / transform.k}
@@ -546,7 +550,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   ✓
                 </text>
               ) : null}
-              {selectedId === node.id && (
+              {(selectedId === node.id || hoveredId === node.id) && (
                 <g
                   className="hover-panel"
                   transform={`translate(${20 / transform.k},${-20 / transform.k})`}
