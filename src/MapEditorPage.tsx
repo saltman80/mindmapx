@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas from './MindmapCanvas'
 import type { NodeData, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
-import FirstNodeModal from '../components/FirstNodeModal'
 
 interface Mindmap {
   id: string
@@ -24,7 +23,6 @@ export default function MapEditorPage(): JSX.Element {
   const [loadingNodes, setLoadingNodes] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(0)
   const [nodes, setNodes] = useState<NodeData[]>([])
-  const [showFirstNodeModal, setShowFirstNodeModal] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   const handleReload = useCallback(() => setReloadFlag(p => p + 1), [])
@@ -120,9 +118,8 @@ export default function MapEditorPage(): JSX.Element {
   useEffect(() => {
     if (!loadingMap && !loadingNodes) {
       setLoaded(true)
-      if (nodes.length === 0) setShowFirstNodeModal(true)
     }
-  }, [loadingMap, loadingNodes, nodes])
+  }, [loadingMap, loadingNodes])
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
@@ -167,32 +164,6 @@ export default function MapEditorPage(): JSX.Element {
       })
   }
 
-  const handleCreateFirstNode = (label: string) => {
-    if (!id) return
-    const newNode = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      label,
-      parentId: null,
-    }
-    fetch('/.netlify/functions/nodes', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...newNode, mindmapId: id })
-    })
-      .then(async res => {
-        if (!res.ok) {
-          throw new Error(`Failed to create node: ${res.status}`)
-        }
-        const data = await res.json()
-        setNodes(prev => [...prev, { ...newNode, id: data.id } as NodeData])
-        setShowFirstNodeModal(false)
-      })
-      .catch(err => {
-        console.error('[CreateFirstNode] Failed to create node', err)
-      })
-  }
 
 
   if (safeNodes.length === 0 && edges.length === 0) {
@@ -234,9 +205,6 @@ export default function MapEditorPage(): JSX.Element {
               {nodesError}{' '}
               <button onClick={handleReload}>Retry</button>
             </div>
-          )}
-          {loaded && nodes.length === 0 && showFirstNodeModal && (
-            <FirstNodeModal onCreate={handleCreateFirstNode} />
           )}
         </main>
       </div>
