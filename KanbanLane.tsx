@@ -1,15 +1,24 @@
-import KanbanCard from './KanbanCard'
+export interface Card {
+  title: string
+  description?: string
+  priority?: 'low' | 'medium' | 'high'
+}
 
-export default function KanbanLane({ title, cards = [] }: { title: string; cards?: string[] }) {
+export default function KanbanLane({ title, cards = [] }: { title: string; cards?: Card[] }) {
   return (
-    <div className="kanban-lane">
+    <div className="lane">
       <h3 className="lane-title">{title}</h3>
-      {cards.length === 0 ? (
-        <KanbanCard title="(Empty)" />
-      ) : (
-        cards.map((card, i) => <KanbanCard key={i} title={card} />)
-      )}
-      <button className="btn-secondary">Add Card</button>
+      {cards.map((card, i) => (
+        <div className="card" key={i}>
+          <div className="card-header">
+            {card.priority && (
+              <span className={`priority ${card.priority}`}>{card.priority.toUpperCase()}</span>
+            )}
+          </div>
+          <h4 className="card-title">{card.title}</h4>
+          {card.description && <p className="card-description">{card.description}</p>}
+        </div>
+      ))}
     </div>
   )
 }
