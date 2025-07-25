@@ -13,6 +13,12 @@ interface Mindmap {
   config?: object
 }
 
+interface Transform {
+  x: number
+  y: number
+  k: number
+}
+
 export default function MapEditorPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
   const [mindmap, setMindmap] = useState<Mindmap | null>(null)
@@ -23,6 +29,7 @@ export default function MapEditorPage(): JSX.Element {
   const [loadingNodes, setLoadingNodes] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(0)
   const [nodes, setNodes] = useState<NodeData[]>([])
+  const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 })
   const [loaded, setLoaded] = useState(false)
 
   const handleReload = useCallback(() => setReloadFlag(p => p + 1), [])
@@ -51,6 +58,15 @@ export default function MapEditorPage(): JSX.Element {
           const mapData = json?.map || json
           if (mapData && typeof mapData === 'object') {
             setMindmap(mapData as Mindmap)
+            const t = (mapData as any).config?.transform
+            if (
+              t &&
+              typeof t.x === 'number' &&
+              typeof t.y === 'number' &&
+              typeof t.k === 'number'
+            ) {
+              setTransform({ x: t.x, y: t.y, k: t.k })
+            }
           } else {
             setMindmap({ id: id!, title: 'Untitled Map' })
           }
@@ -183,6 +199,24 @@ export default function MapEditorPage(): JSX.Element {
     }).catch(() => {})
   }
 
+  const handleTransformChange = useCallback(
+    (t: Transform) => {
+      setTransform(t)
+      setMindmap(prev =>
+        prev ? { ...prev, config: { ...(prev.config || {}), transform: t } } : prev
+      )
+      if (mindmap?.id) {
+        fetch(`/.netlify/functions/update/mindmap/${mindmap.id}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ config: { ...(mindmap.config || {}), transform: t } })
+        }).catch(() => {})
+      }
+    },
+    [mindmap]
+  )
+
   try {
     return (
       <div className="dashboard-layout">
@@ -198,6 +232,8 @@ export default function MapEditorPage(): JSX.Element {
             edges={Array.isArray(edges) ? edges : []}
             onAddNode={handleAddNode}
             onMoveNode={handleMoveNode}
+            initialTransform={transform}
+            onTransformChange={handleTransformChange}
             showMiniMap
           />
           {nodesError && (

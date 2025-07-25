@@ -21,6 +21,8 @@ interface MindmapCanvasProps {
   height?: number | string
   onAddNode?: (node: NodeData) => void
   onMoveNode?: (node: NodeData) => void
+  initialTransform?: { x: number; y: number; k: number }
+  onTransformChange?: (t: { x: number; y: number; k: number }) => void
   showMiniMap?: boolean
 }
 
@@ -41,6 +43,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       height,
       onAddNode,
       onMoveNode,
+      initialTransform = { x: 0, y: 0, k: 1 },
+      onTransformChange,
       showMiniMap = false,
     },
     ref
@@ -53,7 +57,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const safeNodes = Array.isArray(nodes) ? nodes : []
     const safeEdges = Array.isArray(edges) ? edges : []
-    const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
+    const [transform, setTransform] = useState<{ x: number; y: number; k: number }>(
+      () => initialTransform
+    )
+
+    useEffect(() => {
+      setTransform(initialTransform)
+    }, [initialTransform])
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const [showCreate, setShowCreate] = useState(false)
@@ -63,6 +73,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         setShowCreate(true)
       }
     }, [nodes])
+
+    useEffect(() => {
+      onTransformChange?.(transform)
+    }, [transform, onTransformChange])
     const [newName, setNewName] = useState('')
   const [newDesc, setNewDesc] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
