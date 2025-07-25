@@ -6,7 +6,7 @@ export interface Card {
 
 export default function KanbanLane({ title, cards = [] }: { title: string; cards?: Card[] }) {
   return (
-    <div className="lane">
+    <div className="lane kanban-lane">
       <h3 className="lane-title">{title}</h3>
       {cards.map((card, i) => (
         <div className="card" key={i}>
