@@ -28,6 +28,12 @@ export default function KanbanBoardPage(): JSX.Element {
   return (
     <div className="dashboard-layout">
       <main className="main-area">
+        <header className="kanban-header">
+          <h1>{boardData?.title || 'Kanban Board'}</h1>
+          {boardData?.description && (
+            <p className="description">{boardData.description}</p>
+          )}
+        </header>
         <KanbanCanvas boardData={boardData} />
       </main>
     </div>
