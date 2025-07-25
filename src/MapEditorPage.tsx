@@ -164,9 +164,6 @@ export default function MapEditorPage(): JSX.Element {
     : []
 
 
-  if (error) return <div>Error loading map.</div>
-  if (nodes === null || !loaded) return <LoadingSpinner />
-  if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
@@ -224,6 +221,10 @@ export default function MapEditorPage(): JSX.Element {
     },
     [mindmap]
   )
+
+  if (error) return <div>Error loading map.</div>
+  if (nodes === null || !loaded) return <LoadingSpinner />
+  if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
   try {
     return (
