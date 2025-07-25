@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
-import MindmapCanvas, { NodeData, EdgeData } from './MindmapCanvas'
+import MindmapCanvas, { NodeData, EdgeData } from '../MindmapCanvas'
 import { authFetch } from '../authFetch'
 
 function FirstNodeModal({ onCreate }: { onCreate: (label: string) => void }) {
@@ -49,7 +49,7 @@ export default function MapEditorPage(): JSX.Element {
     if (!id) return
     let ignore = false
 
-    authFetch(`/api/maps/${id}`)
+    authFetch(`/.netlify/functions/mapid/${id}`)
       .then(async res => {
         if (!res.ok) {
           if (!ignore) setError(true)
@@ -92,6 +92,9 @@ export default function MapEditorPage(): JSX.Element {
 
   if (error) return <div>Error loading map. Failed to load map: 404</div>
   if (!mindmap) return <div>Loading mind map...</div>
+  if (!mindmap?.id) {
+    return <div>Error: This map is missing or invalid.</div>
+  }
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
