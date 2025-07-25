@@ -2193,13 +2193,23 @@ hr {
   margin-bottom: var(--spacing-sm);
 }
 
+
 .kanban-canvas .kanban-board {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-sm);
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 1rem;
+  min-height: 80vh;
+  scrollbar-gutter: stable;
 }
 
 .kanban-canvas .kanban-lane {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
   background: var(--color-surface);
   padding: var(--spacing-sm);
   border-radius: 4px;
@@ -2495,10 +2505,10 @@ hr {
 
 .scroll-container {
   width: 100%;
-  height: calc(100vh - 130px);
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 0 1rem;
+  scrollbar-gutter: stable;
 }
 
 .scroll-container::-webkit-scrollbar {
@@ -2515,10 +2525,9 @@ hr {
 }
 
 .kanban-lane {
+  flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  width: 300px;
   max-height: 100%;
 }
 
