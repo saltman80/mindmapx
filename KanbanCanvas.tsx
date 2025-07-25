@@ -11,7 +11,7 @@ interface Props {
 
 export default function KanbanCanvas({ boardData, nodeId, todoId }: Props) {
   const [board, setBoard] = useState(boardData)
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(!boardData)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
@@ -49,7 +49,11 @@ export default function KanbanCanvas({ boardData, nodeId, todoId }: Props) {
   if (!activeBoard) {
     return (
       <>
-        <EmptyKanbanBoard onCreateBoard={() => setShowModal(true)} />
+        <div className="kanban-board">
+          {['New', 'In Progress', 'Review', 'Complete'].map(l => (
+            <KanbanLane key={l} title={l} cards={[]} />
+          ))}
+        </div>
         <Modal isOpen={showModal} onClose={() => setShowModal(false)} ariaLabel="Create board">
           <form
             onSubmit={e => {
