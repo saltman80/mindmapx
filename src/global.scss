@@ -125,6 +125,15 @@ select {
   }
 }
 
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border: 2px solid #c8e6c9;
+  box-shadow: 0 0 0 2px rgba(200, 230, 201, 0.3);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
 button {
   cursor: pointer;
   border: none;
@@ -1190,8 +1199,9 @@ hr {
 }
 
 .form-input:focus {
-  border-color: var(--color-primary);
+  border: 2px solid #c8e6c9;
   outline: none;
+  box-shadow: 0 0 0 2px rgba(200, 230, 201, 0.3);
 }
 
 .form-input.form-error {
@@ -2342,9 +2352,13 @@ hr {
 }
 
 /* New Kanban board styles */
+
 .kanban-header {
-  padding: 24px 32px;
-  background: #f9fafc;
+  padding: 12px 24px;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
@@ -2353,13 +2367,13 @@ hr {
 }
 
 .kanban-title {
-  font-size: 24px;
+  font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 4px;
 }
 
 .kanban-description {
-  font-size: 14px;
+  font-size: 0.9rem;
   color: #666;
   margin: 0;
 }
@@ -2370,19 +2384,19 @@ hr {
   gap: 20px;
   padding: 24px;
   height: calc(100vh - 100px);
-  background: var(--color-bg);
+  background: linear-gradient(to bottom, #fff, #fafafa);
   overflow-x: auto;
   align-items: flex-start;
 }
 
 .lane {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 8px;
   border-top: 6px solid var(--color-primary);
   min-width: 280px;
   margin-right: 20px;
   padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -2400,10 +2414,10 @@ hr {
 .card {
   background: #fff;
   border: 1px solid #eee;
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 14px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(255, 167, 38, 0.1);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
 }
 
@@ -2481,6 +2495,11 @@ hr {
   border: none;
   cursor: pointer;
   font-size: 18px;
+}
+
+.lane.done .lane-title-input,
+.lane.done .lane-delete {
+  display: none;
 }
 
 .add-lane-button {
