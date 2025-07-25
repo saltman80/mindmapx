@@ -1995,11 +1995,11 @@ hr {
 .modal {
   background-color: var(--color-surface);
   padding: var(--spacing-lg);
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid var(--color-border);
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
 }
 
 @keyframes fade-in {
@@ -2505,32 +2505,33 @@ hr {
 
 .node-toolbox {
   display: grid;
-  grid-template-columns: repeat(2, 48px);
-  grid-gap: 10px;
-  padding: 8px;
-  border-radius: 12px;
-  background: rgba(20, 20, 20, 0.8);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+  grid-template-columns: repeat(2, 40px);
+  gap: 6px;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   pointer-events: none;
 }
 
 .node-toolbox-button {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #ffa500, #ffb733);
+  background: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 18px;
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background-color 0.2s;
   pointer-events: auto;
 }
 
 .node-toolbox-button:hover {
   transform: scale(1.1);
+  background: var(--color-warning);
 }
