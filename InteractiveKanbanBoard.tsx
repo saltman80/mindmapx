@@ -331,42 +331,42 @@ function Lane({
                   ref={providedCard.innerRef}
                   {...providedCard.draggableProps}
                   {...providedCard.dragHandleProps}
-                  className={`card ${
-                    card.dueDate && isOverdue(card.dueDate) ? 'card-overdue' : ''
+                  className={`kanban-card ${
+                    card.dueDate && isOverdue(card.dueDate) ? 'past-due' : ''
                   }`}
                 >
-                  <p className="card-title">{card.title || 'New Card'}</p>
-                  <div className="card-badges">
+                  <div className="kanban-title">{card.title || 'New Card'}</div>
+                  <div className="kanban-meta">
                     {card.priority && (
-                      <span className={`badge priority-${card.priority}`}>🔺 {card.priority.charAt(0).toUpperCase() + card.priority.slice(1)}</span>
-                    )}
-                    {card.assignee && (
-                      <span className="badge badge-assignee">👤 {card.assignee}</span>
+                      <span className={`priority-badge ${card.priority}`}>
+                        ⚠️ {card.priority.charAt(0).toUpperCase() +
+                        card.priority.slice(1)}
+                      </span>
                     )}
                     {card.dueDate && (
-                      <span className={`badge badge-due ${isOverdue(card.dueDate) ? 'overdue' : ''}`}>📅 {card.dueDate}</span>
+                      <span
+                        className={`due-date ${
+                          isOverdue(card.dueDate) ? 'overdue' : ''
+                        }`}
+                      >
+                        📅 {card.dueDate}
+                      </span>
                     )}
                   </div>
-                  {card.todoId && (
-                    <div className="todo-link">
-                      🔗 <a href={`/todo/${card.todoListId}`}>From Todo List</a>
-                      {card.mindmapId && (
-                        <> + <a href={`/maps/${card.mindmapId}`}>Mindmap</a></>
-                      )}
-                    </div>
-                  )}
-                  <div className="card-buttons">
+                  <div className="kanban-actions">
                     <button
-                      className="btn-edit"
+                      className="action-button"
+                      title="Edit"
                       onClick={() => onEditCard(lane.id, card)}
                     >
-                      ✏️ Edit
+                      ✏️
                     </button>
                     <button
-                      className="btn-comments"
+                      className="action-button"
+                      title="Comments"
                       onClick={() => onShowComments(lane.id, card)}
                     >
-                      💬 Comments
+                      💬
                     </button>
                   </div>
                 </div>
