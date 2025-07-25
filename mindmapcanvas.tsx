@@ -61,6 +61,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
+
+    const safeNodes = Array.isArray(nodes) ? nodes : []
+    const safeEdges = Array.isArray(edges) ? edges : []
     const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 })
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
@@ -149,12 +152,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleAddChild = useCallback(() => {
       if (!addParentId) return
-      const parent = nodes.find(n => n.id === addParentId)
+      const parent = safeNodes.find(n => n.id === addParentId)
       if (!parent) {
         setAddParentId(null)
         return
       }
-      const siblingCount = nodes.filter(n => n.parentId === addParentId).length
+      const siblingCount = safeNodes.filter(n => n.parentId === addParentId).length
       const id =
         typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
           ? crypto.randomUUID()
@@ -176,7 +179,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [addParentId, addNode, nodes, newName, newDesc, onAddNode])
 
     const openEditModal = useCallback((id: string) => {
-      const node = nodes.find(n => n.id === id)
+      const node = safeNodes.find(n => n.id === id)
       if (!node) return
       setEditingId(id)
       setEditTitle(node.label || '')
@@ -185,7 +188,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleSaveEdit = useCallback(() => {
       if (!editingId) return
-      const node = nodes.find(n => n.id === editingId)
+      const node = safeNodes.find(n => n.id === editingId)
       if (!node) return
       const updated = { ...node, label: editTitle, description: editDesc }
       updateNode(updated)
@@ -251,9 +254,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [nodes])
 
-    const safeNodes = useMemo(() => (Array.isArray(nodes) ? nodes : []), [nodes])
-    const safeEdges = useMemo(() => (Array.isArray(edges) ? edges : []), [edges])
-
     console.log('[MindmapCanvas] rendering nodes:', safeNodes)
     console.log('[MindmapCanvas] rendering edges:', safeEdges)
 
@@ -291,7 +291,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handlePointerUp = useCallback(
       (e: PointerEvent) => {
         if (modeRef.current === 'node' && dragNodeIdRef.current) {
-          const node = nodes.find(n => n.id === dragNodeIdRef.current)
+          const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
           if (node && onMoveNode) onMoveNode(node)
         }
         modeRef.current = null
@@ -314,7 +314,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           if (!id) return
           modeRef.current = 'node'
           dragNodeIdRef.current = id
-          const node = nodes.find(n => n.id === id)
+          const node = safeNodes.find(n => n.id === id)
           if (node) nodeOriginRef.current = { x: node.x, y: node.y }
         } else {
           modeRef.current = 'canvas'

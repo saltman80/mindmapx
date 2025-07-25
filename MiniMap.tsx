@@ -12,6 +12,8 @@ interface MiniMapProps {
 }
 
 const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }) => {
+  const safeNodes = Array.isArray(nodes) ? nodes : []
+  const safeEdges = Array.isArray(edges) ? edges : []
   const scale = MINIMAP_SIZE / CANVAS_SIZE
 
   const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
@@ -34,9 +36,9 @@ const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }
       onPointerDown={handlePointerDown}
     >
       <g transform={`scale(${scale})`}>
-        {edges.map(edge => {
-          const from = nodes.find(n => n.id === edge.from)
-          const to = nodes.find(n => n.id === edge.to)
+        {safeEdges.map(edge => {
+          const from = safeNodes.find(n => n.id === edge.from)
+          const to = safeNodes.find(n => n.id === edge.to)
           if (!from || !to) return null
           return (
             <path
@@ -48,7 +50,7 @@ const MiniMap: React.FC<MiniMapProps> = ({ nodes, edges, transform, onNavigate }
             />
           )
         })}
-        {nodes.map(node => (
+        {safeNodes.map(node => (
           <circle key={node.id} cx={node.x} cy={node.y} r={5} fill="orange" />
         ))}
       </g>
