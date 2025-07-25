@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas from './MindmapCanvas'
 import type { NodeData, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
+import FirstNodeModal from '../components/FirstNodeModal'
 import LoadingSpinner from '../loadingspinner'
 
 interface Mindmap {
@@ -155,17 +156,17 @@ export default function MapEditorPage(): JSX.Element {
     })
   }, [safeNodes])
 
-  if (error) return <div>Error loading map.</div>
-  if (nodes === null || !loaded) return <LoadingSpinner />
-  if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
-
-
   const edges: EdgeData[] = Array.isArray(safeNodes)
     ? safeNodes
         .filter(n => n.parentId)
         .map(n => ({ id: n.id + '_edge', from: n.parentId!, to: n.id }))
         .filter(edge => edge.from && edge.to)
     : []
+
+
+  if (error) return <div>Error loading map.</div>
+  if (nodes === null || !loaded) return <LoadingSpinner />
+  if (!mindmap || !mindmap.id) return <div>Invalid map.</div>
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
@@ -244,11 +245,22 @@ export default function MapEditorPage(): JSX.Element {
             showMiniMap
           />
           {safeNodes.length === 0 && (
-            <div className="modal-overlay empty-canvas-modal">
-              <div className="modal">
-                <p>This map has no nodes yet. Click + to get started.</p>
-              </div>
-            </div>
+            <FirstNodeModal
+              onCreate={label => {
+                const node: NodeData = {
+                  id:
+                    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                      ? crypto.randomUUID()
+                      : Math.random().toString(36).slice(2),
+                  x: 100,
+                  y: 100,
+                  label,
+                  parentId: null,
+                  todoId: null,
+                }
+                handleAddNode(node)
+              }}
+            />
           )}
           {nodesError && (
             <div className="error">
