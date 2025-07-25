@@ -127,41 +127,37 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [])
 
     const handleSaveNewNode = () => {
-      if (!containerRef.current) return
+      if (!mindmapId || !containerRef.current) return
 
-      const rect = containerRef.current.getBoundingClientRect()
-      const x = CANVAS_SIZE / 2
-      const y = CANVAS_SIZE / 2
-      const tx = rect.width / 2 - x
-      const ty = rect.height / 2 - y
+      // Define default canvas center position
+      const canvasCenterX = CANVAS_SIZE / 2
+      const canvasCenterY = CANVAS_SIZE / 2
 
-      setTransform({ x: tx, y: ty, k: 1 })
-
-      const node = {
-        x,
-        y,
-        label: newName || 'New Node',
+      const newNode = {
+        x: canvasCenterX,
+        y: canvasCenterY,
+        label: newName || 'Untitled',
         description: newDesc || '',
         parentId: null,
-        mindmapId: mindmapId,
+        mindmapId,
       }
 
       fetch('/.netlify/functions/nodes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(node),
+        body: JSON.stringify(newNode),
       })
         .then(res => res.json())
         .then(data => {
           if (!data?.id) throw new Error('Node insert failed')
-          setNodes(prev => [...prev, { ...node, id: data.id }])
+          setNodes(prev => [...prev, { ...newNode, id: data.id }])
+          setShowCreate(false)
           setNewName('')
           setNewDesc('')
-          setShowCreate(false)
         })
         .catch(err => {
-          console.error('[Save New Node] Failed to save node:', err)
+          console.error('[CreateNode] Failed to save node:', err)
         })
     }
 
