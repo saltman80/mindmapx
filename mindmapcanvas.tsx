@@ -70,6 +70,14 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const [showCreate, setShowCreate] = useState(false)
 
     useEffect(() => {
+      setNodes(safePropNodes)
+    }, [propNodes])
+
+    useEffect(() => {
+      setEdges(safePropEdges)
+    }, [propEdges])
+
+    useEffect(() => {
       if (Array.isArray(nodes) && nodes.length === 0) {
         setShowCreate(true)
       }
