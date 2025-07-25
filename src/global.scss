@@ -2246,6 +2246,17 @@ hr {
   flex: 1;
 }
 
+.todo-empty-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.todo-title-below {
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+
 .done-adding-link {
   margin-top: 0.5rem;
   font-size: 0.85rem;
