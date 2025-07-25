@@ -14,7 +14,7 @@ const DOT_SPACING = 50
 const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
-const TOOL_OFFSET_Y = -60
+const TOOL_OFFSET_Y = -40
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -89,7 +89,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
   const [newTask, setNewTask] = useState('')
   const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
   const modeRef = useRef<'canvas' | 'node' | null>(null)
     const dragStartRef = useRef({ x: 0, y: 0 })
     const originRef = useRef({ x: 0, y: 0 })
@@ -100,6 +99,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     initialCenter: { x: number; y: number }
     initialTransform: { x: number; y: number; k: number }
   } | null>(null)
+
+  const handleNodeClick = useCallback((id: string) => {
+    setSelectedId(prev => (prev === id ? null : id))
+  }, [])
 
 
     const pan = useCallback((dx: number, dy: number) => {
@@ -547,13 +550,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 className="mindmap-node"
                 data-id={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onClick={e => {
+                onPointerDown={e => {
                   e.stopPropagation()
-                  setSelectedId(node.id)
+                  handleNodeClick(node.id)
+                  dragStartRef.current = { x: e.clientX, y: e.clientY }
+                  dragNodeIdRef.current = node.id
+                  modeRef.current = 'node'
+                  nodeOriginRef.current = { x: node.x, y: node.y }
+                  svgRef.current?.setPointerCapture(e.pointerId)
+                  window.addEventListener('pointermove', handlePointerMove)
+                  window.addEventListener('pointerup', handlePointerUp)
                 }}
-                onMouseEnter={() => setHoveredId(node.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onTouchStart={() => setSelectedId(node.id)}
               >
                 <circle
                   r={20 / transform.k}
@@ -580,7 +587,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   ✓
                 </text>
               ) : null}
-              {(selectedId === node.id || hoveredId === node.id) && null}
+              {selectedId === node.id && null}
               </g>
             ))}
           </g>
@@ -588,7 +595,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         {Array.isArray(safeNodes) &&
           safeNodes.length > 0 &&
           safeNodes.map(node =>
-            selectedId === node.id || hoveredId === node.id ? (
+            selectedId === node.id ? (
               <div
                 key={`toolbox-${node.id}`}
                 className="node-toolbox"
