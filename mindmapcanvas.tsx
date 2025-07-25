@@ -89,11 +89,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
   const [newTask, setNewTask] = useState('')
   const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
-  const modeRef = useRef<'canvas' | 'node' | null>(null)
-    const dragStartRef = useRef({ x: 0, y: 0 })
-    const originRef = useRef({ x: 0, y: 0 })
-    const dragNodeIdRef = useRef<string | null>(null)
-  const nodeOriginRef = useRef<{ x: number; y: number } | null>(null)
+  const modeRef = useRef<'canvas' | null>(null)
+  const dragStartRef = useRef({ x: 0, y: 0 })
+  const originRef = useRef({ x: 0, y: 0 })
   const pinchRef = useRef<{
     initialDistance: number
     initialCenter: { x: number; y: number }
@@ -297,77 +295,29 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             y: originRef.current.y + dy,
             k: transform.k,
           })
-        } else if (
-          modeRef.current === 'node' &&
-          dragNodeIdRef.current &&
-          nodeOriginRef.current
-        ) {
-          const scaledDx = dx / transform.k
-          const scaledDy = dy / transform.k
-          setNodes(prev =>
-            Array.isArray(prev)
-              ? prev.map(n =>
-                  n.id === dragNodeIdRef.current
-                    ? {
-                        ...n,
-                        x: nodeOriginRef.current!.x + scaledDx,
-                        y: nodeOriginRef.current!.y + scaledDy,
-                      }
-                    : n
-                )
-              : prev
-          )
         }
       },
       [transform.k]
     )
 
-    const handlePointerUp = useCallback(
-      (e: PointerEvent) => {
-        console.log('[MindmapCanvas] handlePointerUp')
-        if (
-          modeRef.current === 'node' &&
-          dragNodeIdRef.current &&
-          nodeOriginRef.current
-        ) {
-          const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
-          if (
-            node &&
-            (node.x !== nodeOriginRef.current.x || node.y !== nodeOriginRef.current.y)
-          ) {
-            onMoveNode && onMoveNode(node)
-          }
-        }
-        modeRef.current = null
-        dragNodeIdRef.current = null
-        nodeOriginRef.current = null
-        svgRef.current?.releasePointerCapture(e.pointerId)
-      },
-      [Array.isArray(nodes) ? nodes : [], onMoveNode, handlePointerMove]
-    )
+    const handlePointerUp = useCallback((e: PointerEvent) => {
+      console.log('[MindmapCanvas] handlePointerUp')
+      modeRef.current = null
+      svgRef.current?.releasePointerCapture(e.pointerId)
+    }, [])
 
     const handlePointerDown = useCallback(
       (e: React.PointerEvent<SVGSVGElement>) => {
         console.log('[MindmapCanvas] handlePointerDown')
         e.stopPropagation()
         if ((e.target as HTMLElement).closest('.add-child-button')) return
-        const target = (e.target as HTMLElement).closest('.mindmap-node') as HTMLElement | null
         dragStartRef.current = { x: e.clientX, y: e.clientY }
-        if (target) {
-          const id = target.getAttribute('data-id')
-          if (!id) return
-          modeRef.current = 'node'
-          dragNodeIdRef.current = id
-          const node = safeNodes.find(n => n.id === id)
-          if (node) nodeOriginRef.current = { x: node.x, y: node.y }
-        } else {
-          modeRef.current = 'canvas'
-          originRef.current = { x: transform.x, y: transform.y }
-          setSelectedId(null)
-        }
+        modeRef.current = 'canvas'
+        originRef.current = { x: transform.x, y: transform.y }
+        setSelectedId(null)
         svgRef.current?.setPointerCapture(e.pointerId)
       },
-      [Array.isArray(nodes) ? nodes : [], transform, handlePointerMove, handlePointerUp]
+      [transform]
     )
 
 
@@ -467,13 +417,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       if (e.touches.length < 2) {
         pinchRef.current = null
       }
-      if (dragNodeIdRef.current && modeRef.current === 'node') {
-        const node = safeNodes.find(n => n.id === dragNodeIdRef.current)
-        if (node && onMoveNode) onMoveNode(node)
-      }
-      dragNodeIdRef.current = null
-      nodeOriginRef.current = null
-    }, [Array.isArray(nodes) ? nodes : [], onMoveNode])
+    }, [])
 
 
     const containerWidth =
@@ -560,11 +504,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 onPointerDown={e => {
                   e.stopPropagation()
                   handleNodeClick(node.id)
-                  dragStartRef.current = { x: e.clientX, y: e.clientY }
-                  dragNodeIdRef.current = node.id
-                  modeRef.current = 'node'
-                  nodeOriginRef.current = { x: node.x, y: node.y }
-                  svgRef.current?.setPointerCapture(e.pointerId)
                 }}
               >
                 <circle
