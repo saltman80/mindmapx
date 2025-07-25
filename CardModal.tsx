@@ -93,122 +93,134 @@ export default function CardModal({ card, onClose, onSave, currentUser }: Props)
     <Modal isOpen={!!card} onClose={onClose} ariaLabel="Edit card">
       {card && (
         <div className="card-modal">
-          <h2>Edit Card</h2>
+          <h2 className="mb-2 text-lg font-semibold">Edit Card</h2>
 
-          {card.todoId && (
-            <div className="card-links">
-              <span>
-                🔗 Linked to <a href={`/todo/${card.todoListId}`}>Todo List</a>
-              </span>
-              {card.mindmapId && (
-                <span>
-                  {' '} & <a href={`/maps/${card.mindmapId}`}>Mindmap</a>
-                </span>
-              )}
-            </div>
-          )}
-
-          <label>
-            Title
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="input"
-            />
-          </label>
-
-          <label>
-            Description
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              className="textarea"
-            />
-          </label>
-
-          <div className="card-meta-grid">
-            <div>
-              <label>Status</label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as Card['status'])}
-                className="select"
-              >
-                <option value="open">Open</option>
-                <option value="done">Done</option>
-              </select>
-            </div>
-
-            <div>
-              <label>Due Date</label>
+          <section className="card-section">
+            <h3 className="section-title">Card Details</h3>
+            <label>
+              Title
               <input
-                type="date"
-                value={dueDate}
-                onChange={e => setDueDate(e.target.value)}
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
                 className="input"
               />
-            </div>
+            </label>
 
-            <div>
-              <label>Priority</label>
-              <select
-                value={priority}
-                onChange={e =>
-                  setPriority(e.target.value as Card['priority'])
-                }
-                className="select"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
+            <label>
+              Description
+              <textarea
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className="textarea"
+              />
+            </label>
 
-            <div>
-              <label>Assignee</label>
-              <select
-                value={assignee}
-                onChange={e => setAssignee(e.target.value)}
-                className="select"
-              >
-                <option value="">Unassigned</option>
-                {teamMembers.map(m => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            {comments.map(c => (
-              <div key={c.id} className="comment">
-                <strong>{c.author}</strong>
-                <p>{c.text}</p>
-                <span>{new Date(c.createdAt).toLocaleString()}</span>
+            <div className="card-meta-grid">
+              <div>
+                <label>Status</label>
+                <select
+                  value={status}
+                  onChange={e => setStatus(e.target.value as Card['status'])}
+                  className="select"
+                >
+                  <option value="open">Open</option>
+                  <option value="done">Done</option>
+                </select>
               </div>
-            ))}
-          </div>
 
-          <label>
-            Comment
-            <textarea
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              className="textarea"
-            />
-          </label>
+              <div>
+                <label>Due Date</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={e => setDueDate(e.target.value)}
+                  className="input"
+                />
+              </div>
 
-          <div className="card-actions">
-            <button onClick={handleAddComment} className="button orange">
-              Post
-            </button>
-            <button onClick={save} className="button blue">
-              Save
-            </button>
-          </div>
+              <div>
+                <label>Priority</label>
+                <select
+                  value={priority}
+                  onChange={e =>
+                    setPriority(e.target.value as Card['priority'])
+                  }
+                  className="select"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Assignee</label>
+                <select
+                  value={assignee}
+                  onChange={e => setAssignee(e.target.value)}
+                  className="select"
+                >
+                  <option value="">Unassigned</option>
+                  {teamMembers.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {(card.todoId || card.mindmapId) && (
+            <section className="card-section">
+              <h3 className="section-title">Linked Elements</h3>
+              <div className="card-links">
+                {card.todoId && (
+                  <span>
+                    🔗 Linked ToDo:{' '}
+                    <a href={`/todo/${card.todoListId}`}>View</a>
+                  </span>
+                )}
+                {card.mindmapId && (
+                  <span>
+                    {' '}& <a href={`/maps/${card.mindmapId}`}>Mindmap</a>
+                  </span>
+                )}
+              </div>
+            </section>
+          )}
+
+          <section className="card-section">
+            <h3 className="section-title">Comments</h3>
+            <div>
+              {comments.map(c => (
+                <div key={c.id} className="comment">
+                  <strong>{c.author}</strong>
+                  <p>{c.text}</p>
+                  <span>{new Date(c.createdAt).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+
+            <label>
+              Comment
+              <textarea
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                className="textarea"
+              />
+            </label>
+
+            <div className="card-actions">
+              <button onClick={handleAddComment} className="button orange">
+                Post
+              </button>
+              <button onClick={save} className="button blue">
+                Save
+              </button>
+            </div>
+          </section>
         </div>
       )}
     </Modal>
