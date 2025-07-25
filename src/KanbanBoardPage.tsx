@@ -29,10 +29,18 @@ export default function KanbanBoardPage(): JSX.Element {
     <div className="dashboard-layout">
       <main className="main-area">
         <header className="kanban-header">
-          <h1>{boardData?.title || 'Kanban Board'}</h1>
-          {boardData?.description && (
-            <p className="description">{boardData.description}</p>
-          )}
+          <div className="kanban-header-info">
+            <div className="kanban-icon" aria-hidden="true">🗂️</div>
+            <div>
+              <h1 className="kanban-title">{boardData?.title || 'Kanban Board'}</h1>
+              {boardData?.description && (
+                <p className="kanban-description">{boardData.description}</p>
+              )}
+            </div>
+          </div>
+          <div className="kanban-header-actions">
+            <button aria-label="Settings">⋯</button>
+          </div>
         </header>
         <KanbanCanvas boardData={boardData} />
       </main>

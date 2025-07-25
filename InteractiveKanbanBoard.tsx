@@ -166,8 +166,16 @@ export default function InteractiveKanbanBoard({
   return (
     <div className="kanban-canvas">
       <div className="kanban-header">
-        <h1 className="kanban-title">{boardTitle}</h1>
-        <p className="kanban-description">{boardDescription}</p>
+        <div className="kanban-header-info">
+          <div className="kanban-icon" aria-hidden="true">🗂️</div>
+          <div>
+            <h1 className="kanban-title">{boardTitle}</h1>
+            <p className="kanban-description">{boardDescription}</p>
+          </div>
+        </div>
+        <div className="kanban-header-actions">
+          <button aria-label="Settings">⋯</button>
+        </div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
