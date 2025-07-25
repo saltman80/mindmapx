@@ -13,6 +13,8 @@ import type { NodeData, EdgeData } from './mindmapTypes'
 const DOT_SPACING = 50
 const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
+const TOOL_OFFSET_X = 0
+const TOOL_OFFSET_Y = -60
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -564,74 +566,72 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   ✓
                 </text>
               ) : null}
-              {(selectedId === node.id || hoveredId === node.id) && (
-                <g
-                  className="hover-panel"
-                  transform={`translate(${20 / transform.k},${-20 / transform.k})`}
-                  onPointerDown={e => e.stopPropagation()}
-                >
-                  <rect
-                    x={-4 / transform.k}
-                    y={-4 / transform.k}
-                    width={88 / transform.k}
-                    height={88 / transform.k}
-                    fill="#fff"
-                    stroke="#000"
-                    strokeWidth={1 / transform.k}
-                    rx={4 / transform.k}
-                  />
-                  <g
-                    transform="translate(0,0)"
-                    onClick={e => {
-                      e.stopPropagation()
-                      setSelectedId(null)
-                      setAddParentId(node.id)
-                      setNewName('')
-                      setNewDesc('')
-                    }}
-                  >
-                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">+</text>
-                  </g>
-                  <g
-                    transform={`translate(${40 / transform.k},0)`}
-                    onClick={e => {
-                      e.stopPropagation()
-                      setSelectedId(null)
-                      openEditModal(node.id)
-                    }}
-                  >
-                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">✏️</text>
-                  </g>
-                  <g
-                    transform={`translate(0,${40 / transform.k})`}
-                    onClick={e => {
-                      e.stopPropagation()
-                      setSelectedId(null)
-                      handleDeleteNode(node.id)
-                    }}
-                  >
-                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">🗑️</text>
-                  </g>
-                  <g
-                    transform={`translate(${40 / transform.k},${40 / transform.k})`}
-                    onClick={e => {
-                      e.stopPropagation()
-                      setSelectedId(null)
-                      setTodoNodeId(node.id)
-                    }}
-                  >
-                    <circle r={20 / transform.k} fill="orange" stroke="#000" strokeWidth={1 / transform.k} />
-                    <text textAnchor="middle" dy=".35em" fontSize={20 / transform.k} pointerEvents="none">✓</text>
-                  </g>
-                </g>
-              )}
+              {(selectedId === node.id || hoveredId === node.id) && null}
               </g>
             ))}
           </g>
         </svg>
+        {Array.isArray(safeNodes) &&
+          safeNodes.map(node =>
+            selectedId === node.id || hoveredId === node.id ? (
+              <div
+                key={`toolbox-${node.id}`}
+                className="node-toolbox"
+                style={{
+                  position: 'absolute',
+                  left: node.x * transform.k + transform.x + TOOL_OFFSET_X,
+                  top: node.y * transform.k + transform.y + TOOL_OFFSET_Y,
+                  transform: `translate(-50%, -100%) scale(${1 / transform.k})`,
+                  transformOrigin: 'top left',
+                  zIndex: 5,
+                }}
+                onPointerDown={e => e.stopPropagation()}
+              >
+                <div
+                  className="node-toolbox-button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    setSelectedId(null)
+                    setAddParentId(node.id)
+                    setNewName('')
+                    setNewDesc('')
+                  }}
+                >
+                  +
+                </div>
+                <div
+                  className="node-toolbox-button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    setSelectedId(null)
+                    openEditModal(node.id)
+                  }}
+                >
+                  🖉
+                </div>
+                <div
+                  className="node-toolbox-button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    setSelectedId(null)
+                    handleDeleteNode(node.id)
+                  }}
+                >
+                  🗑
+                </div>
+                <div
+                  className="node-toolbox-button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    setSelectedId(null)
+                    setTodoNodeId(node.id)
+                  }}
+                >
+                  ✅
+                </div>
+              </div>
+            ) : null
+          )}
         <div
           className="zoom-controls"
           style={{
