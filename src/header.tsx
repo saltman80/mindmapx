@@ -180,7 +180,13 @@ const Header = (): JSX.Element => {
             </div>
           ) : (
             <>
-              <Link to="/login" className="header__login-link">Login</Link>
+              <NavLink
+                to="/login"
+                className="header__login-link"
+                onClick={() => handleNavSelect('/login')}
+              >
+                Login
+              </NavLink>
             </>
           )}
           </div>
