@@ -88,7 +88,7 @@ export default function TodoDemo(): JSX.Element {
   }, [step, totalSteps])
 
   return (
-    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '5px' }}>
       <div className="todo-demo-page">
       <section className="todo-demo section reveal relative overflow-x-visible">
         <FaintMindmapBackground />

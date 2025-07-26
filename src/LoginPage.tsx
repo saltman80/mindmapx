@@ -34,7 +34,7 @@ const LoginPage = () => {
   }
 
   return (
-    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '5px' }}>
     <section className="section relative overflow-hidden login-page">
       <FaintMindmapBackground />
       <div className="form-card">
