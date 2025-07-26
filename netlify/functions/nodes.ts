@@ -107,8 +107,6 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
         payload.x = typeof payload.x === 'number' ? payload.x : 500
         payload.y = typeof payload.y === 'number' ? payload.y : 500
-        payload.label = payload.label ?? 'Root Node'
-        payload.description = payload.description ?? 'Root Node'
       } else {
         if (payload.x === undefined || payload.y === undefined) {
           return {
