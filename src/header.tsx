@@ -53,13 +53,10 @@ const Header = (): JSX.Element => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
 
-    const currentPath = normalizePath(location.pathname)
-    const targetPath = normalizePath(route)
-
-    if (currentPath !== targetPath) {
+    if (location.pathname !== route) {
       navigate(route)
     } else {
-      navigate(route, { replace: true })
+      // If already on the target page, manually scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
