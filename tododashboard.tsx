@@ -46,6 +46,17 @@ export default function TodoDashboard(): JSX.Element {
     setNewTitle('')
   }
 
+  const handleDeleteList = async (id: string) => {
+    if (!confirm('Delete this list and all todos?')) return
+    const res = await fetch(`/.netlify/functions/todo-lists?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+    if (res.ok) {
+      setLists(prev => prev.filter(l => l.id !== id))
+    }
+  }
+
   return (
     <div className="todo-dashboard relative overflow-hidden">
       <MindmapArm side="left" />
@@ -61,7 +72,14 @@ export default function TodoDashboard(): JSX.Element {
         <div className="todo-lists-grid">
           {lists.map(list => (
             <div key={list.id || 'unassigned'} className="todo-card">
-              <h3>{list.title}</h3>
+              <div className="card-header">
+                <h3>{list.title}</h3>
+                {list.id && (
+                  <button className="delete-btn" onClick={() => handleDeleteList(list.id!)}>
+                    Delete
+                  </button>
+                )}
+              </div>
               <ul className="todo-list">
                 {list.todos.map(t => (
                   <li key={t.id}>{t.title}</li>
