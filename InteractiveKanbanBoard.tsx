@@ -393,9 +393,14 @@ export default function InteractiveKanbanBoard({
       </DragDropContext>
       <CardModal
         card={editing?.card || null}
+        laneId={editing?.laneId || ''}
         onClose={() => setEditing(null)}
-        onSave={card => {
-          if (editing) updateCard(editing.laneId, card)
+        onSave={(laneId, card) => {
+          if (!card.id) {
+            console.error('Cannot save card: ID is missing')
+            return
+          }
+          updateCard(laneId, card)
         }}
         onDelete={card => {
           if (editing) removeCard(editing.laneId, card.id)

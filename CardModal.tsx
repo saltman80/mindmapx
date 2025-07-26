@@ -25,14 +25,16 @@ export interface Card {
 
 interface Props {
   card: Card | null
+  laneId: string
   onClose: () => void
-  onSave: (card: Card) => void
+  onSave: (laneId: string, card: Card) => void
   onDelete: (card: Card) => void
   currentUser?: { name: string }
 }
 
 export default function CardModal({
   card,
+  laneId,
   onClose,
   onSave,
   onDelete,
@@ -82,7 +84,8 @@ export default function CardModal({
 
   const save = () => {
     if (!card) return
-    onSave({
+    console.log('Saving card with ID:', card.id)
+    onSave(laneId, {
       ...card,
       title,
       description,
