@@ -7,19 +7,19 @@ import { z, ZodError } from 'zod'
 const todoInputSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
-  listId: z.string().uuid().optional(),
+  list_id: z.string().uuid().optional(),
   nodeId: z.string().uuid().optional(),
 })
 
-async function getTodos(userId: string, listId?: string) {
+async function getTodos(userId: string, list_id?: string) {
   const client = await getClient()
   try {
     const values: any[] = [userId]
     let sql = `SELECT id, user_id, title, description, completed, assignee_id, created_at, updated_at
                  FROM todos
                 WHERE (user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1))`
-    if (listId) {
-      values.push(listId)
+    if (list_id) {
+      values.push(list_id)
       sql += ` AND list_id = $2`
     }
     sql += ' ORDER BY created_at DESC'
@@ -30,14 +30,14 @@ async function getTodos(userId: string, listId?: string) {
   }
 }
 
-async function createTodo(userId: string, data: { title: string; description?: string; listId?: string; nodeId?: string }) {
+async function createTodo(userId: string, data: { title: string; description?: string; list_id?: string; nodeId?: string }) {
   const client = await getClient()
   try {
     const res = await client.query(
       `INSERT INTO todos (user_id, title, description, list_id, node_id, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
        RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at`,
-      [userId, data.title, data.description ?? null, data.listId ?? null, data.nodeId ?? null]
+      [userId, data.title, data.description ?? null, data.list_id ?? null, data.nodeId ?? null]
     )
     return res.rows[0]
   } finally {
@@ -66,8 +66,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
 
     if (event.httpMethod === 'GET') {
-      const listId = event.queryStringParameters?.listId
-      const todos = await getTodos(userId, listId)
+      const list_id = event.queryStringParameters?.list_id
+      const todos = await getTodos(userId, list_id)
       return { statusCode: 200, headers, body: JSON.stringify(todos) }
     }
 

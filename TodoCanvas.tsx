@@ -12,14 +12,14 @@ export interface TodoCanvasProps {
   initialTodos?: TodoItem[]
   nodeId?: string
   kanbanId?: string
-  listId?: string
+  list_id?: string
 }
 
 export default function TodoCanvas({
   initialTodos = [],
   nodeId,
   kanbanId,
-  listId,
+  list_id,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [adding, setAdding] = useState(initialTodos.length === 0)
@@ -36,7 +36,7 @@ export default function TodoCanvas({
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description: '', listId, nodeId }),
+        body: JSON.stringify({ title, description: '', list_id, nodeId }),
       })
       if (!res.ok) throw new Error('Failed to save todo')
       const created: TodoItem = await res.json()

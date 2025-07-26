@@ -20,7 +20,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     if (event.httpMethod === 'GET') {
       const res = await client.query(
         `SELECT l.id, l.title, l.created_at, l.updated_at,
-                COALESCE(jsonb_agg(jsonb_build_object('id', t.id, 'title', t.title, 'completed', t.completed)) FILTER (WHERE t.id IS NOT NULL), '[]') AS todos
+                COALESCE(jsonb_agg(jsonb_build_object('id', t.id, 'title', t.title, 'description', t.description, 'completed', t.completed)) FILTER (WHERE t.id IS NOT NULL), '[]') AS todos
            FROM todo_lists l
            LEFT JOIN todos t ON t.list_id = l.id
           WHERE l.user_id = $1
