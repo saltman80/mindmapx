@@ -39,6 +39,7 @@ export default function TodoCanvas({
   const [boards, setBoards] = useState<{ id: string; title: string }[]>([])
   const [selectedBoard, setSelectedBoard] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const [adding, setAdding] = useState(true)
 
   useEffect(() => {
     if (!list_id) return
@@ -142,21 +143,19 @@ export default function TodoCanvas({
 
   const activeTodos = todos.filter(t => !(t as any).completed)
   const doneTodos = todos.filter(t => (t as any).completed)
-  const [showAllDone, setShowAllDone] = useState(false)
+  const [showAll, setShowAll] = useState(false)
 
   const renderTodo = (t: TodoItem & { completed?: boolean }) => (
-    <li
-      key={t.id}
-      className={`todo-row ${(t as any).completed ? 'completed' : ''}`}
-    >
+    <div key={t.id} className={`todo-block ${t.completed ? 'completed' : ''}`}>
       <input
         type="checkbox"
-        checked={(t as any).completed || false}
+        checked={t.completed || false}
         onChange={() => handleToggleCompleted(t as any)}
+        className="todo-checkbox"
       />
       {editingId === t.id ? (
         <input
-          className="todo-inline-input"
+          className="todo-edit-input"
           value={editTitle}
           onChange={e => setEditTitle(e.target.value)}
           onBlur={() => saveEdit(t)}
@@ -164,17 +163,16 @@ export default function TodoCanvas({
           autoFocus
         />
       ) : (
-        <span className="todo-title" onClick={() => startEditing(t)}>
+        <span className="todo-text" onClick={() => startEditing(t)}>
           {t.title}
         </span>
       )}
-
-      <div className="todo-actions">
-        <button onClick={() => openEditModal(t)}>✏️</button>
-        <button onClick={() => openCommentPanel(t)}>💬</button>
-        <button onClick={() => openKanbanSendDialog(t)}>➡</button>
+      <div className="todo-tools">
+        <button className="todo-icon-btn" onClick={() => openEditModal(t)}>✏️</button>
+        <button className="todo-icon-btn" onClick={() => openCommentPanel(t)}>💬</button>
+        <button className="todo-icon-btn" onClick={() => openKanbanSendDialog(t)}>➡</button>
       </div>
-    </li>
+    </div>
   )
 
   return (
@@ -187,37 +185,51 @@ export default function TodoCanvas({
       <h3 className="todo-heading">
         {todos.length - doneTodos.length}/{todos.length} completed
       </h3>
-      <ul className="todo-list">
+      <div className="todo-list">
         {activeTodos.map(renderTodo)}
-        <li className="todo-add-row">
-          <input
-            ref={inputRef}
-            placeholder="Add a to-do"
-            className="todo-inline-input"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && newTitle.trim() && handleCreateTodo(newTitle.trim()).then(() => setNewTitle(''))}
-          />
-          <button className="btn-small" onClick={() => newTitle.trim() && handleCreateTodo(newTitle.trim()).then(() => setNewTitle(''))}>Add</button>
-        </li>
-      </ul>
+      </div>
+      {!adding && (
+        <button className="todo-add-circle" onClick={() => setAdding(true)}>+
+        </button>
+      )}
+      {adding && (
+        <div className="todo-add-block">
+          <form
+            className="todo-add-form"
+            onSubmit={e => {
+              e.preventDefault()
+              if (!newTitle.trim()) return
+              handleCreateTodo(newTitle.trim())
+              setNewTitle('')
+            }}
+          >
+            <input
+              type="text"
+              className="todo-add-input"
+              placeholder="New todo"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+            />
+            <button type="submit" className="todo-add-button">Add</button>
+          </form>
+          <div className="done-link" onClick={() => setAdding(false)}>
+            done adding todos
+          </div>
+        </div>
+      )}
 
       {doneTodos.length > 0 && (
         <>
           <hr className="todo-divider" />
-          <ul className="todo-list done-list">
-            {doneTodos
-              .slice(0, showAllDone ? doneTodos.length : 3)
-              .map(renderTodo)}
-            {doneTodos.length > 3 && !showAllDone && (
-              <button
-                onClick={() => setShowAllDone(true)}
-                className="show-more-btn"
-              >
-                View {doneTodos.length - 3} more completed to-dos...
-              </button>
-            )}
-          </ul>
+          <h4 className="done-heading">{doneTodos.length} done</h4>
+          {doneTodos
+            .slice(0, showAll ? doneTodos.length : 2)
+            .map(renderTodo)}
+          {doneTodos.length > 2 && !showAll && (
+            <button className="show-more" onClick={() => setShowAll(true)}>
+              Show more...
+            </button>
+          )}
         </>
       )}
       <TodoModal
