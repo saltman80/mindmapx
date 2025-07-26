@@ -7,10 +7,21 @@ import { requireAuth } from './middleware.js'
 interface NodePayload {
   mindmapId: string
   parentId?: string | null
-  x: number
-  y: number
+  x?: number
+  y?: number
   label?: string
   description?: string
+}
+
+async function isFirstNodeForMindmap(
+  client: PoolClient,
+  mindmapId: string
+): Promise<boolean> {
+  const result = await client.query(
+    'SELECT COUNT(*)::int AS count FROM nodes WHERE mindmap_id=$1 AND parent_id IS NULL',
+    [mindmapId]
+  )
+  return Number(result.rows[0]?.count) === 0
 }
 
 const headers = {
@@ -77,11 +88,36 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid parentId' }) }
       }
 
-      if (payload.x === undefined || payload.y === undefined) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing coordinates' }) }
-      }
-      if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Coordinates must be numbers' }) }
+      const isRoot = !payload.parentId
+
+      if (isRoot) {
+        const first = await isFirstNodeForMindmap(client, payload.mindmapId)
+        if (!first) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Only one root node allowed per mindmap' })
+          }
+        }
+        payload.x = typeof payload.x === 'number' ? payload.x : 500
+        payload.y = typeof payload.y === 'number' ? payload.y : 500
+        payload.label = payload.label ?? 'Root Node'
+        payload.description = payload.description ?? 'Root Node'
+      } else {
+        if (payload.x === undefined || payload.y === undefined) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Missing coordinates' })
+          }
+        }
+        if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Coordinates must be numbers' })
+          }
+        }
       }
 
       try {

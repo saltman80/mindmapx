@@ -172,25 +172,35 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         return
       }
       const siblingCount = safeNodes.filter(n => n.parentId === addParentId).length
-      const id =
-        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-          ? crypto.randomUUID()
-          : Math.random().toString(36).slice(2)
-      const node: NodeData = {
-        id,
+      const newNode = {
         x: parent.x + 150,
         y: parent.y + 50 * (siblingCount + 1),
         label: newName || 'New Node',
-        description: newDesc || undefined,
+        description: newDesc || '',
         parentId: addParentId,
-        todoId: null,
+        mindmapId,
       }
-      addNode(node)
-      onAddNode && onAddNode(node)
-      setAddParentId(null)
-      setNewName('')
-      setNewDesc('')
-    }, [addParentId, addNode, Array.isArray(nodes) ? nodes : [], newName, newDesc, onAddNode])
+
+      authFetch('/.netlify/functions/nodes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newNode),
+      })
+        .then(async res => {
+          if (!res.ok) throw new Error('Node insert failed')
+          const data = await res.json()
+          if (!data?.id) throw new Error('Node insert failed')
+          addNode({ ...newNode, id: data.id, todoId: null })
+        })
+        .catch(err => {
+          console.error('[CreateChildNode] Failed to save node:', err)
+        })
+        .finally(() => {
+          setAddParentId(null)
+          setNewName('')
+          setNewDesc('')
+        })
+    }, [addParentId, addNode, Array.isArray(nodes) ? nodes : [], newName, newDesc, mindmapId])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
