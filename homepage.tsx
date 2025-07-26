@@ -90,7 +90,7 @@ const Homepage: React.FC = (): JSX.Element => {
 
 
   return (
-    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '5px' }}>
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '114px' }}>
     <div className="homepage">
         <section className="hero section relative overflow-x-visible">
         <div className="container">
