@@ -135,42 +135,33 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         return
       }
 
-      const newNode = {
-        // Default position for the very first node
-        // Explicit coordinates help avoid inserting extreme
-        // values when the board is empty
-        x: 500,
-        y: 500,
-        label: newName?.trim() || 'General',
-        description: newDesc?.trim() || undefined,
+      const label = newName.trim() || 'General'
+      const description = newDesc.trim() || ''
+      const id =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2)
+
+      const rect = containerRef.current.getBoundingClientRect()
+      void rect // reference to avoid lint warnings, not used currently
+
+      const node = {
+        id,
+        x: CANVAS_SIZE / 2,
+        y: CANVAS_SIZE / 2,
+        label,
+        description,
         parentId: null,
+        todoId: null,
         mindmapId,
       }
 
-      console.log('[Modal Save] Submitting new node with values:', {
-        newName,
-        newDesc,
-      })
-
-      authFetch('/.netlify/functions/nodes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newNode),
-      })
-        .then(async res => {
-          if (!res.ok) throw new Error('Node insert failed')
-          const data = await res.json()
-          if (!data?.id) throw new Error('Node insert failed')
-          setNodes(prev => [...prev, { ...newNode, id: data.id }])
-          setShowCreate(false)
-          setNewName('')
-          setNewDesc('')
-        })
-        .catch(err => {
-          console.error('[CreateNode] Failed to save node:', err)
-        })
+      console.log('[MindmapCanvas] Creating node with data:', node)
+      addNode(node)
+      onAddNode?.(node)
+      setShowCreate(false)
+      setNewName('')
+      setNewDesc('')
     }
 
     const handleAddChild = useCallback(() => {
