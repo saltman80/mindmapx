@@ -37,15 +37,17 @@ export const handler = async (event: any) => {
       )
 
       const boardId = res.rows[0].id
-      const defaultCols = ['New', 'In-Progress', 'Reviewing', 'Done']
-      for (let i = 0; i < defaultCols.length; i++) {
-        await client.query(
-          `
-          INSERT INTO kanban_columns (board_id, title, position)
-          VALUES ($1, $2, $3)
-        `,
-          [boardId, defaultCols[i], i],
-        )
+      if (!data.skipDefaultColumns) {
+        const defaultCols = ['New', 'In-Progress', 'Reviewing', 'Done']
+        for (let i = 0; i < defaultCols.length; i++) {
+          await client.query(
+            `
+            INSERT INTO kanban_columns (board_id, title, position)
+            VALUES ($1, $2, $3)
+          `,
+            [boardId, defaultCols[i], i],
+          )
+        }
       }
 
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }

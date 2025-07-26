@@ -1,6 +1,23 @@
 import type { Handler } from '@netlify/functions'
+import type { PoolClient } from 'pg'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
+
+async function ensureDefaultColumns(client: PoolClient, boardId: string) {
+  const { rows } = await client.query(
+    'SELECT id FROM kanban_columns WHERE board_id=$1',
+    [boardId]
+  )
+  if (rows.length === 0) {
+    const defaults = ['New', 'In-Progress', 'Reviewing', 'Done']
+    for (let i = 0; i < defaults.length; i++) {
+      await client.query(
+        'INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,$2,$3)',
+        [boardId, defaults[i], i]
+      )
+    }
+  }
+}
 
 const headers = {
   'Content-Type': 'application/json',
@@ -46,6 +63,8 @@ export const handler: Handler = async (event) => {
     if (chk.rows.length === 0) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
     }
+
+    await ensureDefaultColumns(client, boardId)
 
     const { rows: columns } = await client.query(
       `SELECT id, board_id, title, position
