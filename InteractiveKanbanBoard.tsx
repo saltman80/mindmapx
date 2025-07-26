@@ -9,6 +9,8 @@ import CardModal, { Card } from './CardModal'
 import CommentsModal from './CommentsModal'
 import { authFetch } from './authFetch'
 
+const API_BASE = '/api/kanban'
+
 const colorPalette = [
   '#FFA726', '#FFB74D', '#FFCA28', '#FFD54F', '#FFEE58', '#FFF176',
   '#D4E157', '#AED581', '#81C784', '#66BB6A', '#26A69A', '#4DD0E1',
@@ -95,6 +97,7 @@ export default function InteractiveKanbanBoard({
           dueDate: c.due_date || '',
           assignee: c.assignee_id || '',
           comments: [],
+          position: c.position,
         })
       }
     })
@@ -112,7 +115,7 @@ export default function InteractiveKanbanBoard({
   const addLane = () => {
     if (!boardId) return
     const position = lanes.length
-    authFetch('/.netlify/functions/kanban-columns', {
+    authFetch(`${API_BASE}/columns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ board_id: boardId, title: 'New Lane', position })
@@ -136,7 +139,7 @@ export default function InteractiveKanbanBoard({
       alert('Cannot rename or delete the Done column.')
       return
     }
-    authFetch(`/.netlify/functions/kanban-columns/${laneId}`, { method: 'DELETE' })
+    authFetch(`${API_BASE}/columns/${laneId}`, { method: 'DELETE' })
       .then(() => {
         setLanes(prev => prev.filter(l => l.id !== laneId))
       })
@@ -147,7 +150,7 @@ export default function InteractiveKanbanBoard({
     const lane = lanes.find(l => l.id === laneId)
     if (!lane || !boardId) return
     const position = lane.cards.length
-    authFetch('/.netlify/functions/kanban-cards', {
+    authFetch(`${API_BASE}/cards`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ column_id: laneId, title: '', position })
@@ -159,7 +162,8 @@ export default function InteractiveKanbanBoard({
           title: '',
           comments: [],
           status: 'open',
-          priority: 'low'
+          priority: 'low',
+          position,
         }
         setLanes(prev =>
           prev.map(l =>
@@ -184,12 +188,15 @@ export default function InteractiveKanbanBoard({
       const cardIndex = fromLane.cards.findIndex(c => c.id === id)
       if (cardIndex === -1) return prev
       const [card] = fromLane.cards.splice(cardIndex, 1)
-      const updatedCard =
-        toLane.title === 'Done' ? { ...card, status: 'done' } : card
+      const updatedCard = {
+        ...card,
+        status: toLane.title === 'Done' ? 'done' : card.status,
+        position: destIndex,
+      }
       toLane.cards.splice(destIndex, 0, updatedCard)
       return copy
     })
-    authFetch(`/.netlify/functions/kanban-cards/${id}/move`, {
+    authFetch(`${API_BASE}/cards/${id}/move`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ column_id: toLaneId, position: destIndex })
@@ -207,7 +214,7 @@ export default function InteractiveKanbanBoard({
       const done = copy.find(l => l.title === 'Done')
       const result = done ? [...withoutDone, done] : withoutDone
       result.forEach((ln, idx) => {
-        authFetch(`/.netlify/functions/kanban-columns/${ln.id}`, {
+        authFetch(`${API_BASE}/columns/${ln.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ position: idx })
@@ -227,7 +234,7 @@ export default function InteractiveKanbanBoard({
       alert('Cannot create another Done column.')
       return
     }
-    authFetch(`/.netlify/functions/kanban-columns/${laneId}`, {
+    authFetch(`${API_BASE}/columns/${laneId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title })
@@ -239,7 +246,9 @@ export default function InteractiveKanbanBoard({
   }
 
   const updateCard = (laneId: string, updatedCard: Card) => {
-    authFetch(`/.netlify/functions/kanban-cards/${updatedCard.id}`, {
+    const lane = lanes.find(l => l.id === laneId)
+    const pos = lane ? lane.cards.findIndex(c => c.id === updatedCard.id) : 0
+    authFetch(`${API_BASE}/cards/${updatedCard.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -249,7 +258,8 @@ export default function InteractiveKanbanBoard({
         priority: updatedCard.priority,
         due_date: updatedCard.dueDate,
         assignee_id: updatedCard.assignee,
-        column_id: laneId
+        column_id: laneId,
+        position: pos
       })
     })
       .then(() => {
@@ -258,7 +268,9 @@ export default function InteractiveKanbanBoard({
             l.id === laneId
               ? {
                   ...l,
-                  cards: l.cards.map(c => (c.id === updatedCard.id ? updatedCard : c)),
+                  cards: l.cards.map(c =>
+                    c.id === updatedCard.id ? { ...updatedCard, position: pos } : c
+                  ),
                 }
               : l
           )
@@ -267,7 +279,7 @@ export default function InteractiveKanbanBoard({
       .catch(err => console.error('updateCard', err))
   }
   const removeCard = (laneId: string, cardId: string) => {
-    authFetch(`/.netlify/functions/kanban-cards/${cardId}`, { method: 'DELETE' })
+    authFetch(`${API_BASE}/cards/${cardId}`, { method: 'DELETE' })
       .then(() => {
         setLanes(prev =>
           prev.map(l =>

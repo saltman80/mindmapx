@@ -20,6 +20,7 @@ export interface Card {
   todoId?: string
   todoListId?: string
   mindmapId?: string
+  position?: number
 }
 
 interface Props {

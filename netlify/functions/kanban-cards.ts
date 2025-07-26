@@ -35,21 +35,22 @@ export const handler: Handler = async (event) => {
       const columnId = data.column_id
       const title = (data.title || '').trim()
       if (!columnId || !title) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing column_id or title' }) }
-      const res = await client.query(
-        `INSERT INTO kanban_cards (column_id, title, description, status, priority, due_date, assignee_id, position)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-         RETURNING id, column_id, title, position`,
-        [
-          columnId,
-          title,
-          data.description ?? null,
-          data.status ?? 'open',
-          data.priority ?? 'low',
-          data.due_date ?? null,
-          data.assignee_id ?? null,
-          Number(data.position) || 0
-        ]
-      )
+    const res = await client.query(
+      `INSERT INTO kanban_cards (column_id, title, description, status, priority, due_date, assignee_id, position)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       RETURNING id, column_id, title, position`,
+      [
+        columnId,
+        title,
+        data.description ?? null,
+        data.status ?? 'open',
+        data.priority ?? 'low',
+        data.due_date ?? null,
+        data.assignee_id ?? null,
+        Number(data.position) || 0
+      ]
+    )
+      await log(client, res.rows[0].id, userId, 'create', 'Card created')
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
     }
 
