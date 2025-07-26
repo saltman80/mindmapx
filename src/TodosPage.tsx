@@ -22,7 +22,7 @@ export default function TodosPage(): JSX.Element {
   const [lists, setLists] = useState<TodoList[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [newTitle, setNewTitle] = useState('')
+  const [form, setForm] = useState({ title: '', description: '' })
   const [showModal, setShowModal] = useState(false)
   const navigate = useNavigate()
 
@@ -50,18 +50,18 @@ export default function TodosPage(): JSX.Element {
 
   const handleCreateList = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
-    const title = newTitle.trim()
+    const title = form.title.trim()
     if (!title) return
     const res = await fetch('/.netlify/functions/todo-lists', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ title, description: form.description }),
     })
     if (!res.ok) return
     const list = await res.json()
     setLists(prev => [list, ...prev])
-    setNewTitle('')
+    setForm({ title: '', description: '' })
     setShowModal(false)
   }
 
@@ -91,6 +91,20 @@ export default function TodosPage(): JSX.Element {
           return [{ ...l, todos: remaining }]
         })
       )
+    }
+  }
+
+  const handleAiCreate = async (): Promise<void> => {
+    const res = await fetch('/.netlify/functions/ai-create-todo-list', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: form.description || form.title }),
+    })
+    const json = await res.json()
+    if (json?.id) {
+      navigate(`/todos/${json.id}`)
+      setShowModal(false)
     }
   }
 
@@ -208,42 +222,43 @@ export default function TodosPage(): JSX.Element {
       )}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div
-            className="modal fancy-modal"
-            role="dialog"
-            aria-modal="true"
-            onClick={e => e.stopPropagation()}
-          >
+          <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
             <span className="flare-line" aria-hidden="true"></span>
             <h2 className="fade-item">Create Todo List</h2>
+
             <form onSubmit={handleCreateList}>
               <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
-                <label htmlFor="list-title" className="form-label">
-                  Title
-                </label>
+                <label htmlFor="list-title" className="form-label">Title</label>
                 <input
                   id="list-title"
                   className="form-input"
-                  value={newTitle}
-                  onChange={e => setNewTitle(e.target.value)}
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
                   required
                 />
               </div>
+
+              <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
+                <label htmlFor="list-desc" className="form-label">Description</label>
+                <textarea
+                  id="list-desc"
+                  className="form-input"
+                  value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
               <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn-cancel fade-item"
-                  style={{ animationDelay: '0.2s' }}
-                  onClick={() => setShowModal(false)}
-                >
+                <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn-primary fade-item"
-                  style={{ animationDelay: '0.2s' }}
-                >
-                  Create
+                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>
+                  Quick Create
+                </button>
+                <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
+                  <span className="sparkle" aria-hidden="true">✨</span>
+                  Create With AI
                 </button>
               </div>
             </form>
