@@ -9,7 +9,7 @@ interface Todo {
 }
 
 interface TodoList {
-  id: string
+  id: string | null
   title: string
   todos: Todo[]
 }
@@ -23,7 +23,9 @@ export default function TodoDashboard(): JSX.Element {
     fetch('/.netlify/functions/todo-lists', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
-        setLists(Array.isArray(data) ? data : [])
+        const arr: TodoList[] = Array.isArray(data) ? data : []
+        arr.sort((a, b) => (a.id === null ? 1 : 0) - (b.id === null ? 1 : 0))
+        setLists(arr)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -58,7 +60,7 @@ export default function TodoDashboard(): JSX.Element {
       ) : (
         <div className="todo-lists-grid">
           {lists.map(list => (
-            <div key={list.id} className="todo-card">
+            <div key={list.id || 'unassigned'} className="todo-card">
               <h3>{list.title}</h3>
               <ul className="todo-list">
                 {list.todos.map(t => (
