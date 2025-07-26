@@ -130,13 +130,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handleSaveNewNode = () => {
       if (!mindmapId || !containerRef.current) return
 
-      // Define default canvas center position
-      const canvasCenterX = CANVAS_SIZE / 2
-      const canvasCenterY = CANVAS_SIZE / 2
-
       const newNode = {
-        x: canvasCenterX,
-        y: canvasCenterY,
+        // Default position for the very first node
+        // Explicit coordinates help avoid inserting extreme
+        // values when the board is empty
+        x: 500,
+        y: 500,
         label: newName || 'Untitled',
         description: newDesc || '',
         parentId: null,
