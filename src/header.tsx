@@ -3,6 +3,9 @@ import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './useAuth'
 import { Drawer } from '../drawer'
 
+const normalizePath = (path: string): string =>
+  path.replace(/\/+$/, '') || '/'
+
 export interface NavItem {
   label: string
   route: string
@@ -50,10 +53,13 @@ const Header = (): JSX.Element => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
 
-    if (location.pathname !== route) {
+    const currentPath = normalizePath(location.pathname)
+    const targetPath = normalizePath(route)
+
+    if (currentPath !== targetPath) {
       navigate(route)
     } else {
-      // If already on the target page, manually scroll to top
+      navigate(route, { replace: true })
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
