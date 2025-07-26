@@ -13,9 +13,6 @@ interface Props {
 export default function CommentsModal({ card, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
   const feedRef = useRef<HTMLDivElement>(null)
-
-  if (!card) return null
-
   const add = () => {
     if (!text.trim()) return
     const comment: Comment = {
@@ -36,10 +33,13 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
   }
 
   useEffect(() => {
+    if (!card) return
     const el = feedRef.current
     if (!el) return
     el.scrollTop = el.scrollHeight
   }, [card?.comments])
+
+  if (!card) return null
 
   const highlightMentions = (text: string) => {
     return text.split(/(\@[\w-]+)/g).map((part, idx) => {
