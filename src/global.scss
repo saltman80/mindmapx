@@ -2310,6 +2310,46 @@ hr {
   margin-top: 2rem;
 }
 
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #f4f4f8;
+  margin-bottom: 1rem;
+}
+
+.todo-item.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.todo-title {
+  margin-left: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.editable-title {
+  margin-left: 0.75rem;
+  flex: 1;
+}
+
+.done-divider {
+  margin: 2rem 0 0.5rem;
+  border: none;
+  border-top: 2px dashed #ccc;
+  width: 100%;
+}
+
+.done-header {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #888;
+  width: 100%;
+}
+
 /* Kanban Canvas */
 .kanban-board {
   display: flex;
