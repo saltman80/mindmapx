@@ -57,25 +57,18 @@ const Header = (): JSX.Element => {
       navigate(route)
     }
 
-    // Scroll to the top when the About link (or any active link) is clicked
-    if (route === '/about' || location.pathname === route) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+    const marketingPaths = ['/about', '/todo-demo', '/contact', '/pricing']
+    if (marketingPaths.includes(route)) {
+      setTimeout(() => {
+        const topAnchor = document.getElementById('top')
+        if (topAnchor) {
+          topAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      }, 50)
     }
   }
-
-  useEffect(() => {
-    const selector =
-      'a.header__nav-link.header__nav-link--active[href="/about"]'
-    const aboutLink = document.querySelector<HTMLAnchorElement>(selector)
-    if (!aboutLink) return
-    const handleClick = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-    aboutLink.addEventListener('click', handleClick)
-    return () => {
-      aboutLink.removeEventListener('click', handleClick)
-    }
-  }, [location.pathname])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
