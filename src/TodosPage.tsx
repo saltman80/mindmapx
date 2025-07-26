@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
@@ -13,12 +13,15 @@ interface TodoList {
   id: string | null
   title: string
   todos: TodoItem[]
+  createdAt?: string
+  created_at?: string
 }
 
 export default function TodosPage(): JSX.Element {
   const [lists, setLists] = useState<TodoList[]>([])
   const [loading, setLoading] = useState(true)
   const [newTitle, setNewTitle] = useState('')
+  const [showModal, setShowModal] = useState(false)
   const navigate = useNavigate()
 
   const fetchLists = async (): Promise<void> => {
@@ -40,7 +43,8 @@ export default function TodosPage(): JSX.Element {
     fetchLists()
   }, [])
 
-  const handleCreateList = async (): Promise<void> => {
+  const handleCreateList = async (e: FormEvent): Promise<void> => {
+    e.preventDefault()
     const title = newTitle.trim()
     if (!title) return
     const res = await fetch('/.netlify/functions/todo-lists', {
@@ -53,6 +57,7 @@ export default function TodosPage(): JSX.Element {
     const list = await res.json()
     setLists(prev => [list, ...prev])
     setNewTitle('')
+    setShowModal(false)
   }
 
   const handleDeleteList = async (id: string): Promise<void> => {
@@ -66,43 +71,138 @@ export default function TodosPage(): JSX.Element {
     }
   }
 
+  const now = Date.now()
+  const oneDay = 24 * 60 * 60 * 1000
+  const oneWeek = 7 * oneDay
+  const dayAgo = now - oneDay
+  const weekAgo = now - oneWeek
+
+  const createdToday = lists.filter(
+    l => l.id && new Date(l.createdAt || l.created_at || '').getTime() > dayAgo
+  ).length
+  const createdThisWeek = lists.filter(
+    l => l.id && new Date(l.createdAt || l.created_at || '').getTime() > weekAgo
+  ).length
+
   return (
-    <div className="todo-dashboard relative overflow-hidden">
+    <div className="dashboard-page relative overflow-hidden list-page">
       <MindmapArm side="left" />
       <FaintMindmapBackground className="mindmap-bg-small" />
       <h1 className="dashboard-title">
         <img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos
       </h1>
-      <div className="mb-4">
-        <input
-          value={newTitle}
-          onChange={e => setNewTitle(e.target.value)}
-          placeholder="New list"
-        />
-        <button onClick={handleCreateList}>Add</button>
-      </div>
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="todo-lists-grid">
-          {lists.map(list => (
-            <div key={list.id || 'unassigned'} className="todo-card">
-              <div className="card-header">
-                <h3>{list.title}</h3>
-                {list.id && (
-                  <>
-                    <button className="open-btn" onClick={() => navigate(`/todos/${list.id}`)}>
+        <div className="four-col-grid">
+          <div className="dashboard-tile create-tile">
+            <header className="tile-header">
+              <h2>Create Todo List</h2>
+            </header>
+            <section className="tile-body">
+              <p className="create-help">Click Create to Start</p>
+              <button className="btn-primary" onClick={() => setShowModal(true)}>
+                Create
+              </button>
+            </section>
+          </div>
+          <div className="metric-tile simple">
+            <div className="metric-header stacked">
+              <h3>Metrics</h3>
+              <div className="metric-circle">{lists.length}</div>
+              <p className="metric-total">total</p>
+            </div>
+            <div className="metric-detail-grid">
+              <div className="metric-detail">
+                <span className="label">Today</span>
+                <span className="value">{createdToday}</span>
+              </div>
+              <div className="metric-detail">
+                <span className="label">Week</span>
+                <span className="value">{createdThisWeek}</span>
+              </div>
+            </div>
+          </div>
+          {lists.length === 0 ? (
+            <div className="dashboard-tile empty">
+              <p>No todo lists found.</p>
+            </div>
+          ) : (
+            lists.map(list => (
+              <div className="dashboard-tile open-tile" key={list.id || 'unassigned'}>
+                <header className="tile-header">
+                  <h2>{list.title}</h2>
+                  <div className="tile-actions">
+                    <button className="btn btn-primary" onClick={() => navigate(`/todos/${list.id}`)}>
                       Open
                     </button>
-                    <button className="delete-btn" onClick={() => handleDeleteList(list.id!)}>
-                      Delete
-                    </button>
-                  </>
-                )}
+                    {list.id && (
+                      <a
+                        href="#"
+                        className="tile-link delete-link"
+                        onClick={e => {
+                          e.preventDefault()
+                          handleDeleteList(list.id!)
+                        }}
+                      >
+                        Delete
+                      </a>
+                    )}
+                  </div>
+                </header>
+                <section className="tile-body">
+                  <p>{list.todos?.length ?? 0} todos</p>
+                </section>
               </div>
-              {/* Only show the list title on the dashboard. Individual todos are shown after opening the list */}
-            </div>
+            ))
+          )}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div className="dashboard-tile ghost-tile" key={`ghost-${i}`} />
           ))}
+        </div>
+      )}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div
+            className="modal fancy-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={e => e.stopPropagation()}
+          >
+            <span className="flare-line" aria-hidden="true"></span>
+            <h2 className="fade-item">Create Todo List</h2>
+            <form onSubmit={handleCreateList}>
+              <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
+                <label htmlFor="list-title" className="form-label">
+                  Title
+                </label>
+                <input
+                  id="list-title"
+                  className="form-input"
+                  value={newTitle}
+                  onChange={e => setNewTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-cancel fade-item"
+                  style={{ animationDelay: '0.2s' }}
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary fade-item"
+                  style={{ animationDelay: '0.2s' }}
+                >
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
