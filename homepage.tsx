@@ -105,7 +105,7 @@ const Homepage: React.FC = (): JSX.Element => {
             Vision Meets Action
           </h1>
           <p>
-            Build your ideas while AI builds mind maps and auto-creates todos so your vision becomes a complete plan. Every task stays connected to keep the big picture clear.
+            Mindmaps connect todos to boards, turning ideas into executed vision.
           </p>
           <Link to="/purchase" className="btn">
             Get Started
