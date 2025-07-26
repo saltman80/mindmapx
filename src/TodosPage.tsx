@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
+import LoadingSkeleton from '../loadingskeleton'
 
 interface TodoItem {
   id: string
@@ -20,12 +21,14 @@ interface TodoList {
 export default function TodosPage(): JSX.Element {
   const [lists, setLists] = useState<TodoList[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [newTitle, setNewTitle] = useState('')
   const [showModal, setShowModal] = useState(false)
   const navigate = useNavigate()
 
   const fetchLists = async (): Promise<void> => {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/.netlify/functions/todo-lists', {
         credentials: 'include',
@@ -34,6 +37,8 @@ export default function TodosPage(): JSX.Element {
       const arr: TodoList[] = Array.isArray(data) ? data : []
       arr.sort((a, b) => (a.id === null ? 1 : 0) - (b.id === null ? 1 : 0))
       setLists(arr)
+    } catch (err: any) {
+      setError(err.message || 'Failed to load lists')
     } finally {
       setLoading(false)
     }
@@ -92,7 +97,9 @@ export default function TodosPage(): JSX.Element {
         <img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos
       </h1>
       {loading ? (
-        <p>Loading...</p>
+        <LoadingSkeleton count={3} />
+      ) : error ? (
+        <p className="error">{error}</p>
       ) : (
         <div className="four-col-grid">
           <div className="dashboard-tile create-tile">
