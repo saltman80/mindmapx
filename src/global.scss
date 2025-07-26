@@ -2078,6 +2078,11 @@ hr {
   font-size: 1rem;
 }
 
+.btn-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+
 .btn-plus {
   margin-right: var(--spacing-xs);
   font-weight: 600;
@@ -3259,4 +3264,67 @@ hr {
 .mention {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+.todo-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.todo-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+
+  &:hover .todo-actions {
+    opacity: 1;
+  }
+}
+
+.todo-title {
+  flex: 1;
+  cursor: pointer;
+}
+
+.todo-row.completed .todo-title {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.todo-inline-input {
+  flex: 1;
+  border: none;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: #f8f8f8;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.todo-divider {
+  border: none;
+  border-top: 1px dashed #ccc;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.show-more-btn {
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  color: #007aff;
+  cursor: pointer;
 }
