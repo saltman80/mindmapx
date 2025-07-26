@@ -50,6 +50,7 @@ const Header = (): JSX.Element => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
     navigate(route)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {
