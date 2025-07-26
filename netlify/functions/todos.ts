@@ -7,32 +7,37 @@ import { z, ZodError } from 'zod'
 const todoInputSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
+  listId: z.string().uuid().optional(),
+  nodeId: z.string().uuid().optional(),
 })
 
-async function getTodos(userId: string) {
+async function getTodos(userId: string, listId?: string) {
   const client = await getClient()
   try {
-    const res = await client.query(
-      `SELECT id, user_id, title, description, completed, assignee_id, created_at, updated_at
-         FROM todos
-        WHERE user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1)
-        ORDER BY created_at DESC`,
-      [userId]
-    )
+    const values: any[] = [userId]
+    let sql = `SELECT id, user_id, title, description, completed, assignee_id, created_at, updated_at
+                 FROM todos
+                WHERE (user_id = $1 OR user_id IN (SELECT user_id FROM team_members WHERE member_id = $1))`
+    if (listId) {
+      values.push(listId)
+      sql += ` AND list_id = $2`
+    }
+    sql += ' ORDER BY created_at DESC'
+    const res = await client.query(sql, values)
     return res.rows
   } finally {
     client.release()
   }
 }
 
-async function createTodo(userId: string, data: { title: string; description?: string }) {
+async function createTodo(userId: string, data: { title: string; description?: string; listId?: string; nodeId?: string }) {
   const client = await getClient()
   try {
     const res = await client.query(
-      `INSERT INTO todos (user_id, title, description, created_at, updated_at)
-       VALUES ($1, $2, $3, NOW(), NOW())
+      `INSERT INTO todos (user_id, title, description, list_id, node_id, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
        RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at`,
-      [userId, data.title, data.description ?? null]
+      [userId, data.title, data.description ?? null, data.listId ?? null, data.nodeId ?? null]
     )
     return res.rows[0]
   } finally {
@@ -61,7 +66,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
 
     if (event.httpMethod === 'GET') {
-      const todos = await getTodos(userId)
+      const listId = event.queryStringParameters?.listId
+      const todos = await getTodos(userId, listId)
       return { statusCode: 200, headers, body: JSON.stringify(todos) }
     }
 

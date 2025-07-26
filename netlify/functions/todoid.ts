@@ -17,6 +17,7 @@ const updateTodoSchema = z
     description: z.string().max(1000).nullable().optional(),
     completed: z.boolean().optional(),
     assignee_id: z.string().uuid().nullable().optional(),
+    list_id: z.string().uuid().nullable().optional(),
   })
   .refine(data => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
@@ -27,7 +28,7 @@ async function getTodo(todoId: string, userId: string): Promise<Todo> {
   try {
     const result = await client.query(
       `SELECT t.id, t.user_id, t.title, t.description, t.completed,
-              t.assignee_id, t.created_at, t.updated_at,
+              t.assignee_id, t.list_id, t.created_at, t.updated_at,
               u.name AS assignee_name, u.email AS assignee_email
          FROM todos t
          LEFT JOIN users u ON t.assignee_id = u.id
@@ -68,6 +69,10 @@ async function updateTodo(
     fields.push(`assignee_id = $${idx++}`)
     values.push(data.assignee_id)
   }
+  if (data.list_id !== undefined) {
+    fields.push(`list_id = $${idx++}`)
+    values.push(data.list_id)
+  }
   values.push(todoId, userId)
   const idPos = idx++
   const userPos = idx
@@ -75,7 +80,7 @@ async function updateTodo(
     UPDATE todos
     SET ${fields.join(', ')}, updated_at = NOW()
     WHERE id = $${idPos} AND user_id = $${userPos}
-    RETURNING id, user_id, title, description, completed, assignee_id, created_at, updated_at
+    RETURNING id, user_id, title, description, completed, assignee_id, list_id, created_at, updated_at
   `
   const client = await getClient()
   try {
