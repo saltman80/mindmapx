@@ -33,7 +33,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
 
   let session
   try {
-    session = verifySession(token)
+    session = await verifySession(token)
   } catch {
     return {
       statusCode: 401,

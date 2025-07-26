@@ -25,7 +25,7 @@ export const handler = async (
 
   let userId: string
   try {
-    const session = verifySession(token) as { userId: string }
+    const session = await verifySession(token) as { userId: string }
     userId = session.userId
     if (!isUuid(userId)) {
       return {
