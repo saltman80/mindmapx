@@ -83,10 +83,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     useEffect(() => {
       onTransformChange?.(transform)
     }, [transform, onTransformChange])
-    const [newName, setNewName] = useState('')
-  const [newDesc, setNewDesc] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [addParentId, setAddParentId] = useState<string | null>(null)
+    const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDesc, setEditDesc] = useState('')
@@ -122,31 +119,27 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [])
 
 
-    const handleAddChild = useCallback(() => {
-      console.log('[MindmapCanvas] handleAddChild')
-      if (!addParentId) return
-      const parent = safeNodes.find(n => n.id === addParentId)
-      if (!parent) {
-        setAddParentId(null)
-        return
-      }
-      const siblingCount = safeNodes.filter(n => n.parentId === addParentId).length
-      const newNode = {
-        x: parent.x + 150,
-        y: parent.y + 50 * (siblingCount + 1),
-        label: newName.trim() || 'General',
-        description: newDesc.trim() || '',
-        parentId: addParentId,
-        mindmapId,
-      }
+    const handleAddChild = useCallback(
+      (parentId: string) => {
+        console.log('[MindmapCanvas] handleAddChild', parentId)
+        const parent = safeNodes.find(n => n.id === parentId)
+        if (!parent) return
+        const newNode = {
+          x: parent.x + 150,
+          y: parent.y + 100,
+          label: 'New Node',
+          description: '',
+          parentId,
+          mindmapId,
+        }
 
-      console.log('[MindmapCanvas] Posting child node payload:', newNode)
+        console.log('[MindmapCanvas] Posting child node payload:', newNode)
 
-      authFetch('/.netlify/functions/nodes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newNode),
-      })
+        authFetch('/.netlify/functions/nodes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newNode),
+        })
         .then(async res => {
           if (!res.ok) throw new Error('Node insert failed')
           const data = await res.json()
@@ -156,12 +149,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         .catch(err => {
           console.error('[CreateChildNode] Failed to save node:', err)
         })
-        .finally(() => {
-          setAddParentId(null)
-          setNewName('')
-          setNewDesc('')
-        })
-    }, [addParentId, addNode, Array.isArray(nodes) ? nodes : [], newName, newDesc, mindmapId])
+    }, [addNode, Array.isArray(nodes) ? nodes : [], mindmapId])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
@@ -490,9 +478,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
-                    setAddParentId(node.id)
-                    setNewName('')
-                    setNewDesc('')
+                    handleAddChild(node.id)
                   }}
                 >
                   +
@@ -537,29 +523,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             ) : null
           )}
 
-        {addParentId && (
-          <div className="modal-overlay" onClick={() => setAddParentId(null)}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <h2>Add Child Node</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={newName}
-                  onChange={e => setNewName(e.target.value)}
-                />
-                <textarea
-                  placeholder="Description (optional)"
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                />
-                <button className="btn-primary" onClick={handleAddChild}>
-                  Add Node
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Add-child modal removed for auto-placement workflow */}
         {editingId && (
           <div className="modal-overlay" onClick={() => setEditingId(null)}>
             <div className="modal" onClick={e => e.stopPropagation()}>

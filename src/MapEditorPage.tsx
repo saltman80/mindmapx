@@ -146,8 +146,8 @@ export default function MapEditorPage(): JSX.Element {
     if (loaded && Array.isArray(nodes) && nodes.length === 0 && !firstNodeCreated && mindmap?.id) {
       setFirstNodeCreated(true)
 
-      const rootX = window.innerWidth / 2
-      const rootY = window.innerHeight / 2
+      const rootX = 400
+      const rootY = 300
 
       const generalNode = {
         x: rootX,
@@ -165,39 +165,8 @@ export default function MapEditorPage(): JSX.Element {
         body: JSON.stringify(generalNode)
       })
         .then(res => res.json())
-        .then(data => {
-          const rootId = data.id
-          if (!rootId) return
-
-          const childNodes = [
-            {
-              x: rootX + 150,
-              y: rootY - 100,
-              label: 'Idea 1',
-              description: '',
-              parentId: rootId,
-              mindmapId: mindmap.id,
-            },
-            {
-              x: rootX + 150,
-              y: rootY + 100,
-              label: 'Idea 2',
-              description: '',
-              parentId: rootId,
-              mindmapId: mindmap.id,
-            }
-          ]
-
-          childNodes.forEach(n => {
-            fetch('/.netlify/functions/nodes', {
-              method: 'POST',
-              credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(n)
-            }).catch(console.error)
-          })
-
-          // Reload nodes after automatically creating the initial set
+        .then(() => {
+          // Reload nodes after automatically creating the initial root node
           setReloadFlag(p => p + 1)
         })
         .catch(err => console.error('[AutoCreateNode] Failed:', err))
