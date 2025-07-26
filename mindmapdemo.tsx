@@ -84,7 +84,7 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
   }, [inView, step, totalSteps])
 
   return (
-    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '5px' }}>
     <div className="mindmap-demo-page">
       <section ref={sectionRef} className="mindmap-demo section reveal relative overflow-x-visible">
         <FaintMindmapBackground />
