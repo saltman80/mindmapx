@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Homepage from '../homepage'
 import AboutPage from '../about'
 import MindmapDemo from '../mindmapdemo'
@@ -81,6 +82,14 @@ function AppLayout() {
   const isDashboard = dashboardPaths.some(path =>
     location.pathname === path || location.pathname.startsWith(path + '/')
   )
+
+  useEffect(() => {
+    if (isDashboard) {
+      document.body.classList.remove('marketing')
+    } else {
+      document.body.classList.add('marketing')
+    }
+  }, [isDashboard])
 
   return isDashboard ? (
     <div className="app-layout">
