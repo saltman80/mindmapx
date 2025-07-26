@@ -56,7 +56,8 @@
 html,
 body {
   height: 100%;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 html {
@@ -1101,7 +1102,7 @@ hr {
 
 .about-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-lg);
   align-items: center;
   justify-items: center;
