@@ -161,7 +161,15 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         })
         .catch(err => {
           console.error('[CreateNode] Failed to save node:', err)
-          alert('Failed to create node.')
+          // Fallback: create a client-side id so the user can continue editing
+          const fallbackId =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2)
+          setNodes(prev => [...prev, { ...newNode, id: fallbackId }])
+          setShowCreate(false)
+          setNewName('')
+          setNewDesc('')
         })
     }
 

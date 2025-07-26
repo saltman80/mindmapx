@@ -187,6 +187,12 @@ export default function MapEditorPage(): JSX.Element {
       })
       .catch(err => {
         console.error('[handleAddNode] error', err)
+        // fall back to client-side id so the user can continue working
+        const fallbackId =
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2)
+        setNodes(prev => [...prev, { ...node, id: node.id || fallbackId }])
       })
   }
 
