@@ -99,11 +99,18 @@ export const handler = async (
     const token = jwt.sign(
       { userId: user.id },
       JWT_SECRET!,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     )
+    const cookieParts = [
+      `token=${token}`,
+      'HttpOnly',
+      'Path=/',
+      'Secure',
+      'Max-Age=604800'
+    ]
     return {
       statusCode: 201,
-      headers: corsHeaders,
+      headers: { ...corsHeaders, 'Set-Cookie': cookieParts.join('; ') },
       body: JSON.stringify({ success: true, user, token }),
     }
   } catch (error) {

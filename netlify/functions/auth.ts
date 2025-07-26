@@ -13,14 +13,12 @@ export function extractToken(event: HandlerEvent): string | null {
   const auth = event.headers.authorization || event.headers.Authorization
   if (auth && auth.startsWith('Bearer ')) {
     const token = auth.slice(7)
-    return token || 'demo'
+    return token || null
   }
   const cookies = cookie.parse(event.headers.cookie || '')
-  return cookies.session || 'demo'
+  return cookies.token || null
 }
 
 export function verifySession(token: string): SessionPayload {
-  // Temporary stub implementation to bypass JWT verification
-  // until the full authorization system is implemented.
-  return { userId: '11111111-1111-1111-1111-111111111111' }
+  return jwt.verify(token, process.env.JWT_SECRET!) as SessionPayload
 }
