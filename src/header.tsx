@@ -57,7 +57,15 @@ const Header = (): JSX.Element => {
       navigate(route)
     }
 
-    const marketingPaths = ['/about', '/todo-demo', '/contact', '/pricing']
+    const marketingPaths = [
+      '/',
+      '/about',
+      '/mindmap-demo',
+      '/todo-demo',
+      '/kanban-demo',
+      '/purchase',
+      '/login'
+    ]
     if (marketingPaths.includes(route)) {
       setTimeout(() => {
         const topAnchor = document.getElementById('top')

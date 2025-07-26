@@ -78,6 +78,7 @@ export default function Kanban(): JSX.Element {
   }, [step, totalSteps])
 
   return (
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
     <div className="kanban-demo-page">
       <section className="kanban-demo section reveal relative overflow-x-visible">
         <FaintMindmapBackground className="mindmap-bg-small" />
@@ -188,6 +189,7 @@ export default function Kanban(): JSX.Element {
           </p>
         </div>
       </section>
+      </div>
     </div>
   )
 }
