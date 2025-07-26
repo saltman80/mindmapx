@@ -1,272 +1,112 @@
-import { useState, useEffect, FormEvent } from 'react'
-import { authFetch } from '../authFetch'
-import { authHeaders } from '../authHeaders'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 
 interface TodoItem {
   id: string
-  title?: string
-  content?: string
-  completed?: boolean
-  createdAt?: string
-  created_at?: string
+  title: string
+  completed: boolean
 }
 
-const getLastViewed = (id: string): number => {
-  const v = localStorage.getItem(`todo_last_viewed_${id}`)
-  return v ? parseInt(v, 10) : 0
+interface TodoList {
+  id: string | null
+  title: string
+  todos: TodoItem[]
 }
 
 export default function TodosPage(): JSX.Element {
-  const [todos, setTodos] = useState<TodoItem[]>([])
+  const [lists, setLists] = useState<TodoList[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ title: '', description: '', list_id: '' })
-  const [lists, setLists] = useState<{ id: string; title: string }[]>([])
+  const [newTitle, setNewTitle] = useState('')
   const navigate = useNavigate()
 
-  const fetchData = async (): Promise<void> => {
+  const fetchLists = async (): Promise<void> => {
     setLoading(true)
-    setError(null)
     try {
-      const res = await authFetch('/.netlify/functions/todos', { credentials: 'include' })
-      const json = res.ok ? await res.json() : []
-      const list: TodoItem[] = Array.isArray(json) ? json : []
-      setTodos(list)
-    } catch (err: any) {
-      setError(err.message || 'Failed to load todos')
+      const res = await fetch('/.netlify/functions/todo-lists', {
+        credentials: 'include',
+      })
+      const data = await res.json()
+      const arr: TodoList[] = Array.isArray(data) ? data : []
+      arr.sort((a, b) => (a.id === null ? 1 : 0) - (b.id === null ? 1 : 0))
+      setLists(arr)
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchLists = async (): Promise<void> => {
-    try {
-      const res = await authFetch('/.netlify/functions/todo-lists', {
-        credentials: 'include',
-      })
-      const json = await res.json()
-      const arr: { id: string; title: string }[] = Array.isArray(json)
-        ? json.filter((l: any) => l.id).map((l: any) => ({ id: l.id, title: l.title }))
-        : []
-      setLists(arr)
-    } catch {
-      setLists([])
-    }
-  }
-
   useEffect(() => {
-    fetchData()
     fetchLists()
   }, [])
 
-  const handleCreate = async (e: FormEvent): Promise<void> => {
-    e.preventDefault()
-    try {
-      const res = await fetch('/.netlify/functions/todos', {
-        method: 'POST',
-        credentials: 'include', // Required for session cookie
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description,
-          list_id: form.list_id || undefined,
-        }),
-      })
-      const json = await res.json()
-      setShowModal(false)
-      setForm({ title: '', description: '', list_id: '' })
-      if (json?.id) {
-        setTimeout(() => navigate(`/todos/${json.id}`), 250)
-      } else {
-        fetchData()
-      }
-    } catch (err: any) {
-      alert(err.message || 'Creation failed')
-    }
+  const handleCreateList = async (): Promise<void> => {
+    const title = newTitle.trim()
+    if (!title) return
+    const res = await fetch('/.netlify/functions/todo-lists', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    })
+    if (!res.ok) return
+    const list = await res.json()
+    setLists(prev => [list, ...prev])
+    setNewTitle('')
   }
 
-  const handleAiCreate = async (): Promise<void> => {
-    try {
-      const res = await fetch('/.netlify/functions/ai-create-todo', {
-        method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
-        body: JSON.stringify({ prompt: form.description, list_id: form.list_id || undefined }),
-      })
-      const json = await res.json()
-      setShowModal(false)
-      setForm({ title: '', description: '', list_id: '' })
-      if (json?.id) {
-        setTimeout(() => navigate(`/todos/${json.id}`), 250)
-      } else {
-        fetchData()
-      }
-    } catch (err: any) {
-      alert(err.message || 'AI creation failed')
+  const handleDeleteList = async (id: string): Promise<void> => {
+    if (!confirm('Delete this list and all todos?')) return
+    const res = await fetch(`/.netlify/functions/todo-lists?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (res.ok) {
+      setLists(prev => prev.filter(l => l.id !== id))
     }
   }
-
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!confirm('Delete this todo?')) return
-    try {
-      const res = await fetch(`/.netlify/functions/todoid/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
-      if (!res.ok) throw new Error('Failed to delete')
-      setTodos(prev => prev.filter(t => t.id !== id))
-    } catch (err: any) {
-      alert(err.message || 'Delete failed')
-    }
-  }
-
-  const now = Date.now()
-  const oneDay = 24 * 60 * 60 * 1000
-  const oneWeek = 7 * oneDay
-  const dayAgo = now - oneDay
-  const weekAgo = now - oneWeek
-
-  const addedDay = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
-  const addedWeek = todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
-
-  const sorted = [...todos].sort((a, b) => {
-    const av = getLastViewed(a.id)
-    const bv = getLastViewed(b.id)
-    if (av !== bv) return bv - av
-    const at = new Date(a.createdAt || a.created_at || '').getTime()
-    const bt = new Date(b.createdAt || b.created_at || '').getTime()
-    return bt - at
-  })
 
   return (
-    <div className="dashboard-page relative overflow-hidden list-page">
+    <div className="todo-dashboard relative overflow-hidden">
       <MindmapArm side="left" />
       <FaintMindmapBackground className="mindmap-bg-small" />
-      <h1 className="dashboard-title"><img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos</h1>
+      <h1 className="dashboard-title">
+        <img src="./assets/logo.png" alt="MindXdo logo" className="dashboard-logo" /> Todos
+      </h1>
+      <div className="mb-4">
+        <input
+          value={newTitle}
+          onChange={e => setNewTitle(e.target.value)}
+          placeholder="New list"
+        />
+        <button onClick={handleCreateList}>Add</button>
+      </div>
       {loading ? (
-        <LoadingSkeleton count={3} />
-      ) : error ? (
-        <p className="error">{error}</p>
+        <p>Loading...</p>
       ) : (
-        <> 
-          <div className="four-col-grid">
-            <div className="dashboard-tile create-tile">
-              <header className="tile-header"><h2>Create Todo</h2></header>
-              <section className="tile-body">
-                <p className="create-help">Click Create to Start</p>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
-                  Create
-                </button>
-              </section>
-            </div>
-            <div className="metric-tile simple">
-              <div className="metric-header stacked">
-                <h3>Metrics</h3>
-                <div className="metric-circle">{todos.length}</div>
-                <p className="metric-total">total</p>
-              </div>
-              <div className="metric-detail-grid">
-                <div className="metric-detail">
-                  <span className="label">Today</span>
-                  <span className="value">{addedDay}</span>
-                </div>
-                <div className="metric-detail">
-                  <span className="label">Week</span>
-                  <span className="value">{addedWeek}</span>
-                </div>
-              </div>
-            </div>
-            {sorted.map(t => (
-              <div className="dashboard-tile open-tile" key={t.id}>
-                <header className="tile-header">
-                  <h2>{t.title || t.content}</h2>
-                  <div className="tile-actions">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        localStorage.setItem(
-                          `todo_last_viewed_${t.id}`,
-                          Date.now().toString()
-                        )
-                        navigate(`/todos/${t.id}`)
-                      }}
-                    >
+        <div className="todo-lists-grid">
+          {lists.map(list => (
+            <div key={list.id || 'unassigned'} className="todo-card">
+              <div className="card-header">
+                <h3>{list.title}</h3>
+                {list.id && (
+                  <>
+                    <button className="open-btn" onClick={() => navigate(`/todos/${list.id}`)}>
                       Open
                     </button>
-                    <a
-                      href="#"
-                      className="tile-link delete-link"
-                      onClick={e => {
-                        e.preventDefault()
-                        handleDelete(t.id)
-                      }}
-                    >
+                    <button className="delete-btn" onClick={() => handleDeleteList(list.id!)}>
                       Delete
-                    </a>
-                  </div>
-                </header>
-                <section className="tile-body">
-                  <p>{t.content || 'Todo details coming soon...'}</p>
-                </section>
+                    </button>
+                  </>
+                )}
               </div>
-            ))}
-            {Array.from({ length: 10 }).map((_v, i) => (
-              <div className="dashboard-tile ghost-tile" key={`ghost-${i}`}></div>
-            ))}
-          </div>
-        </>
-      )}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
-            <span className="flare-line" aria-hidden="true"></span>
-            <h2 className="fade-item">Create Todo</h2>
-            <form onSubmit={handleCreate}>
-              <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
-                <label htmlFor="title" className="form-label">Title</label>
-                <input id="title" className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
-              </div>
-              <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
-                <label htmlFor="desc" className="form-label">Description</label>
-                <textarea id="desc" className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
-              </div>
-              <div className="form-field fade-item" style={{ animationDelay: '0.25s' }}>
-                <label htmlFor="list" className="form-label">List</label>
-                <select
-                  id="list"
-                  className="form-input"
-                  value={form.list_id}
-                  onChange={e => setForm({ ...form, list_id: e.target.value })}
-                >
-                  <option value="">Unassigned</option>
-                  {lists.map(l => (
-                    <option key={l.id} value={l.id}>
-                      {l.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-actions">
-                <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>
-                  Quick Create
-                </button>
-                <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
-                  <span className="sparkle" aria-hidden="true">✨</span>
-                  Create With AI
-                </button>
-              </div>
-            </form>
-          </div>
+              <ul className="todo-list">
+                {list.todos.map(t => (
+                  <li key={t.id}>{t.title}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       )}
     </div>
