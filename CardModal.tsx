@@ -84,6 +84,10 @@ export default function CardModal({
 
   const save = () => {
     if (!card) return
+    if (!card.id) {
+      console.error("Cannot save card: ID is missing");
+      return;
+    }
     console.log('Saving card with ID:', card.id)
     onSave(laneId, {
       ...card,
@@ -100,6 +104,10 @@ export default function CardModal({
 
   const handleDelete = () => {
     if (!card) return
+    if (!card.id) {
+      console.error("Cannot delete card: ID is missing");
+      return;
+    }
     if (window.confirm('Delete this card?')) {
       onDelete(card)
       onClose()
