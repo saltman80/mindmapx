@@ -70,7 +70,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [initialTransform])
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
-    const [showCreate, setShowCreate] = useState(false)
+    const [initialNodeCreated, setInitialNodeCreated] = useState(false)
 
     useEffect(() => {
       setNodes(safePropNodes)
@@ -81,10 +81,31 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [propEdges])
 
     useEffect(() => {
-      if (Array.isArray(nodes) && nodes.length === 0) {
-        setShowCreate(true)
+      if (
+        !initialNodeCreated &&
+        Array.isArray(nodes) &&
+        nodes.length === 0 &&
+        mindmapId
+      ) {
+        const id =
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2)
+        const node: NodeData = {
+          id,
+          x: CANVAS_SIZE / 2,
+          y: CANVAS_SIZE / 2,
+          label: 'General',
+          description: '',
+          parentId: null,
+          todoId: null,
+          mindmapId,
+        }
+        addNode(node)
+        onAddNode?.(node)
+        setInitialNodeCreated(true)
       }
-    }, [nodes])
+    }, [nodes, initialNodeCreated, mindmapId, addNode, onAddNode])
 
     useEffect(() => {
       onTransformChange?.(transform)
@@ -127,41 +148,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       }
     }, [])
 
-    const handleSaveNewNode = () => {
-      if (!mindmapId || !containerRef.current) return
-
-      if (!newName?.trim()) {
-        alert('Please enter a name for the node.')
-        return
-      }
-
-      const label = newName.trim() || 'General'
-      const description = newDesc.trim() || ''
-      const id =
-        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-          ? crypto.randomUUID()
-          : Math.random().toString(36).slice(2)
-
-      const rect = containerRef.current.getBoundingClientRect()
-      void rect // reference to avoid lint warnings, not used currently
-
-      const node: NodeData = {
-        id,
-        x: CANVAS_SIZE / 2,
-        y: CANVAS_SIZE / 2,
-        label,
-        description,
-        parentId: null,
-        todoId: null,
-        mindmapId,
-      }
-      console.log('[MindmapCanvas] Creating node with data:', node)
-      addNode(node)
-      onAddNode?.(node)
-      setShowCreate(false)
-      setNewName('')
-      setNewDesc('')
-    }
 
     const handleAddChild = useCallback(() => {
       console.log('[MindmapCanvas] handleAddChild')
@@ -570,33 +556,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               </div>
             ) : null
           )}
-        {showCreate && (
-          <div className="modal-overlay" onClick={() => setShowCreate(false)}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <h2>Create Map Node</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={newName}
-                  onChange={e => setNewName(e.target.value)}
-                />
-                <textarea
-                  placeholder="Description (optional)"
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                />
-                <button
-                  className="btn-primary"
-                  onClick={handleSaveNewNode}
-                  disabled={!newName?.trim()}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {addParentId && (
           <div className="modal-overlay" onClick={() => setAddParentId(null)}>
