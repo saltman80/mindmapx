@@ -30,6 +30,20 @@ export default function TodoCanvas({
     if (adding) inputRef.current?.focus()
   }, [adding])
 
+  useEffect(() => {
+    if (!list_id) return
+    fetch(`/.netlify/functions/todos?list_id=${encodeURIComponent(list_id)}`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setTodos(data)
+      })
+      .catch(err => {
+        console.error('Failed to load todos', err)
+      })
+  }, [list_id])
+
   const handleCreateTodo = async (title: string) => {
     try {
       const res = await fetch('/.netlify/functions/todos', {

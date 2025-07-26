@@ -30,7 +30,7 @@ export default function TodosCanvasPage(): JSX.Element {
         {error ? (
           <p className="error">{error}</p>
         ) : (
-          <TodoCanvas initialTodos={todo ? [todo] : []} />
+          <TodoCanvas initialTodos={todo ? [todo] : []} list_id={id} />
         )}
       </main>
     </div>
