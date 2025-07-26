@@ -18,7 +18,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
     const client = await getClient()
     if (event.httpMethod === 'GET') {
-      const res = await client.query(
+      const listsRes = await client.query(
         `SELECT l.id, l.title, l.created_at, l.updated_at,
                 COALESCE(jsonb_agg(jsonb_build_object('id', t.id, 'title', t.title, 'description', t.description, 'completed', t.completed)) FILTER (WHERE t.id IS NOT NULL), '[]') AS todos
            FROM todo_lists l
@@ -28,8 +28,19 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
           ORDER BY l.created_at DESC`,
         [userId]
       )
+      const unassignedRes = await client.query(
+        `SELECT id, title, description, completed
+           FROM todos
+          WHERE user_id = $1 AND list_id IS NULL
+          ORDER BY created_at DESC`,
+        [userId]
+      )
       client.release()
-      return { statusCode: 200, headers, body: JSON.stringify(res.rows) }
+      const rows = listsRes.rows
+      if (unassignedRes.rows.length > 0) {
+        rows.push({ id: null, title: 'Unassigned Todos', todos: unassignedRes.rows })
+      }
+      return { statusCode: 200, headers, body: JSON.stringify(rows) }
     }
     if (event.httpMethod === 'POST') {
       if (!event.body) {

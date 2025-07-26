@@ -25,7 +25,8 @@ export default function TodosPage(): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ title: '', description: '' })
+  const [form, setForm] = useState({ title: '', description: '', list_id: '' })
+  const [lists, setLists] = useState<{ id: string; title: string }[]>([])
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
@@ -43,7 +44,25 @@ export default function TodosPage(): JSX.Element {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  const fetchLists = async (): Promise<void> => {
+    try {
+      const res = await authFetch('/.netlify/functions/todo-lists', {
+        credentials: 'include',
+      })
+      const json = await res.json()
+      const arr: { id: string; title: string }[] = Array.isArray(json)
+        ? json.filter((l: any) => l.id).map((l: any) => ({ id: l.id, title: l.title }))
+        : []
+      setLists(arr)
+    } catch {
+      setLists([])
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+    fetchLists()
+  }, [])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
@@ -54,11 +73,15 @@ export default function TodosPage(): JSX.Element {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: form.title, description: form.description }),
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          list_id: form.list_id || undefined,
+        }),
       })
       const json = await res.json()
       setShowModal(false)
-      setForm({ title: '', description: '' })
+      setForm({ title: '', description: '', list_id: '' })
       if (json?.id) {
         setTimeout(() => navigate(`/todos/${json.id}`), 250)
       } else {
@@ -75,11 +98,11 @@ export default function TodosPage(): JSX.Element {
         method: 'POST',
         credentials: 'include',
         headers: authHeaders(),
-        body: JSON.stringify({ prompt: form.description }),
+        body: JSON.stringify({ prompt: form.description, list_id: form.list_id || undefined }),
       })
       const json = await res.json()
       setShowModal(false)
-      setForm({ title: '', description: '' })
+      setForm({ title: '', description: '', list_id: '' })
       if (json?.id) {
         setTimeout(() => navigate(`/todos/${json.id}`), 250)
       } else {
@@ -213,6 +236,22 @@ export default function TodosPage(): JSX.Element {
               <div className="form-field fade-item" style={{ animationDelay: '0.2s' }}>
                 <label htmlFor="desc" className="form-label">Description</label>
                 <textarea id="desc" className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+              </div>
+              <div className="form-field fade-item" style={{ animationDelay: '0.25s' }}>
+                <label htmlFor="list" className="form-label">List</label>
+                <select
+                  id="list"
+                  className="form-input"
+                  value={form.list_id}
+                  onChange={e => setForm({ ...form, list_id: e.target.value })}
+                >
+                  <option value="">Unassigned</option>
+                  {lists.map(l => (
+                    <option key={l.id} value={l.id}>
+                      {l.title}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-actions">
                 <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>
