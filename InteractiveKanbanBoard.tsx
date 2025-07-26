@@ -127,7 +127,14 @@ export default function InteractiveKanbanBoard({
           const done = prev.find(l => l.title === 'Done')
           const others = prev.filter(l => l.title !== 'Done')
           const lane = { id, title: data.title, cards: [] }
-          return done ? [...others, lane, done] : [...prev, lane]
+          const updated = done ? [...others, lane, done] : [...prev, lane]
+          const payload = updated.map((ln, idx) => ({ id: ln.id, position: idx }))
+          authFetch(`${API_BASE}/columns`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ columns: payload })
+          }).catch(() => {})
+          return updated
         })
       })
       .catch(err => console.error('addLane', err))
@@ -213,13 +220,12 @@ export default function InteractiveKanbanBoard({
       const withoutDone = copy.filter(l => l.title !== 'Done')
       const done = copy.find(l => l.title === 'Done')
       const result = done ? [...withoutDone, done] : withoutDone
-      result.forEach((ln, idx) => {
-        authFetch(`${API_BASE}/columns/${ln.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ position: idx })
-        }).catch(() => {})
-      })
+      const payload = result.map((ln, idx) => ({ id: ln.id, position: idx }))
+      authFetch(`${API_BASE}/columns`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ columns: payload })
+      }).catch(() => {})
       return result
     })
   }
