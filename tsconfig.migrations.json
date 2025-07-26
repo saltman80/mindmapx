@@ -9,5 +9,9 @@
     "rootDir": ".",
     "types": ["node", "@netlify/functions"]
   },
-  "include": ["migrationrunner.ts", "netlify/functions/**/*.ts"]
+  "include": [
+    "migrationrunner.ts",
+    "netlify/functions/**/*.ts",
+    "cookie.d.ts"
+  ]
 }
