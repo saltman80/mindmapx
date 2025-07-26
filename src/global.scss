@@ -56,7 +56,7 @@
 html,
 body {
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 html {
@@ -65,6 +65,7 @@ html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) var(--color-bg-alt);
+  scroll-padding: 32px;
 }
 
 body {
@@ -1029,7 +1030,9 @@ hr {
   align-items: flex-start;
   gap: 1rem;
   min-width: max-content;
-  padding-bottom: 2rem;
+  padding-right: 100px;
+  padding-bottom: 100px;
+  min-height: calc(100vh - 80px);
 }
 
 .kanban-lane {
@@ -2205,10 +2208,7 @@ hr {
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 1rem;
-  min-height: 80vh;
+  overflow: visible;
   scrollbar-gutter: stable;
 }
 
@@ -2512,8 +2512,7 @@ hr {
 
 .scroll-container {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   padding: 0 1rem;
   scrollbar-gutter: stable;
 }
@@ -2528,7 +2527,9 @@ hr {
   align-items: flex-start;
   gap: 1rem;
   min-width: max-content;
-  padding-bottom: 2rem;
+  padding-right: 100px;
+  padding-bottom: 100px;
+  min-height: calc(100vh - 80px);
 }
 
 .kanban-lane {
