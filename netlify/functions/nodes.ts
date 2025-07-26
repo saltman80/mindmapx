@@ -99,7 +99,6 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         label: payload.label ?? '',
         description: payload.description ?? ''
       }
-      console.log('[Insert Node] payload:', payload)
 
       try {
         const result = await client.query(
@@ -121,7 +120,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           body: JSON.stringify({ id: result.rows[0].id })
         }
       } catch (e) {
-        console.error('[Insert Node failed]', e)
+        console.error('[Insert Node failed]', { payload, error: e })
         return {
           statusCode: 500,
           headers,
