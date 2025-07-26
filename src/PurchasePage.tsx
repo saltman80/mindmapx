@@ -39,7 +39,7 @@ const PurchasePage = () => {
     <section className="section relative overflow-x-visible">
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
-        <p className="text-center mb-lg">$9.99 per month - Mindmap and Todo platform</p>
+        <p className="text-center mb-lg">$6.95 per month (Mindmap + Todo + Kanban System)</p>
         <div className="two-column purchase-grid">
           <div className="relative">
             <div className="offer-card text-center">
@@ -128,7 +128,7 @@ const PurchasePage = () => {
                 />
               </label>
             </div>
-            <p className="total-charge text-center">Total: $9.99 / month</p>
+            <p className="total-charge text-center">Total: $6.95 / month</p>
             {message && <p className="text-center mb-md">{message}</p>}
             <div className="payment-actions">
               <button type="submit" className="btn" disabled={loading}>
