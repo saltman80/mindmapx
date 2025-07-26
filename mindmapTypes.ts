@@ -6,6 +6,7 @@ export interface NodeData {
   description?: string
   parentId?: string | null
   todoId?: string | null
+  mindmapId?: string
 }
 
 export interface EdgeData {
