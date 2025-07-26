@@ -47,11 +47,12 @@ export default function KanbanBoardsPage(): JSX.Element {
   const handleSave = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
+      const token = getAuthToken()
       const res = await fetch('/.netlify/functions/kanban-boards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${getAuthToken()}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           title: form.title,
