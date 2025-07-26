@@ -130,17 +130,27 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handleSaveNewNode = () => {
       if (!mindmapId || !containerRef.current) return
 
+      if (!newName?.trim()) {
+        alert('Please enter a name for the node.')
+        return
+      }
+
       const newNode = {
         // Default position for the very first node
         // Explicit coordinates help avoid inserting extreme
         // values when the board is empty
         x: 500,
         y: 500,
-        label: newName || 'Untitled',
-        description: newDesc || '',
+        label: newName?.trim() || 'General',
+        description: newDesc?.trim() || undefined,
         parentId: null,
         mindmapId,
       }
+
+      console.log('[Modal Save] Submitting new node with values:', {
+        newName,
+        newDesc,
+      })
 
       authFetch('/.netlify/functions/nodes', {
         method: 'POST',
@@ -584,7 +594,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   value={newDesc}
                   onChange={e => setNewDesc(e.target.value)}
                 />
-                <button className="btn-primary" onClick={handleSaveNewNode}>
+                <button
+                  className="btn-primary"
+                  onClick={handleSaveNewNode}
+                  disabled={!newName?.trim()}
+                >
                   Save
                 </button>
               </div>
