@@ -1,7 +1,8 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import type { PoolClient } from 'pg'
-import { extractToken, verifySession } from './auth.js'
+import { validate as isUuid } from 'uuid'
+import { requireAuth } from './middleware.js'
 
 interface NodePayload {
   mindmapId: string
@@ -26,17 +27,14 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       return { statusCode: 204, headers, body: '' }
     }
 
-    const token = extractToken(event)
-    if (!token) {
-      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
-    }
-
     let userId: string
     try {
-      const session = await verifySession(token) as { userId: string }
-      userId = session.userId
+      userId = await requireAuth(event)
+      if (!isUuid(userId)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid userId' }) }
+      }
     } catch {
-      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
     }
 
     client = await getClient()
@@ -60,15 +58,29 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     if (event.httpMethod === 'POST') {
-      if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
+      if (!event.body) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
+      }
+
       let payload: NodePayload
       try {
         payload = JSON.parse(event.body)
       } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
-      console.log('Received body:', event.body)
-      console.log('Parsed payload:', payload)
+
+      if (!payload.mindmapId || !isUuid(payload.mindmapId)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid mindmapId' }) }
+      }
+
+      if (payload.parentId && !isUuid(payload.parentId)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid parentId' }) }
+      }
+
+      if (payload.x === undefined || payload.y === undefined) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing coordinates' }) }
+      }
+
       const result = await client.query(
         `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
          VALUES ($1, $2, $3, $4, $5, $6)
@@ -82,8 +94,9 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           payload.parentId ?? null,
         ]
       )
+
       return {
-        statusCode: 200,
+        statusCode: 201,
         headers,
         body: JSON.stringify({ id: result.rows[0].id })
       }
