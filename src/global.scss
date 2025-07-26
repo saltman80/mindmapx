@@ -927,6 +927,12 @@ hr {
   text-align: center;
 }
 
+.kanban-demo .kanban-board {
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-right: 0;
+}
+
 .mindmap-demo {
   max-width: 1200px;
   margin: 0 auto;
@@ -2653,8 +2659,9 @@ hr {
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  padding: 0 1rem 16px;
+  padding: 0 1rem;
   scrollbar-gutter: stable;
+  height: calc(100vh - 80px);
 }
 
 .scroll-container::-webkit-scrollbar {
