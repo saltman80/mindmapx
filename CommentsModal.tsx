@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
-import { v4 as uuid } from 'uuid'
 import type { Card, Comment } from './CardModal'
 
 interface Props {
@@ -12,32 +11,51 @@ interface Props {
 
 export default function CommentsModal({ card, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
+  const [comments, setComments] = useState<Comment[]>([])
   const feedRef = useRef<HTMLDivElement>(null)
-  const add = () => {
-    if (!text.trim()) return
-    const comment: Comment = {
-      id: uuid(),
-      text,
-      createdAt: new Date().toISOString(),
-      author: currentUser?.name || 'Anon',
+
+  const submitComment = async () => {
+    if (!card || !text.trim()) return
+    const body = { todoId: card.id, comment: text.trim() }
+    const res = await fetch('/.netlify/functions/todo-comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body),
+    })
+    if (res.ok) {
+      const newComment = {
+        comment: body.comment,
+        author: 'You',
+        created_at: new Date().toISOString(),
+      } as any
+      setComments(prev => [...prev, newComment])
+      onAdd(newComment)
+      setText('')
     }
-    onAdd(comment)
-    setText('')
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      add()
+      submitComment()
     }
   }
 
   useEffect(() => {
     if (!card) return
+    fetch(`/.netlify/functions/todo-comments?todoId=${card.id}`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(setComments)
+  }, [card?.id])
+
+  useEffect(() => {
     const el = feedRef.current
     if (!el) return
     el.scrollTop = el.scrollHeight
-  }, [card?.comments])
+  }, [comments])
 
   if (!card) return null
 
@@ -59,16 +77,16 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
       <div className="comment-modal">
         <h2 className="mb-2 text-lg font-semibold">Comments for "{card.title}"</h2>
         <div className="comment-feed" ref={feedRef}>
-          {(card.comments || []).map(c => {
+          {comments.map((c, i) => {
             const isMine = c.author === currentUser?.name
             const name = isMine ? 'Me' : c.author || 'Anon'
             return (
-              <div key={c.id} className={`comment-bubble ${isMine ? 'me' : 'other'} fade-item`}>
+              <div key={i} className={`comment-bubble ${isMine ? 'me' : 'other'} fade-item`}>
                 <div className="comment-meta">
-                  <span>{name}</span>
-                  <span className="timestamp">{new Date(c.createdAt).toLocaleString()}</span>
+                  <span className="comment-author">{name}</span>
+                  <span className="comment-time">{new Date((c as any).created_at || c.createdAt).toLocaleString()}</span>
                 </div>
-                <div className="comment-text">{highlightMentions(c.text)}</div>
+                <div className="comment-body">{highlightMentions((c as any).comment || c.text)}</div>
               </div>
             )
           })}
@@ -80,7 +98,7 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
             placeholder="Type a comment..."
             onKeyDown={handleKeyDown}
           />
-          <button className="send-button" onClick={add} disabled={!text.trim()}>Send</button>
+          <button className="send-button" onClick={submitComment} disabled={!text.trim()}>Send</button>
         </div>
       </div>
     </Modal>
