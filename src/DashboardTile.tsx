@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 
 export interface DashboardItem {
   id: string
-  label: string
+  label: ReactNode | string
   link: string
+  subText?: string
 }
 
 interface DashboardTileProps {
@@ -14,9 +15,10 @@ interface DashboardTileProps {
   metrics?: ReactNode
   onCreate?: () => void
   moreLink?: string
+  listClassName?: string
 }
 
-export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink }: DashboardTileProps) {
+export default function DashboardTile({ icon, title, items = [], metrics, onCreate, moreLink, listClassName = 'recent-list' }: DashboardTileProps) {
   return (
     <div className={`dashboard-tile${onCreate ? ' can-create' : ''}`}>
       <header className="tile-header">
@@ -31,10 +33,15 @@ export default function DashboardTile({ icon, title, items = [], metrics, onCrea
         )}
       </header>
       {items.length > 0 && (
-        <ul className="recent-list">
+        <ul className={listClassName}>
           {items.map(item => (
             <li key={item.id}>
-              <Link to={item.link}>{item.label}</Link>
+              <Link to={item.link} className="dashboard-link">
+                {item.label}
+              </Link>
+              {item.subText && (
+                <span className="dashboard-subtext">{item.subText}</span>
+              )}
             </li>
           ))}
         </ul>
