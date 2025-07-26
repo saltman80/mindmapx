@@ -86,8 +86,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
       try {
         const result = await client.query(
-          `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id, content)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
+           VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING id`,
           [
             payload.mindmapId,
@@ -95,8 +95,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
             payload.y,
             payload.label ?? null,
             payload.description ?? null,
-            payload.parentId ?? null,
-            payload.label ?? ''
+            payload.parentId ?? null
           ]
         )
 
