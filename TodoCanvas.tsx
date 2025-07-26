@@ -189,7 +189,7 @@ export default function TodoCanvas({
   )
 
   return (
-    <div className="todo-canvas-wrapper">
+    <div className="todo-canvas">
       {listTitle && (
         <>
           <img src="/assets/logo.png" alt="MindXdo" className="todo-logo" />
