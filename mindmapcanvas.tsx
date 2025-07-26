@@ -70,7 +70,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [initialTransform])
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
-    const [initialNodeCreated, setInitialNodeCreated] = useState(false)
 
     useEffect(() => {
       setNodes(safePropNodes)
@@ -79,33 +78,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     useEffect(() => {
       setEdges(safePropEdges)
     }, [propEdges])
-
-    useEffect(() => {
-      if (
-        !initialNodeCreated &&
-        Array.isArray(nodes) &&
-        nodes.length === 0 &&
-        mindmapId
-      ) {
-        const id =
-          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-            ? crypto.randomUUID()
-            : Math.random().toString(36).slice(2)
-        const node: NodeData = {
-          id,
-          x: CANVAS_SIZE / 2,
-          y: CANVAS_SIZE / 2,
-          label: 'General',
-          description: '',
-          parentId: null,
-          todoId: null,
-          mindmapId,
-        }
-        addNode(node)
-        onAddNode?.(node)
-        setInitialNodeCreated(true)
-      }
-    }, [nodes, initialNodeCreated, mindmapId, addNode, onAddNode])
 
     useEffect(() => {
       onTransformChange?.(transform)

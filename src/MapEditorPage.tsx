@@ -141,6 +141,41 @@ export default function MapEditorPage(): JSX.Element {
     }
   }, [loadingMap, loadingNodes])
 
+  useEffect(() => {
+    if (
+      !loadingMap &&
+      !loadingNodes &&
+      Array.isArray(nodes) &&
+      nodes.length === 0 &&
+      mindmap?.id
+    ) {
+      const generalNode = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        label: 'General',
+        description: '',
+        parentId: null,
+        mindmapId: mindmap.id,
+      }
+
+      fetch('/.netlify/functions/nodes', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(generalNode),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.id) {
+            setNodes([{ ...generalNode, id: data.id }])
+          }
+        })
+        .catch(err => {
+          console.error('[AutoCreateGeneralNode] Failed to create node:', err)
+        })
+    }
+  }, [loadingMap, loadingNodes, nodes, mindmap])
+
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
   const handleSaveLayout = useCallback(() => {
