@@ -42,18 +42,29 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const mapId = event.queryStringParameters?.mindmapId
       if (!mapId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'mindmapId required' }) }
       const { rows } = await client.query(
-        `SELECT id, parent_id, x, y, label, description, todo_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
+        `SELECT id, parent_id, x, y, content, todo_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
         [mapId]
       )
-      const nodes = rows.map(r => ({
-        id: r.id,
-        parentId: r.parent_id,
-        x: r.x,
-        y: r.y,
-        label: r.label ?? undefined,
-        description: r.description ?? undefined,
-        todoId: r.todo_id ?? undefined,
-      }))
+      const nodes = rows.map(r => {
+        let label: string | undefined
+        let description: string | undefined
+        try {
+          const obj = r.content ? JSON.parse(r.content) : {}
+          if (obj && typeof obj === 'object') {
+            label = typeof obj.label === 'string' ? obj.label : undefined
+            description = typeof obj.description === 'string' ? obj.description : undefined
+          }
+        } catch {}
+        return {
+          id: r.id,
+          parentId: r.parent_id,
+          x: r.x,
+          y: r.y,
+          label,
+          description,
+          todoId: r.todo_id ?? undefined,
+        }
+      })
       return { statusCode: 200, headers, body: JSON.stringify(nodes) }
     }
 
@@ -80,18 +91,25 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       if (payload.x === undefined || payload.y === undefined) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing coordinates' }) }
       }
+      if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Coordinates must be numbers' }) }
+      }
+
+      const contentObj = {
+        label: payload.label ?? '',
+        description: payload.description ?? ''
+      }
 
       const result = await client.query(
-        `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO nodes (mindmap_id, x, y, content, parent_id)
+         VALUES ($1, $2, $3, $4, $5)
          RETURNING id`,
         [
           payload.mindmapId,
           payload.x,
           payload.y,
-          payload.label ?? null,
-          payload.description ?? null,
-          payload.parentId ?? null,
+          JSON.stringify(contentObj),
+          payload.parentId ?? null
         ]
       )
 
@@ -117,23 +135,28 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const values: any[] = [nodeId]
       let idx = 2
       if (payload.x !== undefined) {
+        if (typeof payload.x !== 'number') {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'x must be a number' }) }
+        }
         fields.push(`x=$${idx}`)
         values.push(payload.x)
         idx++
       }
       if (payload.y !== undefined) {
+        if (typeof payload.y !== 'number') {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'y must be a number' }) }
+        }
         fields.push(`y=$${idx}`)
         values.push(payload.y)
         idx++
       }
-      if (payload.label !== undefined) {
-        fields.push(`label=$${idx}`)
-        values.push(payload.label)
-        idx++
-      }
-      if (payload.description !== undefined) {
-        fields.push(`description=$${idx}`)
-        values.push(payload.description)
+      if (payload.label !== undefined || payload.description !== undefined) {
+        fields.push(`content=$${idx}`)
+        const contentObj = {
+          label: payload.label ?? '',
+          description: payload.description ?? ''
+        }
+        values.push(JSON.stringify(contentObj))
         idx++
       }
       if (payload.parentId !== undefined) {
