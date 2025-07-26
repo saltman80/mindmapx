@@ -116,7 +116,7 @@ export default function TodosPage(): JSX.Element {
   const handleDelete = async (id: string): Promise<void> => {
     if (!confirm('Delete this todo?')) return
     try {
-      const res = await fetch(`/.netlify/functions/todos/${id}`, {
+      const res = await fetch(`/.netlify/functions/todoid/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       })

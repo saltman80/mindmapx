@@ -61,12 +61,28 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       client.release()
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
     }
+    if (event.httpMethod === 'DELETE') {
+      const id = event.queryStringParameters?.id
+      if (!id) {
+        client.release()
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing id' }) }
+      }
+      const result = await client.query(
+        'DELETE FROM todo_lists WHERE id = $1 AND user_id = $2',
+        [id, userId]
+      )
+      client.release()
+      if (result.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not Found' }) }
+      }
+      return { statusCode: 204, headers, body: '' }
+    }
     if (event.httpMethod === 'OPTIONS') {
       client.release()
-      return { statusCode: 204, headers: { ...headers, Allow: 'GET,POST,OPTIONS' }, body: '' }
+      return { statusCode: 204, headers: { ...headers, Allow: 'GET,POST,DELETE,OPTIONS' }, body: '' }
     }
     client.release()
-    return { statusCode: 405, headers: { ...headers, Allow: 'GET,POST,OPTIONS' }, body: JSON.stringify({ error: 'Method Not Allowed' }) }
+    return { statusCode: 405, headers: { ...headers, Allow: 'GET,POST,DELETE,OPTIONS' }, body: JSON.stringify({ error: 'Method Not Allowed' }) }
   } catch (err) {
     console.error('todo-lists error:', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
