@@ -1,18 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-
-const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL, JWT_SECRET } = process.env
-const DATABASE_URL = LOCAL_DB || NETLIFY_DATABASE_URL
-if (!DATABASE_URL || !JWT_SECRET) {
-  console.error('Missing DATABASE_URL or JWT_SECRET')
-  throw new Error('Missing required environment variables')
-}
-console.info(
-  `login using ${LOCAL_DB ? 'DATABASE_URL' : 'NETLIFY_DATABASE_URL'} connection`
-)
+import { login as createLogin } from './auth.js'
 
 const loginSchema = z.object({
   email: z.string().email().transform((s: string) => s.trim().toLowerCase()),
@@ -118,55 +106,16 @@ export const handler = async (
 
   failedLoginAttempts.set(ip, recent)
 
-  const client = await getClient()
   try {
-    const result = await client.query(
-      'SELECT id, password_hash FROM users WHERE email = $1',
-      [email]
-    )
-
-    const count = result.rowCount ?? 0
-    if (count === 0) {
-      recent.push(now)
-      failedLoginAttempts.set(ip, recent)
-      console.warn(`Login failed for ${email} from ${ip}`)
-      return {
-        statusCode: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'User not found' }),
-      }
-    }
-
-    const user = result.rows[0] as { id: string; password_hash: string }
-    const isValid = await bcrypt.compare(password, user.password_hash)
-
-    if (!isValid) {
-      recent.push(now)
-      failedLoginAttempts.set(ip, recent)
-      console.warn(`Login failed for ${email} from ${ip}`)
-      return {
-        statusCode: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid password' }),
-      }
-    }
-
+    const token = await createLogin(email, password)
     failedLoginAttempts.delete(ip)
-
-    const token = jwt.sign(
-      { userId: user.id, sessionStart: Date.now() },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    )
-
     const cookieParts = [
-      `token=${token}`,
+      `session=${token}`,
       'HttpOnly',
       'Path=/',
-      'Secure',
-      'Max-Age=604800'
+      'SameSite=Strict',
+      'Secure'
     ]
-
     console.info(`Login successful for ${email} from ${ip}`)
     return {
       statusCode: 200,
@@ -175,17 +124,17 @@ export const handler = async (
         'Content-Type': 'application/json',
         'Set-Cookie': cookieParts.join('; ')
       },
-      body: JSON.stringify({ success: true, token })
+      body: JSON.stringify({ success: true })
     }
   } catch (error) {
-    console.error('Login error:', error)
+    recent.push(now)
+    failedLoginAttempts.set(ip, recent)
+    const message = error instanceof Error ? error.message : 'Login failed'
     return {
-      statusCode: 500,
+      statusCode: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ error: message })
     }
-  } finally {
-    client.release()
   }
 }
 

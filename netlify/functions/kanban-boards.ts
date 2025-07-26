@@ -14,7 +14,7 @@ export const handler = async (event: any) => {
   const token = extractToken(event)
   if (!token) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
 
-  const session = verifySession(token)
+  const session = await verifySession(token)
   const userId = (session as any)?.userId
   if (!userId) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
 

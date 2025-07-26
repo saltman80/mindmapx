@@ -33,7 +33,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
     let userId: string
     try {
-      const session = verifySession(token) as { userId: string }
+      const session = await verifySession(token) as { userId: string }
       userId = session.userId
     } catch {
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }

@@ -31,7 +31,7 @@ export const handler = async (
   }
   let user: any
   try {
-    user = verifySession(token)
+    user = await verifySession(token)
   } catch {
     return {
       statusCode: 401,

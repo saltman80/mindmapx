@@ -58,7 +58,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
     let userId: string
     try {
-      const session = verifySession(token)
+      const session = await verifySession(token)
       userId = session.userId
       if (!userId || !isUuid(userId)) {
         throw new Error('Invalid userId')

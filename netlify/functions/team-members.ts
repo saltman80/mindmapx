@@ -28,7 +28,7 @@ export const handler = async (
 
     let userId: string
     try {
-      const payload = verifySession(token)
+      const payload = await verifySession(token)
       userId = payload.userId
     } catch {
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }

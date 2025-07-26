@@ -9,9 +9,14 @@ export async function authFetch(
     const extra = new Headers(init.headers);
     extra.forEach((value, key) => headers.set(key, value));
   }
-  return fetch(input, {
+  const res = await fetch(input, {
     ...init,
     headers,
     credentials: init.credentials ?? 'include',
   });
+  if (res.status === 401 && typeof window !== 'undefined') {
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+  return res;
 }

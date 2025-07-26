@@ -2,12 +2,12 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import { createSession } from './auth.js'
 
-const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL, JWT_SECRET, SALT_ROUNDS = '10' } = process.env
+const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL, SALT_ROUNDS = '10' } = process.env
 const DATABASE_URL = LOCAL_DB || NETLIFY_DATABASE_URL
-if (!DATABASE_URL || !JWT_SECRET) {
-  console.error('Missing DATABASE_URL or JWT_SECRET')
+if (!DATABASE_URL) {
+  console.error('Missing DATABASE_URL')
   throw new Error('Missing required environment variables')
 }
 console.info(
@@ -96,22 +96,18 @@ export const handler = async (
       [email, passwordHash, name || null]
     )
     const user = result.rows[0]
-    const token = jwt.sign(
-      { userId: user.id },
-      JWT_SECRET!,
-      { expiresIn: '7d' }
-    )
+    const token = await createSession(user.id)
     const cookieParts = [
-      `token=${token}`,
+      `session=${token}`,
       'HttpOnly',
       'Path=/',
-      'Secure',
-      'Max-Age=604800'
+      'SameSite=Strict',
+      'Secure'
     ]
     return {
       statusCode: 201,
       headers: { ...corsHeaders, 'Set-Cookie': cookieParts.join('; ') },
-      body: JSON.stringify({ success: true, user, token }),
+      body: JSON.stringify({ success: true, user }),
     }
   } catch (error) {
     console.error('Registration error:', error)

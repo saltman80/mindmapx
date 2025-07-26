@@ -77,7 +77,7 @@ export const handler = async (
 
   let userId: string
   try {
-    const payload = verifySession(token)
+    const payload = await verifySession(token)
     const parsed = JwtPayloadSchema.parse(payload)
     userId = parsed.userId
   } catch {

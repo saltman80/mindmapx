@@ -43,7 +43,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
 
   let payload: any
   try {
-    payload = verifySession(token)
+    payload = await verifySession(token)
   } catch {
     return {
       statusCode: 401,

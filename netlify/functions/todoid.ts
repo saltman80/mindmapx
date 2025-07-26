@@ -126,7 +126,7 @@ export const handler = async (
     }
     let userId: string
     try {
-      const session = verifySession(token)
+      const session = await verifySession(token)
       userId = session.userId
       if (!userId) throw new Error('Missing userId')
     } catch (err) {
