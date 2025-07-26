@@ -3,25 +3,38 @@ import { useParams } from 'react-router-dom'
 import TodoCanvas from '../TodoCanvas'
 import { authFetch } from '../authFetch'
 
+interface TodoItem {
+  id: string
+  title: string
+  description?: string
+  completed?: boolean
+}
+
+interface TodoList {
+  id: string | null
+  title: string
+  todos: TodoItem[]
+}
+
 export default function TodosCanvasPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
-  const [todo, setTodo] = useState<any | null>(null)
+  const [list, setList] = useState<TodoList | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
-    authFetch(`/.netlify/functions/todoid/${id}`)
-      .then(async res => {
-        if (res.status === 403) {
-          setError('You must be signed in to view this to-do list.')
-          return null
+    authFetch('/.netlify/functions/todo-lists', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        const arr: TodoList[] = Array.isArray(data) ? data : []
+        const found = arr.find(l => l.id === id)
+        if (!found) {
+          setError('List not found')
+          return
         }
-        if (!res.ok) return null
-        const data = await res.json().catch(() => null)
-        return data && !('error' in data) ? data : null
+        setList(found)
       })
-      .then(setTodo)
-      .catch(() => setTodo(null))
+      .catch(() => setError('Failed to load list'))
   }, [id])
 
   return (
@@ -30,7 +43,11 @@ export default function TodosCanvasPage(): JSX.Element {
         {error ? (
           <p className="error">{error}</p>
         ) : (
-          <TodoCanvas initialTodos={todo ? [todo] : []} list_id={id} />
+          <TodoCanvas
+            initialTodos={list?.todos ?? []}
+            list_id={id}
+            listTitle={list?.title}
+          />
         )}
       </main>
     </div>

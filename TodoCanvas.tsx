@@ -13,6 +13,7 @@ export interface TodoCanvasProps {
   nodeId?: string
   kanbanId?: string
   list_id?: string
+  listTitle?: string
 }
 
 export default function TodoCanvas({
@@ -20,6 +21,7 @@ export default function TodoCanvas({
   nodeId,
   kanbanId,
   list_id,
+  listTitle,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [adding, setAdding] = useState(initialTodos.length === 0)
@@ -63,13 +65,15 @@ export default function TodoCanvas({
 
   return (
     <div className="todo-canvas-wrapper">
-      {todos.length > 0 && (
+      {(listTitle || todos.length > 0) && (
         <header className="todo-header">
-          <h1>{todos[0].title}</h1>
-          {todos[0].description && (
+          <h1>{listTitle ?? todos[0].title}</h1>
+          {!listTitle && todos[0].description && (
             <p className="todo-description">{todos[0].description}</p>
           )}
-          <h2 className="todo-title-below">{todos[0].title}</h2>
+          {!listTitle && (
+            <h2 className="todo-title-below">{todos[0].title}</h2>
+          )}
         </header>
       )}
       <div className="todo-list">
