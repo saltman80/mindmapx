@@ -9,6 +9,7 @@ import {
 } from 'react'
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData } from './mindmapTypes'
+import { getAuthToken } from './getAuthToken'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -142,14 +143,20 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         mindmapId,
       }
 
+      const token = getAuthToken()
+
       fetch('/.netlify/functions/nodes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         credentials: 'include',
         body: JSON.stringify(newNode),
       })
-        .then(res => res.json())
-        .then(data => {
+        .then(async res => {
+          if (!res.ok) throw new Error('Node insert failed')
+          const data = await res.json()
           if (!data?.id) throw new Error('Node insert failed')
           setNodes(prev => [...prev, { ...newNode, id: data.id }])
           setShowCreate(false)
@@ -158,6 +165,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         })
         .catch(err => {
           console.error('[CreateNode] Failed to save node:', err)
+          alert('Failed to create node.')
         })
     }
 

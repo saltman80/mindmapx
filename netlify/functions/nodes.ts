@@ -67,6 +67,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
+      console.log('Received body:', event.body)
+      console.log('Parsed payload:', payload)
       const result = await client.query(
         `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
          VALUES ($1, $2, $3, $4, $5, $6)
