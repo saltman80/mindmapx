@@ -157,16 +157,23 @@ export default function InteractiveKanbanBoard({
     const lane = lanes.find(l => l.id === laneId)
     if (!lane || !boardId) return
     const position = lane.cards.length
+    console.log('addCard laneId', laneId)
     authFetch(`${API_BASE}/cards`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ column_id: laneId, title: '', position })
+      body: JSON.stringify({
+        column_id: laneId,
+        title: 'New Card',
+        position,
+        status: 'open',
+        priority: 'low'
+      })
     })
       .then(res => res.json())
       .then(data => {
         const newCard: Card = {
           id: data.id,
-          title: '',
+          title: 'New Card',
           comments: [],
           status: 'open',
           priority: 'low',
@@ -252,6 +259,10 @@ export default function InteractiveKanbanBoard({
   }
 
   const updateCard = (laneId: string, updatedCard: Card) => {
+    if (!updatedCard.id) {
+      console.error('Card ID missing for save')
+      return
+    }
     const lane = lanes.find(l => l.id === laneId)
     const pos = lane ? lane.cards.findIndex(c => c.id === updatedCard.id) : 0
     authFetch(`${API_BASE}/cards/${updatedCard.id}`, {
