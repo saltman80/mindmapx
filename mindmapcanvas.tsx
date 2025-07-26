@@ -61,6 +61,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const safeNodes = Array.isArray(nodes) ? nodes : []
     const safeEdges = Array.isArray(edges) ? edges : []
+    const [hasCentered, setHasCentered] = useState(false)
     const [transform, setTransform] = useState<{ x: number; y: number; k: number }>(
       () => initialTransform
     )
@@ -243,6 +244,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       () => ({ pan, addNode, updateNode, removeNode }),
       [pan, addNode, updateNode, removeNode]
     )
+
+    useEffect(() => {
+      if (Array.isArray(nodes) && nodes.length > 0 && !hasCentered) {
+        setHasCentered(true)
+        pan(-window.innerWidth / 2, -window.innerHeight / 2)
+      }
+    }, [nodes, hasCentered, pan])
 
     const nodeMap = useMemo(() => {
       const map = new Map<string, NodeData>()

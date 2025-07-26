@@ -94,6 +94,10 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid parentId' }) }
       }
 
+      if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid coordinates' }) }
+      }
+
       const isRoot = !payload.parentId
 
       if (isRoot) {
@@ -105,37 +109,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
             body: JSON.stringify({ error: 'Only one root node allowed per mindmap' })
           }
         }
-        payload.x = typeof payload.x === 'number' ? payload.x : 500
-        payload.y = typeof payload.y === 'number' ? payload.y : 500
-      } else {
-        if (payload.x === undefined || payload.y === undefined) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Missing coordinates' })
-          }
-        }
-        if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Coordinates must be numbers' })
-          }
-        }
       }
 
       try {
         console.log('[CreateNode] payload:', payload)
         const result = await client.query(
           `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id`,
+           VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
           [
             payload.mindmapId,
-            payload.x,
-            payload.y,
-            payload.label?.trim() || 'General',
-            payload.description?.trim() || '',
+            payload.x ?? 0,
+            payload.y ?? 0,
+            payload.label ?? 'Untitled',
+            payload.description ?? '',
             payload.parentId ?? null
           ]
         )
