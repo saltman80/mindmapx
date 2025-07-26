@@ -10,6 +10,7 @@
     "dev": "vite",
     "deploy-seed": "curl -s https://mindxdo.netlify.app/api/seed-admin || true",
     "build": "vite build",
+    "compile:functions": "tsc -p tsconfig.json",
     "preview": "vite preview",
     "compile:migrations": "tsc -p tsconfig.migrations.json",
     "migrate": "npm run compile:migrations && node dist/migrationrunner.js",
