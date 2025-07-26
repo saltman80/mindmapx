@@ -35,6 +35,7 @@ const PurchasePage = () => {
   }
 
   return (
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
     <section className="section relative overflow-x-visible">
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
@@ -140,6 +141,7 @@ const PurchasePage = () => {
         </div>
       </div>
     </section>
+    </div>
   )
 }
 
