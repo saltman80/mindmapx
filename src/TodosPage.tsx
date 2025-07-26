@@ -100,11 +100,7 @@ export default function TodosPage(): JSX.Element {
                   </>
                 )}
               </div>
-              <ul className="todo-list">
-                {list.todos.map(t => (
-                  <li key={t.id}>{t.title}</li>
-                ))}
-              </ul>
+              {/* Only show the list title on the dashboard. Individual todos are shown after opening the list */}
             </div>
           ))}
         </div>
