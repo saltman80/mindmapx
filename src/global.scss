@@ -2576,6 +2576,31 @@ hr {
   color: #888;
 }
 
+.canvas-header {
+  max-width: 960px;
+  margin: 2rem auto 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.canvas-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.canvas-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.canvas-logo {
+  width: 36px;
+  height: 36px;
+}
+
 .header-right .settings-button {
   background: none;
   border: none;
@@ -3303,6 +3328,13 @@ hr {
   margin: 1.5rem 0 0.75rem;
 }
 
+.todo-progress {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 1rem;
+  color: var(--color-primary);
+}
+
 .todo-list {
   list-style: none;
   padding-left: 0;
@@ -3361,21 +3393,27 @@ hr {
 }
 
 .todo-block {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at top left, #fafdff, #ffffff);
+  border: 1px solid #e0e7ff;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: #f9f9fc;
-  border: 1px solid #eee;
-  border-radius: 0.75rem;
-  margin-bottom: 0.5rem;
-  transition: background 0.2s ease;
-  max-width: 600px;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: background 0.3s ease;
 
-  &.completed {
+  &:hover {
+    background: #f0f6ff;
+    box-shadow: 0 0 8px rgba(0, 153, 255, 0.15);
+  }
+
+  &.completed .todo-text {
+    text-decoration: line-through;
     opacity: 0.6;
-    .todo-text {
-      text-decoration: line-through;
-    }
   }
 }
 
@@ -3386,9 +3424,11 @@ hr {
 
 .todo-text {
   flex-grow: 1;
+  margin-left: 0.75rem;
+  margin-right: auto;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -3412,9 +3452,10 @@ hr {
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  opacity: 0.65;
+  transition: transform 0.2s, opacity 0.2s;
   &:hover {
+    transform: scale(1.1);
     opacity: 1;
   }
 }

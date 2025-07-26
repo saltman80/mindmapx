@@ -143,6 +143,8 @@ export default function TodoCanvas({
 
   const activeTodos = todos.filter(t => !(t as any).completed)
   const doneTodos = todos.filter(t => (t as any).completed)
+  const totalCount = todos.length
+  const completedCount = todos.filter(t => (t as any).completed).length
   const [showAll, setShowAll] = useState(false)
 
   const renderTodo = (t: TodoItem & { completed?: boolean }) => (
@@ -178,12 +180,16 @@ export default function TodoCanvas({
   return (
     <div className="todo-canvas-wrapper">
       {listTitle && (
-        <header className="todo-header">
-          <h1>{listTitle}</h1>
-        </header>
+        <div className="canvas-header">
+          <div className="canvas-header-left">
+            <img src="/assets/logo.png" className="canvas-logo" />
+            <h1 className="canvas-title">{listTitle}</h1>
+          </div>
+          <div className="canvas-header-right"></div>
+        </div>
       )}
-      <h3 className="todo-heading">
-        {todos.length - doneTodos.length}/{todos.length} completed
+      <h3 className="todo-progress">
+        {completedCount}/{totalCount} completed
       </h3>
       <div className="todo-list">
         {activeTodos.map(renderTodo)}
