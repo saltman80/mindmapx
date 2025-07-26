@@ -9,6 +9,7 @@ type TodoInput = {
   description?: string | null
   completed?: boolean
   assignee_id?: string | null
+  list_id?: string | null
 }
 
 const updateTodoSchema = z
