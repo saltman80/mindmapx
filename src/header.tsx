@@ -49,9 +49,12 @@ const Header = (): JSX.Element => {
   const handleNavSelect = (route: string): void => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
-    // Scroll to the top before navigating so the new page loads from the top
+    // Always scroll to the top when a navigation item is selected
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    navigate(route)
+    // Only navigate if the destination route is different from the current one
+    if (location.pathname !== route) {
+      navigate(route)
+    }
   }
 
   useEffect(() => {
@@ -119,7 +122,10 @@ const Header = (): JSX.Element => {
                         isActive ? ' header__nav-link--active' : ''
                       }`
                     }
-                    onClick={() => handleNavSelect(item.route)}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleNavSelect(item.route)
+                    }}
                   >
                     {item.label}
                   </NavLink>
@@ -160,7 +166,10 @@ const Header = (): JSX.Element => {
                     type="button"
                     role="menuitem"
                     className="header__dropdown-item"
-                    onClick={() => handleNavSelect('/profile')}
+                    onClick={e => {
+                      e.preventDefault()
+                      handleNavSelect('/profile')
+                    }}
                   >
                     Profile
                   </button>
@@ -183,7 +192,10 @@ const Header = (): JSX.Element => {
               <NavLink
                 to="/login"
                 className="header__login-link"
-                onClick={() => handleNavSelect('/login')}
+                onClick={e => {
+                  e.preventDefault()
+                  handleNavSelect('/login')
+                }}
               >
                 Login
               </NavLink>
@@ -206,7 +218,10 @@ const Header = (): JSX.Element => {
                   className={({ isActive }) =>
                     `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
                   }
-                  onClick={() => handleNavSelect(item.route)}
+                  onClick={e => {
+                    e.preventDefault()
+                    handleNavSelect(item.route)
+                  }}
                 >
                   {item.label}
                 </NavLink>
