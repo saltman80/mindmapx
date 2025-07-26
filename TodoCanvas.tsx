@@ -20,6 +20,7 @@ export interface TodoCanvasProps {
   kanbanId?: string
   list_id?: string
   listTitle?: string
+  listDescription?: string
 }
 
 export default function TodoCanvas({
@@ -28,6 +29,7 @@ export default function TodoCanvas({
   kanbanId,
   list_id,
   listTitle,
+  listDescription,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [newTitle, setNewTitle] = useState('')
@@ -169,10 +171,16 @@ export default function TodoCanvas({
           {t.title}
         </span>
       )}
-      <div className="todo-tools">
-        <button className="todo-icon-btn" onClick={() => openEditModal(t)}>✏️</button>
-        <button className="todo-icon-btn" onClick={() => openCommentPanel(t)}>💬</button>
-        <button className="todo-icon-btn" onClick={() => openKanbanSendDialog(t)}>➡</button>
+      <div className="todo-icons">
+        <button className="circle-icon" onClick={() => openEditModal(t)}>
+          <span role="img" aria-label="Edit">✏️</span>
+        </button>
+        <button className="circle-icon" onClick={() => openCommentPanel(t)}>
+          <span role="img" aria-label="Comment">💬</span>
+        </button>
+        <button className="circle-icon" onClick={() => openKanbanSendDialog(t)}>
+          <span role="img" aria-label="Send">➡</span>
+        </button>
       </div>
     </div>
   )
@@ -180,13 +188,13 @@ export default function TodoCanvas({
   return (
     <div className="todo-canvas-wrapper">
       {listTitle && (
-        <div className="canvas-header">
-          <div className="canvas-header-left">
-            <img src="/assets/logo.png" className="canvas-logo" />
-            <h1 className="canvas-title">{listTitle}</h1>
-          </div>
-          <div className="canvas-header-right"></div>
-        </div>
+        <>
+          <img src="/assets/logo.png" alt="MindXdo" className="todo-logo" />
+          <h1 className="todo-title">{listTitle}</h1>
+        </>
+      )}
+      {listDescription && (
+        <p className="todo-description">{listDescription}</p>
       )}
       <h3 className="todo-progress">
         {completedCount}/{totalCount} completed

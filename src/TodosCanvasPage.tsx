@@ -13,6 +13,7 @@ interface TodoItem {
 interface TodoList {
   id: string | null
   title: string
+  description?: string
   todos: TodoItem[]
 }
 
@@ -47,6 +48,7 @@ export default function TodosCanvasPage(): JSX.Element {
             initialTodos={list?.todos ?? []}
             list_id={id}
             listTitle={list?.title}
+            listDescription={list?.description}
           />
         )}
       </main>

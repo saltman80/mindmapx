@@ -2270,6 +2270,26 @@ hr {
   align-items: center;
 }
 
+.todo-logo {
+  height: 70px;
+  width: auto;
+  margin-bottom: 0.5rem;
+}
+
+.todo-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.todo-description {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  max-width: 600px;
+}
+
 .todo-placeholder.tile {
   background: #e0e0e0;
   border-radius: 8px;
@@ -2312,13 +2332,17 @@ hr {
 
 .todo-add-form {
   display: flex;
+  max-width: 600px;
+  margin: 1rem auto;
   gap: 0.5rem;
-  width: 100%;
-  margin-top: 1rem;
 }
 
 .todo-add-form input {
-  flex: 1;
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 .todo-empty-message {
@@ -3440,24 +3464,34 @@ hr {
   border-radius: 6px;
 }
 
-.todo-tools {
+.todo-icons {
   display: flex;
-  gap: 0.5rem;
+  gap: 5px;
   margin-left: 1rem;
   flex-shrink: 0;
 }
 
-.todo-icon-btn {
-  background: none;
+.circle-icon {
+  width: 36px;
+  height: 36px;
+  background: #2e2e2e;
+  color: #dcdcdc;
+  border-radius: 50%;
   border: none;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 0.95rem;
-  opacity: 0.65;
-  transition: transform 0.2s, opacity 0.2s;
-  &:hover {
-    transform: scale(1.1);
-    opacity: 1;
-  }
+  transition: background 0.2s;
+}
+
+.circle-icon:hover {
+  background: #444;
+}
+
+.circle-icon span {
+  filter: grayscale(100%);
 }
 
 .todo-add-block {
@@ -3468,23 +3502,26 @@ hr {
 
 .todo-add-form {
   display: flex;
-  justify-content: center;
+  max-width: 600px;
+  margin: 1rem auto;
   gap: 0.5rem;
 }
 
 .todo-add-input {
-  width: 60%;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 .todo-add-button {
   background: #ffa726;
-  border: none;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0 1.25rem;
   cursor: pointer;
 }
 
