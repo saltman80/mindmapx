@@ -196,6 +196,9 @@ export default function MapEditorPage(): JSX.Element {
               body: JSON.stringify(n)
             }).catch(console.error)
           })
+
+          // Reload nodes after automatically creating the initial set
+          setReloadFlag(p => p + 1)
         })
         .catch(err => console.error('[AutoCreateNode] Failed:', err))
     }
