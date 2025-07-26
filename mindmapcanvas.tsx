@@ -9,7 +9,7 @@ import {
 } from 'react'
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData } from './mindmapTypes'
-import { getAuthToken } from './getAuthToken'
+import { authFetch } from './authFetch'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -143,15 +143,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         mindmapId,
       }
 
-      const token = getAuthToken()
-
-      fetch('/.netlify/functions/nodes', {
+      authFetch('/.netlify/functions/nodes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        credentials: 'include',
         body: JSON.stringify(newNode),
       })
         .then(async res => {

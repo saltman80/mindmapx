@@ -156,19 +156,16 @@ export const handler = async (
     const token = jwt.sign(
       { userId: user.id, sessionStart: Date.now() },
       JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     )
 
     const cookieParts = [
-      `session=${token}`,
+      `token=${token}`,
       'HttpOnly',
       'Path=/',
-      'SameSite=Lax'
+      'Secure',
+      'Max-Age=604800'
     ]
-
-    if (process.env.NODE_ENV === 'production') {
-      cookieParts.push('Secure')
-    }
 
     console.info(`Login successful for ${email} from ${ip}`)
     return {

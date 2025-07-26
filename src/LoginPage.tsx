@@ -24,11 +24,7 @@ const LoginPage = () => {
         const data = await res.json().catch(() => ({}))
         throw new Error(data.error || 'Login failed')
       }
-      const data = await res.json().catch(() => ({}))
-      const token = (data as { token?: string }).token
-      if (token) {
-        localStorage.setItem('token', token)
-      }
+      await res.json().catch(() => ({}))
       navigate('/dashboard')
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred')

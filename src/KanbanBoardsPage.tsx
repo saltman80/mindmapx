@@ -1,7 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
-import { getAuthToken } from '../getAuthToken'
 import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -47,13 +46,9 @@ export default function KanbanBoardsPage(): JSX.Element {
   const handleSave = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const token = getAuthToken()
-      const res = await fetch('/.netlify/functions/kanban-boards', {
+      const res = await authFetch('/.netlify/functions/kanban-boards', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: form.title,
           description: form.description,
