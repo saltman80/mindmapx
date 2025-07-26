@@ -76,6 +76,24 @@ export default function TodosPage(): JSX.Element {
     }
   }
 
+  const handleDeleteTodo = async (todoId: string): Promise<void> => {
+    if (!confirm('Delete this todo?')) return
+    const res = await fetch(`/.netlify/functions/todoid/${todoId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (res.ok) {
+      setLists(prev =>
+        prev.flatMap(l => {
+          if (!l.todos.some(t => t.id === todoId)) return [l]
+          const remaining = l.todos.filter(t => t.id !== todoId)
+          if (l.id === null && remaining.length === 0) return []
+          return [{ ...l, todos: remaining }]
+        })
+      )
+    }
+  }
+
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
   const oneWeek = 7 * oneDay
@@ -158,7 +176,27 @@ export default function TodosPage(): JSX.Element {
                   </div>
                 </header>
                 <section className="tile-body">
-                  <p>{list.todos?.length ?? 0} todos</p>
+                  {list.id === null ? (
+                    <ul className="todo-items">
+                      {list.todos.map(t => (
+                        <li key={t.id} className="todo-item">
+                          {t.title}{' '}
+                          <a
+                            href="#"
+                            className="tile-link delete-link"
+                            onClick={e => {
+                              e.preventDefault()
+                              handleDeleteTodo(t.id)
+                            }}
+                          >
+                            Delete
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>{list.todos?.length ?? 0} todos</p>
+                  )}
                 </section>
               </div>
             ))
