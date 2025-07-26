@@ -49,13 +49,12 @@ const Header = (): JSX.Element => {
   const handleNavSelect = (route: string): void => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
-    // Always scroll to the top when a navigation item is selected
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    // Only navigate if the destination route is different from the current one
-    const basePath = import.meta.env.BASE_URL || '/'
-    const currentRoute = location.pathname.replace(basePath, '/')
-    if (currentRoute !== route) {
+
+    if (location.pathname !== route) {
       navigate(route)
+    } else {
+      // If already on the target page, manually scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
