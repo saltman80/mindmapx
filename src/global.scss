@@ -1632,7 +1632,11 @@ hr {
   backdrop-filter: blur(6px);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: var(--spacing-sm);
+  max-height: 240px;
+  min-height: 200px;
+  overflow-y: hidden;
 }
 
 .dashboard-tile.can-create {
@@ -1874,6 +1878,9 @@ hr {
   flex-direction: column;
   justify-content: space-between;
   aspect-ratio: 16 / 10;
+  max-height: 240px;
+  min-height: 200px;
+  overflow-y: hidden;
 }
 
 .tile-header {

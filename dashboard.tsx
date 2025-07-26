@@ -156,6 +156,10 @@ export default function DashboardPage(): JSX.Element {
   const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
   const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
 
+  const recentMaps = [...maps].slice(-3).reverse()
+  const recentTodos = [...todos].slice(-3).reverse()
+  const recentBoards = [...boards].slice(-3).reverse()
+
   return (
     <div className="dashboard-page relative overflow-hidden">
       <MindmapArm side="left" />
@@ -247,7 +251,7 @@ export default function DashboardPage(): JSX.Element {
               </header>
               <section className="tile-body">
                 <ul>
-                  {maps.map(m => (
+                  {recentMaps.map(m => (
                     <li key={m.id}>
                       <Link to={`/maps/${m.id}`}>{m.title || (m as any).data?.title || 'Untitled Map'}</Link>
                     </li>
@@ -270,7 +274,7 @@ export default function DashboardPage(): JSX.Element {
               </header>
               <section className="tile-body">
                 <ul>
-                  {todos.map(t => (
+                  {recentTodos.map(t => (
                     <li key={t.id}>
                       {t.title || t.content}
                       {t.mindmap_id && <span className="text-sm text-gray-500"> (Map: {t.mindmap_id})</span>}
@@ -283,9 +287,16 @@ export default function DashboardPage(): JSX.Element {
             <div className="dashboard-tile">
               <header className="tile-header">
                 <h2>Kanban Boards</h2>
+                <Link to="/kanban" className="tile-link">See All</Link>
               </header>
               <section className="tile-body">
-                <Link to="/kanban" className="text-blue-600 underline">Open Kanban</Link>
+                <ul>
+                  {recentBoards.map(b => (
+                    <li key={b.id}>
+                      <Link to={`/kanban/${b.id}`}>{b.title || 'Board'}</Link>
+                    </li>
+                  ))}
+                </ul>
               </section>
             </div>
             </div>

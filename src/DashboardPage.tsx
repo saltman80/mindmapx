@@ -239,9 +239,9 @@ export default function DashboardPage(): JSX.Element {
     return bTime - aTime
   }
 
-  const recentMaps = [...safeMapArray].sort(dateSort).slice(0, 10)
-  const recentTodos = [...safeTodoArray].sort(dateSort).slice(0, 10)
-  const recentBoards = [...safeBoardArray].sort(dateSort).slice(0, 10)
+  const recentMaps = [...safeMapArray].sort(dateSort).slice(0, 3)
+  const recentTodos = [...safeTodoArray].sort(dateSort).slice(0, 3)
+  const recentBoards = [...safeBoardArray].sort(dateSort).slice(0, 3)
 
   const mapItems: DashboardItem[] = Array.isArray(recentMaps)
     ? recentMaps.map(m => ({
