@@ -2650,13 +2650,20 @@ hr {
 
 .scroll-container {
   width: 100%;
-  overflow: visible;
-  padding: 0 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 0 1rem 16px;
   scrollbar-gutter: stable;
 }
 
 .scroll-container::-webkit-scrollbar {
   height: 6px;
+}
+
+.kanban-scroll-spacer {
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .kanban-board {

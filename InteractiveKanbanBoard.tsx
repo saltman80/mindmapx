@@ -385,6 +385,7 @@ export default function InteractiveKanbanBoard({
                 <div className="lane kanban-lane add-lane" onClick={addLane}>
                   <button className="add-lane-button">+ Add Lane</button>
                 </div>
+                <div className="kanban-scroll-spacer" />
               </div>
             </div>
           )}
