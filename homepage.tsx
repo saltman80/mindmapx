@@ -90,22 +90,10 @@ const Homepage: React.FC = (): JSX.Element => {
 
 
   return (
-    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '5px' }}>
-      <div
-        className="homepage"
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          padding: '0 1rem',
-          margin: '0 auto',
-          marginTop: '130px',
-        }}
-      >
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '114px' }}>
+      <div className="homepage">
         <section className="hero section relative overflow-x-visible">
         <div className="container">
-        <div className="shape shape-circle hero-shape1" />
-        <div className="shape shape-circle hero-shape2" />
         <motion.div
           className="hero-content"
           initial={{ opacity: 0, y: 20 }}
@@ -285,7 +273,6 @@ const Homepage: React.FC = (): JSX.Element => {
 
       <section className="ai-power section section--one-col text-center relative">
         <div className="container text-center">
-        <div className="shape shape-circle ai-power-shape" />
         <motion.h2
           className="marketing-text-large"
           initial={{ opacity: 0, scale: 0.8 }}
