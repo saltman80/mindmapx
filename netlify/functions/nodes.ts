@@ -145,12 +145,12 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           headers,
           body: JSON.stringify({ id: result.rows[0].id })
         }
-      } catch (e) {
-        console.error('[Insert Node failed]', { payload, error: e })
+      } catch (err) {
+        console.error('[InsertNode Error]', { payload, error: err })
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ error: (e as Error).message })
+          body: JSON.stringify({ error: (err as Error).message })
         }
       }
     }
