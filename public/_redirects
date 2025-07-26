@@ -1,3 +1,10 @@
 /api/maps/:id /.netlify/functions/mapid 200
+/api/kanban/boards /.netlify/functions/kanban-boards 200
+/api/kanban/board-data /.netlify/functions/kanban-board-data 200
+/api/kanban/columns /.netlify/functions/kanban-columns 200
+/api/kanban/columns/:id /.netlify/functions/kanban-columns/:id 200
+/api/kanban/cards /.netlify/functions/kanban-cards 200
+/api/kanban/cards/:id/move /.netlify/functions/kanban-cards/:id/move 200
+/api/kanban/cards/:id /.netlify/functions/kanban-cards/:id 200
 /api/* /.netlify/functions/:splat 200
 /*  /index.html  200

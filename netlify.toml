@@ -14,6 +14,41 @@
   status = 200
 
 [[redirects]]
+  from = "/api/kanban/boards"
+  to = "/.netlify/functions/kanban-boards"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/board-data"
+  to = "/.netlify/functions/kanban-board-data"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/columns"
+  to = "/.netlify/functions/kanban-columns"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/columns/:id"
+  to = "/.netlify/functions/kanban-columns/:id"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/cards"
+  to = "/.netlify/functions/kanban-cards"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/cards/:id/move"
+  to = "/.netlify/functions/kanban-cards/:id/move"
+  status = 200
+
+[[redirects]]
+  from = "/api/kanban/cards/:id"
+  to = "/.netlify/functions/kanban-cards/:id"
+  status = 200
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
