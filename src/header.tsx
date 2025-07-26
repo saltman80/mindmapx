@@ -49,8 +49,9 @@ const Header = (): JSX.Element => {
   const handleNavSelect = (route: string): void => {
     setProfileMenuOpen(false)
     setMenuOpen(false)
-    navigate(route)
+    // Scroll to the top before navigating so the new page loads from the top
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigate(route)
   }
 
   useEffect(() => {
