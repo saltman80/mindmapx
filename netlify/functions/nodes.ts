@@ -99,24 +99,34 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         label: payload.label ?? '',
         description: payload.description ?? ''
       }
+      console.log('[Insert Node] payload:', payload)
 
-      const result = await client.query(
-        `INSERT INTO nodes (mindmap_id, x, y, content, parent_id)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING id`,
-        [
-          payload.mindmapId,
-          payload.x,
-          payload.y,
-          JSON.stringify(contentObj),
-          payload.parentId ?? null
-        ]
-      )
+      try {
+        const result = await client.query(
+          `INSERT INTO nodes (mindmap_id, x, y, content, parent_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id`,
+          [
+            payload.mindmapId,
+            payload.x,
+            payload.y,
+            JSON.stringify(contentObj),
+            payload.parentId ?? null
+          ]
+        )
 
-      return {
-        statusCode: 201,
-        headers,
-        body: JSON.stringify({ id: result.rows[0].id })
+        return {
+          statusCode: 201,
+          headers,
+          body: JSON.stringify({ id: result.rows[0].id })
+        }
+      } catch (e) {
+        console.error('[Insert Node failed]', e)
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: (e as Error).message })
+        }
       }
     }
 
@@ -180,7 +190,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal server error in /nodes' })
+      body: JSON.stringify({ error: (err as Error).message || 'Internal error' })
     }
   } finally {
     if (client) {
