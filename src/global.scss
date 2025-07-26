@@ -1944,6 +1944,37 @@ hr {
   color: var(--color-secondary);
 }
 
+.dashboard-list-preview {
+  list-style: none;
+  padding: 0;
+}
+
+.dashboard-list-preview li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.85rem;
+}
+
+.dashboard-link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.dashboard-link:hover {
+  color: var(--color-secondary);
+}
+
+.dashboard-subtext {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.dashboard-empty {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
 /* style for create tiles */
 .create-tile {
   display: flex;

@@ -9,18 +9,34 @@ import Sparkline from './Sparkline'
 import DashboardTile, { DashboardItem } from './DashboardTile'
 import {
   MapItem,
-  TodoItem,
   BoardItem,
   NodeItem,
   validateMaps,
-  validateTodos,
   validateBoards,
   validateNodes,
 } from './apiValidators'
 
+interface TodoItem {
+  id: string
+  title?: string
+  completed?: boolean
+  createdAt?: string
+  created_at?: string
+  updatedAt?: string
+  updated_at?: string
+}
+
+interface TodoList {
+  id: string | null
+  title: string
+  todos: TodoItem[]
+  createdAt?: string
+  created_at?: string
+}
+
 export default function DashboardPage(): JSX.Element {
   const [maps, setMaps] = useState<MapItem[]>([])
-  const [todos, setTodos] = useState<TodoItem[]>([])
+  const [todoLists, setTodoLists] = useState<TodoList[]>([])
   const [boards, setBoards] = useState<BoardItem[]>([])
   const [nodes, setNodes] = useState<NodeItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -34,9 +50,9 @@ export default function DashboardPage(): JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const [mapsRes, todosRes, boardsRes, nodesRes] = await Promise.all([
+      const [mapsRes, listsRes, boardsRes, nodesRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmaps', { credentials: 'include' }),
-        authFetch('/.netlify/functions/todos', { credentials: 'include' }),
+        authFetch('/.netlify/functions/todo-lists', { credentials: 'include' }),
         authFetch('/.netlify/functions/boards', { credentials: 'include' }),
         authFetch('/.netlify/functions/node', { credentials: 'include' }),
       ])
@@ -45,10 +61,10 @@ export default function DashboardPage(): JSX.Element {
         : []
       const mapsList = validateMaps(Array.isArray(mapsJson) ? mapsJson : mapsJson.maps)
 
-      const todosJson = todosRes.ok && todosRes.headers.get('content-type')?.includes('application/json')
-        ? await todosRes.json()
+      const listsJson = listsRes.ok && listsRes.headers.get('content-type')?.includes('application/json')
+        ? await listsRes.json()
         : []
-      const todosList = validateTodos(Array.isArray(todosJson) ? todosJson : todosJson.todos)
+      const lists: TodoList[] = Array.isArray(listsJson) ? listsJson : []
 
       const boardsJson = boardsRes.ok && boardsRes.headers.get('content-type')?.includes('application/json')
         ? await boardsRes.json()
@@ -61,7 +77,7 @@ export default function DashboardPage(): JSX.Element {
       const nodesList = validateNodes(Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes)
 
       setMaps(Array.isArray(mapsList) ? mapsList : [])
-      setTodos(Array.isArray(todosList) ? todosList : [])
+      setTodoLists(Array.isArray(lists) ? lists : [])
       setBoards(Array.isArray(boardsList) ? boardsList : [])
       setNodes(Array.isArray(nodesList) ? nodesList : [])
     } catch (err: any) {
@@ -91,13 +107,13 @@ export default function DashboardPage(): JSX.Element {
           setTimeout(() => navigate(`/maps/${json.id}`), 250)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/todos', {
+        await fetch('/.netlify/functions/todo-lists', {
           method: 'POST',
           credentials: 'include', // Required for session cookie
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ title: form.title, description: form.description }),
+          body: JSON.stringify({ title: form.title }),
         })
       } else {
         await fetch('/.netlify/functions/boards', {
@@ -137,13 +153,13 @@ export default function DashboardPage(): JSX.Element {
           setTimeout(() => navigate(`/maps/${json.id}`), 250)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/ai-create-todo', {
+        await fetch('/.netlify/functions/todo-lists', {
           method: 'POST',
           credentials: 'include', // Required for session cookie
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt: form.description }),
+          body: JSON.stringify({ title: form.title }),
         })
       } else {
         await fetch('/.netlify/functions/boards', {
@@ -172,7 +188,7 @@ export default function DashboardPage(): JSX.Element {
   const twoWeekAgo = now - 2 * oneWeek
 
   const safeMapArray = Array.isArray(maps) ? maps : []
-  const safeTodoArray = Array.isArray(todos) ? todos : []
+  const safeTodoLists = Array.isArray(todoLists) ? todoLists : []
   const safeBoardArray = Array.isArray(boards) ? boards : []
   const safeNodeArray = Array.isArray(nodes) ? nodes : []
 
@@ -185,10 +201,12 @@ export default function DashboardPage(): JSX.Element {
     return t > twoWeekAgo && t <= weekAgo
   }).length
 
-  const todoAddedDay = safeTodoArray.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length
-  const todoAddedWeek = safeTodoArray.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length
-  const todoDoneDay = safeTodoArray.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length
-  const todoDoneWeek = safeTodoArray.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length
+  const totalTodos = safeTodoLists.reduce((sum, l) => sum + l.todos.length, 0)
+
+  const todoAddedDay = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length, 0)
+  const todoAddedWeek = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length, 0)
+  const todoDoneDay = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length, 0)
+  const todoDoneWeek = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length, 0)
 
   const boardDay = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
   const boardWeek = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
@@ -207,10 +225,15 @@ export default function DashboardPage(): JSX.Element {
     const start = new Date(now - (13 - i) * oneDay)
     start.setHours(0, 0, 0, 0)
     const end = start.getTime() + oneDay
-    return safeTodoArray.filter(t => {
-      const t1 = new Date(t.updatedAt || t.updated_at || '').getTime()
-      return t.completed && t1 >= start.getTime() && t1 < end
-    }).length
+    return safeTodoLists.reduce(
+      (sum, l) =>
+        sum +
+        l.todos.filter(t => {
+          const t1 = new Date(t.updatedAt || t.updated_at || '').getTime()
+          return t.completed && t1 >= start.getTime() && t1 < end
+        }).length,
+      0
+    )
   })
 
   const boardTrend = Array.from({ length: 14 }, (_, i) => {
@@ -240,7 +263,7 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const recentMaps = [...safeMapArray].sort(dateSort).slice(0, 3)
-  const recentTodos = [...safeTodoArray].sort(dateSort).slice(0, 3)
+  const recentTodoLists = [...safeTodoLists].sort(dateSort).slice(0, 3)
   const recentBoards = [...safeBoardArray].sort(dateSort).slice(0, 3)
 
   const mapItems: DashboardItem[] = Array.isArray(recentMaps)
@@ -250,12 +273,15 @@ export default function DashboardPage(): JSX.Element {
         link: `/maps/${m.id}`,
       }))
     : []
-  const todoItems: DashboardItem[] = Array.isArray(recentTodos)
-    ? recentTodos.map(t => ({
-        id: t.id,
-        label: t.title || t.content || 'Todo',
-        link: '/todo-demo',
-      }))
+  const todoItems: DashboardItem[] = Array.isArray(recentTodoLists)
+    ? recentTodoLists
+        .filter(l => l.id)
+        .map(l => ({
+          id: l.id as string,
+          label: l.title,
+          link: `/todos/${l.id}`,
+          subText: `${l.todos.length} todo${l.todos.length !== 1 ? 's' : ''}`,
+        }))
     : []
   const boardItems: DashboardItem[] = Array.isArray(recentBoards)
     ? recentBoards.map(b => ({
@@ -302,7 +328,7 @@ export default function DashboardPage(): JSX.Element {
               <div className="metric-tile">
                 <div className="metric-left">
                   <div className="metric-header">
-                    <div className="metric-circle">{todos.length}</div>
+                    <div className="metric-circle">{totalTodos}</div>
                     <h3>Todos</h3>
                   </div>
                   <Sparkline data={todoTrend} />
@@ -352,6 +378,7 @@ export default function DashboardPage(): JSX.Element {
                 icon={<span role="img" aria-label="Todos">✅</span>}
                 title="Todos"
                 items={todoItems}
+                listClassName="dashboard-list-preview"
                 moreLink="/todos"
                 onCreate={() => { setCreateType('todo'); setShowModal(true) }}
               />
@@ -370,7 +397,7 @@ export default function DashboardPage(): JSX.Element {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
             <span className="flare-line" aria-hidden="true"></span>
-            <h2 className="fade-item">Create {createType === 'map' ? 'Mind Map' : createType === 'todo' ? 'Todo' : 'Board'}</h2>
+            <h2 className="fade-item">Create {createType === 'map' ? 'Mind Map' : createType === 'todo' ? 'Todo List' : 'Board'}</h2>
             <form onSubmit={handleCreate}>
               <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
                 <label htmlFor="title" className="form-label">Title</label>
