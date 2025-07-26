@@ -199,7 +199,7 @@ export default function TodoCanvas({
       {listDescription && (
         <p className="todo-description">{listDescription}</p>
       )}
-      <h3 className="todo-progress">
+      <h3 className="todo-completion">
         {completedCount}/{totalCount} completed
       </h3>
       <div className="todo-list">
@@ -211,24 +211,26 @@ export default function TodoCanvas({
       )}
       {adding && (
         <div className="todo-add-block">
-          <form
-            className="todo-add-form"
-            onSubmit={e => {
+          <div className="todo-add-wrapper">
+            <form
+              className="todo-add-form"
+              onSubmit={e => {
               e.preventDefault()
               if (!newTitle.trim()) return
               handleCreateTodo(newTitle.trim())
               setNewTitle('')
-            }}
-          >
-            <input
-              type="text"
-              className="todo-add-input"
-              placeholder="New todo"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-            />
-            <button type="submit" className="todo-add-button">Add</button>
-          </form>
+              }}
+            >
+              <input
+                type="text"
+                className="todo-add-input"
+                placeholder="New todo"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+              />
+              <button type="submit" className="todo-add-button">Add</button>
+            </form>
+          </div>
           <div className="done-link" onClick={() => setAdding(false)}>
             done adding todos
           </div>
