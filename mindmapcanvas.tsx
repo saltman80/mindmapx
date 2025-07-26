@@ -145,7 +145,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       const rect = containerRef.current.getBoundingClientRect()
       void rect // reference to avoid lint warnings, not used currently
 
-      const node = {
+      const node: NodeData = {
         id,
         x: CANVAS_SIZE / 2,
         y: CANVAS_SIZE / 2,
@@ -155,7 +155,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         todoId: null,
         mindmapId,
       }
-
       console.log('[MindmapCanvas] Creating node with data:', node)
       addNode(node)
       onAddNode?.(node)
@@ -176,11 +175,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       const newNode = {
         x: parent.x + 150,
         y: parent.y + 50 * (siblingCount + 1),
-        label: newName || 'New Node',
-        description: newDesc || '',
+        label: newName.trim() || 'General',
+        description: newDesc.trim() || '',
         parentId: addParentId,
         mindmapId,
       }
+
+      console.log('[MindmapCanvas] Posting child node payload:', newNode)
 
       authFetch('/.netlify/functions/nodes', {
         method: 'POST',
