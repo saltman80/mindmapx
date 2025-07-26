@@ -119,18 +119,20 @@ const Header = (): JSX.Element => {
               />
             </Link>
           </div>
-          <button
-            className="header__toggle"
-            type="button"
-            onClick={() => setMenuOpen(open => !open)}
-            aria-label="Toggle navigation"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-navigation"
-          >
-            <span className="header__toggle-bar" />
-            <span className="header__toggle-bar" />
-            <span className="header__toggle-bar" />
-          </button>
+          {user && (
+            <button
+              className="header__toggle"
+              type="button"
+              onClick={() => setMenuOpen(open => !open)}
+              aria-label="Toggle navigation"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+            >
+              <span className="header__toggle-bar" />
+              <span className="header__toggle-bar" />
+              <span className="header__toggle-bar" />
+            </button>
+          )}
 
           <nav className="header__nav" aria-label="Primary">
             <ul className="header__nav-list">
@@ -154,7 +156,21 @@ const Header = (): JSX.Element => {
               ))}
             </ul>
           </nav>
-          <div className="header__actions">
+          <div className={`header__actions${user ? '' : ' header__actions--marketing'}`}>
+          {!user && (
+            <button
+              className="header__toggle"
+              type="button"
+              onClick={() => setMenuOpen(open => !open)}
+              aria-label="Toggle navigation"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+            >
+              <span className="header__toggle-bar" />
+              <span className="header__toggle-bar" />
+              <span className="header__toggle-bar" />
+            </button>
+          )}
           {user ? (
             <div className="header__avatar-container" ref={avatarRef}>
               <button
