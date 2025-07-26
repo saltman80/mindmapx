@@ -1,6 +1,6 @@
 [build]
   # Install dev dependencies so the vite build tool is available
-  command = "npm install --include=dev && npm run migrate && npm run build"
+  command = "npm install --include=dev && npm run migrate && npm run compile:functions && npm run build"
   publish = "dist"
   functions = "netlify/functions"
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { authFetch } from '../authFetch'
 import { authHeaders } from '../authHeaders'
+import { getAuthToken } from '../getAuthToken'
 import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
@@ -26,7 +27,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const [form, setForm] = useState({ title: '', description: '' })
   const navigate = useNavigate()
 
-  const fetchData = async (): Promise<void> => {
+  const fetchBoards = async (): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
@@ -41,29 +42,32 @@ export default function KanbanBoardsPage(): JSX.Element {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  useEffect(() => { fetchBoards() }, [])
 
-  const handleCreate = async (e: FormEvent): Promise<void> => {
+  const handleSave = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     try {
-      const res = await fetch('/.netlify/functions/boards', {
+      const res = await fetch('/.netlify/functions/kanban-boards', {
         method: 'POST',
-        credentials: 'include', // Required for session cookie
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
         },
-        body: JSON.stringify({ title: form.title, description: form.description }),
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+        }),
       })
-      const json = await res.json()
+
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to save')
+
+      const data = await res.json()
+      console.log('[Kanban] Board created:', data)
       setShowModal(false)
-      setForm({ title: '', description: '' })
-      if (json?.id) {
-        navigate(`/kanban/${json.id}`)
-      } else {
-        fetchData()
-      }
+      fetchBoards()
     } catch (err: any) {
-      alert(err.message || 'Creation failed')
+      console.error('[Kanban Modal Save] Error:', err)
+      alert(err.message)
     }
   }
 
@@ -83,7 +87,7 @@ export default function KanbanBoardsPage(): JSX.Element {
       if (json?.id) {
         navigate(`/kanban/${json.id}`)
       } else {
-        fetchData()
+        fetchBoards()
       }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
@@ -205,7 +209,7 @@ export default function KanbanBoardsPage(): JSX.Element {
           <div className="modal fancy-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
             <span className="flare-line" aria-hidden="true"></span>
             <h2 className="fade-item">Create Board</h2>
-            <form onSubmit={handleCreate}>
+            <form onSubmit={handleSave}>
               <div className="form-field fade-item" style={{ animationDelay: '0.1s' }}>
                 <label htmlFor="title" className="form-label">Title</label>
                 <input id="title" className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
