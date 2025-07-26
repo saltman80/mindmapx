@@ -26,6 +26,8 @@ export default function TodoCanvas({
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [adding, setAdding] = useState(initialTodos.length === 0)
   const [newTitle, setNewTitle] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -63,35 +65,83 @@ export default function TodoCanvas({
     }
   }
 
+  const saveTodoUpdate = async (todo: TodoItem) => {
+    await fetch('/.netlify/functions/todos', {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: todo.id, updates: { title: todo.title, completed: (todo as any).completed } }),
+    })
+  }
+
+  const handleToggleCompleted = async (todo: TodoItem & { completed?: boolean }) => {
+    const updated = { ...todo, completed: !todo.completed }
+    setTodos(prev => prev.map(t => (t.id === todo.id ? updated : t)))
+    try {
+      await saveTodoUpdate(updated)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const startEditing = (todo: TodoItem) => {
+    setEditingId(todo.id)
+    setEditTitle(todo.title)
+  }
+
+  const saveEdit = async (todo: TodoItem) => {
+    const trimmed = editTitle.trim()
+    if (!trimmed || trimmed === todo.title) {
+      setEditingId(null)
+      return
+    }
+    const updated = { ...todo, title: trimmed }
+    setTodos(prev => prev.map(t => (t.id === todo.id ? updated : t)))
+    setEditingId(null)
+    try {
+      await saveTodoUpdate(updated)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const activeTodos = todos.filter(t => !(t as any).completed)
+  const doneTodos = todos.filter(t => (t as any).completed)
+
   return (
     <div className="todo-canvas-wrapper">
-      {(listTitle || todos.length > 0) && (
+      {listTitle && (
         <header className="todo-header">
-          <h1>{listTitle ?? todos[0].title}</h1>
-          {!listTitle && todos[0].description && (
-            <p className="todo-description">{todos[0].description}</p>
-          )}
-          {!listTitle && (
-            <h2 className="todo-title-below">{todos[0].title}</h2>
-          )}
+          <h1>{listTitle}</h1>
         </header>
       )}
       <div className="todo-list">
-        {todos.length === 0 && (
-          <p className="todo-empty-message">Add a new todo to get started.</p>
-        )}
-        {todos.map(t => (
-          <div key={t.id} className="tile">
-            <header className="tile-header">
-              <h2>{t.title}</h2>
-            </header>
-            {t.description && (
-              <section className="tile-body">
-                <p>{t.description}</p>
-              </section>
-            )}
+        {activeTodos.map(t => (
+          <div key={t.id} className="tile todo-item">
+            <div className="tile-header">
+              <input
+                type="checkbox"
+                checked={(t as any).completed || false}
+                onChange={() => handleToggleCompleted(t as any)}
+              />
+              {editingId === t.id ? (
+                <input
+                  className="editable-title"
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  onBlur={() => saveEdit(t)}
+                  onKeyDown={e => e.key === 'Enter' && saveEdit(t)}
+                  autoFocus
+                />
+              ) : (
+                <span className="todo-title" onClick={() => startEditing(t)}>
+                  {t.title}
+                </span>
+              )}
+            </div>
           </div>
         ))}
+
         {adding && (
           <>
             <form
@@ -136,6 +186,25 @@ export default function TodoCanvas({
           >
             +
           </button>
+        )}
+
+        {doneTodos.length > 0 && (
+          <>
+            <hr className="done-divider" />
+            <h3 className="done-header">Done</h3>
+            {doneTodos.map(t => (
+              <div key={t.id} className="tile todo-item completed">
+                <div className="tile-header">
+                  <input
+                    type="checkbox"
+                    checked
+                    onChange={() => handleToggleCompleted(t as any)}
+                  />
+                  <span className="todo-title done-text">{t.title}</span>
+                </div>
+              </div>
+            ))}
+          </>
         )}
       </div>
     </div>
