@@ -57,7 +57,8 @@ const sections: AboutSection[] = [
 export default function AboutPage(): JSX.Element {
   useScrollReveal()
   return (
-    <div className="about-page">
+    <div id="top" tabIndex={-1} style={{ scrollMarginTop: '64px' }}>
+      <div className="about-page">
       <section className="section section--one-col reveal relative overflow-x-visible">
         <MindmapArm side="left" />
         <FaintMindmapBackground />
@@ -98,6 +99,7 @@ export default function AboutPage(): JSX.Element {
           )}
         </section>
       ))}
+      </div>
     </div>
   )
 }
