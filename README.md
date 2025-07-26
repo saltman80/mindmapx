@@ -69,3 +69,16 @@ FOR EACH ROW EXECUTE PROCEDURE trigger_set_boards_updated_at();
 
 CREATE INDEX IF NOT EXISTS idx_kanban_boards_user_id ON kanban_boards(user_id);
 ```
+
+## Login Demo
+
+The `scripts/loginAndFetch.js` helper demonstrates how to sign in and fetch
+authenticated API endpoints. Provide your credentials via environment variables
+and optionally set the base URL of your deployed site:
+
+```bash
+EMAIL=you@example.com \
+PASSWORD=yourpassword \
+API_BASE_URL=https://your-site.netlify.app \
+node scripts/loginAndFetch.js
+```
