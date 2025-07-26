@@ -136,8 +136,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
             payload.mindmapId,
             payload.x,
             payload.y,
-            payload.label ?? null,
-            payload.description ?? null,
+            payload.label?.trim() || 'General',
+            payload.description?.trim() || '',
             payload.parentId ?? null
           ]
         )
