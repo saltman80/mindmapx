@@ -23,6 +23,25 @@ export const handler: Handler = async (event) => {
 
   const client = await getClient()
   try {
+    if (event.httpMethod === 'PATCH' && /kanban-columns$/.test(event.path)) {
+      if (!event.body) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
+      }
+      const data = JSON.parse(event.body)
+      if (!Array.isArray(data.columns)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'columns array required' }) }
+      }
+      for (const col of data.columns) {
+        if (!col.id || col.position === undefined) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'id and position required' }) }
+        }
+        await client.query(
+          'UPDATE kanban_columns SET position=$1, updated_at=now() WHERE id=$2',
+          [Number(col.position), col.id]
+        )
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ updated: data.columns.length }) }
+    }
     if (event.httpMethod === 'POST') {
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       const data = JSON.parse(event.body)

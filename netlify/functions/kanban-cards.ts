@@ -92,7 +92,8 @@ export const handler: Handler = async (event) => {
         [...values, cardId]
       )
       if (res.rowCount === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
-      await log(client, cardId, userId, 'update', 'Card updated')
+      const changed = keys.filter(k => data[k] !== undefined).join(',')
+      await log(client, cardId, userId, 'update', `Updated: ${changed}`)
       return { statusCode: 200, headers, body: JSON.stringify({ id: cardId }) }
     }
 
