@@ -44,10 +44,15 @@ export default function InteractiveKanbanBoard({
     { id: 'lane-3', title: 'Reviewing', cards: [] },
     { id: 'lane-4', title: 'Done', cards: [] },
   ])
-  const [boardTitle] = useState(title || 'Kanban Board')
-  const [boardDescription] = useState(
+  const [boardTitle, setBoardTitle] = useState(title || 'Kanban Board')
+  const [boardDescription, setBoardDescription] = useState(
     description || 'Organize tasks across lanes'
   )
+
+  useEffect(() => {
+    setBoardTitle(title || 'Kanban Board')
+    setBoardDescription(description || 'Organize tasks across lanes')
+  }, [title, description])
   const [editing, setEditing] = useState<{ laneId: string; card: Card } | null>(null)
   const [commenting, setCommenting] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)

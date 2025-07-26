@@ -2412,7 +2412,7 @@ hr {
 }
 
 .btn-secondary {
-  background: #f97316;
+  background: #fdba74;
   color: #fff;
   border: none;
   padding: 0.5rem;
@@ -2541,7 +2541,7 @@ hr {
 
 .lane {
   flex-shrink: 0;
-  background: #ffffff;
+  background: #f9fafb;
   border-radius: 6px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.06);
   display: flex;
@@ -2556,13 +2556,13 @@ hr {
   border-top-right-radius: 6px;
 }
 .done-bar {
-  background-color: #3b82f6;
+  background-color: #60a5fa;
 }
 .in-progress-bar {
-  background-color: #10b981;
+  background-color: #6ee7b7;
 }
 .other-bar {
-  background-color: #f59e0b;
+  background-color: #fcd34d;
 }
 .lane:not(:last-child)::after {
   content: '';
@@ -2749,7 +2749,7 @@ hr {
 }
 
 .add-lane-button {
-  background: #1d72f3;
+  background: #60a5fa;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -2761,7 +2761,7 @@ hr {
 }
 
 .add-lane-button:hover {
-  background: #145dcc;
+  background: #3b82f6;
 }
 
 .card-modal {
