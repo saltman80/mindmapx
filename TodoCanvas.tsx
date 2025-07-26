@@ -75,11 +75,14 @@ export default function TodoCanvas({
   }
 
   const saveTodoUpdate = async (todo: TodoItem) => {
-    await fetch('/.netlify/functions/todos', {
-      method: 'PATCH',
+    await fetch(`/.netlify/functions/todoid/${todo.id}`, {
+      method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: todo.id, updates: { title: todo.title, completed: (todo as any).completed } }),
+      body: JSON.stringify({
+        title: todo.title,
+        completed: (todo as any).completed,
+      }),
     })
   }
 
