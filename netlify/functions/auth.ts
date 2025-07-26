@@ -22,5 +22,5 @@ export function extractToken(event: HandlerEvent): string | null {
 export function verifySession(token: string): SessionPayload {
   // Temporary stub implementation to bypass JWT verification
   // until the full authorization system is implemented.
-  return { userId: 'demo-user' }
+  return { userId: '11111111-1111-1111-1111-111111111111' }
 }

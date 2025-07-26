@@ -1,6 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
+import { validate as isUuid } from 'uuid'
 
 const headers: Record<string, string> = {
   'Content-Type': 'application/json',
@@ -26,6 +27,13 @@ export const handler = async (
   try {
     const session = verifySession(token) as { userId: string }
     userId = session.userId
+    if (!isUuid(userId)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid userId' })
+      }
+    }
   } catch {
     return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid token' }) }
   }
