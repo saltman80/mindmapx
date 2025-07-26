@@ -1,6 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
+import { validate as isUuid } from 'uuid'
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
 
@@ -59,7 +60,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     try {
       const session = verifySession(token)
       userId = session.userId
-      if (!userId) throw new Error('Missing userId')
+      if (!userId || !isUuid(userId)) {
+        throw new Error('Invalid userId')
+      }
     } catch (err) {
       console.error('Auth failure in todos.ts:', err)
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
