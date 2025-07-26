@@ -121,7 +121,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
             payload.x ?? 0,
             payload.y ?? 0,
             payload.label ?? 'Untitled',
-            payload.description ?? '',
+            payload.description ?? null,
             payload.parentId ?? null
           ]
         )
