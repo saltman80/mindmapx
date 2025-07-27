@@ -170,6 +170,32 @@ export const handler = async (
           }
         }
         const updated = await updateTodo(todoId, parseResult.data, userId)
+
+        if (parseResult.data.completed !== undefined) {
+          const info = await getClient()
+          try {
+            const { rows: todoRow } = await info.query('SELECT linked_kanban_card_id FROM todos WHERE id=$1', [todoId])
+            const cardId = todoRow[0]?.linked_kanban_card_id
+            if (cardId) {
+              const { rows: boardRows } = await info.query('SELECT board_id FROM canvas_links WHERE todo_id=$1', [todoId])
+              const boardId = boardRows[0]?.board_id
+              if (boardId) {
+                const { rows: colRows } = await info.query("SELECT id FROM kanban_columns WHERE board_id=$1 AND title='Done'", [boardId])
+                let doneId = colRows[0]?.id
+                if (!doneId) {
+                  const { rows } = await info.query("INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,'Done',99) RETURNING id", [boardId])
+                  doneId = rows[0].id
+                }
+                if (parseResult.data.completed === true && doneId) {
+                  await info.query('UPDATE kanban_cards SET column_id=$1, updated_at=now() WHERE id=$2', [doneId, cardId])
+                }
+              }
+            }
+          } finally {
+            info.release()
+          }
+        }
+
         return {
           statusCode: 200,
           headers,
