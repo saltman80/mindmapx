@@ -1493,7 +1493,7 @@ hr {
   background-color: var(--color-bg-alt);
   padding: var(--spacing-lg) var(--spacing-md);
   position: relative;
-  overflow: hidden;
+  overflow: visible; // allow drawer toggle to remain fully visible
 }
 
 @media (max-width: 768px) {
