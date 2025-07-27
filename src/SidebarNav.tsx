@@ -33,12 +33,6 @@ export default function SidebarNav(): JSX.Element {
 
   const [sidebarWidth, setSidebarWidth] = useState(DESKTOP_WIDTH)
 
-  const metrics = [
-    { label: 'Mindmaps', value: '1/10' },
-    { label: 'Todo Lists', value: '0/100' },
-    { label: 'Kanban Boards', value: '0/10' },
-    { label: 'AI Automations', value: '0/25 this month' }
-  ]
 
   useEffect(() => {
     const updateWidth = () => {
@@ -76,16 +70,6 @@ export default function SidebarNav(): JSX.Element {
       >
         <span>{open ? '‹' : '›'}</span>
       </button>
-      <table className="sidebar-metrics">
-        <tbody>
-          {metrics.map(m => (
-            <tr key={m.label}>
-              <td className="metric-label">{m.label}</td>
-              <td className="metric-value">{m.value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
       <nav>
         <ul>
           {mainLinks.map(link => (
