@@ -28,7 +28,7 @@ export const handler = async (
   if (typeof title !== 'string' || !title.trim()) return { statusCode: 400, body: 'Invalid title' }
   if (!description) return { statusCode: 400, body: 'Missing description' }
 
-  const prompt = `Create a mindmap JSON based on: "${description}". Return an array of nodes with fields: id, title, parentId.`
+  const prompt = `Generate a mindmap as JSON from: "${description}". Limit to 40 nodes or fewer and include one root node with child and sub nodes. Each node should have fields id (uuid), title, and parentId (uuid or null). Return only valid JSON.\nExample:\n[{"id":"uuid","title":"Root","parentId":null},{"id":"uuid","title":"Child","parentId":"root-uuid"}]`
 
   let nodes: any[] = []
   try {
