@@ -1053,7 +1053,8 @@ hr {
   gap: var(--spacing-sm);
   flex-shrink: 0;
   width: 300px;
-  max-height: 100%;
+  /* allow lane height to grow with content */
+  max-height: none;
 }
 
 @media (max-width: 640px) {
@@ -2331,7 +2332,8 @@ hr {
   flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  /* allow lane height to grow with content */
+  max-height: none;
   background: var(--color-surface);
   padding: var(--spacing-sm);
   border-radius: 4px;
@@ -2752,7 +2754,8 @@ hr {
   flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  /* allow lane height to grow with content */
+  max-height: none;
 }
 
 .lane {
@@ -2762,7 +2765,8 @@ hr {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* let the lane expand vertically */
+  height: auto;
   position: relative;
 }
 .lane-header-bar {
