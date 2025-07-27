@@ -50,7 +50,7 @@ export default function SidebarNav(): JSX.Element {
 
   const sidebarVariants = {
     open: { x: 0 },
-    closed: { x: -(sidebarWidth - 20) }
+    closed: { x: -(sidebarWidth - 40) }
   }
 
   return (
