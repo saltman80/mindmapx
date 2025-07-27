@@ -40,6 +40,7 @@ export default function TodoCanvas({
   const [sendingTodo, setSendingTodo] = useState<TodoItem | null>(null)
   const [boards, setBoards] = useState<{ id: string; title: string }[]>([])
   const [selectedBoard, setSelectedBoard] = useState('')
+  const [sendingAll, setSendingAll] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const [adding, setAdding] = useState(true)
 
@@ -130,6 +131,17 @@ export default function TodoCanvas({
     }
   }
 
+  const openSendAllDialog = async () => {
+    setSendingAll(true)
+    try {
+      const res = await fetch('/.netlify/functions/boards', { credentials: 'include' })
+      const data = await res.json()
+      if (Array.isArray(data.boards)) setBoards(data.boards)
+    } catch {
+      setBoards([])
+    }
+  }
+
   const saveEdit = async (todo: TodoItem) => {
     const trimmed = editTitle.trim()
     if (!trimmed || trimmed === todo.title) {
@@ -202,6 +214,9 @@ export default function TodoCanvas({
       <h3 className="todo-completion">
         {completedCount}/{totalCount} completed
       </h3>
+      <button className="btn-secondary" onClick={openSendAllDialog} style={{marginBottom:'8px'}}>
+        Send All To Kanban
+      </button>
       <div className="todo-list">
         {activeTodos.map(renderTodo)}
       </div>
@@ -287,7 +302,7 @@ export default function TodoCanvas({
                 disabled={!selectedBoard}
                 onClick={async () => {
                   if (!sendingTodo) return
-                  await fetch('/.netlify/functions/kanban-items', {
+                  await fetch('/.netlify/functions/kanban-cards', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -299,6 +314,37 @@ export default function TodoCanvas({
                     }),
                   })
                   setSendingTodo(null)
+                }}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {sendingAll && (
+        <Modal isOpen={true} onClose={() => setSendingAll(false)} ariaLabel="Send list">
+          <div className="modal-container card-modal">
+            <h2 className="mb-2 text-lg font-semibold">Send List to Kanban</h2>
+            <select value={selectedBoard} onChange={e => setSelectedBoard(e.target.value)} className="input-styled">
+              <option value="">Select board</option>
+              {boards.map(b => (
+                <option key={b.id} value={b.id}>{b.title}</option>
+              ))}
+            </select>
+            <div className="card-actions" style={{ marginTop: '1rem' }}>
+              <button className="btn-cancel" onClick={() => setSendingAll(false)}>Cancel</button>
+              <button
+                className="btn-save"
+                disabled={!selectedBoard}
+                onClick={async () => {
+                  await fetch('/.netlify/functions/send-todo-list-to-kanban', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ listId: list_id, boardId: selectedBoard })
+                  })
+                  setSendingAll(false)
                 }}
               >
                 Send
