@@ -95,7 +95,7 @@ export default function TodosPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
-    const res = await fetch('/.netlify/functions/ai-create-todo-list', {
+    const res = await fetch('/.netlify/functions/ai-create-todo', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
