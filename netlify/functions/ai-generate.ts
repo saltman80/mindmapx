@@ -1,4 +1,5 @@
 import OpenAI from "openai"
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
@@ -8,7 +9,7 @@ const openai = new OpenAI({
 const MODEL = "openai/gpt-4o-mini"
 
 export async function generateAIResponse(prompt: string, systemPrompt?: string) {
-  const messages = [
+  const messages: ChatCompletionMessageParam[] = [
     ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
     { role: "user", content: prompt }
   ]
