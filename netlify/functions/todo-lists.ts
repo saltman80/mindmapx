@@ -19,12 +19,12 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const client = await getClient()
     if (event.httpMethod === 'GET') {
       const listsRes = await client.query(
-        `SELECT l.id, l.title, l.created_at, l.updated_at,
+        `SELECT l.id, l.title, l.node_id, l.created_at, l.updated_at,
                 COALESCE(jsonb_agg(jsonb_build_object('id', t.id, 'title', t.title, 'description', t.description, 'completed', t.completed)) FILTER (WHERE t.id IS NOT NULL), '[]') AS todos
            FROM todo_lists l
            LEFT JOIN todos t ON t.list_id = l.id
           WHERE l.user_id = $1
-          GROUP BY l.id
+          GROUP BY l.id, l.node_id
           ORDER BY l.created_at DESC`,
         [userId]
       )
@@ -54,9 +54,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         client.release();
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid title' }) }
       }
+      const nodeId = data.nodeId || null
       const res = await client.query(
-        'INSERT INTO todo_lists (user_id, title) VALUES ($1,$2) RETURNING id, title, created_at, updated_at',
-        [userId, title]
+        'INSERT INTO todo_lists (user_id, title, node_id) VALUES ($1,$2,$3) RETURNING id, title, node_id, created_at, updated_at',
+        [userId, title, nodeId]
       )
       client.release()
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
