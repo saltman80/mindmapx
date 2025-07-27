@@ -402,14 +402,6 @@ export default function DashboardPage(): JSX.Element {
                 }}
               />
             </div>
-            <div className="dashboard-row">
-              <div className="limit-tile">
-                <p>Mindmaps {maps.length}/{LIMIT_MINDMAPS}</p>
-                <p>Todo Lists {todoLists.length}/{LIMIT_TODO_LISTS}</p>
-                <p>Kanban Boards {boards.length}/{LIMIT_KANBAN_BOARDS}</p>
-                <p>AI Automations {aiUsage}/{TOTAL_AI_LIMIT} this month</p>
-              </div>
-            </div>
           </div>
         </>
       )}
