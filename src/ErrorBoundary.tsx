@@ -30,15 +30,33 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (this.state.hasError) {
-      return (
-        <div role="alert" style={{ padding: '1rem', textAlign: 'center' }}>
-          Oops! Something went wrong loading the mind map. Please try again.
-        </div>
-      )
-    }
+    const popup = this.state.hasError ? (
+      <div
+        role="alert"
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 1000,
+          padding: '1rem',
+          background: 'white',
+          border: '1px solid red',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        }}
+      >
+        Oops! Something went wrong loading the mind map. Please try again.
+        <button onClick={this.reset} style={{ marginLeft: '0.5rem' }}>
+          Dismiss
+        </button>
+      </div>
+    ) : null
 
-    return this.props.children
+    return (
+      <>
+        {this.props.children}
+        {popup}
+      </>
+    )
   }
 }
 
