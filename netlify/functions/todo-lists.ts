@@ -1,5 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { getClient } from './db-client.js'
+import { getClient } from "./db-client.js"
+import { LIMIT_TODO_LISTS } from "./limits.js"
 import { extractToken, verifySession } from './auth.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -55,6 +56,11 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid title' }) }
       }
       const nodeId = data.nodeId || null
+      const countRes = await client.query('SELECT COUNT(*) FROM todo_lists WHERE user_id = $1', [userId])
+      if (Number(countRes.rows[0].count) >= LIMIT_TODO_LISTS) {
+        client.release()
+        return { statusCode: 403, headers, body: JSON.stringify({ error: 'Todo list limit reached' }) }
+      }
       const res = await client.query(
         'INSERT INTO todo_lists (user_id, title, node_id) VALUES ($1,$2,$3) RETURNING id, title, node_id, created_at, updated_at',
         [userId, title, nodeId]

@@ -1,4 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
+import { LIMIT_KANBAN_BOARDS } from './limits.js'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
@@ -55,6 +56,11 @@ export const handler = async (
       const todoId = data.todoId || null
       if (!title) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing title' }) }
+      }
+
+      const countRes = await client.query('SELECT COUNT(*) FROM kanban_boards WHERE user_id = $1', [userId])
+      if (Number(countRes.rows[0].count) >= LIMIT_KANBAN_BOARDS) {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: 'Kanban board limit reached' }) }
       }
 
       const result = await client.query(

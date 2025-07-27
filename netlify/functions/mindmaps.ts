@@ -3,7 +3,7 @@ import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 import { ZodError } from 'zod'
-import { randomUUID } from 'crypto'
+import { LIMIT_MINDMAPS } from "./limits.js"
 import { mapInputSchema } from './validationschemas.js'
 
 export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -57,6 +57,15 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           return { statusCode: 400, headers, body: JSON.stringify({ error: 'Validation failed', details: err.errors }) }
         }
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
+      }
+
+      const countRes = await client.query(
+        'SELECT COUNT(*) FROM mindmaps WHERE user_id = $1',
+        [userId]
+      )
+      if (Number(countRes.rows[0].count) >= LIMIT_MINDMAPS) {
+        client.release()
+        return { statusCode: 403, headers, body: JSON.stringify({ error: 'Mindmap limit reached' }) }
       }
 
       const result = await client.query(
@@ -140,6 +149,13 @@ export async function createMindmapFromNodes(
 ): Promise<string> {
   const client = await getClient()
   try {
+    const { rows } = await client.query(
+      'SELECT COUNT(*) FROM mindmaps WHERE user_id = $1',
+      [userId]
+    )
+    if (Number(rows[0].count) >= LIMIT_MINDMAPS) {
+      throw new Error('Mindmap limit reached')
+    }
     await client.query('BEGIN')
     const res = await client.query(
       `INSERT INTO mindmaps(user_id, title, description, created_at)
