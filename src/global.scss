@@ -2315,6 +2315,12 @@ hr {
   margin-right: 4px;
 }
 
+.kanban-canvas {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+}
+
 .kanban-canvas .card-form {
   margin-bottom: var(--spacing-sm);
 }
@@ -2721,12 +2727,12 @@ hr {
 
 .scroll-container {
   width: 100%;
+  flex: 1;
   overflow-x: auto;
   overflow-y: auto;
   white-space: nowrap;
   padding: 0 1rem;
   scrollbar-gutter: stable;
-  height: calc(100vh - 80px);
 }
 
 .scroll-container::-webkit-scrollbar {
