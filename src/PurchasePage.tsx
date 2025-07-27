@@ -46,21 +46,20 @@ const PurchasePage = () => {
               <FaintMindmapBackground className="mindmap-bg-small" />
               <h2 className="mb-md">Monthly Service Includes</h2>
               <div className="features-grid mb-lg">
-                <div className="feature-name">Manual mindmaps &amp; todos</div>
-                <div className="feature-limit">Unlimited</div>
+                <div className="feature-name">Manual mindmaps</div>
+                <div className="feature-limit">10</div>
+                <div className="feature-name">Manual todo lists</div>
+                <div className="feature-limit">50</div>
                 <div className="feature-name">AI mind maps</div>
-                <div className="feature-limit">20 / month</div>
+                <div className="feature-limit">10 / month</div>
                 <div className="feature-name">AI todo lists</div>
-                <div className="feature-limit">200 / month</div>
+                <div className="feature-limit">30 / month</div>
                 <div className="feature-name">Kanban board</div>
-                <div className="feature-limit">50 / unlimited cards</div>
+                <div className="feature-limit">10 + 100 cards</div>
                 <div className="feature-name">Team members</div>
-                <div className="feature-limit">3 seats</div>
+                <div className="feature-limit">2 seats</div>
               </div>
-              <p className="mb-md">
-                Need more AI credits?{' '}
-                <a href="mailto:hey@mindxdo.com">hey@mindxdo.com</a>
-              </p>
+              <p className="mb-md">In App Upgrades Available</p>
               <p>
                 Mindmaps, todos and the kanban board can be created separately or together.
               </p>
