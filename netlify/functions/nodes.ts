@@ -12,11 +12,11 @@ import { requireAuth } from './middleware.js'
 
 interface NodePayload {
   mindmapId: string
-  parentId?: string | null
-  x?: number
-  y?: number
+  x: number
+  y: number
   label?: string
   description?: string
+  parentId?: string | null
 }
 
 async function isFirstNodeForMindmap(
@@ -75,72 +75,65 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     if (event.httpMethod === 'POST') {
-      if (!event.body) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
-      }
-
-      let payload: NodePayload
+      let payload: any
       try {
         payload = JSON.parse(event.body)
       } catch {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
-      }
-
-      if (!payload.mindmapId || !isUuid(payload.mindmapId)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid mindmapId' }) }
-      }
-
-      if (payload.parentId && !isUuid(payload.parentId)) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid parentId' }) }
-      }
-
-      if (typeof payload.x !== 'number' || typeof payload.y !== 'number') {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid coordinates' }) }
-      }
-
-      const isRoot = !payload.parentId
-
-      if (isRoot) {
-        const first = await isFirstNodeForMindmap(client, payload.mindmapId)
-        if (!first) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Only one root node allowed per mindmap' })
-          }
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid JSON' }),
         }
       }
 
+      if (!payload.mindmapId || !isUuid(payload.mindmapId)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing or invalid mindmapId' }),
+        }
+      }
+
+      const x = typeof payload.x === 'number' ? payload.x : 0
+      const y = typeof payload.y === 'number' ? payload.y : 0
+      const label =
+        typeof payload.label === 'string' && payload.label.trim() !== ''
+          ? payload.label.trim()
+          : 'General'
+      const description =
+        typeof payload.description === 'string' ? payload.description.trim() : ''
+      const parentId = payload.parentId ?? null
+
       try {
-        console.log('[CreateNode] payload:', payload)
+        console.log('[CreateNode] inserting', {
+          mindmapId: payload.mindmapId,
+          x,
+          y,
+          label,
+          description,
+          parentId,
+        })
+
         const result = await client.query(
           `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
-           VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-          [
-            payload.mindmapId,
-            payload.x ?? 0,
-            payload.y ?? 0,
-            payload.label ?? 'Untitled',
-            payload.description ?? null,
-            payload.parentId ?? null
-          ]
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
+          [payload.mindmapId, x, y, label, description, parentId]
         )
+
+        console.log('[CreateNode] inserted id', result.rows[0].id)
 
         return {
           statusCode: 201,
           headers,
-          body: JSON.stringify({ id: result.rows[0].id })
+          body: JSON.stringify({ id: result.rows[0].id }),
         }
       } catch (err) {
-        console.error('[CreateNode] Failed to insert node', {
-          payload,
-          error: err instanceof Error ? err.message : err,
-        })
-
+        console.error('[CreateNode] DB Insert Failed:', { payload, error: err })
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ error: 'Node insert failed' }),
+          body: JSON.stringify({ error: 'Database insert failed' }),
         }
       }
     }
