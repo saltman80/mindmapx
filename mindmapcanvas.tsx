@@ -124,8 +124,21 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         console.log('[MindmapCanvas] handleAddChild', parentId)
         const parent = safeNodes.find(n => n.id === parentId)
         if (!parent) return
+
+        const parentParent = parent.parentId
+          ? safeNodes.find(n => n.id === parent.parentId)
+          : null
+
+        let direction: 'left' | 'right' = 'right'
+        if (!parentParent) {
+          const siblings = safeNodes.filter(n => n.parentId === parentId)
+          direction = siblings.length % 2 === 0 ? 'right' : 'left'
+        } else {
+          direction = parent.x >= parentParent.x ? 'right' : 'left'
+        }
+
         const newNode = {
-          x: parent.x + 150,
+          x: direction === 'right' ? parent.x + 150 : parent.x - 150,
           y: parent.y + 100,
           label: 'New Node',
           description: '',
