@@ -1526,6 +1526,10 @@ hr {
   overflow: visible;
 }
 
+.app-sidebar.closed .sidebar-drawer-toggle {
+  z-index: 1200;
+}
+
 .app-sidebar.closed nav {
   display: none;
 }
@@ -2717,7 +2721,7 @@ hr {
 .scroll-container {
   width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   white-space: nowrap;
   padding: 0 1rem;
   scrollbar-gutter: stable;
