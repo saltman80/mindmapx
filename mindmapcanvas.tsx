@@ -382,7 +382,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const containerWidth =
       typeof width === 'number'
         ? `${width}px`
-        : width ?? '100vw'
+        : width ?? '100%'
     const containerHeight =
       typeof height === 'number'
         ? `${height}px`
