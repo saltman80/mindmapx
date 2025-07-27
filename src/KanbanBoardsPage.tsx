@@ -160,40 +160,46 @@ export default function KanbanBoardsPage(): JSX.Element {
                   </div>
                 </div>
               </div>
-            {sorted.map(b => (
-              <div className="dashboard-tile open-tile" key={b.id}>
-                <header className="tile-header">
-                  <h2>{b.title || 'Board'}</h2>
-                  <div className="tile-actions">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        localStorage.setItem(
-                          `board_last_viewed_${b.id}`,
-                          Date.now().toString()
-                        )
-                        navigate(`/kanban/${b.id}`)
-                      }}
-                    >
-                      Open
-                    </button>
-                    <a
-                      href="#"
-                      className="tile-link delete-link"
-                      onClick={e => {
-                        e.preventDefault()
-                        handleDelete(b.id)
-                      }}
-                    >
-                      Delete
-                    </a>
-                  </div>
-                </header>
-                <section className="tile-body">
-                  <p>Board details coming soon...</p>
-                </section>
+            {sorted.length === 0 ? (
+              <div className="dashboard-tile empty">
+                <p>No Kanban found.</p>
               </div>
-            ))}
+            ) : (
+              sorted.map(b => (
+                <div className="dashboard-tile open-tile" key={b.id}>
+                  <header className="tile-header">
+                    <h2>{b.title || 'Board'}</h2>
+                    <div className="tile-actions">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          localStorage.setItem(
+                            `board_last_viewed_${b.id}`,
+                            Date.now().toString()
+                          )
+                          navigate(`/kanban/${b.id}`)
+                        }}
+                      >
+                        Open
+                      </button>
+                      <a
+                        href="#"
+                        className="tile-link delete-link"
+                        onClick={e => {
+                          e.preventDefault()
+                          handleDelete(b.id)
+                        }}
+                      >
+                        Delete
+                      </a>
+                    </div>
+                  </header>
+                  <section className="tile-body">
+                    <p>Board details coming soon...</p>
+                  </section>
+                </div>
+              ))
+            )}
             {Array.from({ length: 10 }).map((_v, i) => (
               <div className="dashboard-tile ghost-tile" key={`ghost-${i}`}></div>
             ))}
