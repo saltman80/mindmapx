@@ -156,6 +156,36 @@ export default function DashboardPage(): JSX.Element {
   const boardDay = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
   const boardWeek = boards.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
 
+  const mapTrend = Array.from({ length: 14 }, (_, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
+    start.setHours(0, 0, 0, 0)
+    const end = start.getTime() + oneDay
+    return maps.filter(m => {
+      const t = new Date(m.createdAt || m.created_at || '').getTime()
+      return t >= start.getTime() && t < end
+    }).length
+  })
+
+  const todoTrend = Array.from({ length: 14 }, (_, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
+    start.setHours(0, 0, 0, 0)
+    const end = start.getTime() + oneDay
+    return todos.filter(t => {
+      const t1 = new Date(t.updatedAt || t.updated_at || '').getTime()
+      return t.completed && t1 >= start.getTime() && t1 < end
+    }).length
+  })
+
+  const boardTrend = Array.from({ length: 14 }, (_, i) => {
+    const start = new Date(now - (13 - i) * oneDay)
+    start.setHours(0, 0, 0, 0)
+    const end = start.getTime() + oneDay
+    return boards.filter(b => {
+      const t2 = new Date(b.createdAt || b.created_at || '').getTime()
+      return t2 >= start.getTime() && t2 < end
+    }).length
+  })
+
   const recentMaps = [...maps].slice(-3).reverse()
   const recentTodos = [...todos].slice(-3).reverse()
   const recentBoards = [...boards].slice(-3).reverse()
