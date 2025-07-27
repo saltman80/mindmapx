@@ -6,11 +6,10 @@ import MindmapArm from './MindmapArm'
 interface Profile {
   name: string
   email: string
-  address: string
 }
 
 export default function ProfilePage(): JSX.Element {
-  const [profile, setProfile] = useState<Profile>({ name: '', email: '', address: '' })
+  const [profile, setProfile] = useState<Profile>({ name: '', email: '' })
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
@@ -21,9 +20,9 @@ export default function ProfilePage(): JSX.Element {
     fetch('/api/profile', { credentials: 'include', signal: controller.signal })
       .then(res => {
         if (!res.ok) throw new Error('Failed to load profile')
-        return res.json() as Promise<Profile>
+        return res.json() as Promise<any>
       })
-      .then(data => setProfile(data))
+      .then(data => setProfile({ name: data.name || '', email: data.email || '' }))
       .catch(err => {
         if (err.name !== 'AbortError') setError(err.message || 'Unknown error')
       })
@@ -31,7 +30,7 @@ export default function ProfilePage(): JSX.Element {
     return () => controller.abort()
   }, [])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setProfile(prev => ({ ...prev, [name]: value }))
   }
@@ -62,11 +61,6 @@ export default function ProfilePage(): JSX.Element {
       <FaintMindmapBackground />
       <div className="form-card text-center profile-page">
         <h1 className="text-2xl font-semibold mb-4">Update Profile</h1>
-        <img
-          src="./assets/profile-header.png"
-          alt="Profile header"
-          className="profile-image w-32 mx-auto mb-4"
-        />
         {error && <div className="text-red-600 mb-4">{error}</div>}
         {success && <div className="text-green-600 mb-4">Profile updated!</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,17 +85,6 @@ export default function ProfilePage(): JSX.Element {
             onChange={handleChange}
             className="form-input"
             required
-          />
-        </div>
-        <div className="form-field">
-          <label htmlFor="address" className="form-label">Address</label>
-          <textarea
-            id="address"
-            name="address"
-            value={profile.address}
-            onChange={handleChange}
-            rows={3}
-            className="form-input"
           />
         </div>
         <button
