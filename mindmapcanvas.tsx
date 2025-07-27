@@ -171,9 +171,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           direction = parent.x >= parentParent.x ? 'right' : 'left'
         }
 
+        const siblings = safeNodes.filter(n => n.parentId === parentId)
+        const siblingIndex = siblings.length
+        const verticalSpacing = 80
+        const verticalDirection = siblingIndex % 2 === 0 ? 1 : -1
+        const yOffset = (siblingIndex + 1) * verticalSpacing * verticalDirection
+        const jitter = Math.floor(Math.random() * 10 - 5)
+
         const newNode: NodePayload = {
-          x: direction === 'right' ? parent.x + 150 : parent.x - 150,
-          y: parent.y + 100 + Math.floor(Math.random() * 20 - 10),
+          x: direction === 'right' ? parent.x + 180 : parent.x - 180,
+          y: parent.y + yOffset + jitter,
           label: `Child of ${parent.label || 'Node'}`,
           description: '',
           parentId,
