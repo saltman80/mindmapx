@@ -347,12 +347,15 @@ export default function InteractiveKanbanBoard({
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
-            <div className="scroll-container" ref={autoScrollRightRef}>
-              <div
-                className="kanban-board"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
+            <div
+              className="scroll-container"
+              ref={el => {
+                autoScrollRightRef.current = el
+                provided.innerRef(el)
+              }}
+              {...provided.droppableProps}
+            >
+              <div className="kanban-board">
                 {sortedLanes.map((lane, i) => (
                   <Draggable key={lane.id} draggableId={lane.id} index={i} isDragDisabled={lane.title === 'Done'}>
                     {providedLane => (
