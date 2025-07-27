@@ -1963,7 +1963,6 @@ hr {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  aspect-ratio: 16 / 10;
   max-height: 240px;
   min-height: 200px;
   overflow-y: hidden;
@@ -2062,7 +2061,6 @@ hr {
   justify-content: center;
   text-align: center;
   min-height: 150px;
-  aspect-ratio: 16 / 10;
   background-color: #fff8ec;
   border: 1px solid #fbd8a8;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -2086,7 +2084,6 @@ hr {
   border: 2px dashed var(--color-border);
   background-color: transparent;
   min-height: 120px;
-  aspect-ratio: 16 / 10;
   opacity: 0.5;
 }
 
@@ -3210,7 +3207,6 @@ hr {
   transition: transform var(--transition-duration) var(--transition-ease);
   display: flex;
   flex-direction: column;
-  aspect-ratio: 16 / 10;
 }
 
 .card:hover {
