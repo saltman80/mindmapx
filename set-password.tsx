@@ -9,6 +9,7 @@ export default function SetPasswordPage(): JSX.Element {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const validate = () => {
     if (password.length < 8) {
@@ -37,7 +38,8 @@ export default function SetPasswordPage(): JSX.Element {
         body: JSON.stringify({ userId, password })
       })
       if (!res.ok) throw new Error('Failed')
-      navigate('/login')
+      setSuccess(true)
+      setTimeout(() => navigate('/login'), 1000)
     } catch {
       setError('Failed to set password.')
     }
@@ -57,6 +59,11 @@ export default function SetPasswordPage(): JSX.Element {
           </ul>
         </div>
         {error && <div className="text-red-600 mb-4">{error}</div>}
+        {success && (
+          <div className="text-green-600 mb-4" role="status">
+            Password set! Redirecting to login...
+          </div>
+        )}
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-field">
             <label htmlFor="password" className="form-label">Password</label>
