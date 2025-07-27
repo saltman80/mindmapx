@@ -94,7 +94,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
-      // Default values
+      // Default values and type checks
       const x = typeof payload.x === 'number' ? payload.x : 0
       const y = typeof payload.y === 'number' ? payload.y : 0
       const label =
@@ -103,7 +103,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           : 'General'
       const description =
         typeof payload.description === 'string' ? payload.description.trim() : ''
-      const parentId = payload.parentId ?? null
+
+      let parentId: string | null = null
+      if (payload.parentId !== undefined && payload.parentId !== null) {
+        if (typeof payload.parentId === 'string' && isUuid(payload.parentId)) {
+          parentId = payload.parentId
+        } else {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Invalid parentId' }),
+          }
+        }
+      }
 
       // Optional: restrict one root node if desired
       // const isRoot = !parentId
