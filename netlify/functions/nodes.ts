@@ -103,7 +103,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           'SELECT id FROM mindmaps WHERE id = $1',
           [payload.mindmapId]
         )
-        if (result.rowCount > 0) {
+        const count = result.rowCount ?? 0
+        if (count > 0) {
           mindmapExists = true
           break
         }
@@ -124,7 +125,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           'SELECT id FROM mindmaps WHERE id = $1',
           [payload.mindmapId]
         )
-        mindmapExists = finalCheck.rowCount > 0
+        const finalCount = finalCheck.rowCount ?? 0
+        mindmapExists = finalCount > 0
       }
 
       if (!mindmapExists) {
