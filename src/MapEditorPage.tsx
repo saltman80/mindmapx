@@ -206,11 +206,13 @@ export default function MapEditorPage(): JSX.Element {
 
   const handleAddNode = (node: NodeData) => {
     if (!id) return
+    const payload = { ...node, mindmapId: id }
+    console.log('[handleAddNode] payload', payload)
     fetch('/.netlify/functions/nodes', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...node, mindmapId: id })
+      body: JSON.stringify(payload)
     })
       .then(async res => {
         if (!res.ok) {
