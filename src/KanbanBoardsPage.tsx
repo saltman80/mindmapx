@@ -61,7 +61,12 @@ export default function KanbanBoardsPage(): JSX.Element {
       const data = await res.json()
       console.log('[Kanban] Board created:', data)
       setShowModal(false)
-      fetchBoards()
+      setForm({ title: '', description: '' })
+      if (data?.id) {
+        navigate(`/kanban/${data.id}`)
+      } else {
+        fetchBoards()
+      }
     } catch (err: any) {
       console.error('[Kanban Modal Save] Error:', err)
       alert(err.message)
