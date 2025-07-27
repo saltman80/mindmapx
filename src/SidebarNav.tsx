@@ -56,7 +56,7 @@ export default function SidebarNav(): JSX.Element {
 
   const sidebarVariants = {
     open: { x: 0 },
-    closed: { x: -sidebarWidth }
+    closed: { x: -(sidebarWidth - 20) }
   }
 
   return (
@@ -76,14 +76,16 @@ export default function SidebarNav(): JSX.Element {
       >
         <span>{open ? '‹' : '›'}</span>
       </button>
-      <div className="sidebar-metrics">
-        {metrics.map(m => (
-          <div key={m.label} className="sidebar-metric">
-            <span className="sidebar-metric-circle">{m.value}</span>
-            <span className="sidebar-metric-label">{m.label}</span>
-          </div>
-        ))}
-      </div>
+      <table className="sidebar-metrics">
+        <tbody>
+          {metrics.map(m => (
+            <tr key={m.label}>
+              <td className="metric-label">{m.label}</td>
+              <td className="metric-value">{m.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <nav>
         <ul>
           {mainLinks.map(link => (
