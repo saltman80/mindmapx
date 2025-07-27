@@ -94,16 +94,26 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
-      // Ensure referenced mindmap exists
+      // Ensure referenced mindmap exists. If it doesn't, attempt to create a
+      // placeholder so the node insert won't violate the FK constraint.
       const mindmapCheck = await client.query<{ id: string }>(
         'SELECT id FROM mindmaps WHERE id = $1',
         [payload.mindmapId]
       )
       if (mindmapCheck.rowCount === 0) {
-        return {
-          statusCode: 404,
-          headers,
-          body: JSON.stringify({ error: 'Mindmap not found' }),
+        try {
+          await client.query(
+            `INSERT INTO mindmaps(id, user_id, title, description, config)
+             VALUES ($1, $2, $3, NULL, '{}'::jsonb)`,
+            [payload.mindmapId, userId, 'Untitled']
+          )
+        } catch (createErr) {
+          console.error('[CreateNode] auto create mindmap failed', createErr)
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: 'Mindmap not found' }),
+          }
         }
       }
 

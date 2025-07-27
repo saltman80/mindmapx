@@ -134,24 +134,42 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     )
 
     const createNode = useCallback(async (node: NodePayload): Promise<string | null> => {
-      try {
-        console.log('[MindmapCanvas] createNode payload:', node)
-        const res = await authFetch('/.netlify/functions/nodes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(node),
-        })
-        if (!res.ok) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          console.log('[MindmapCanvas] createNode payload:', node)
+          const res = await authFetch('/.netlify/functions/nodes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(node),
+          })
+
+          if (res.ok) {
+            const data = await res.json()
+            console.log('[MindmapCanvas] createNode response:', data)
+            return data.id || null
+          }
+
+          const err = await res.json().catch(() => ({}))
+          if (
+            (res.status === 404 || res.status === 500) &&
+            typeof err?.error === 'string' &&
+            err.error.toLowerCase().includes('mindmap')
+          ) {
+            await authFetch('/.netlify/functions/mindmaps', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: { title: 'Untitled', description: '' } })
+            })
+            await new Promise(r => setTimeout(r, 300))
+            continue
+          }
           console.error('[MindmapCanvas] createNode failed', res.status)
           return null
+        } catch (err) {
+          console.error('[MindmapCanvas] createNode attempt error', err)
         }
-        const data = await res.json()
-        console.log('[MindmapCanvas] createNode response:', data)
-        return data.id || null
-      } catch (err) {
-        console.error('[MindmapCanvas] createNode error', err)
-        return null
       }
+      return null
     }, [])
 
 

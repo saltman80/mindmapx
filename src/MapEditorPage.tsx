@@ -204,32 +204,53 @@ export default function MapEditorPage(): JSX.Element {
 
 
 
-  const handleAddNode = (node: NodeData) => {
+  const handleAddNode = async (node: NodeData) => {
     if (!id) return
     const payload = { ...node, mindmapId: id }
     console.log('[handleAddNode] payload', payload)
-    fetch('/.netlify/functions/nodes', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-      .then(async res => {
-        if (!res.ok) {
-          throw new Error(`Failed to create node: ${res.status}`)
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch('/.netlify/functions/nodes', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
+          return
         }
-        const data = await res.json()
-        setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
-      })
-      .catch(err => {
-        console.error('[handleAddNode] error', err)
-        // fall back to client-side id so the user can continue working
-        const fallbackId =
-          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-            ? crypto.randomUUID()
-            : Math.random().toString(36).slice(2)
-        setNodes(prev => [...prev, { ...node, id: node.id || fallbackId }])
-      })
+
+        const err = await res.json().catch(() => ({}))
+        if (
+          (res.status === 404 || res.status === 500) &&
+          typeof err?.error === 'string' &&
+          err.error.toLowerCase().includes('mindmap')
+        ) {
+          await fetch('/.netlify/functions/mindmaps', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: { title: 'Untitled', description: '' } })
+          })
+          await new Promise(r => setTimeout(r, 300))
+          continue
+        }
+        throw new Error(`Failed to create node: ${res.status}`)
+      } catch (err) {
+        console.error('[handleAddNode] attempt failed', err)
+      }
+    }
+
+    // fallback to client-side id so the user can continue working
+    const fallbackId =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2)
+    setNodes(prev => [...prev, { ...node, id: node.id || fallbackId }])
   }
 
 
