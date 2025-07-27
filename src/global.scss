@@ -1512,7 +1512,7 @@ hr {
   }
 
   .sidebar-drawer-toggle {
-    position: fixed;
+    position: absolute;
     top: 10px;
     left: 10px;
     right: auto;
@@ -1532,20 +1532,20 @@ hr {
 
 .sidebar-drawer-toggle {
   position: absolute;
-  top: 50%;
-  right: -25px;
-  transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background-color: #555;
-  color: #ccc;
+  background-color: #ffedd5;
+  color: #c05600;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
-  z-index: 1000;
+  z-index: 1100;
+  transform: none;
 }
 .sidebar-drawer-toggle span {
   font-size: 24px;
@@ -3626,3 +3626,28 @@ hr {
 }
 
 .limit-tile p { margin: 0.25rem 0; font-weight: 600; }
+
+.sidebar-metrics {
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sidebar-metric {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-metric-circle {
+  background-color: #ffedd5;
+  color: #c05600;
+  border-radius: 9999px;
+  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.sidebar-metric-label {
+  font-size: 0.8rem;
+}
