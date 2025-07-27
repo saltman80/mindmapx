@@ -17,6 +17,15 @@ export interface TodoList {
   updated_at: string
 }
 
+export interface NodePayload {
+  mindmapId: string
+  x: number
+  y: number
+  label?: string
+  description?: string
+  parentId?: string | null
+}
+
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 
 export interface HandlerResponse {

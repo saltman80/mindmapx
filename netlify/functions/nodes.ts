@@ -3,21 +3,13 @@ import { getClient } from './db-client.js'
 import type { PoolClient } from 'pg'
 import { validate as isUuid } from 'uuid'
 import { requireAuth } from './middleware.js'
+import type { NodePayload } from './types.js'
 
 // Node creation rules:
 // - A mindmap may contain only one root node (parentId null).
 // - The first root node defaults to the canvas center if no coordinates are
 //   provided.
 // - Child nodes require a parentId and coordinates relative to that parent.
-
-interface NodePayload {
-  mindmapId: string
-  x: number
-  y: number
-  label?: string
-  description?: string
-  parentId?: string | null
-}
 
 async function isFirstNodeForMindmap(
   client: PoolClient,

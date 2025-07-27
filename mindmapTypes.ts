@@ -1,12 +1,15 @@
-export interface NodeData {
-  id: string
+export interface NodePayload {
+  mindmapId: string
   x: number
   y: number
   label?: string
   description?: string
   parentId?: string | null
+}
+
+export interface NodeData extends NodePayload {
+  id: string
   todoId?: string | null
-  mindmapId?: string
 }
 
 export interface EdgeData {

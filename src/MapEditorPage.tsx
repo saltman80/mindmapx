@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
 import MindmapCanvas from './MindmapCanvas'
-import type { NodeData, EdgeData } from '../mindmapTypes'
+import type { NodeData, NodePayload, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
 import LoadingSpinner from '../loadingspinner'
 
@@ -149,7 +149,7 @@ export default function MapEditorPage(): JSX.Element {
       const rootX = 400
       const rootY = 300
 
-      const generalNode = {
+      const generalNode: NodePayload = {
         x: rootX,
         y: rootY,
         label: 'General',
