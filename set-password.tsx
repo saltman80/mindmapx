@@ -48,9 +48,14 @@ export default function SetPasswordPage(): JSX.Element {
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <h2 className="text-2xl font-bold mb-6 text-center">Set Password</h2>
-        <p className="mb-md text-left text-sm">
-          Password must be at least 8 characters and include uppercase, lowercase and a number.
-        </p>
+        <div className="mb-md text-left text-sm">
+          <p className="mb-sm">Password requirements:</p>
+          <ul className="list-disc list-inside text-left">
+            <li>At least 8 characters long</li>
+            <li>Contains both uppercase and lowercase letters</li>
+            <li>Includes at least one number</li>
+          </ul>
+        </div>
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-field">
