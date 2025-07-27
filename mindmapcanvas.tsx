@@ -38,12 +38,12 @@ interface MindmapCanvasHandle {
 }
 
 interface NodePayload {
+  mindmapId: string
   x: number
   y: number
   label?: string
   description?: string
   parentId?: string | null
-  mindmapId?: string
 }
 
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
@@ -135,15 +135,21 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const createNode = useCallback(async (node: NodePayload): Promise<string | null> => {
       try {
+        console.log('[MindmapCanvas] createNode payload:', node)
         const res = await authFetch('/.netlify/functions/nodes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(node),
         })
-        if (!res.ok) return null
+        if (!res.ok) {
+          console.error('[MindmapCanvas] createNode failed', res.status)
+          return null
+        }
         const data = await res.json()
+        console.log('[MindmapCanvas] createNode response:', data)
         return data.id || null
-      } catch {
+      } catch (err) {
+        console.error('[MindmapCanvas] createNode error', err)
         return null
       }
     }, [])
