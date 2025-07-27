@@ -1502,6 +1502,41 @@ hr {
   width: 200px;
   background-color: var(--color-bg-alt);
   padding: var(--spacing-lg) var(--spacing-md);
+  position: relative;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.app-sidebar.closed {
+  width: 20px;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: visible;
+}
+
+.app-sidebar.closed nav {
+  display: none;
+}
+
+.sidebar-drawer-toggle {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #555;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+}
+.sidebar-drawer-toggle span {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .app-sidebar ul {
