@@ -2388,8 +2388,7 @@ hr {
 }
 
 .todo-list {
-  width: 100%;
-  max-width: 600px;
+  width: min(600px, 80%);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -2413,7 +2412,7 @@ hr {
 
 .todo-add-form {
   display: flex;
-  width: 600px;
+  width: min(600px, 80%);
   margin: 1rem auto;
   gap: 0.5rem;
 }
@@ -2735,7 +2734,7 @@ hr {
 }
 
 .kanban-scroll-spacer {
-  min-width: 100px;
+  min-width: 150px;
   flex-shrink: 0;
 }
 
@@ -2745,8 +2744,8 @@ hr {
   align-items: flex-start;
   gap: 1rem;
   min-width: max-content;
-  padding-right: 100px;
-  padding-bottom: 100px;
+  padding-right: 150px;
+  padding-bottom: 150px;
   min-height: calc(100vh - 80px);
 }
 
@@ -3508,7 +3507,7 @@ hr {
 }
 
 .todo-block {
-  width: 600px;
+  width: min(600px, 80%);
   margin: 0 auto 0.5rem;
   display: flex;
   align-items: center;
@@ -3588,13 +3587,13 @@ hr {
 }
 
 .todo-add-wrapper {
-  width: 600px;
+  width: min(600px, 80%);
   margin: 1.5rem auto 0.5rem;
 }
 
 .todo-add-form {
   display: flex;
-  width: 600px;
+  width: min(600px, 80%);
   gap: 0.5rem;
   margin: 0 auto;
 }
