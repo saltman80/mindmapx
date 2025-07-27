@@ -100,10 +100,7 @@ const Homepage: React.FC = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">
-            <img src="./assets/logo.png" alt="MindXdo logo" className="hero-logo" />
-            Vision Meets Action
-          </h1>
+          <h1 className="hero-title">Vision Meets Action</h1>
           <p>
             Mindmaps connect todos to boards, turning ideas into executed vision.
           </p>
