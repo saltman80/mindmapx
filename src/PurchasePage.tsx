@@ -11,10 +11,16 @@ const PurchasePage = () => {
 
   const navigate = useNavigate()
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setMessage('')
+    if (!emailRegex.test(email)) {
+      setMessage('Please enter a valid email address.')
+      return
+    }
+    setLoading(true)
     try {
       const res = await fetch('/api/simulate-purchase', {
         method: 'POST',
