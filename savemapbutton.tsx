@@ -1,4 +1,13 @@
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { authFetch } from './authFetch'
+
+// Placeholder toast hook to avoid runtime errors if no library is integrated
+function useToast() {
+  return {
+    success: (msg: string) => console.log('toast success:', msg),
+    error: (msg: string) => console.error('toast error:', msg)
+  }
+}
 
 function isSaveMapResponse(obj: any): obj is SaveMapResponse {
   return obj != null && typeof obj.id === 'string'

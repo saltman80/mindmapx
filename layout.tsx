@@ -1,3 +1,10 @@
+import { useState, useRef, useEffect, type ReactNode, type KeyboardEvent } from 'react'
+import { NavLink } from 'react-router-dom'
+
+interface LayoutProps {
+  children: ReactNode
+}
+
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navId = 'primary-navigation';
