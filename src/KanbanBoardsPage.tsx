@@ -171,18 +171,6 @@ export default function KanbanBoardsPage(): JSX.Element {
                   <header className="tile-header">
                     <h2>{b.title || 'Board'}</h2>
                     <div className="tile-actions">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => {
-                          localStorage.setItem(
-                            `board_last_viewed_${b.id}`,
-                            Date.now().toString()
-                          )
-                          navigate(`/kanban/${b.id}`)
-                        }}
-                      >
-                        Open
-                      </button>
                       <a
                         href="#"
                         className="tile-link delete-link"
@@ -196,6 +184,18 @@ export default function KanbanBoardsPage(): JSX.Element {
                     </div>
                   </header>
                   <section className="tile-body">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        localStorage.setItem(
+                          `board_last_viewed_${b.id}`,
+                          Date.now().toString()
+                        )
+                        navigate(`/kanban/${b.id}`)
+                      }}
+                    >
+                      Open
+                    </button>
                     <p>Board details coming soon...</p>
                   </section>
                 </div>
