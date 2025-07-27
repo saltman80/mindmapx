@@ -94,6 +94,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
+      // Ensure referenced mindmap exists
+      const mindmapCheck = await client.query<{ id: string }>(
+        'SELECT id FROM mindmaps WHERE id = $1',
+        [payload.mindmapId]
+      )
+      if (mindmapCheck.rowCount === 0) {
+        return {
+          statusCode: 404,
+          headers,
+          body: JSON.stringify({ error: 'Mindmap not found' }),
+        }
+      }
+
       // Default values and type checks
       const x =
         typeof payload.x === 'number' && Number.isFinite(payload.x)
@@ -153,12 +166,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           headers,
           body: JSON.stringify({ id: result.rows[0].id }),
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('[CreateNode] DB Insert Failed:', { payload, error: err })
+        if (err?.code === '23503') {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: 'Related record not found' })
+          }
+        }
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ error: 'Database insert failed' }),
+          body: JSON.stringify({ error: err?.message || 'Database insert failed' })
         }
       }
     }
