@@ -20,6 +20,7 @@ export default function MindmapsPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
+  const [aiLoading, setAiLoading] = useState(false)
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
@@ -65,27 +66,29 @@ export default function MindmapsPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    setAiLoading(true)
     try {
-      const res = await fetch('/.netlify/functions/ai-create-mindmap', {
+      const res = await fetch('/api/ai-create-mindmap', {
         method: 'POST',
-        credentials: 'include',
-        headers: authHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: undefined,
           title: form.title,
-          description: form.description,
-          prompt: form.description,
-        }),
+          description: form.description
+        })
       })
       const json = await res.json()
       setShowModal(false)
       setForm({ title: '', description: '' })
-      if (json?.id) {
-        setTimeout(() => navigate(`/maps/${json.id}`), 250)
+      if (json?.mindmapId) {
+        setTimeout(() => navigate(`/maps/${json.mindmapId}`), 250)
       } else {
         fetchData()
       }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
+    } finally {
+      setAiLoading(false)
     }
   }
 
@@ -246,8 +249,7 @@ export default function MindmapsPage(): JSX.Element {
                   Quick Create
                 </button>
                 <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
-                  <span className="sparkle" aria-hidden="true">✨</span>
-                  Create With AI
+                  {aiLoading ? 'Generating...' : <><span className="sparkle" aria-hidden="true">✨</span> Create With AI</>}
                 </button>
               </div>
             </form>

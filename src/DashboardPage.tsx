@@ -44,6 +44,7 @@ export default function DashboardPage(): JSX.Element {
   const [showModal, setShowModal] = useState(false)
   const [createType, setCreateType] = useState<'map' | 'todo' | 'board'>('map')
   const [form, setForm] = useState({ title: '', description: '' })
+  const [aiLoading, setAiLoading] = useState(false)
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
@@ -134,41 +135,29 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    setAiLoading(true)
     try {
       if (createType === 'map') {
-        const res = await fetch('/.netlify/functions/ai-create-mindmap', {
+        const res = await fetch('/api/ai-create-mindmap', {
           method: 'POST',
-          credentials: 'include', // Required for session cookie
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: form.title,
-            description: form.description,
-            prompt: form.description,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title, description: form.description })
         })
         const json = await res.json()
-        if (json?.id) {
-          setTimeout(() => navigate(`/maps/${json.id}`), 250)
+        if (json?.mindmapId) {
+          setTimeout(() => navigate(`/maps/${json.mindmapId}`), 250)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/todo-lists', {
+        await fetch('/api/todo-lists', {
           method: 'POST',
-          credentials: 'include', // Required for session cookie
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ title: form.title }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title })
         })
       } else {
-        await fetch('/.netlify/functions/boards', {
+        await fetch('/api/boards', {
           method: 'POST',
-          credentials: 'include', // Required for session cookie
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ title: form.title }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: form.title })
         })
       }
       setShowModal(false)
@@ -176,6 +165,8 @@ export default function DashboardPage(): JSX.Element {
       fetchData()
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
+    } finally {
+      setAiLoading(false)
     }
   }
 
@@ -411,8 +402,7 @@ export default function DashboardPage(): JSX.Element {
                 <button type="button" className="btn-cancel fade-item" style={{ animationDelay: '0.3s' }} onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn-primary fade-item" style={{ animationDelay: '0.3s' }}>Quick Create</button>
                 <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
-                  <span className="sparkle" aria-hidden="true">✨</span>
-                  Create With AI
+                  {aiLoading ? 'Generating...' : <><span className="sparkle" aria-hidden="true">✨</span> Create With AI</>}
                 </button>
               </div>
             </form>

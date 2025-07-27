@@ -1,7 +1,6 @@
 import type { HandlerEvent, HandlerContext } from "@netlify/functions"
-import { randomUUID } from 'crypto'
-import { getClient } from './db-client.js'
 import { generateAIResponse } from './ai-generate.js'
+import { createMindmapFromNodes } from './mindmaps.js'
 import { requireAuth } from './middleware.js'
 import { aiMindmapNodesSchema } from './validationschemas.js'
 
@@ -39,29 +38,14 @@ export const handler = async (
     nodes = []
   }
 
-  const client = await getClient()
   try {
-    await client.query('BEGIN')
-    const res = await client.query(
-      `INSERT INTO mindmaps(user_id, title, description, created_at)
-       VALUES ($1, $2, $3, NOW()) RETURNING id`,
-      [userId, title.trim(), description.trim() || null]
-    )
-    const mapId = res.rows[0].id
-    for (const n of nodes) {
-      await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, data)
-         VALUES ($1,$2,$3,$4)`,
-        [n.id || randomUUID(), mapId, n.parentId ?? null, JSON.stringify({ content: n.title })]
-      )
+    const mindmapId = await createMindmapFromNodes(userId, title, description, nodes)
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ mindmapId })
     }
-    await client.query('COMMIT')
-    return { statusCode: 201, body: JSON.stringify({ id: mapId }) }
   } catch (err) {
-    await client.query('ROLLBACK')
     console.error(err)
     return { statusCode: 500, body: 'Internal Server Error' }
-  } finally {
-    client.release()
   }
 }

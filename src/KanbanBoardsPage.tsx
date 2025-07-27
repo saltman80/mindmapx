@@ -24,6 +24,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
+  const [aiLoading, setAiLoading] = useState(false)
   const navigate = useNavigate()
 
   const fetchBoards = async (): Promise<void> => {
@@ -68,14 +69,12 @@ export default function KanbanBoardsPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    setAiLoading(true)
     try {
-      const res = await fetch('/.netlify/functions/ai-create-board', {
+      const res = await fetch('/api/ai-create-board', {
         method: 'POST',
-        credentials: 'include', // Required for session cookie
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title: form.title, description: form.description }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: form.title, description: form.description })
       })
       const json = await res.json()
       setShowModal(false)
@@ -87,6 +86,8 @@ export default function KanbanBoardsPage(): JSX.Element {
       }
     } catch (err: any) {
       alert(err.message || 'AI creation failed')
+    } finally {
+      setAiLoading(false)
     }
   }
 
@@ -228,8 +229,7 @@ export default function KanbanBoardsPage(): JSX.Element {
                   Quick Create
                 </button>
                 <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
-                  <span className="sparkle" aria-hidden="true">✨</span>
-                  Create With AI
+                  {aiLoading ? 'Generating...' : <><span className="sparkle" aria-hidden="true">✨</span> Create With AI</>}
                 </button>
               </div>
             </form>

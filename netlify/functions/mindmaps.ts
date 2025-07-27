@@ -3,6 +3,7 @@ import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 import { ZodError } from 'zod'
+import { randomUUID } from 'crypto'
 import { mapInputSchema } from './validationschemas.js'
 
 export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -126,6 +127,38 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
   } catch (err) {
     console.error('Mindmap function error:', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
+  } finally {
+    client.release()
+  }
+}
+
+export async function createMindmapFromNodes(
+  userId: string,
+  title: string,
+  description: string,
+  nodes: Array<{ id?: string; title: string; parentId?: string | null }>
+): Promise<string> {
+  const client = await getClient()
+  try {
+    await client.query('BEGIN')
+    const res = await client.query(
+      `INSERT INTO mindmaps(user_id, title, description, created_at)
+       VALUES ($1, $2, $3, NOW()) RETURNING id`,
+      [userId, title.trim(), description.trim() || null]
+    )
+    const mapId = res.rows[0].id
+    for (const n of nodes) {
+      await client.query(
+        `INSERT INTO nodes(id, mindmap_id, parent_id, data)
+         VALUES ($1, $2, $3, $4)`,
+        [n.id || randomUUID(), mapId, n.parentId ?? null, JSON.stringify({ content: n.title })]
+      )
+    }
+    await client.query('COMMIT')
+    return mapId
+  } catch (err) {
+    await client.query('ROLLBACK')
+    throw err
   } finally {
     client.release()
   }
