@@ -179,9 +179,6 @@ export default function TodosPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{list.title}</h2>
                   <div className="tile-actions">
-                    <button className="btn btn-primary" onClick={() => navigate(`/todos/${list.id}`)}>
-                      Open
-                    </button>
                     {list.id && (
                       <a
                         href="#"
@@ -197,6 +194,9 @@ export default function TodosPage(): JSX.Element {
                   </div>
                 </header>
                 <section className="tile-body">
+                  <button className="btn btn-primary" onClick={() => navigate(`/todos/${list.id}`)}>
+                    Open
+                  </button>
                   {list.id === null ? (
                     <ul className="todo-items">
                       {list.todos.map(t => (

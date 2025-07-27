@@ -180,18 +180,6 @@ export default function MindmapsPage(): JSX.Element {
                 <header className="tile-header">
                   <h2>{m.title || m.data?.title || 'Untitled Map'}</h2>
                   <div className="tile-actions">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        localStorage.setItem(
-                          `mindmap_last_viewed_${m.id}`,
-                          Date.now().toString()
-                        )
-                        navigate(`/maps/${m.id}`)
-                      }}
-                    >
-                      Open
-                    </button>
                     <a
                       href="#"
                       className="tile-link delete-link"
@@ -205,6 +193,18 @@ export default function MindmapsPage(): JSX.Element {
                   </div>
                 </header>
                 <section className="tile-body">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      localStorage.setItem(
+                        `mindmap_last_viewed_${m.id}`,
+                        Date.now().toString()
+                      )
+                      navigate(`/maps/${m.id}`)
+                    }}
+                  >
+                    Open
+                  </button>
                   <p>{m.data?.description || 'Map details coming soon...'}</p>
                 </section>
               </div>
