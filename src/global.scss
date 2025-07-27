@@ -1514,8 +1514,8 @@ hr {
   .sidebar-drawer-toggle {
     position: absolute;
     top: 10px;
-    left: 10px;
-    right: auto;
+    right: -40px;
+    left: auto;
     transform: none;
     z-index: 1100;
   }
@@ -1533,18 +1533,19 @@ hr {
 .sidebar-drawer-toggle {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: -40px;
+  left: auto;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #ffedd5;
-  color: #c05600;
+  background-color: #4b5563;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
-  z-index: 1100;
+  z-index: 1200;
   transform: none;
 }
 .sidebar-drawer-toggle span {
@@ -3629,25 +3630,20 @@ hr {
 
 .sidebar-metrics {
   margin: 1rem 0;
-  display: grid;
-  gap: 0.5rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
 }
 
-.sidebar-metric {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.sidebar-metrics tr + tr {
+  border-top: 1px solid var(--color-border);
 }
 
-.sidebar-metric-circle {
-  background-color: #ffedd5;
-  color: #c05600;
-  border-radius: 9999px;
-  padding: 0.25rem 0.5rem;
+.sidebar-metrics td {
+  padding: 0.25rem 0;
+}
+
+.sidebar-metrics .metric-value {
+  text-align: right;
   font-weight: 600;
-  font-size: 0.8rem;
-}
-
-.sidebar-metric-label {
-  font-size: 0.8rem;
 }
