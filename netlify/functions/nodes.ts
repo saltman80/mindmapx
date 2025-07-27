@@ -67,6 +67,13 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     if (event.httpMethod === 'POST') {
+      if (!event.body) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing body' }),
+        }
+      }
       let payload: any
       try {
         payload = JSON.parse(event.body)
