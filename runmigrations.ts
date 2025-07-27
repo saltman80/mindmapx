@@ -22,16 +22,37 @@ export async function runMigrations(): Promise<void> {
       );
     `)
 
-    // Create base tables in the correct order so later migrations that
-    // reference them do not fail on a fresh database.
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS mindmaps (
-        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        title       TEXT NOT NULL,
-        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-    `)
+    const files = fs
+      .readdirSync(migrationsDir)
+      .filter(f => f.endsWith('.sql'))
+      .sort((a, b) => {
+        const pa = parseInt(a.split('_')[0], 10)
+        const pb = parseInt(b.split('_')[0], 10)
+        if (!isNaN(pa) && !isNaN(pb) && pa !== pb) return pa - pb
+        return a.localeCompare(b)
+      })
+    const { rows } = await client.query<{ name: string }>('SELECT name FROM migrations')
+    const applied = new Set(rows.map(r => r.name))
+
+    async function applyFile(file: string) {
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8')
+      await client.query('BEGIN')
+      try {
+        await client.query(sql)
+        await client.query('INSERT INTO migrations(name) VALUES($1)', [file])
+        await client.query('COMMIT')
+        console.log(`✅ Successfully applied: ${file}`)
+      } catch (err) {
+        await client.query('ROLLBACK').catch(() => {})
+        console.error(`❌ Migration failed in file: ${file}`)
+        throw err
+      }
+    }
+
+    if (files.includes('001_create_tables.sql') && !applied.has('001_create_tables.sql')) {
+      console.log('🟡 Applying 001_create_tables.sql')
+      await applyFile('001_create_tables.sql')
+    }
 
     // Ensure the user_id column exists so later migrations that reference it do
     // not fail when creating indexes or constraints.
@@ -93,6 +114,12 @@ export async function runMigrations(): Promise<void> {
           WHERE table_name = 'mindmaps' AND column_name = 'data'
         ) THEN
           ALTER TABLE mindmaps ADD COLUMN data JSONB DEFAULT '{}'::jsonb;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'mindmaps' AND column_name = 'config'
+        ) THEN
+          ALTER TABLE mindmaps ADD COLUMN config JSONB DEFAULT '{}'::jsonb;
         END IF;
       END;
       $$;
@@ -199,20 +226,9 @@ export async function runMigrations(): Promise<void> {
       $$;
     `)
 
-    // Ensure columns used in later indexes exist before index creation. The
-    // mindmap_id columns are already created in the SQL migration files, so no
-    // additional ALTER TABLE checks are required here.
-    const files = fs.readdirSync(migrationsDir)
-      .filter((file: string) => file.endsWith('.sql'))
-      .sort((a: string, b: string) => {
-        const pa = parseInt(a.split('_')[0], 10)
-        const pb = parseInt(b.split('_')[0], 10)
-        if (!isNaN(pa) && !isNaN(pb) && pa !== pb) return pa - pb
-        return a.localeCompare(b)
-      })
-    const { rows } = await client.query<{ name: string }>('SELECT name FROM migrations')
-    const applied = new Set(rows.map((r: any) => r.name))
+    // Apply any remaining SQL migrations
     for (const file of files) {
+      if (file === '001_create_tables.sql') continue
       if (applied.has(file)) {
         console.log(`[skip] Migration already applied: ${file}`)
         continue
