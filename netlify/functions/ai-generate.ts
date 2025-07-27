@@ -9,10 +9,13 @@ const openai = new OpenAI({
 const MODEL = "openai/gpt-4o-mini"
 
 export async function generateAIResponse(prompt: string, systemPrompt?: string) {
-  const messages: ChatCompletionMessageParam[] = [
-    ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
-    { role: "user", content: prompt }
-  ]
+  const messages: ChatCompletionMessageParam[] = []
+
+  if (systemPrompt) {
+    messages.push({ role: "system", content: systemPrompt } as ChatCompletionMessageParam)
+  }
+
+  messages.push({ role: "user", content: prompt } as ChatCompletionMessageParam)
 
   const completion = await openai.chat.completions.create({
     model: MODEL,
