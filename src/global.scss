@@ -724,22 +724,12 @@ hr {
   font-weight: 800;
   margin-bottom: var(--spacing-md);
   gap: var(--spacing-sm);
-}
-
-.hero-title .hero-logo {
-  height: 100px;
-  vertical-align: middle;
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 640px) {
-  .hero-title {
-    flex-direction: column;
-  }
-
-  .hero-title .hero-logo {
-    margin-bottom: var(--spacing-sm);
-  }
-
   .hero-banner {
     margin-top: -70px;
   }
