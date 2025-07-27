@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import React from 'react'
+import React, { useState } from 'react'
 import { useAuth } from './useAuth'
 
 const mainLinks = [
@@ -20,13 +20,24 @@ export default function SidebarNav(): JSX.Element {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
+  const [open, setOpen] = useState(true)
+
   const handleSignOut = () => {
     logout()
     navigate('/login')
   }
 
   return (
-    <aside className="app-sidebar">
+    <aside className={`app-sidebar${open ? '' : ' closed'}`}>
+      <button
+        type="button"
+        className="sidebar-drawer-toggle"
+        aria-label={open ? 'Collapse sidebar' : 'Expand sidebar'}
+        aria-expanded={open}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span>{open ? '‹' : '›'}</span>
+      </button>
       <nav>
         <ul>
           {mainLinks.map(link => (
