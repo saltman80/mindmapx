@@ -103,42 +103,45 @@ export async function runMigrations(): Promise<void> {
         id          UUID PRIMARY KEY,
         mindmap_id  UUID NOT NULL REFERENCES mindmaps(id),
         parent_id   UUID REFERENCES nodes(id),
-        content     TEXT NOT NULL,
+        x           DOUBLE PRECISION DEFAULT 0,
+        y           DOUBLE PRECISION DEFAULT 0,
+        label       TEXT,
+        description TEXT,
+        todo_id     UUID REFERENCES todos(id),
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+
+      CREATE OR REPLACE FUNCTION nodes_update_updated_at()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.updated_at = now();
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+
+      DROP TRIGGER IF EXISTS nodes_set_updated_at ON nodes;
+      CREATE TRIGGER nodes_set_updated_at
+        BEFORE UPDATE ON nodes
+        FOR EACH ROW EXECUTE PROCEDURE nodes_update_updated_at();
+
+      CREATE INDEX IF NOT EXISTS idx_nodes_mindmap_id ON nodes(mindmap_id);
+      CREATE INDEX IF NOT EXISTS idx_nodes_parent_id ON nodes(parent_id);
+      CREATE INDEX IF NOT EXISTS idx_nodes_todo_id ON nodes(todo_id);
     `)
 
+    // Drop legacy columns from early experiments
     await client.query(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'nodes' AND column_name = 'x'
-        ) THEN
-          ALTER TABLE nodes ADD COLUMN x INTEGER;
-        END IF;
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'nodes' AND column_name = 'y'
-        ) THEN
-          ALTER TABLE nodes ADD COLUMN y INTEGER;
-        END IF;
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'nodes' AND column_name = 'label'
-        ) THEN
-          ALTER TABLE nodes ADD COLUMN label TEXT;
-        END IF;
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'nodes' AND column_name = 'description'
-        ) THEN
-          ALTER TABLE nodes ADD COLUMN description TEXT;
-        END IF;
-      END;
-      $$;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS position_x;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS position_y;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS content;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS data;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS style;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS width;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS height;
+      ALTER TABLE nodes DROP COLUMN IF EXISTS sort_order;
     `)
+
 
     // Kanban boards table for task organization
     await client.query(`
