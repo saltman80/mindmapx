@@ -295,16 +295,16 @@ const Homepage: React.FC = (): JSX.Element => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <h2>Pro Plan</h2>
-          <p className="price">$9.99 / month</p>
+          <h2>Vision Plan</h2>
+          <p className="price">$6.95 / month</p>
           <ul>
-            <li>Unlimited manual mind maps</li>
-            <li>Unlimited manual todos</li>
-            <li>Unlimited manual kanban</li>
+            <li>Mind maps</li>
+            <li>Todos</li>
+            <li>Kanban</li>
             <li>AI assistance available</li>
             <li>Support &amp; Training Available</li>
           </ul>
-          <Link to="/purchase" className="btn">
+          <Link to="/purchase" className="btn" style={{ marginTop: '15px' }}>
             Purchase Today &gt;
           </Link>
         </motion.div>
