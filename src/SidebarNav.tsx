@@ -28,16 +28,34 @@ export default function SidebarNav(): JSX.Element {
     navigate('/login')
   }
 
-  const SIDEBAR_WIDTH = 200
+  const DESKTOP_WIDTH = 200
+  const MOBILE_PERCENT = 0.35
+
+  const [sidebarWidth, setSidebarWidth] = useState(DESKTOP_WIDTH)
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (window.innerWidth <= 768) {
+        setSidebarWidth(window.innerWidth * MOBILE_PERCENT)
+      } else {
+        setSidebarWidth(DESKTOP_WIDTH)
+      }
+    }
+
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   const sidebarVariants = {
     open: { x: 0 },
-    closed: { x: -SIDEBAR_WIDTH }
+    closed: { x: -sidebarWidth }
   }
 
   return (
     <motion.aside
       className={`app-sidebar${open ? '' : ' closed'}`}
+      style={{ width: sidebarWidth }}
       animate={open ? 'open' : 'closed'}
       variants={sidebarVariants}
       transition={{ duration: 0.3 }}
