@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from "@netlify/functions"
 import { generateAIResponse } from './ai-generate.js'
 import { createMindmapFromNodes } from './mindmaps.js'
 import { requireAuth } from './middleware.js'
+import { checkAiLimit, logAiUsage } from "./usage-utils.js"
 import { aiMindmapNodesSchema } from './validationschemas.js'
 
 export const handler = async (
@@ -19,6 +20,11 @@ export const handler = async (
   } catch {
     return { statusCode: 401, body: 'Unauthorized' }
   }
+
+  if (!(await checkAiLimit(userId))) {
+    return { statusCode: 429, body: 'AI limit reached' }
+  }
+  await logAiUsage(userId)
 
   let data: any
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }

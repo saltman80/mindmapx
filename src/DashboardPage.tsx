@@ -7,6 +7,7 @@ import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import Sparkline from './Sparkline'
 import DashboardTile, { DashboardItem } from './DashboardTile'
+import { LIMIT_MINDMAPS, LIMIT_TODO_LISTS, LIMIT_KANBAN_BOARDS, TOTAL_AI_LIMIT } from "./constants"
 import {
   MapItem,
   BoardItem,
@@ -45,6 +46,7 @@ export default function DashboardPage(): JSX.Element {
   const [createType, setCreateType] = useState<'map' | 'todo' | 'board'>('map')
   const [form, setForm] = useState({ title: '', description: '' })
   const [aiLoading, setAiLoading] = useState(false)
+  const [aiUsage, setAiUsage] = useState(0)
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
@@ -76,6 +78,10 @@ export default function DashboardPage(): JSX.Element {
         ? await nodesRes.json()
         : []
       const nodesList = validateNodes(Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes)
+
+      const usageRes = await authFetch('/.netlify/functions/usage', { credentials: 'include' })
+      const usageJson = usageRes.ok ? await usageRes.json() : { aiUsage: 0 }
+      setAiUsage(Number(usageJson.aiUsage) || 0)
 
       setMaps(Array.isArray(mapsList) ? mapsList : [])
       setTodoLists(Array.isArray(lists) ? lists : [])
@@ -363,7 +369,12 @@ export default function DashboardPage(): JSX.Element {
                 title="Mind Maps"
                 items={mapItems}
                 moreLink="/mindmaps"
-                onCreate={() => { setCreateType('map'); setShowModal(true) }}
+                onCreate={() => {
+                  if (maps.length < LIMIT_MINDMAPS) {
+                    setCreateType('map')
+                    setShowModal(true)
+                  }
+                }}
               />
               <DashboardTile
                 icon={<span role="img" aria-label="Todos">✅</span>}
@@ -371,15 +382,33 @@ export default function DashboardPage(): JSX.Element {
                 items={todoItems}
                 listClassName="dashboard-list-preview"
                 moreLink="/todos"
-                onCreate={() => { setCreateType('todo'); setShowModal(true) }}
+                onCreate={() => {
+                  if (todoLists.length < LIMIT_TODO_LISTS) {
+                    setCreateType('todo')
+                    setShowModal(true)
+                  }
+                }}
               />
               <DashboardTile
                 icon={<span role="img" aria-label="Kanban">📋</span>}
                 title="Kanban Boards"
                 items={boardItems}
                 moreLink="/kanban"
-                onCreate={() => { setCreateType('board'); setShowModal(true) }}
+                onCreate={() => {
+                  if (boards.length < LIMIT_KANBAN_BOARDS) {
+                    setCreateType('board')
+                    setShowModal(true)
+                  }
+                }}
               />
+            </div>
+            <div className="dashboard-row">
+              <div className="limit-tile">
+                <p>Mindmaps {maps.length}/{LIMIT_MINDMAPS}</p>
+                <p>Todo Lists {todoLists.length}/{LIMIT_TODO_LISTS}</p>
+                <p>Kanban Boards {boards.length}/{LIMIT_KANBAN_BOARDS}</p>
+                <p>AI Automations {aiUsage}/{TOTAL_AI_LIMIT} this month</p>
+              </div>
             </div>
           </div>
         </>
