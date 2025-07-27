@@ -24,6 +24,7 @@ export default function TodosPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({ title: '', description: '' })
   const [showModal, setShowModal] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
   const navigate = useNavigate()
 
   const fetchLists = async (): Promise<void> => {
@@ -95,16 +96,22 @@ export default function TodosPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
-    const res = await fetch('/.netlify/functions/ai-create-todo', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: form.description || form.title }),
-    })
-    const json = await res.json()
-    if (json?.id) {
-      navigate(`/todos/${json.id}`)
-      setShowModal(false)
+    setAiLoading(true)
+    try {
+      const res = await fetch('/api/ai-create-todo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: form.description || form.title })
+      })
+      const json = await res.json()
+      if (json?.id) {
+        navigate(`/todos/${json.id}`)
+        setShowModal(false)
+      }
+    } catch (err) {
+      alert('AI creation failed')
+    } finally {
+      setAiLoading(false)
     }
   }
 
@@ -257,8 +264,7 @@ export default function TodosPage(): JSX.Element {
                   Quick Create
                 </button>
                 <button type="button" className="btn-ai fade-item" style={{ animationDelay: '0.3s' }} onClick={handleAiCreate}>
-                  <span className="sparkle" aria-hidden="true">✨</span>
-                  Create With AI
+                  {aiLoading ? 'Generating...' : <><span className="sparkle" aria-hidden="true">✨</span> Create With AI</>}
                 </button>
               </div>
             </form>
