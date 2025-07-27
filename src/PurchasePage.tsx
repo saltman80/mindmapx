@@ -37,6 +37,7 @@ const PurchasePage = () => {
       <div className="container">
         <h1 className="text-center mb-md">Purchase MindXdo</h1>
         <p className="text-center mb-lg">$6.95 per month<br />(Mindmap + Todo + Kanban System)</p>
+        <p className="text-center text-sm mb-lg text-gray-600">This is a simulated checkout. No real charges will occur.</p>
         <div className="two-column purchase-grid">
           <div className="relative">
             <div className="offer-card text-center">
