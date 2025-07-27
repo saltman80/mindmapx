@@ -37,6 +37,15 @@ interface MindmapCanvasHandle {
   removeNode: (nodeId: string) => void
 }
 
+interface NodePayload {
+  x: number
+  y: number
+  label?: string
+  description?: string
+  parentId?: string | null
+  mindmapId?: string
+}
+
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   (
     {
@@ -105,23 +114,48 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [])
 
 
-    const addNode = useCallback((node: NodeData) => {
-      console.log('[MindmapCanvas] addNode', node)
-      setNodes(prev => [...prev, node])
-      if (node.parentId) {
-        const edgeId =
-          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-            ? crypto.randomUUID()
-            : Math.random().toString(36).slice(2)
-        const edge: EdgeData = { id: edgeId, from: node.parentId, to: node.id }
-        setEdges(prev => [...prev, edge])
+    const addNode = useCallback(
+      (node: NodeData) => {
+        console.log('[MindmapCanvas] addNode', node)
+        setNodes(prev => [...prev, node])
+        if (
+          node.parentId &&
+          !safeEdges.some(e => e.from === node.parentId && e.to === node.id)
+        ) {
+          const edgeId =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2)
+          const edge: EdgeData = { id: edgeId, from: node.parentId, to: node.id }
+          setEdges(prev => [...prev, edge])
+        }
+      },
+      [safeEdges]
+    )
+
+    const createNode = useCallback(async (node: NodePayload): Promise<string | null> => {
+      try {
+        const res = await authFetch('/.netlify/functions/nodes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(node),
+        })
+        if (!res.ok) return null
+        const data = await res.json()
+        return data.id || null
+      } catch {
+        return null
       }
     }, [])
 
 
     const handleAddChild = useCallback(
-      (parentId: string) => {
+      async (parentId: string) => {
         console.log('[MindmapCanvas] handleAddChild', parentId)
+        if (!mindmapId) {
+          console.warn('[handleAddChild] Missing mindmapId')
+          return
+        }
         const parent = safeNodes.find(n => n.id === parentId)
         if (!parent) return
 
@@ -137,10 +171,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           direction = parent.x >= parentParent.x ? 'right' : 'left'
         }
 
-        const newNode = {
+        const newNode: NodePayload = {
           x: direction === 'right' ? parent.x + 150 : parent.x - 150,
-          y: parent.y + 100,
-          label: 'New Node',
+          y: parent.y + 100 + Math.floor(Math.random() * 20 - 10),
+          label: `Child of ${parent.label || 'Node'}`,
           description: '',
           parentId,
           mindmapId,
@@ -148,21 +182,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
         console.log('[MindmapCanvas] Posting child node payload:', newNode)
 
-        authFetch('/.netlify/functions/nodes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newNode),
-        })
-        .then(async res => {
-          if (!res.ok) throw new Error('Node insert failed')
-          const data = await res.json()
-          if (!data?.id) throw new Error('Node insert failed')
-          addNode({ ...newNode, id: data.id, todoId: null })
-        })
-        .catch(err => {
-          console.error('[CreateChildNode] Failed to save node:', err)
-        })
-    }, [addNode, Array.isArray(nodes) ? nodes : [], mindmapId])
+        const nodeId = await createNode(newNode)
+        if (nodeId) addNode({ ...newNode, id: nodeId, todoId: null })
+    }, [addNode, safeNodes, mindmapId, createNode])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
