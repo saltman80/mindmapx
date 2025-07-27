@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 
@@ -8,25 +9,21 @@ const PurchasePage = () => {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const navigate = useNavigate()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage('')
     try {
-      const tempPassword = crypto.randomUUID()
-      await fetch('/api/register', {
+      const res = await fetch('/api/simulate-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: tempPassword })
+        body: JSON.stringify({ name, email })
       })
-      await fetch('/api/forgotpassword', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      })
-      setMessage('Check your email to set your password.')
-      setName('')
-      setEmail('')
+      if (!res.ok) throw new Error('Purchase failed')
+      const data = await res.json()
+      navigate(`/set-password?userId=${data.userId}`)
     } catch {
       setMessage('Something went wrong. Please try again.')
     } finally {

@@ -22,6 +22,7 @@ import ResetPassword from '../reset-password'
 import PrivacyPolicy from '../privacypolicy'
 import TermsOfService from '../terms'
 import CheckoutPage from '../checkout'
+import SetPassword from '../set-password'
 
 import LoginPage from './LoginPage'
 import DashboardPage from './DashboardPage'
@@ -50,6 +51,7 @@ function AppRoutes() {
       <Route path="/todos/:id" element={<TodosCanvasPage />} />
       <Route path="/todo-canvas" element={<TodoEditorPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/set-password" element={<SetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/login" element={<LoginPage />} />
