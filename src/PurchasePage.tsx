@@ -44,18 +44,16 @@ const PurchasePage = () => {
           <div className="relative">
             <div className="offer-card text-center">
               <FaintMindmapBackground className="mindmap-bg-small" />
-              <h2 className="mb-md">Monthly Service Includes</h2>
+              <h2 className="mb-md">Account Totals</h2>
               <div className="features-grid mb-lg">
-                <div className="feature-name">Manual mindmaps</div>
+                <div className="feature-name">Mindmaps</div>
                 <div className="feature-limit">10</div>
-                <div className="feature-name">Manual todo lists</div>
-                <div className="feature-limit">50</div>
-                <div className="feature-name">AI mind maps</div>
-                <div className="feature-limit">10 / month</div>
-                <div className="feature-name">AI todo lists</div>
-                <div className="feature-limit">30 / month</div>
+                <div className="feature-name">Todo lists</div>
+                <div className="feature-limit">100</div>
                 <div className="feature-name">Kanban board</div>
-                <div className="feature-limit">10 + 100 cards</div>
+                <div className="feature-limit">10</div>
+                <div className="feature-name">AI automations</div>
+                <div className="feature-limit">20 / month</div>
                 <div className="feature-name">Team members</div>
                 <div className="feature-limit">2 seats</div>
               </div>
