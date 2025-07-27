@@ -158,6 +158,8 @@ export default function MapEditorPage(): JSX.Element {
         mindmapId: mindmap.id,
       }
 
+      console.log('[MapEditorPage] auto root node payload', generalNode)
+
       fetch('/.netlify/functions/nodes', {
         method: 'POST',
         credentials: 'include',

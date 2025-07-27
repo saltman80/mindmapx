@@ -196,7 +196,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         console.log('[MindmapCanvas] Posting child node payload:', newNode)
 
         const nodeId = await createNode(newNode)
-        if (nodeId) addNode({ ...newNode, id: nodeId, todoId: null })
+        if (nodeId) {
+          addNode({ ...newNode, id: nodeId, todoId: null })
+        } else {
+          console.error('[MindmapCanvas] Failed to create node', newNode)
+        }
     }, [addNode, safeNodes, mindmapId, createNode])
 
     const openEditModal = useCallback((id: string) => {
