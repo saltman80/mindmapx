@@ -185,12 +185,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const jitter = Math.floor(Math.random() * 10 - 5)
 
         const newNode: NodePayload = {
+          mindmapId,
           x: direction === 'right' ? parent.x + 180 : parent.x - 180,
           y: parent.y + yOffset + jitter,
           label: `Child of ${parent.label || 'Node'}`,
           description: '',
-          parentId,
-          mindmapId,
+          parentId: parent.id || null,
         }
 
         console.log('[MindmapCanvas] Posting child node payload:', newNode)

@@ -75,13 +75,6 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     if (event.httpMethod === 'POST') {
-      if (!event.body) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing body' }),
-        }
-      }
       let payload: any
       try {
         payload = JSON.parse(event.body)
@@ -93,6 +86,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
+      // Validate mindmapId
       if (!payload.mindmapId || !isUuid(payload.mindmapId)) {
         return {
           statusCode: 400,
@@ -101,6 +95,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
+      // Default values
       const x = typeof payload.x === 'number' ? payload.x : 0
       const y = typeof payload.y === 'number' ? payload.y : 0
       const label =
@@ -110,6 +105,10 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const description =
         typeof payload.description === 'string' ? payload.description.trim() : ''
       const parentId = payload.parentId ?? null
+
+      // Optional: restrict one root node if desired
+      // const isRoot = !parentId
+      // const first = await isFirstNodeForMindmap(client, payload.mindmapId)
 
       try {
         console.log('[CreateNode] inserting', {
