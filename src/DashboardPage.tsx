@@ -123,7 +123,7 @@ export default function DashboardPage(): JSX.Element {
           body: JSON.stringify({ title: form.title }),
         })
       } else {
-        await fetch('/.netlify/functions/boards', {
+        const res = await fetch('/.netlify/functions/boards', {
           method: 'POST',
           credentials: 'include', // Required for session cookie
           headers: {
@@ -131,6 +131,10 @@ export default function DashboardPage(): JSX.Element {
           },
           body: JSON.stringify({ title: form.title, description: form.description }),
         })
+        const data = await res.json()
+        if (data?.id) {
+          setTimeout(() => navigate(`/kanban/${data.id}`), 250)
+        }
       }
       setShowModal(false)
       setForm({ title: '', description: '' })
@@ -160,11 +164,15 @@ export default function DashboardPage(): JSX.Element {
           body: JSON.stringify({ title: form.title })
         })
       } else {
-        await fetch('/api/boards', {
+        const res = await fetch('/api/boards', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title })
         })
+        const data = await res.json()
+        if (data?.id) {
+          setTimeout(() => navigate(`/kanban/${data.id}`), 250)
+        }
       }
       setShowModal(false)
       setForm({ title: '', description: '' })
