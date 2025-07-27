@@ -86,7 +86,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
 
       // Validate mindmapId
-      if (!payload.mindmapId || !isUuid(payload.mindmapId)) {
+      if (typeof payload.mindmapId !== 'string' || !isUuid(payload.mindmapId)) {
         return {
           statusCode: 400,
           headers,
@@ -95,17 +95,25 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
 
       // Default values and type checks
-      const x = typeof payload.x === 'number' ? payload.x : 0
-      const y = typeof payload.y === 'number' ? payload.y : 0
+      const x =
+        typeof payload.x === 'number' && Number.isFinite(payload.x)
+          ? payload.x
+          : 0
+      const y =
+        typeof payload.y === 'number' && Number.isFinite(payload.y)
+          ? payload.y
+          : 0
       const label =
         typeof payload.label === 'string' && payload.label.trim() !== ''
           ? payload.label.trim()
-          : 'General'
+          : 'Untitled'
       const description =
-        typeof payload.description === 'string' ? payload.description.trim() : ''
+        typeof payload.description === 'string' && payload.description.trim() !== ''
+          ? payload.description.trim()
+          : null
 
       let parentId: string | null = null
-      if (payload.parentId !== undefined && payload.parentId !== null) {
+      if (payload.parentId) {
         if (typeof payload.parentId === 'string' && isUuid(payload.parentId)) {
           parentId = payload.parentId
         } else {

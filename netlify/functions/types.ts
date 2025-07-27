@@ -19,10 +19,10 @@ export interface TodoList {
 
 export interface NodePayload {
   mindmapId: string
-  x: number
-  y: number
-  label?: string
-  description?: string
+  x?: number
+  y?: number
+  label?: string | null
+  description?: string | null
   parentId?: string | null
 }
 
