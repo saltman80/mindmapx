@@ -1580,6 +1580,13 @@ hr {
   padding: var(--spacing-lg);
 }
 
+@media (max-width: 768px) {
+  body.sidebar-open .app-content {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-duration) var(--transition-ease);
+  }
+}
+
 /* Sidebar account section */
 .app-sidebar .account-links {
   margin-top: var(--spacing-xl);

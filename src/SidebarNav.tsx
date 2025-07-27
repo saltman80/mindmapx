@@ -48,6 +48,14 @@ export default function SidebarNav(): JSX.Element {
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
 
+  useEffect(() => {
+    if (window.innerWidth <= 768 && open) {
+      document.body.classList.add('sidebar-open')
+    } else {
+      document.body.classList.remove('sidebar-open')
+    }
+  }, [open])
+
   const sidebarVariants = {
     open: { x: 0 },
     closed: { x: -(sidebarWidth - 40) }
@@ -56,7 +64,7 @@ export default function SidebarNav(): JSX.Element {
   return (
     <motion.aside
       className={`app-sidebar${open ? '' : ' closed'}`}
-      style={{ width: sidebarWidth }}
+      style={{ width: sidebarWidth, ['--sidebar-width' as any]: `${sidebarWidth}px` }}
       animate={open ? 'open' : 'closed'}
       variants={sidebarVariants}
       transition={{ duration: 0.3 }}
