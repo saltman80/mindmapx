@@ -35,21 +35,44 @@ export const handler: Handler = async (event) => {
       const columnId = data.column_id
       const title = (data.title || '').trim()
       if (!columnId || !title) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing column_id or title' }) }
-    const res = await client.query(
-      `INSERT INTO kanban_cards (column_id, title, description, status, priority, due_date, assignee_id, position)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       RETURNING id, column_id, title, position`,
-      [
-        columnId,
-        title,
-        data.description ?? null,
-        data.status ?? 'open',
-        data.priority ?? 'low',
-        data.due_date ?? null,
-        data.assignee_id ?? null,
-        Number(data.position) || 0
-      ]
-    )
+
+      const todoId: string | undefined = data.todo_id
+
+      const res = await client.query(
+        `INSERT INTO kanban_cards (column_id, title, description, status, priority, due_date, assignee_id, position, linked_todo_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+         RETURNING id, column_id, title, position`,
+        [
+          columnId,
+          title,
+          data.description ?? null,
+          data.status ?? 'open',
+          data.priority ?? 'low',
+          data.due_date ?? null,
+          data.assignee_id ?? null,
+          Number(data.position) || 0,
+          todoId ?? null
+        ]
+      )
+
+      if (todoId) {
+        await client.query(
+          'UPDATE todos SET linked_kanban_card_id=$1 WHERE id=$2',
+          [res.rows[0].id, todoId]
+        )
+        const { rows: b } = await client.query(
+          'SELECT board_id FROM kanban_columns WHERE id=$1',
+          [columnId]
+        )
+        const boardId = b[0]?.board_id
+        if (boardId) {
+          await client.query(
+            'INSERT INTO canvas_links (todo_id, board_id) VALUES ($1,$2)',
+            [todoId, boardId]
+          )
+        }
+      }
+
       await log(client, res.rows[0].id, userId, 'create', 'Card created')
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
     }
@@ -64,11 +87,18 @@ export const handler: Handler = async (event) => {
       const position = Number(data.position) || 0
       if (!columnId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing column_id' }) }
       const res = await client.query(
-        `UPDATE kanban_cards SET column_id=$1, position=$2, updated_at=now() WHERE id=$3 RETURNING id`,
+        `UPDATE kanban_cards SET column_id=$1, position=$2, updated_at=now() WHERE id=$3 RETURNING id, linked_todo_id`,
         [columnId, position, cardId]
       )
       if (res.rowCount === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
       await log(client, cardId, userId, 'move', 'Card moved')
+      const linkedTodo = res.rows[0].linked_todo_id
+      if (linkedTodo) {
+        const { rows: col } = await client.query('SELECT title FROM kanban_columns WHERE id=$1', [columnId])
+        if (col[0]?.title === 'Done') {
+          await client.query('UPDATE todos SET completed=true, updated_at=now() WHERE id=$1', [linkedTodo])
+        }
+      }
       return { statusCode: 200, headers, body: JSON.stringify({ id: cardId }) }
     }
 
@@ -89,18 +119,32 @@ export const handler: Handler = async (event) => {
       }
       if (fields.length === 0) return { statusCode: 400, headers, body: JSON.stringify({ error: 'No fields' }) }
       const res = await client.query(
-        `UPDATE kanban_cards SET ${fields.join(', ')}, updated_at=now() WHERE id=$${idx} RETURNING id`,
+        `UPDATE kanban_cards SET ${fields.join(', ')}, updated_at=now() WHERE id=$${idx} RETURNING id, linked_todo_id, column_id`,
         [...values, cardId]
       )
       if (res.rowCount === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
       const changed = keys.filter(k => data[k] !== undefined).join(',')
       await log(client, cardId, userId, 'update', `Updated: ${changed}`)
+      if (data.column_id && res.rows[0].linked_todo_id) {
+        const { rows: col } = await client.query('SELECT title FROM kanban_columns WHERE id=$1', [data.column_id])
+        if (col[0]?.title === 'Done') {
+          await client.query('UPDATE todos SET completed=true, updated_at=now() WHERE id=$1', [res.rows[0].linked_todo_id])
+        }
+      }
       return { statusCode: 200, headers, body: JSON.stringify({ id: cardId }) }
     }
 
     if (event.httpMethod === 'DELETE') {
+      const info = await client.query('SELECT linked_todo_id, column_id FROM kanban_cards WHERE id=$1', [cardId])
       const res = await client.query('DELETE FROM kanban_cards WHERE id=$1', [cardId])
       if (res.rowCount === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+      if (info.rows[0]?.linked_todo_id) {
+        await client.query('UPDATE todos SET linked_kanban_card_id=NULL WHERE id=$1', [info.rows[0].linked_todo_id])
+        const { rows: board } = await client.query('SELECT board_id FROM kanban_columns WHERE id=$1', [info.rows[0].column_id])
+        if (board[0]?.board_id) {
+          await client.query('DELETE FROM canvas_links WHERE todo_id=$1 AND board_id=$2', [info.rows[0].linked_todo_id, board[0].board_id])
+        }
+      }
       await log(client, cardId, userId, 'delete', 'Card deleted')
       return { statusCode: 204, headers, body: '' }
     }
