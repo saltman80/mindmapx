@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import { useAuth } from './useAuth'
 
 const mainLinks = [
@@ -27,14 +28,25 @@ export default function SidebarNav(): JSX.Element {
     navigate('/login')
   }
 
+  const sidebarVariants = {
+    open: { width: 200 },
+    closed: { width: 20 }
+  }
+
   return (
-    <aside className={`app-sidebar${open ? '' : ' closed'}`}>
+    <motion.aside
+      className={`app-sidebar${open ? '' : ' closed'}`}
+      animate={open ? 'open' : 'closed'}
+      variants={sidebarVariants}
+      transition={{ duration: 0.3 }}
+    >
       <button
         type="button"
         className="sidebar-drawer-toggle"
         aria-label={open ? 'Collapse sidebar' : 'Expand sidebar'}
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
+        style={{ left: open ? '175px' : '-5px' }}
       >
         <span>{open ? '‹' : '›'}</span>
       </button>
@@ -69,6 +81,6 @@ export default function SidebarNav(): JSX.Element {
           </li>
         </ul>
       </nav>
-    </aside>
+    </motion.aside>
   )
 }
