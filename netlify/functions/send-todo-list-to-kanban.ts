@@ -33,9 +33,9 @@ export const handler: Handler = async (event) => {
 
   const client = await getClient()
   try {
-    // fetch todos for the list
+    // fetch todos that have not already been sent to the board
     const { rows: todos } = await client.query(
-      'SELECT id, title FROM todos WHERE list_id=$1 AND user_id=$2',
+      'SELECT id, title FROM todos WHERE list_id=$1 AND user_id=$2 AND linked_kanban_card_id IS NULL',
       [listId, userId]
     )
     // ensure New column
@@ -51,13 +51,21 @@ export const handler: Handler = async (event) => {
       )
       newColId = res.rows[0].id
     }
+    // determine next position for new cards
+    let { rows: posRows } = await client.query(
+      'SELECT COALESCE(MAX(position),0)+1 AS pos FROM kanban_cards WHERE column_id=$1',
+      [newColId]
+    )
+    let nextPos = posRows[0]?.pos ?? 0
+
     for (const todo of todos) {
       const cardRes = await client.query(
         `INSERT INTO kanban_cards (column_id, title, position, linked_todo_id)
-         VALUES ($1,$2,0,$3) RETURNING id`,
-        [newColId, todo.title, todo.id]
+         VALUES ($1,$2,$3,$4) RETURNING id`,
+        [newColId, todo.title, nextPos, todo.id]
       )
       const cardId = cardRes.rows[0].id
+      nextPos++
       await client.query(
         'UPDATE todos SET linked_kanban_card_id=$1 WHERE id=$2',
         [cardId, todo.id]

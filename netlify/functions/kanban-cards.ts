@@ -109,7 +109,6 @@ export const handler: Handler = async (event) => {
     if (event.httpMethod === 'PATCH') {
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       const data = JSON.parse(event.body)
-  console.log("PATCH request to update card:", cardId, data);
       const fields: string[] = []
       const values: any[] = []
       let idx = 1
