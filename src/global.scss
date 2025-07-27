@@ -3661,3 +3661,12 @@ hr {
   text-align: right;
   font-weight: 600;
 }
+
+@media (max-width: 500px) {
+  .todo-list,
+  .todo-block,
+  .todo-add-form,
+  .todo-add-wrapper {
+    width: 70%;
+  }
+}
