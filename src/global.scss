@@ -1496,10 +1496,8 @@ hr {
   overflow: hidden;
 }
 
+
 .app-sidebar.closed {
-  width: 20px;
-  padding-left: 0;
-  padding-right: 0;
   overflow: visible;
 }
 
@@ -1508,8 +1506,9 @@ hr {
 }
 
 .sidebar-drawer-toggle {
-  position: fixed;
+  position: absolute;
   top: 50%;
+  right: -25px;
   transform: translateY(-50%);
   width: 50px;
   height: 50px;
@@ -1522,7 +1521,6 @@ hr {
   cursor: pointer;
   border: none;
   z-index: 1000;
-  transition: left 0.3s ease;
 }
 .sidebar-drawer-toggle span {
   font-size: 24px;

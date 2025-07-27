@@ -28,9 +28,11 @@ export default function SidebarNav(): JSX.Element {
     navigate('/login')
   }
 
+  const SIDEBAR_WIDTH = 200
+
   const sidebarVariants = {
-    open: { width: 200 },
-    closed: { width: 20 }
+    open: { x: 0 },
+    closed: { x: -SIDEBAR_WIDTH }
   }
 
   return (
@@ -46,7 +48,6 @@ export default function SidebarNav(): JSX.Element {
         aria-label={open ? 'Collapse sidebar' : 'Expand sidebar'}
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
-        style={{ left: open ? '175px' : '-5px' }}
       >
         <span>{open ? '‹' : '›'}</span>
       </button>
