@@ -2,6 +2,7 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
+import { randomUUID } from 'crypto'
 import { ZodError } from 'zod'
 import { LIMIT_MINDMAPS } from "./limits.js"
 import { mapInputSchema } from './validationschemas.js'
