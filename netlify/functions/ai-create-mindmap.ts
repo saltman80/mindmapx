@@ -1,11 +1,9 @@
 import type { HandlerEvent, HandlerContext } from "@netlify/functions"
-import OpenAI from 'openai'
 import { randomUUID } from 'crypto'
 import { getClient } from './db-client.js'
-const openaiKey = process.env.OPENAI_API_KEY
-if (!openaiKey) throw new Error('Missing OPENAI_API_KEY')
-const openai = new OpenAI({ apiKey: openaiKey })
-const MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
+import { generateAIResponse } from './ai-generate.js'
+import { requireAuth } from './middleware.js'
+import { aiMindmapNodesSchema } from './validationschemas.js'
 
 export const handler = async (
   event: HandlerEvent,
@@ -15,50 +13,47 @@ export const handler = async (
     return { statusCode: 405, body: 'Method Not Allowed' }
   }
   if (!event.body) return { statusCode: 400, body: 'Missing body' }
+
+  let userId: string
+  try {
+    userId = await requireAuth(event)
+  } catch {
+    return { statusCode: 401, body: 'Unauthorized' }
+  }
+
   let data: any
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }
-  const { title, description = '', prompt } = data
+
+  const { title, description = '' } = data
   if (typeof title !== 'string' || !title.trim()) return { statusCode: 400, body: 'Invalid title' }
+  if (!description) return { statusCode: 400, body: 'Missing description' }
+
+  const prompt = `Create a mindmap JSON based on: "${description}". Return an array of nodes with fields: id, title, parentId.`
+
+  let nodes: any[] = []
+  try {
+    const content = await generateAIResponse(prompt)
+    nodes = aiMindmapNodesSchema.parse(JSON.parse(content))
+  } catch (err) {
+    console.error('AI parse failed:', err)
+    nodes = []
+  }
+
   const client = await getClient()
   try {
     await client.query('BEGIN')
     const res = await client.query(
       `INSERT INTO mindmaps(user_id, title, description, created_at)
        VALUES ($1, $2, $3, NOW()) RETURNING id`,
-      [data.userId ?? null, title.trim(), description.trim() || null]
+      [userId, title.trim(), description.trim() || null]
     )
     const mapId = res.rows[0].id
-    if (prompt && typeof prompt === 'string' && prompt.trim()) {
-      const baseMessages = [
-        {
-          role: 'system',
-          content: 'Generate a JSON array of mind map node titles based on the user prompt.'
-        },
-        { role: 'user', content: prompt }
-      ]
-      const completion = await openai.chat.completions.create({
-        model: MODEL,
-        messages: baseMessages.map(m => ({
-          role: m.role as any,
-          content: m.content,
-          name: (m as any).name ?? undefined
-        })),
-        max_tokens: 200
-      })
-      const text = completion.choices?.[0]?.message?.content
-      if (text) {
-        try {
-          const items: string[] = JSON.parse(text)
-          for (const t of items) {
-            await client.query(
-              `INSERT INTO nodes(id, mindmap_id, parent_id, data) VALUES ($1,$2,NULL,$3)`,
-              [randomUUID(), mapId, JSON.stringify({ content: String(t) })]
-            )
-          }
-        } catch {
-          // ignore parse errors
-        }
-      }
+    for (const n of nodes) {
+      await client.query(
+        `INSERT INTO nodes(id, mindmap_id, parent_id, data)
+         VALUES ($1,$2,$3,$4)`,
+        [n.id || randomUUID(), mapId, n.parentId ?? null, JSON.stringify({ content: n.title })]
+      )
     }
     await client.query('COMMIT')
     return { statusCode: 201, body: JSON.stringify({ id: mapId }) }

@@ -11,3 +11,11 @@ export const mapInputSchema = z.object({
     description: z.string().optional().default(''),
   }),
 })
+
+export const aiMindmapNodeSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string(),
+  parentId: z.string().uuid().nullable().optional()
+})
+
+export const aiMindmapNodesSchema = z.array(aiMindmapNodeSchema)
