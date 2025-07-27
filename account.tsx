@@ -3,7 +3,7 @@ import MindmapArm from './MindmapArm'
 
 export default function AccountPage(): JSX.Element {
   return (
-    <section className="section relative overflow-hidden">
+    <section className="section section--one-col relative overflow-hidden">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center space-y-4">
