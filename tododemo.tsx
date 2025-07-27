@@ -170,10 +170,6 @@ export default function TodoDemo(): JSX.Element {
 
       <section className="about-section reveal">
         <MindmapArm side="left" />
-        <img
-          src="./assets/marketing_square_ai_connecting.png"
-          alt="Vision Meets Action"
-        />
         <div>
           <motion.h2
             className="marketing-text-large"
