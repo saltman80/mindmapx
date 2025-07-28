@@ -95,13 +95,14 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           body: JSON.stringify({ error: 'Missing or invalid mindmapId' }),
         }
       }
+      const mindmapId = payload.mindmapId
 
       // Ensure referenced mindmap exists. Attempt creation up to 3 times if not found.
       let mindmapExists = false
       for (let attempt = 0; attempt < 3; attempt++) {
         const result = await client.query<{ id: string }>(
           'SELECT id FROM mindmaps WHERE id = $1',
-          [payload.mindmapId]
+          [mindmapId]
         )
         const count = typeof result.rowCount === 'number' ? result.rowCount : 0
         if (count > 0) {
@@ -109,11 +110,11 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           break
         }
         try {
-          console.log(`[CreateNode] mindmap missing, attempt ${attempt + 1} to create`, payload.mindmapId)
+          console.log(`[CreateNode] mindmap missing, attempt ${attempt + 1} to create`, mindmapId)
           await client.query(
             `INSERT INTO mindmaps(id, user_id, title, description, config)
              VALUES ($1, $2, $3, NULL, '{}'::jsonb)`,
-            [payload.mindmapId, userId, 'Untitled']
+            [mindmapId, userId, 'Untitled']
           )
         } catch (createErr) {
           console.error(`[CreateNode] auto create attempt ${attempt + 1} failed`, createErr)
@@ -123,7 +124,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       if (!mindmapExists) {
         const finalCheck = await client.query<{ id: string }>(
           'SELECT id FROM mindmaps WHERE id = $1',
-          [payload.mindmapId]
+          [mindmapId]
         )
         const finalCount =
           typeof finalCheck.rowCount === 'number' ? finalCheck.rowCount : 0
@@ -131,7 +132,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
 
       if (!mindmapExists) {
-        console.error('[CreateNode] mindmap not found after retries', { mindmapId: payload.mindmapId })
+        console.error('[CreateNode] mindmap not found after retries', { mindmapId })
         return {
           statusCode: 400,
           headers,
@@ -173,7 +174,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       // Enforce single root node per mindmap
       const isRoot = !parentId
       if (isRoot) {
-        const first = await isFirstNodeForMindmap(client, payload.mindmapId)
+        const first = await isFirstNodeForMindmap(client, mindmapId)
         if (!first) {
           return {
             statusCode: 400,
@@ -185,7 +186,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
       try {
         console.log('[CreateNode] inserting', {
-          mindmapId: payload.mindmapId,
+          mindmapId,
           x,
           y,
           label,
@@ -197,7 +198,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
-          [payload.mindmapId, x, y, label, description, parentId]
+          [mindmapId, x, y, label, description, parentId]
         )
 
         console.log('[CreateNode] inserted id', result.rows[0].id)
