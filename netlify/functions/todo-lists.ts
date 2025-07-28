@@ -70,6 +70,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         'INSERT INTO todo_lists (user_id, title, node_id) VALUES ($1,$2,$3) RETURNING id, title, node_id, created_at, updated_at',
         [userId, title, nodeId]
       )
+      if (nodeId) {
+        await client.query('UPDATE nodes SET linked_todo_list_id=$1 WHERE id=$2', [res.rows[0].id, nodeId])
+      }
       client.release()
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
     }
@@ -83,6 +86,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         'DELETE FROM todo_lists WHERE id = $1 AND user_id = $2',
         [id, userId]
       )
+      await client.query('UPDATE nodes SET linked_todo_list_id=NULL WHERE linked_todo_list_id=$1', [id])
       client.release()
       if (result.rowCount === 0) {
         return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not Found' }) }

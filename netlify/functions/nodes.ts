@@ -64,7 +64,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const mapId = event.queryStringParameters?.mindmapId
       if (!mapId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'mindmapId required' }) }
       const { rows } = await client.query(
-        `SELECT id, parent_id, x, y, label, description, todo_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
+        `SELECT id, parent_id, x, y, label, description, todo_id, linked_todo_list_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
         [mapId]
       )
       const nodes = rows.map(r => ({
@@ -75,6 +75,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         label: r.label ?? undefined,
         description: r.description ?? undefined,
         todoId: r.todo_id ?? undefined,
+        linkedTodoListId: r.linked_todo_list_id ?? undefined,
       }))
       return { statusCode: 200, headers, body: JSON.stringify(nodes) }
     }
@@ -290,6 +291,11 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       if (payload.parentId !== undefined) {
         fields.push(`parent_id=$${idx}`)
         values.push(payload.parentId)
+        idx++
+      }
+      if (payload.linkedTodoListId !== undefined) {
+        fields.push(`linked_todo_list_id=$${idx}`)
+        values.push(payload.linkedTodoListId)
         idx++
       }
       if (fields.length === 0) {
