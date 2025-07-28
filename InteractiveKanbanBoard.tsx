@@ -79,6 +79,8 @@ export default function InteractiveKanbanBoard({
   const [commenting, setCommenting] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
   const boardRef = useRef<HTMLDivElement | null>(null)
+  const topScrollRef = useRef<HTMLDivElement | null>(null)
+  const [boardWidth, setBoardWidth] = useState(0)
 
   useEffect(() => {
     if (!columns) return
@@ -324,7 +326,28 @@ export default function InteractiveKanbanBoard({
     if (autoScrollRightRef.current) {
       autoScrollRightRef.current.scrollLeft = autoScrollRightRef.current.scrollWidth;
     }
+    if (boardRef.current) {
+      setBoardWidth(boardRef.current.scrollWidth);
+    }
   }, [lanes.length]);
+
+  useEffect(() => {
+    const top = topScrollRef.current;
+    const board = boardRef.current;
+    if (!top || !board) return;
+    const syncTop = () => {
+      top.scrollLeft = board.scrollLeft;
+    };
+    const syncBoard = () => {
+      board.scrollLeft = top.scrollLeft;
+    };
+    board.addEventListener('scroll', syncTop);
+    top.addEventListener('scroll', syncBoard);
+    return () => {
+      board.removeEventListener('scroll', syncTop);
+      top.removeEventListener('scroll', syncBoard);
+    };
+  }, []);
 
   const handleDragEnd = (result: DropResult) => {
     const { source, destination, draggableId, type } = result
@@ -357,6 +380,9 @@ export default function InteractiveKanbanBoard({
           <button className="settings-button" aria-label="Settings">⋯</button>
         </div>
       </header>
+      <div className="kanban-scrollbar" ref={topScrollRef}>
+        <div style={{ width: boardWidth }} />
+      </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (

@@ -1059,7 +1059,7 @@ hr {
   flex-direction: column;
   gap: var(--spacing-sm);
   flex-shrink: 0;
-  width: 300px;
+  width: 200px;
   /* allow lane height to grow with content */
   max-height: none;
 }
@@ -2359,7 +2359,7 @@ hr {
 }
 
 .kanban-canvas .kanban-lane {
-  flex: 0 0 300px;
+  flex: 0 0 200px;
   display: flex;
   flex-direction: column;
   /* allow lane height to grow with content */
@@ -2533,7 +2533,7 @@ hr {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
-  width: 300px;
+  width: 200px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -2765,6 +2765,41 @@ hr {
   -ms-overflow-style: scrollbar;
 }
 
+.kanban-scrollbar {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+  height: 25px;
+  margin-bottom: 0.5rem;
+  -ms-overflow-style: scrollbar;
+  scrollbar-width: 25px;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.kanban-scrollbar::-webkit-scrollbar {
+  height: 25px;
+  width: 25px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 12px;
+  border: 4px solid #f1f1f1;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
 .kanban-board-container::-webkit-scrollbar {
   height: 25px;
   width: 25px;
@@ -2818,7 +2853,7 @@ hr {
 }
 
 .kanban-lane {
-  flex: 0 0 300px;
+  flex: 0 0 200px;
   display: flex;
   flex-direction: column;
   /* allow lane height to grow with content */
