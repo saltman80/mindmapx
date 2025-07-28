@@ -252,6 +252,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       if (!node) return
       const updated = { ...node, label: editTitle, description: editDesc }
       updateNode(updated)
+      authFetch(`/.netlify/functions/nodes/${editingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: editTitle, description: editDesc })
+      }).catch(err => console.error('[MindmapCanvas] update failed', err))
       setEditingId(null)
       setEditTitle('')
       setEditDesc('')
