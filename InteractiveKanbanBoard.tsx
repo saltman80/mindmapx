@@ -196,6 +196,7 @@ export default function InteractiveKanbanBoard({
     toLaneId: string,
     destIndex: number
   ) => {
+    let updates: { id: string; column_id: string; position: number }[] = []
     setLanes(prev => {
       const copy = prev.map(l => ({ ...l, cards: [...l.cards] }))
       const fromLane = copy.find(l => l.id === fromLaneId)
@@ -207,16 +208,24 @@ export default function InteractiveKanbanBoard({
       const updatedCard = {
         ...card,
         status: toLane.title === 'Done' ? 'done' : card.status,
-        position: destIndex,
       }
       toLane.cards.splice(destIndex, 0, updatedCard)
+      const changedLanes = new Set<Lane>([fromLane, toLane])
+      changedLanes.forEach(lane =>
+        lane.cards.forEach((c, idx) => {
+          c.position = idx
+          updates.push({ id: c.id, column_id: lane.id, position: idx })
+        })
+      )
       return copy
     })
-    authFetch(`${API_BASE}/cards/${id}/move`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ column_id: toLaneId, position: destIndex })
-    }).catch(err => console.error('moveCard', err))
+    updates.forEach(u =>
+      authFetch(`${API_BASE}/cards/${u.id}/move`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ column_id: u.column_id, position: u.position })
+      }).catch(err => console.error('moveCard', err))
+    )
   }
 
   const moveLane = (id: string, from: number, to: number) => {
