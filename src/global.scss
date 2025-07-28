@@ -2341,8 +2341,8 @@ hr {
   position: relative;
   flex-direction: column;
   min-height: calc(100vh - 80px);
-  /* allow horizontal scrolling when many lanes are present */
-  overflow-x: auto;
+  /* contain scrollbars to the board container */
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 
@@ -2754,6 +2754,8 @@ hr {
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
+  display: flex;
+  align-items: flex-start;
   white-space: nowrap;
   padding: 0 1rem 0.5rem;
   scrollbar-gutter: stable;
