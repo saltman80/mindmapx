@@ -35,6 +35,8 @@ export const handler: Handler = async (event) => {
         if (!col.id || col.position === undefined) {
           return { statusCode: 400, headers, body: JSON.stringify({ error: 'id and position required' }) }
         }
+        const check = await client.query('SELECT title FROM kanban_columns WHERE id=$1', [col.id])
+        if (['Done', 'New'].includes(check.rows[0]?.title)) continue
         await client.query(
           'UPDATE kanban_columns SET position=$1, updated_at=now() WHERE id=$2',
           [Number(col.position), col.id]
@@ -50,6 +52,9 @@ export const handler: Handler = async (event) => {
       const position = Number(data.position) || 0
       if (!boardId || !title) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing board_id or title' }) }
+      }
+      if (title === 'Done' || title === 'New') {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Reserved column title' }) }
       }
       const res = await client.query(
         `INSERT INTO kanban_columns (board_id, title, position)
@@ -69,6 +74,13 @@ export const handler: Handler = async (event) => {
     if (event.httpMethod === 'PATCH') {
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       const data = JSON.parse(event.body)
+      const current = await client.query('SELECT title FROM kanban_columns WHERE id=$1', [colId])
+      if (['Done', 'New'].includes(current.rows[0]?.title)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Cannot modify reserved column' }) }
+      }
+      if (data.title === 'Done' || data.title === 'New') {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Reserved column title' }) }
+      }
       const fields: string[] = []
       const values: any[] = []
       let idx = 1
@@ -84,6 +96,10 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'DELETE') {
+      const info = await client.query('SELECT title FROM kanban_columns WHERE id=$1', [colId])
+      if (['Done', 'New'].includes(info.rows[0]?.title)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Cannot delete reserved column' }) }
+      }
       const res = await client.query('DELETE FROM kanban_columns WHERE id=$1', [colId])
       if (res.rowCount === 0) return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
       return { statusCode: 204, headers, body: '' }
