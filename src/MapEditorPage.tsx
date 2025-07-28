@@ -166,10 +166,19 @@ export default function MapEditorPage(): JSX.Element {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(generalNode)
       })
-        .then(res => res.json())
-        .then(() => {
-          // Reload nodes after automatically creating the initial root node
-          setReloadFlag(p => p + 1)
+        .then(async res => {
+          if (!res.ok) throw new Error(`Failed: ${res.status}`)
+          return res.json()
+        })
+        .then(data => {
+          // Immediately show the new root node so the canvas is not empty
+          const id = typeof data?.id === 'string' ? data.id : undefined
+          if (id) {
+            setNodes([{ ...generalNode, id }])
+          } else {
+            // Fallback: refetch nodes if response is unexpected
+            setReloadFlag(p => p + 1)
+          }
         })
         .catch(err => console.error('[AutoCreateNode] Failed:', err))
     }
