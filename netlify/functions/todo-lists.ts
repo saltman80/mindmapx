@@ -4,7 +4,12 @@ import { LIMIT_TODO_LISTS } from "./limits.js"
 import { extractToken, verifySession } from './auth.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+  }
   try {
     const token = extractToken(event)
     if (!token) {
