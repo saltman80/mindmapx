@@ -319,12 +319,13 @@ $spacers: (
 
 html {
   /* Firefox */
-  scrollbar-width: thin;
+  scrollbar-width: 25px;
   scrollbar-color: var(--color-border) var(--color-bg-alt);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 25px;
+  height: 25px;
 }
 
 ::-webkit-scrollbar-track {
@@ -2753,10 +2754,12 @@ hr {
   white-space: nowrap;
   padding: 0 1rem 0.5rem;
   scrollbar-gutter: stable;
+  scrollbar-width: 25px;
 }
 
 .scroll-container::-webkit-scrollbar {
-  height: 6px;
+  height: 25px;
+  width: 25px;
 }
 
 .kanban-scroll-spacer {
