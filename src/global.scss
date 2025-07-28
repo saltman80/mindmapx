@@ -922,9 +922,15 @@ hr {
   text-align: center;
 }
 
+.kanban-demo .kanban-scroll-area {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
 .kanban-demo .kanban-board {
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  width: max-content;
   padding-right: 0;
 }
 
