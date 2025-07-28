@@ -348,7 +348,7 @@ export default function InteractiveKanbanBoard({
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
             <div
-              className="scroll-container"
+              className="kanban-board-container"
               ref={el => {
                 autoScrollRightRef.current = el
                 provided.innerRef(el)
