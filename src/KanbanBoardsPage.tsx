@@ -18,6 +18,12 @@ const getLastViewed = (id: string): number => {
   return v ? parseInt(v, 10) : 0
 }
 
+const isOverdue = (date: string): boolean => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return new Date(date) < today
+}
+
 export default function KanbanBoardsPage(): JSX.Element {
   const [boards, setBoards] = useState<BoardItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,6 +31,7 @@ export default function KanbanBoardsPage(): JSX.Element {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
   const [aiLoading, setAiLoading] = useState(false)
+  const [stats, setStats] = useState<Record<string, { total: number; overdue: number }>>({})
   const navigate = useNavigate()
 
   const fetchBoards = async (): Promise<void> => {
@@ -109,6 +116,23 @@ export default function KanbanBoardsPage(): JSX.Element {
       alert(err.message || 'Delete failed')
     }
   }
+
+  useEffect(() => {
+    boards.forEach(b => {
+      if (stats[b.id]) return
+      authFetch(`/.netlify/functions/kanban-board-data?id=${b.id}`)
+        .then(res => res.json())
+        .then(data => {
+          const cards = Array.isArray(data.cards) ? data.cards : []
+          const notDone = cards.filter((c: any) => c.status !== 'done').length
+          const overdue = cards.filter(
+            (c: any) => c.status !== 'done' && c.due_date && isOverdue(c.due_date)
+          ).length
+          setStats(prev => ({ ...prev, [b.id]: { total: notDone, overdue } }))
+        })
+        .catch(() => {})
+    })
+  }, [boards])
 
   const now = Date.now()
   const oneDay = 24 * 60 * 60 * 1000
@@ -201,7 +225,16 @@ export default function KanbanBoardsPage(): JSX.Element {
                     >
                       Open
                     </button>
-                    <p>Board details coming soon...</p>
+                    <div className="tile-stats">
+                      <div className="metric-detail">
+                        <span className="label">Not Done</span>
+                        <span className="value">{stats[b.id]?.total ?? '-'}</span>
+                      </div>
+                      <div className="metric-detail">
+                        <span className="label">Past Due</span>
+                        <span className="value">{stats[b.id]?.overdue ?? '-'}</span>
+                      </div>
+                    </div>
                   </section>
                 </div>
               ))
