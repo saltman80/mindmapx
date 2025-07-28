@@ -21,7 +21,9 @@ export default function SidebarNav(): JSX.Element {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth > 768 : true
+  )
 
   const handleSignOut = () => {
     logout()
