@@ -38,7 +38,7 @@ async function columnExists(
 const headers = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 }
 
@@ -300,6 +300,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
       }
       return { statusCode: 200, headers, body: JSON.stringify({ id: nodeId }) }
+    }
+
+    if (event.httpMethod === 'DELETE') {
+      const pathMatch = event.path.match(/nodes\/([^/]+)/)
+      const nodeId = pathMatch?.[1]
+      if (!nodeId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing node id' }) }
+      }
+      const result = await client.query('DELETE FROM nodes WHERE id=$1', [nodeId])
+      if (result.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+      }
+      return { statusCode: 204, headers, body: '' }
     }
 
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) }
