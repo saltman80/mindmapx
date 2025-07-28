@@ -100,7 +100,7 @@ export async function runMigrations(): Promise<void> {
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS nodes (
-        id          UUID PRIMARY KEY,
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         mindmap_id  UUID NOT NULL REFERENCES mindmaps(id),
         parent_id   UUID REFERENCES nodes(id),
         x           DOUBLE PRECISION DEFAULT 0,
@@ -128,6 +128,19 @@ export async function runMigrations(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_nodes_mindmap_id ON nodes(mindmap_id);
       CREATE INDEX IF NOT EXISTS idx_nodes_parent_id ON nodes(parent_id);
       CREATE INDEX IF NOT EXISTS idx_nodes_todo_id ON nodes(todo_id);
+    `)
+
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'nodes' AND column_name = 'id' AND column_default IS NULL
+        ) THEN
+          ALTER TABLE nodes ALTER COLUMN id SET DEFAULT gen_random_uuid();
+        END IF;
+      END;
+      $$;
     `)
 
     // Drop legacy columns from early experiments
