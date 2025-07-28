@@ -187,25 +187,33 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           ? safeNodes.find(n => n.id === parent.parentId)
           : null
 
-        let direction: 'left' | 'right' = 'right'
-        if (!parentParent) {
-          const siblings = safeNodes.filter(n => n.parentId === parentId)
-          direction = siblings.length % 2 === 0 ? 'right' : 'left'
-        } else {
-          direction = parent.x >= parentParent.x ? 'right' : 'left'
-        }
-
         const siblings = safeNodes.filter(n => n.parentId === parentId)
         const siblingIndex = siblings.length
-        const verticalSpacing = 80
-        const verticalDirection = siblingIndex % 2 === 0 ? 1 : -1
-        const yOffset = (siblingIndex + 1) * verticalSpacing * verticalDirection
         const jitter = Math.floor(Math.random() * 10 - 5)
+
+        let newX = parent.x
+        let newY = parent.y
+        if (!parentParent) {
+          // Distribute root children across four quadrants
+          const angle = (siblingIndex % 4) * (Math.PI / 2)
+          const layer = Math.floor(siblingIndex / 4)
+          const radius = 180 + layer * 100
+          newX += Math.cos(angle) * radius
+          newY += Math.sin(angle) * radius + jitter
+        } else {
+          // Original left/right staggered placement for non-root nodes
+          const direction = parent.x >= parentParent.x ? 'right' : 'left'
+          const verticalSpacing = 80
+          const verticalDirection = siblingIndex % 2 === 0 ? 1 : -1
+          const yOffset = (siblingIndex + 1) * verticalSpacing * verticalDirection
+          newX = direction === 'right' ? parent.x + 180 : parent.x - 180
+          newY = parent.y + yOffset + jitter
+        }
 
         const newNode: NodePayload = {
           mindmapId,
-          x: direction === 'right' ? parent.x + 180 : parent.x - 180,
-          y: parent.y + yOffset + jitter,
+          x: newX,
+          y: newY,
           label: `Child of ${parent.label || 'Node'}`,
           description: '',
           parentId: parent.id || null,
