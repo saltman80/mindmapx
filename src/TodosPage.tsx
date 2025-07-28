@@ -217,7 +217,12 @@ export default function TodosPage(): JSX.Element {
                       ))}
                     </ul>
                   ) : (
-                    <p>{list.todos?.length ?? 0} todos</p>
+                  <div className="tile-stats">
+                    <div className="metric-detail">
+                      <span className="label">Todos</span>
+                      <span className="value">{list.todos?.length ?? 0}</span>
+                    </div>
+                  </div>
                   )}
                 </section>
               </div>
