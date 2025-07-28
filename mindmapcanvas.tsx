@@ -8,7 +8,7 @@ import {
   useEffect
 } from 'react'
 import MiniMap from './MiniMap'
-import type { NodeData, EdgeData } from './mindmapTypes'
+import type { NodeData, EdgeData, Direction } from './mindmapTypes'
 import { authFetch } from './authFetch'
 
 const DOT_SPACING = 50
@@ -184,14 +184,40 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         if (!parent) return
 
         const siblings = safeNodes.filter(n => n.parentId === parentId)
-        const index = siblings.length
-        const radius = 120
-        const angleStep = (2 * Math.PI) / (index + 1)
-        const angle = angleStep * index
-        const jitter = Math.floor(Math.random() * 10 - 5)
 
-        const newX = parent.x + radius * Math.cos(angle) + jitter
-        const newY = parent.y + radius * Math.sin(angle) + jitter
+        const quadrantOrder: Direction[] = ['tr', 'br', 'bl', 'tl']
+        const dirVectors: Record<Direction, { x: number; y: number }> = {
+          tr: { x: 1, y: -1 },
+          br: { x: 1, y: 1 },
+          bl: { x: -1, y: 1 },
+          tl: { x: -1, y: -1 },
+        }
+        const getDirection = (node: NodeData): Direction => {
+          if (node.direction) return node.direction
+          if (!node.parentId) return 'tr'
+          const p = safeNodes.find(n => n.id === node.parentId)
+          if (!p) return 'tr'
+          const dx = node.x - p.x
+          const dy = node.y - p.y
+          if (dx >= 0 && dy <= 0) return 'tr'
+          if (dx >= 0 && dy >= 0) return 'br'
+          if (dx <= 0 && dy >= 0) return 'bl'
+          return 'tl'
+        }
+
+        let direction: Direction
+        if (!parent.parentId) {
+          direction = quadrantOrder[siblings.length % 4]
+        } else {
+          direction = getDirection(parent)
+        }
+
+        const countInDir = siblings.filter(s => getDirection(s) === direction).length
+        const radius = 120 * (countInDir + 1)
+        const vec = dirVectors[direction]
+
+        const newX = parent.x + vec.x * radius
+        const newY = parent.y + vec.y * radius
 
         const newNode: NodePayload = {
           mindmapId,
@@ -206,7 +232,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
         const nodeId = await createNode(newNode)
         if (nodeId) {
-          addNode({ ...newNode, id: nodeId, todoId: null })
+          addNode({ ...newNode, id: nodeId, todoId: null, direction })
         } else {
           console.error('[MindmapCanvas] Failed to create node', newNode)
         }

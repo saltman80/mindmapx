@@ -7,9 +7,13 @@ export interface NodePayload {
   parentId?: string | null
 }
 
+export type Direction = 'tr' | 'br' | 'bl' | 'tl'
+
 export interface NodeData extends NodePayload {
   id: string
   todoId?: string | null
+  /** Optional quadrant used for client-side layout */
+  direction?: Direction
 }
 
 export interface EdgeData {
