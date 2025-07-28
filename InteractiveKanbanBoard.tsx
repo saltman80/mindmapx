@@ -108,7 +108,8 @@ export default function InteractiveKanbanBoard({
   }, [columns, cards])
 
   const sortedLanes = [
-    ...lanes.filter(l => l.title !== 'Done'),
+    lanes.find(l => l.title === 'New'),
+    ...lanes.filter(l => l.title !== 'Done' && l.title !== 'New'),
     lanes.find(l => l.title === 'Done'),
   ].filter(Boolean) as Lane[]
 
@@ -124,10 +125,11 @@ export default function InteractiveKanbanBoard({
       .then(data => {
         const id = data.id
         setLanes(prev => {
+          const newCol = prev.find(l => l.title === 'New')
           const done = prev.find(l => l.title === 'Done')
-          const others = prev.filter(l => l.title !== 'Done')
+          const others = prev.filter(l => l.title !== 'New' && l.title !== 'Done')
           const lane = { id, title: data.title, cards: [] }
-          const updated = done ? [...others, lane, done] : [...prev, lane]
+          const updated = [newCol, ...others, lane, done].filter(Boolean) as Lane[]
           const payload = updated.map((ln, idx) => ({ id: ln.id, position: idx }))
           authFetch(`${API_BASE}/columns`, {
             method: 'PATCH',
@@ -142,8 +144,8 @@ export default function InteractiveKanbanBoard({
 
   const removeLane = (laneId: string) => {
     const lane = lanes.find(l => l.id === laneId)
-    if (lane?.title === 'Done') {
-      alert('Cannot rename or delete the Done column.')
+    if (lane?.title === 'Done' || lane?.title === 'New') {
+      alert('Cannot rename or delete the Done or New column.')
       return
     }
     authFetch(`${API_BASE}/columns/${laneId}`, { method: 'DELETE' })
@@ -224,9 +226,10 @@ export default function InteractiveKanbanBoard({
       if (index === -1) return prev
       const [lane] = copy.splice(index, 1)
       copy.splice(to, 0, lane)
-      const withoutDone = copy.filter(l => l.title !== 'Done')
+      const newCol = copy.find(l => l.title === 'New')
       const done = copy.find(l => l.title === 'Done')
-      const result = done ? [...withoutDone, done] : withoutDone
+      const others = copy.filter(l => l.title !== 'New' && l.title !== 'Done')
+      const result = [newCol, ...others, done].filter(Boolean) as Lane[]
       const payload = result.map((ln, idx) => ({ id: ln.id, position: idx }))
       authFetch(`${API_BASE}/columns`, {
         method: 'PATCH',
@@ -239,12 +242,12 @@ export default function InteractiveKanbanBoard({
 
   const updateTitle = (laneId: string, title: string) => {
     const lane = lanes.find(l => l.id === laneId)
-    if (lane?.title === 'Done') {
-      alert('Cannot rename or delete the Done column.')
+    if (lane?.title === 'Done' || lane?.title === 'New') {
+      alert('Cannot rename or delete the Done or New column.')
       return
     }
-    if (title === 'Done') {
-      alert('Cannot create another Done column.')
+    if (title === 'Done' || title === 'New') {
+      alert('Cannot create another reserved column.')
       return
     }
     authFetch(`${API_BASE}/columns/${laneId}`, {
@@ -319,7 +322,7 @@ export default function InteractiveKanbanBoard({
     if (!destination) return
 
     const draggedLane = lanes.find(l => l.id === draggableId)
-    if (type === 'COLUMN' && draggedLane?.title === 'Done') return
+    if (type === 'COLUMN' && (draggedLane?.title === 'Done' || draggedLane?.title === 'New')) return
 
     if (type === 'CARD') {
       moveCard(draggableId, source.droppableId, destination.droppableId, destination.index)
@@ -357,7 +360,7 @@ export default function InteractiveKanbanBoard({
             >
               <div className="kanban-board">
                 {sortedLanes.map((lane, i) => (
-                  <Draggable key={lane.id} draggableId={lane.id} index={i} isDragDisabled={lane.title === 'Done'}>
+                  <Draggable key={lane.id} draggableId={lane.id} index={i} isDragDisabled={lane.title === 'Done' || lane.title === 'New'}>
                     {providedLane => (
                       <div
                         ref={providedLane.innerRef}
@@ -474,7 +477,7 @@ function Lane({
             }`}
           />
           <div className="lane-header">
-            {lane.title.toLowerCase() === 'done' ? (
+            {['done','new'].includes(lane.title.toLowerCase()) ? (
               <h3 className="lane-title">{lane.title}</h3>
             ) : (
               <>

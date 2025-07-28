@@ -5,7 +5,7 @@ import { extractToken, verifySession } from './auth.js'
 
 async function ensureDefaultColumns(client: PoolClient, boardId: string) {
   const { rows } = await client.query(
-    'SELECT id FROM kanban_columns WHERE board_id=$1',
+    'SELECT id, title, position FROM kanban_columns WHERE board_id=$1 ORDER BY position',
     [boardId]
   )
   if (rows.length === 0) {
@@ -15,6 +15,32 @@ async function ensureDefaultColumns(client: PoolClient, boardId: string) {
         'INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,$2,$3)',
         [boardId, defaults[i], i]
       )
+    }
+    return
+  }
+  let newCol = rows.find(r => r.title === 'New')
+  let doneCol = rows.find(r => r.title === 'Done')
+  if (!newCol) {
+    const res = await client.query(
+      "INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,'New',0) RETURNING id",
+      [boardId]
+    )
+    newCol = { id: res.rows[0].id, title: 'New', position: 0 }
+    rows.unshift(newCol)
+  }
+  if (!doneCol) {
+    const res = await client.query(
+      'INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,\'Done\',$2) RETURNING id',
+      [boardId, rows.length]
+    )
+    doneCol = { id: res.rows[0].id, title: 'Done', position: rows.length }
+    rows.push(doneCol)
+  }
+  const others = rows.filter(r => r.title !== 'New' && r.title !== 'Done')
+  const ordered = [newCol, ...others, doneCol]
+  for (let i = 0; i < ordered.length; i++) {
+    if (ordered[i] && ordered[i]!.position !== i) {
+      await client.query('UPDATE kanban_columns SET position=$1 WHERE id=$2', [i, ordered[i]!.id])
     }
   }
 }
