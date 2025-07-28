@@ -22,6 +22,18 @@ async function isFirstNodeForMindmap(
   return Number(result.rows[0]?.count) === 0
 }
 
+async function columnExists(
+  client: PoolClient,
+  table: string,
+  column: string
+): Promise<boolean> {
+  const res = await client.query(
+    `SELECT 1 FROM information_schema.columns WHERE table_name=$1 AND column_name=$2`,
+    [table, column]
+  )
+  return res.rowCount > 0
+}
+
 const headers = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -171,6 +183,8 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         }
       }
 
+      const hasContent = await columnExists(client, 'nodes', 'content')
+      
       // Enforce single root node per mindmap
       const isRoot = !parentId
       if (isRoot) {
@@ -194,12 +208,19 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
           parentId,
         })
 
-        const result = await client.query(
-          `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id`,
-          [mindmapId, x, y, label, description, parentId]
-        )
+        const query = hasContent
+          ? `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id, content)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id`
+          : `INSERT INTO nodes (mindmap_id, x, y, label, description, parent_id)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             RETURNING id`
+
+        const params = hasContent
+          ? [mindmapId, x, y, label, description, parentId, label]
+          : [mindmapId, x, y, label, description, parentId]
+
+        const result = await client.query(query, params)
 
         console.log('[CreateNode] inserted id', result.rows[0].id)
 
