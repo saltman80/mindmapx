@@ -2745,13 +2745,15 @@ hr {
 .kanban-board-container {
   width: 100%;
   flex: 1;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
   padding: 0 1rem 0.5rem;
   scrollbar-gutter: stable;
   scrollbar-width: 25px;
   scrollbar-color: #c1c1c1 #f1f1f1;
   -ms-overflow-style: scrollbar;
+  cursor: grab;
 }
 
 .kanban-board-container::-webkit-scrollbar {
@@ -2776,6 +2778,10 @@ hr {
 
 .kanban-board-container::-webkit-scrollbar-corner {
   background: #f1f1f1;
+}
+
+.kanban-board-container.drag-scroll-active {
+  cursor: grabbing;
 }
 
 @media (max-width: 768px) {
