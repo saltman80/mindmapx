@@ -118,14 +118,23 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       if (!id) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing id' }) }
       }
-      const result = await client.query(
-        'DELETE FROM mindmaps WHERE id = $1 AND user_id = $2',
-        [id, userId]
-      )
-      if (result.rowCount === 0) {
-        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+      await client.query('BEGIN')
+      try {
+        await client.query('DELETE FROM nodes WHERE mindmap_id = $1', [id])
+        const result = await client.query(
+          'DELETE FROM mindmaps WHERE id = $1 AND user_id = $2',
+          [id, userId]
+        )
+        if (result.rowCount === 0) {
+          await client.query('ROLLBACK')
+          return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) }
+        }
+        await client.query('COMMIT')
+        return { statusCode: 204, headers, body: '' }
+      } catch (error) {
+        await client.query('ROLLBACK')
+        throw error
       }
-      return { statusCode: 204, headers, body: '' }
     }
 
     // ❌ No other method allowed
