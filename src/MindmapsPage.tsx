@@ -21,6 +21,7 @@ export default function MindmapsPage(): JSX.Element {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ title: '', description: '' })
   const [aiLoading, setAiLoading] = useState(false)
+  const [nodeCounts, setNodeCounts] = useState<Record<string, number>>({})
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
@@ -40,6 +41,25 @@ export default function MindmapsPage(): JSX.Element {
   useEffect(() => {
     fetchData()
   }, [])
+
+  useEffect(() => {
+    maps.forEach(m => {
+      if (nodeCounts[m.id] !== undefined) return
+      authFetch(`/.netlify/functions/nodes?mindmapId=${m.id}`)
+        .then(res => res.json())
+        .then(data => {
+          const nodes = Array.isArray(data?.nodes)
+            ? data.nodes
+            : Array.isArray(data)
+              ? data
+              : []
+          setNodeCounts(prev => ({ ...prev, [m.id]: nodes.length }))
+        })
+        .catch(() => {
+          setNodeCounts(prev => ({ ...prev, [m.id]: 0 }))
+        })
+    })
+  }, [maps])
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
@@ -205,7 +225,12 @@ export default function MindmapsPage(): JSX.Element {
                   >
                     Open
                   </button>
-                  <p>{m.data?.description || 'Map details coming soon...'}</p>
+                  <div className="tile-stats">
+                    <div className="metric-detail">
+                      <span className="label">Nodes</span>
+                      <span className="value">{nodeCounts[m.id] ?? '-'}</span>
+                    </div>
+                  </div>
                 </section>
               </div>
             ))
