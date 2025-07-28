@@ -183,32 +183,15 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const parent = safeNodes.find(n => n.id === parentId)
         if (!parent) return
 
-        const parentParent = parent.parentId
-          ? safeNodes.find(n => n.id === parent.parentId)
-          : null
-
         const siblings = safeNodes.filter(n => n.parentId === parentId)
-        const siblingIndex = siblings.length
+        const index = siblings.length
+        const radius = 120
+        const angleStep = (2 * Math.PI) / (index + 1)
+        const angle = angleStep * index
         const jitter = Math.floor(Math.random() * 10 - 5)
 
-        let newX = parent.x
-        let newY = parent.y
-        if (!parentParent) {
-          // Distribute root children across four quadrants
-          const angle = (siblingIndex % 4) * (Math.PI / 2)
-          const layer = Math.floor(siblingIndex / 4)
-          const radius = 180 + layer * 100
-          newX += Math.cos(angle) * radius
-          newY += Math.sin(angle) * radius + jitter
-        } else {
-          // Original left/right staggered placement for non-root nodes
-          const direction = parent.x >= parentParent.x ? 'right' : 'left'
-          const verticalSpacing = 80
-          const verticalDirection = siblingIndex % 2 === 0 ? 1 : -1
-          const yOffset = (siblingIndex + 1) * verticalSpacing * verticalDirection
-          newX = direction === 'right' ? parent.x + 180 : parent.x - 180
-          newY = parent.y + yOffset + jitter
-        }
+        const newX = parent.x + radius * Math.cos(angle) + jitter
+        const newY = parent.y + radius * Math.sin(angle) + jitter
 
         const newNode: NodePayload = {
           mindmapId,
