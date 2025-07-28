@@ -1,7 +1,46 @@
+import { useEffect, useState } from 'react'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
+import {
+  LIMIT_MINDMAPS,
+  LIMIT_TODO_LISTS,
+  LIMIT_KANBAN_BOARDS,
+  TOTAL_AI_LIMIT,
+} from './src/constants'
+
+interface Usage {
+  mindmaps: number
+  todoLists: number
+  boards: number
+  aiUsage: number
+}
 
 export default function AccountPage(): JSX.Element {
+  const [usage, setUsage] = useState<Usage>({
+    mindmaps: 0,
+    todoLists: 0,
+    boards: 0,
+    aiUsage: 0,
+  })
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('/api/usage', { credentials: 'include', signal: controller.signal })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data) {
+          setUsage({
+            mindmaps: Number(data.mindmaps) || 0,
+            todoLists: Number(data.todoLists) || 0,
+            boards: Number(data.boards) || 0,
+            aiUsage: Number(data.aiUsage) || 0,
+          })
+        }
+      })
+      .catch(() => {})
+    return () => controller.abort()
+  }, [])
+
   return (
     <section className="section section--one-col relative overflow-hidden">
       <MindmapArm side="right" />
@@ -20,19 +59,27 @@ export default function AccountPage(): JSX.Element {
           <tbody>
             <tr>
               <td className="metric-label">Mindmaps</td>
-              <td className="metric-value">1/10</td>
+              <td className="metric-value">
+                {usage.mindmaps}/{LIMIT_MINDMAPS}
+              </td>
             </tr>
             <tr>
               <td className="metric-label">Todo Lists</td>
-              <td className="metric-value">0/100</td>
+              <td className="metric-value">
+                {usage.todoLists}/{LIMIT_TODO_LISTS}
+              </td>
             </tr>
             <tr>
               <td className="metric-label">Kanban Boards</td>
-              <td className="metric-value">0/10</td>
+              <td className="metric-value">
+                {usage.boards}/{LIMIT_KANBAN_BOARDS}
+              </td>
             </tr>
             <tr>
               <td className="metric-label">AI Automations</td>
-              <td className="metric-value">0/25 this month</td>
+              <td className="metric-value">
+                {usage.aiUsage}/{TOTAL_AI_LIMIT} this month
+              </td>
             </tr>
           </tbody>
         </table>
