@@ -16,9 +16,10 @@ const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
 const TOOL_OFFSET_Y = -40
-const CHILD_BASE_DISTANCE = 100
-const CHILD_DEPTH_INCREMENT = 20
-const CHILD_DISTANCE_INCREMENT = 75
+// Increase node spacing to reduce overlap
+const CHILD_BASE_DISTANCE = 120
+const CHILD_DEPTH_INCREMENT = 24
+const CHILD_DISTANCE_INCREMENT = 90
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
