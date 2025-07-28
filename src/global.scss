@@ -3642,7 +3642,8 @@ hr {
 }
 
 .todo-add-input {
-  flex: 1;
+  width: 100%;
+  flex-shrink: 0;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
@@ -3709,7 +3710,8 @@ hr {
   .todo-list,
   .todo-block,
   .todo-add-form,
-  .todo-add-wrapper {
+  .todo-add-wrapper,
+  .todo-add-input {
     width: 70%;
   }
 }
