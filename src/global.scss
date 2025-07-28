@@ -3625,8 +3625,8 @@ hr {
 }
 
 .todo-add-block {
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  width: min(600px, 80%);
+  margin: 1rem auto 2rem;
   text-align: center;
 }
 
@@ -3643,8 +3643,7 @@ hr {
 }
 
 .todo-add-input {
-  width: 100%;
-  flex-shrink: 0;
+  flex: 1;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
