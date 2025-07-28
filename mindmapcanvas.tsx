@@ -16,6 +16,9 @@ const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
 const TOOL_OFFSET_Y = -40
+const CHILD_BASE_DISTANCE = 100
+const CHILD_DEPTH_INCREMENT = 20
+const CHILD_DISTANCE_INCREMENT = 75
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -225,8 +228,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const siblingsInDir = siblings.filter(s => getDirection(s) === direction)
         const index = siblingsInDir.length
         const depth = getDepth(parent.id)
-        const baseDistance = 70 + depth * 15
-        const distance = baseDistance + index * 15
+        const baseDistance = CHILD_BASE_DISTANCE + depth * CHILD_DEPTH_INCREMENT
+        const distance = baseDistance + index * CHILD_DISTANCE_INCREMENT
         const centerAngle = Math.atan2(dirVectors[direction].y, dirVectors[direction].x)
         const angleStep = Math.PI / 10 // ~18deg spread between siblings
         let angleOffset = 0
