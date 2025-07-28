@@ -7,6 +7,7 @@ import {
   useMemo,
   useEffect
 } from 'react'
+import { useNavigate } from 'react-router-dom'
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData, Direction } from './mindmapTypes'
 import { authFetch } from './authFetch'
@@ -68,6 +69,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   ) => {
     const safePropNodes = Array.isArray(propNodes) ? propNodes : []
     const safePropEdges = Array.isArray(propEdges) ? propEdges : []
+
+    const navigate = useNavigate()
 
     const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
@@ -262,7 +265,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
         const nodeId = await createNode(newNode)
         if (nodeId) {
-          addNode({ ...newNode, id: nodeId, todoId: null, direction })
+          addNode({ ...newNode, id: nodeId, todoId: null, linkedTodoListId: null, direction })
         } else {
           console.error('[MindmapCanvas] Failed to create node', newNode)
         }
@@ -325,6 +328,34 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         }
       },
       [removeNode]
+    )
+
+    const handleTodoClick = useCallback(
+      async (node: NodeData) => {
+        if (node.linkedTodoListId) {
+          navigate(`/todos/${node.linkedTodoListId}`)
+          return
+        }
+        try {
+          const res = await authFetch('/.netlify/functions/todo-lists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: node.label || 'Todo List', nodeId: node.id })
+          })
+          if (!res.ok) throw new Error('create failed')
+          const list = await res.json()
+          updateNode({ ...node, linkedTodoListId: list.id })
+          authFetch(`/.netlify/functions/nodes/${node.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ linkedTodoListId: list.id })
+          }).catch(() => {})
+          navigate(`/todos/${list.id}`)
+        } catch (err) {
+          console.error('Todo list create failed', err)
+        }
+      },
+      [navigate, updateNode]
     )
 
     const handleAddTask = useCallback(() => {
@@ -661,10 +692,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
-                    setTodoNodeId(node.id)
+                    handleTodoClick(node)
                   }}
                 >
-                  ✅
+                  {node.linkedTodoListId ? '📋' : '✅'}
                 </div>
               </div>
             ) : null

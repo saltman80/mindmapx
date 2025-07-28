@@ -24,6 +24,7 @@ export interface NodePayload {
   label?: string | null
   description?: string | null
   parentId?: string | null
+  linkedTodoListId?: string | null
 }
 
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'

@@ -5,6 +5,7 @@ export interface NodePayload {
   label?: string | null
   description?: string | null
   parentId?: string | null
+  linkedTodoListId?: string | null
 }
 
 export type Direction = 'tr' | 'br' | 'bl' | 'tl'
