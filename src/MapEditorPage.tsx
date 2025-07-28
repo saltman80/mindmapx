@@ -156,6 +156,7 @@ export default function MapEditorPage(): JSX.Element {
         description: '',
         parentId: null,
         mindmapId: mindmap.id,
+        linkedTodoListId: null,
       }
 
       console.log('[MapEditorPage] auto root node payload', generalNode)

@@ -49,6 +49,7 @@ interface NodePayload {
   label?: string | null
   description?: string | null
   parentId?: string | null
+  linkedTodoListId?: string | null
 }
 
 const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
@@ -259,6 +260,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           label: `Child of ${parent.label || 'Node'}`,
           description: '',
           parentId: parent.id || null,
+          linkedTodoListId: null,
         }
 
         console.log('[MindmapCanvas] Posting child node payload:', newNode)
