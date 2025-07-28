@@ -31,7 +31,8 @@ async function columnExists(
     `SELECT 1 FROM information_schema.columns WHERE table_name=$1 AND column_name=$2`,
     [table, column]
   )
-  return res.rowCount > 0
+  const count = typeof res.rowCount === 'number' ? res.rowCount : 0
+  return count > 0
 }
 
 const headers = {
