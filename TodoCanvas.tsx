@@ -82,6 +82,7 @@ export default function TodoCanvas({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: todo.title,
+        description: todo.description,
         completed: (todo as any).completed,
       }),
     })
