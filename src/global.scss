@@ -2754,7 +2754,6 @@ hr {
   scrollbar-width: 25px;
   scrollbar-color: #c1c1c1 #f1f1f1;
   -ms-overflow-style: scrollbar;
-  cursor: grab;
 }
 
 .kanban-board-container::-webkit-scrollbar {
@@ -2781,9 +2780,6 @@ hr {
   background: #f1f1f1;
 }
 
-.kanban-board-container.drag-scroll-active {
-  cursor: grabbing;
-}
 
 @media (max-width: 768px) {
   .kanban-board-container {
