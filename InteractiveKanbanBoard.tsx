@@ -79,17 +79,6 @@ export default function InteractiveKanbanBoard({
   const [commenting, setCommenting] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
 
-  const scrollByColumn = (dir: number) => {
-    const container = autoScrollRightRef.current
-    if (!container) return
-    const lane = container.querySelector<HTMLElement>('.lane-wrapper')
-    const laneWidth = lane?.offsetWidth || 300
-    const gap = parseInt(
-      getComputedStyle(container.querySelector('.kanban-board') as HTMLElement).gap || '0'
-    )
-    container.scrollBy({ left: dir * (laneWidth + gap), behavior: 'smooth' })
-  }
-
   useEffect(() => {
     if (!columns) return
     const colMap = new Map<string, Card[]>()
@@ -355,20 +344,6 @@ export default function InteractiveKanbanBoard({
           <button className="settings-button" aria-label="Settings">⋯</button>
         </div>
       </header>
-      <button
-        className="scroll-btn left"
-        aria-label="Scroll left"
-        onClick={() => scrollByColumn(-1)}
-      >
-        ‹
-      </button>
-      <button
-        className="scroll-btn right"
-        aria-label="Scroll right"
-        onClick={() => scrollByColumn(1)}
-      >
-        ›
-      </button>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {provided => (
