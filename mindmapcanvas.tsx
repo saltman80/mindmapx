@@ -237,8 +237,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const finalAngle = centerAngle + angleOffset
         const rand = () => (Math.random() - 0.5) * 20 // ±10px jitter
 
-        const newX = parent.x + Math.cos(finalAngle) * distance + rand()
-        const newY = parent.y + Math.sin(finalAngle) * distance + rand()
+        // Round coordinates to integers to avoid DB errors on numeric types
+        const newX = Math.round(
+          parent.x + Math.cos(finalAngle) * distance + rand()
+        )
+        const newY = Math.round(
+          parent.y + Math.sin(finalAngle) * distance + rand()
+        )
 
         const newNode: NodePayload = {
           mindmapId,
