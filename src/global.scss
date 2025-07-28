@@ -2341,8 +2341,8 @@ hr {
   position: relative;
   flex-direction: column;
   min-height: calc(100vh - 80px);
-  /* contain scrollbars to the board container */
-  overflow-x: hidden;
+  /* allow horizontal overflow so board can scroll */
+  overflow-x: auto;
   overflow-y: hidden;
 }
 
