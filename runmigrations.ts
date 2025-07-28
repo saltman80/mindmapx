@@ -143,6 +143,11 @@ export async function runMigrations(): Promise<void> {
       $$;
     `)
 
+    const { rows: defaultRows } = await client.query(
+      `SELECT column_default FROM information_schema.columns WHERE table_name = 'nodes' AND column_name = 'id'`
+    )
+    console.log('nodes.id default:', defaultRows[0]?.column_default)
+
     // Drop legacy columns from early experiments
     await client.query(`
       ALTER TABLE nodes DROP COLUMN IF EXISTS position_x;
