@@ -192,6 +192,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           bl: { x: -1, y: 1 },
           tl: { x: -1, y: -1 },
         }
+
+        const getDepth = (nodeId: string): number => {
+          let depth = 0
+          let current = safeNodes.find(n => n.id === nodeId)
+          while (current && current.parentId) {
+            current = safeNodes.find(n => n.id === current!.parentId)
+            depth++
+          }
+          return depth
+        }
         const getDirection = (node: NodeData): Direction => {
           if (node.direction) return node.direction
           if (!node.parentId) return 'tr'
@@ -213,7 +223,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         }
 
         const countInDir = siblings.filter(s => getDirection(s) === direction).length
-        const radius = 120 * (countInDir + 1)
+        const depth = getDepth(parent.id) + 1
+        const radius = 120 * (countInDir + 1) * depth
         const vec = dirVectors[direction]
 
         const newX = parent.x + vec.x * radius
