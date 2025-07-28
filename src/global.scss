@@ -2763,30 +2763,10 @@ hr {
 }
 
 .kanban-scroll-spacer {
-  min-width: 150px;
+  min-width: 2rem;
   flex-shrink: 0;
 }
 
-.scroll-btn {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-  background: var(--color-bg);
-  border: none;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  border-radius: 50%;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-}
-
-.scroll-btn.left {
-  left: 0.25rem;
-}
-
-.scroll-btn.right {
-  right: 0.25rem;
-}
 
 .kanban-board {
   display: flex;
@@ -2794,8 +2774,8 @@ hr {
   align-items: flex-start;
   gap: 1rem;
   min-width: max-content;
-  padding-right: 150px;
-  padding-bottom: 150px;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
   min-height: calc(100vh - 80px);
 }
 
