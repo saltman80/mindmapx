@@ -222,13 +222,23 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           direction = getDirection(parent)
         }
 
-        const countInDir = siblings.filter(s => getDirection(s) === direction).length
-        const depth = getDepth(parent.id) + 1
-        const radius = 120 * (countInDir + 1) * depth
-        const vec = dirVectors[direction]
+        const siblingsInDir = siblings.filter(s => getDirection(s) === direction)
+        const index = siblingsInDir.length
+        const depth = getDepth(parent.id)
+        const baseDistance = 70 + depth * 15
+        const distance = baseDistance + index * 15
+        const centerAngle = Math.atan2(dirVectors[direction].y, dirVectors[direction].x)
+        const angleStep = Math.PI / 10 // ~18deg spread between siblings
+        let angleOffset = 0
+        if (index > 0) {
+          const step = Math.ceil(index / 2)
+          angleOffset = (index % 2 ? 1 : -1) * step * angleStep
+        }
+        const finalAngle = centerAngle + angleOffset
+        const rand = () => (Math.random() - 0.5) * 20 // ±10px jitter
 
-        const newX = parent.x + vec.x * radius
-        const newY = parent.y + vec.y * radius
+        const newX = parent.x + Math.cos(finalAngle) * distance + rand()
+        const newY = parent.y + Math.sin(finalAngle) * distance + rand()
 
         const newNode: NodePayload = {
           mindmapId,
