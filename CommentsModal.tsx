@@ -89,6 +89,7 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
                 <div className="comment-body">{highlightMentions((c as any).comment || c.text)}</div>
               </div>
             )
+          // end comments map
           })}
         </div>
         <div className="comment-input-bar">
