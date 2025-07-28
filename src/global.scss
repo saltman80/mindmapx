@@ -2341,9 +2341,9 @@ hr {
   position: relative;
   flex-direction: column;
   min-height: calc(100vh - 80px);
-  /* allow horizontal overflow so board can scroll */
+  /* allow scrolling in both directions */
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 .kanban-canvas .card-form {
@@ -2754,7 +2754,7 @@ hr {
   flex: 1;
   min-width: 0;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   display: flex;
   align-items: flex-start;
   white-space: nowrap;
@@ -3056,6 +3056,10 @@ hr {
   font-size: 16px;
   border: none;
   background: transparent;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 4px;
+  margin-right: 4px;
 }
 
 .lane-delete {
@@ -3063,6 +3067,8 @@ hr {
   border: none;
   cursor: pointer;
   font-size: 18px;
+  padding: 2px;
+  line-height: 1;
 }
 
 .lane.done .lane-title-input,
