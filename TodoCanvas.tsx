@@ -214,12 +214,12 @@ export default function TodoCanvas({
       <h3 className="todo-completion">
         {completedCount}/{totalCount} completed
       </h3>
-      <button className="btn-secondary" onClick={openSendAllDialog} style={{marginBottom:'8px'}}>
-        Send All To Kanban
-      </button>
       <div className="todo-list">
         {activeTodos.map(renderTodo)}
       </div>
+      <button className="btn-secondary" onClick={openSendAllDialog} style={{ marginBottom: '8px' }}>
+        Send All To Kanban
+      </button>
       {!adding && (
         <button className="todo-add-circle" onClick={() => setAdding(true)}>+
         </button>
