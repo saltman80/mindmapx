@@ -114,7 +114,7 @@ export default function DashboardPage(): JSX.Element {
           setTimeout(() => navigate(`/maps/${json.id}`), 250)
         }
       } else if (createType === 'todo') {
-        await fetch('/.netlify/functions/todo-lists', {
+        const res = await fetch('/.netlify/functions/todo-lists', {
           method: 'POST',
           credentials: 'include', // Required for session cookie
           headers: {
@@ -122,6 +122,10 @@ export default function DashboardPage(): JSX.Element {
           },
           body: JSON.stringify({ title: form.title }),
         })
+        const data = await res.json()
+        if (data?.id) {
+          setTimeout(() => navigate(`/todos/${data.id}`), 250)
+        }
       } else {
         const res = await fetch('/.netlify/functions/boards', {
           method: 'POST',
@@ -158,11 +162,15 @@ export default function DashboardPage(): JSX.Element {
           setTimeout(() => navigate(`/maps/${json.mindmapId}`), 250)
         }
       } else if (createType === 'todo') {
-        await fetch('/api/todo-lists', {
+        const res = await fetch('/api/todo-lists', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: form.title })
         })
+        const data = await res.json()
+        if (data?.id) {
+          setTimeout(() => navigate(`/todos/${data.id}`), 250)
+        }
       } else {
         const res = await fetch('/api/boards', {
           method: 'POST',

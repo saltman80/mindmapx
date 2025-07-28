@@ -64,6 +64,7 @@ export default function TodosPage(): JSX.Element {
     setLists(prev => [list, ...prev])
     setForm({ title: '', description: '' })
     setShowModal(false)
+    navigate(`/todos/${list.id}`)
   }
 
   const handleDeleteList = async (id: string): Promise<void> => {
