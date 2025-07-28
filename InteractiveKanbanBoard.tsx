@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import useDragScroll from './useDragScroll'
 import {
   DragDropContext,
   Droppable,
@@ -80,9 +79,6 @@ export default function InteractiveKanbanBoard({
   const [commenting, setCommenting] = useState<{ laneId: string; card: Card } | null>(null)
   const autoScrollRightRef = useRef<HTMLDivElement | null>(null)
   const boardRef = useRef<HTMLDivElement | null>(null)
-  const canvasRef = useRef<HTMLDivElement | null>(null)
-  useDragScroll(boardRef)
-  useDragScroll(canvasRef)
 
   useEffect(() => {
     if (!columns) return
@@ -348,7 +344,7 @@ export default function InteractiveKanbanBoard({
   }
 
   return (
-    <div className="kanban-canvas" ref={canvasRef}>
+    <div className="kanban-canvas">
       <header className="kanban-header">
         <div className="header-left">
           <div className="kanban-icon" aria-hidden="true">🗂️</div>
