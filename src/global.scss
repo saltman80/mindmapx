@@ -2335,8 +2335,9 @@ hr {
   position: relative;
   flex-direction: column;
   min-height: calc(100vh - 80px);
-  /* scrolling handled by kanban-board-container */
-  overflow: hidden;
+  /* allow horizontal scrolling when many lanes are present */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .kanban-canvas .card-form {
