@@ -23,7 +23,7 @@ export const handler: Handler = async (event) => {
 
   const client = await getClient()
   try {
-    if (event.httpMethod === 'PATCH' && /kanban-columns$/.test(event.path)) {
+    if (event.httpMethod === 'PATCH' && /columns$/.test(event.path)) {
       if (!event.body) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       }
@@ -65,7 +65,7 @@ export const handler: Handler = async (event) => {
       return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
     }
 
-    const match = event.path.match(/kanban-columns\/(.+)/)
+    const match = event.path.match(/columns\/(.+)/)
     const colId = match?.[1]
     if (!colId) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing column id' }) }

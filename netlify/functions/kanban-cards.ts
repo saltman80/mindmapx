@@ -78,7 +78,7 @@ export const handler: Handler = async (event) => {
     }
 
     const path = event.path
-    const moveMatch = path.match(/kanban-cards\/([^/]+)\/move/)
+    const moveMatch = path.match(/cards\/([^/]+)\/move/)
     if (moveMatch) {
       const cardId = moveMatch[1]
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
@@ -102,7 +102,7 @@ export const handler: Handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ id: cardId }) }
     }
 
-    const match = path.match(/kanban-cards\/([^/]+)/)
+    const match = path.match(/cards\/([^/]+)/)
     const cardId = match?.[1]
     if (!cardId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing card id' }) }
 
