@@ -257,11 +257,23 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditDesc('')
     }, [editingId, editTitle, editDesc, Array.isArray(nodes) ? nodes : [], updateNode])
 
-    const handleDeleteNode = useCallback((id: string) => {
-      console.log('[MindmapCanvas] handleDeleteNode', id)
-      if (!window.confirm('Are you sure you want to delete this node?')) return
-      removeNode(id)
-    }, [removeNode])
+    const handleDeleteNode = useCallback(
+      async (id: string) => {
+        console.log('[MindmapCanvas] handleDeleteNode', id)
+        if (!window.confirm('Are you sure you want to delete this node?')) return
+        try {
+          const res = await authFetch(`/.netlify/functions/nodes/${id}`, {
+            method: 'DELETE',
+          })
+          if (!res.ok) throw new Error(`Failed: ${res.status}`)
+          removeNode(id)
+        } catch (err) {
+          console.error('[MindmapCanvas] delete failed', err)
+          alert('Failed to delete node')
+        }
+      },
+      [removeNode]
+    )
 
     const handleAddTask = useCallback(() => {
       console.log('[MindmapCanvas] handleAddTask for', todoNodeId)
