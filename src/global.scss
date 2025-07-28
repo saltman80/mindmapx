@@ -2331,6 +2331,8 @@ hr {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 80px);
+  /* extend width to enable scrolling */
+  width: 200%;
   /* allow horizontal scrolling as lanes overflow */
   overflow-x: auto;
 }
