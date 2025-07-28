@@ -2329,10 +2329,9 @@ hr {
 
 .kanban-canvas {
   display: flex;
+  position: relative;
   flex-direction: column;
   min-height: calc(100vh - 80px);
-  /* extend width to enable scrolling */
-  width: 200%;
   /* allow horizontal scrolling as lanes overflow */
   overflow-x: auto;
 }
@@ -2760,6 +2759,27 @@ hr {
 .kanban-scroll-spacer {
   min-width: 150px;
   flex-shrink: 0;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: var(--color-bg);
+  border: none;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.scroll-btn.left {
+  left: 0.25rem;
+}
+
+.scroll-btn.right {
+  right: 0.25rem;
 }
 
 .kanban-board {
