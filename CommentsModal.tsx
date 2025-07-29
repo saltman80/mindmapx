@@ -49,8 +49,16 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
     fetch(`/.netlify/functions/todo-comments?todoId=${todoId}`, {
       credentials: 'include',
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) throw new Error('Failed to load comments')
+        const data = await res.json()
+        return Array.isArray(data) ? data : []
+      })
       .then(setComments)
+      .catch(err => {
+        console.error('Error fetching comments:', err)
+        setComments([])
+      })
   }, [card?.todoId, card?.id])
 
   useEffect(() => {
