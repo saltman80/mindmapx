@@ -42,6 +42,7 @@ interface CardData {
   due_date?: string
   assignee_id?: string
   position: number
+  linked_todo_id?: string | null
 }
 
 interface Props {
@@ -101,6 +102,7 @@ export default function InteractiveKanbanBoard({
           assignee: c.assignee_id || '',
           comments: [],
           position: c.position,
+          todoId: c.linked_todo_id || undefined,
         })
       }
     })
@@ -544,7 +546,7 @@ function Lane({
                   {...providedCard.dragHandleProps}
                   className={`kanban-card ${
                     card.dueDate && isOverdue(card.dueDate) ? 'past-due' : ''
-                  }`}
+                  } ${card.todoId ? 'todo-linked' : ''}`}
                 >
                   <div className="kanban-title">{card.title || 'New Card'}</div>
                   <div className="kanban-meta">
