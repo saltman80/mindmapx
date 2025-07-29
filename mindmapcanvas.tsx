@@ -635,37 +635,37 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             {Array.isArray(safeEdges) &&
               safeEdges.length > 0 &&
               safeEdges.map((edge, i) => {
-              const from = nodeMap.get(edge.from)
-              const to = nodeMap.get(edge.to)
-              if (!from || !to) return null
-              return (
-                <path
-                  key={`${edge.id}-${edgeRenderKey}`}
-                  className="mindmap-edge"
-                  d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${
-                    (from.y + to.y) / 2 + (to.y > from.y ? 40 : -40)
-                  } ${to.x},${to.y}`}
-                  fill="none"
-                  vectorEffect="non-scaling-stroke"
-                />
-              )
-            })}
+                const from = nodeMap.get(edge.from)
+                const to = nodeMap.get(edge.to)
+                if (!from || !to) return null
+                return (
+                  <motion.path
+                    key={`${edge.id}-${edgeRenderKey}`}
+                    className="mindmap-edge"
+                    d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${
+                      (from.y + to.y) / 2 + (to.y > from.y ? 40 : -40)
+                    } ${to.x},${to.y}`}
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                  />
+                )
+              })}
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => (
-              <g
-                key={node.id}
-                transform={`translate(${node.x},${node.y})`}
-              >
                 <motion.g
+                  key={node.id}
                   className="mindmap-node"
                   data-id={node.id}
                   onPointerDown={e => {
                     e.stopPropagation()
                     handleNodeClick(node.id)
                   }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.8, x: 0, y: 0 }}
+                  animate={{ opacity: 1, scale: 1, x: node.x, y: node.y }}
                   transition={{ duration: 0.3, delay: i * 0.05 }}
                 >
                   <circle
@@ -695,8 +695,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               ) : null}
               {selectedId === node.id && null}
                 </motion.g>
-              </g>
-            ))}
+              ))}
           </g>
         </svg>
         {Array.isArray(safeNodes) &&
