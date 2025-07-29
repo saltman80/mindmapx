@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg'
 import { validate as isUuid } from 'uuid'
 import { requireAuth } from './middleware.js'
 import type { NodePayload } from './types.js'
+import { DEFAULT_ROOT_X, DEFAULT_ROOT_Y } from './constants.js'
 
 // Node creation rules:
 // - A mindmap may contain only one root node (parentId null).
@@ -158,14 +159,21 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       }
 
       // Default values and type checks
+      const isRootPayload = !payload.parentId
+      const xValid = typeof payload.x === 'number' && Number.isFinite(payload.x)
+      const yValid = typeof payload.y === 'number' && Number.isFinite(payload.y)
       const x =
-        typeof payload.x === 'number' && Number.isFinite(payload.x)
-          ? payload.x
-          : 0
+        isRootPayload && !xValid
+          ? DEFAULT_ROOT_X
+          : xValid
+            ? payload.x
+            : 0
       const y =
-        typeof payload.y === 'number' && Number.isFinite(payload.y)
-          ? payload.y
-          : 0
+        isRootPayload && !yValid
+          ? DEFAULT_ROOT_Y
+          : yValid
+            ? payload.y
+            : 0
       const label =
         typeof payload.label === 'string' && payload.label.trim() !== ''
           ? payload.label.trim()
