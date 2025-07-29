@@ -655,24 +655,28 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               })}
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
-              safeNodes.map((node, i) => (
-                <motion.g
-                  key={node.id}
-                  className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
-                  data-id={node.id}
-                  onPointerDown={e => {
-                    e.stopPropagation()
-                    handleNodeClick(node.id)
-                  }}
-                  initial={{ opacity: 0, scale: 0.8, x: 0, y: 0 }}
-                  animate={{ opacity: 1, scale: 1, x: node.x, y: node.y }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                >
-                  <circle
-                    className="mindmap-node-circle"
-                    r={20 / transform.k}
-                    vectorEffect="non-scaling-stroke"
-                  />
+              safeNodes.map((node, i) => {
+                const parent = node.parentId ? nodeMap.get(node.parentId) : null
+                const startX = parent ? parent.x : node.x
+                const startY = parent ? parent.y : node.y
+                return (
+                  <motion.g
+                    key={node.id}
+                    className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
+                    data-id={node.id}
+                    onPointerDown={e => {
+                      e.stopPropagation()
+                      handleNodeClick(node.id)
+                    }}
+                    initial={{ opacity: 0, scale: 0.8, x: startX, y: startY }}
+                    animate={{ opacity: 1, scale: 1, x: node.x, y: node.y }}
+                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                  >
+                <circle
+                  className="mindmap-node-circle"
+                  r={20 / transform.k}
+                  vectorEffect="non-scaling-stroke"
+                />
                 {node.label && (
                   <text
                     textAnchor="middle"
