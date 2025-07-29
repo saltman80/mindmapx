@@ -3416,7 +3416,7 @@ hr {
 /* Mindmap Canvas Styling */
 .mindmap-node {
   opacity: 0;
-  animation: pop-in 0.5s var(--transition-ease) forwards;
+  animation: fade-in 0.5s var(--transition-ease) forwards;
   cursor: pointer;
   transform-origin: center;
 }
@@ -3458,16 +3458,6 @@ hr {
   stroke-opacity: 0.6;
 }
 
-@keyframes pop-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
 /* Generic modal styling used across the app */
 .modal-backdrop {
