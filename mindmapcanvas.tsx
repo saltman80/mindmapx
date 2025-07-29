@@ -7,6 +7,7 @@ import {
   useMemo,
   useEffect
 } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData, Direction } from './mindmapTypes'
@@ -575,26 +576,29 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           >
             {Array.isArray(safeEdges) &&
               safeEdges.length > 0 &&
-              safeEdges.map(edge => {
+              safeEdges.map((edge, i) => {
               const from = nodeMap.get(edge.from)
               const to = nodeMap.get(edge.to)
               if (!from || !to) return null
               return (
-                <path
+                <motion.path
                   key={edge.id}
+                  className="mindmap-edge"
                   d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${
                     (from.y + to.y) / 2 + (to.y > from.y ? 40 : -40)
                   } ${to.x},${to.y}`}
                   fill="none"
-                  stroke="#888"
-                  strokeWidth={2 / transform.k}
+                  vectorEffect="non-scaling-stroke"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
                 />
               )
             })}
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
-              safeNodes.map(node => (
-              <g
+              safeNodes.map((node, i) => (
+              <motion.g
                 key={node.id}
                 className="mindmap-node"
                 data-id={node.id}
@@ -603,22 +607,25 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   e.stopPropagation()
                   handleNodeClick(node.id)
                 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
               >
                 <circle
+                  className="mindmap-node-circle"
                   r={20 / transform.k}
-                  fill={node.linkedTodoListId ? '#e6ffe6' : '#fff'}
-                  stroke="#000"
-                  strokeWidth={2 / transform.k}
+                  fill={node.linkedTodoListId ? '#e6ffe6' : undefined}
+                  vectorEffect="non-scaling-stroke"
                 />
                 {node.label && (
                   <text
                     textAnchor="middle"
                     dy=".35em"
                     fontSize={14 / transform.k}
-                  pointerEvents="none"
-                >
-                  {node.label}
-                </text>
+                    pointerEvents="none"
+                  >
+                    {node.label}
+                  </text>
               )}
               {todoLists[node.id]?.length ? (
                 <text
@@ -630,7 +637,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </text>
               ) : null}
               {selectedId === node.id && null}
-              </g>
+              </motion.g>
             ))}
           </g>
         </svg>
