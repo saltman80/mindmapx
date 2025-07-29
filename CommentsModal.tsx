@@ -16,7 +16,8 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
 
   const submitComment = async () => {
     if (!card || !text.trim()) return
-    const body = { todoId: card.id, comment: text.trim() }
+    const todoId = card.todoId || card.id
+    const body = { todoId, comment: text.trim() }
     const res = await fetch('/.netlify/functions/todo-comments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,12 +45,13 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
 
   useEffect(() => {
     if (!card) return
-    fetch(`/.netlify/functions/todo-comments?todoId=${card.id}`, {
+    const todoId = card.todoId || card.id
+    fetch(`/.netlify/functions/todo-comments?todoId=${todoId}`, {
       credentials: 'include',
     })
       .then(res => res.json())
       .then(setComments)
-  }, [card?.id])
+  }, [card?.todoId, card?.id])
 
   useEffect(() => {
     const el = feedRef.current
