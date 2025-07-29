@@ -698,7 +698,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               ) : null}
               {selectedId === node.id && null}
                 </motion.g>
-              ))}
+                )
+              })}
           </g>
         </svg>
         {Array.isArray(safeNodes) &&
