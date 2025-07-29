@@ -63,13 +63,11 @@ export default function FaintMindmapBackground({ className = '' }: BgProps): JSX
                 transition={{ duration: 0.8 }}
               />
               <motion.circle
-                cx={x}
-                cy={y}
                 r="20"
                 fill="none"
                 stroke="var(--mindmap-color)"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0, cx: 0, cy: 0 }}
+                animate={{ scale: 1, cx: x, cy: y }}
                 transition={{ duration: 0.8 }}
               />
             </g>
