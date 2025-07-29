@@ -124,10 +124,14 @@ export default function KanbanBoardsPage(): JSX.Element {
         .then(res => res.json())
         .then(data => {
           const cards = Array.isArray(data.cards) ? data.cards : []
-          const notDone = cards.filter((c: any) => c.status !== 'done').length
-          const overdue = cards.filter(
-            (c: any) => c.status !== 'done' && c.due_date && isOverdue(c.due_date)
-          ).length
+          const columns = Array.isArray(data.columns) ? data.columns : []
+          const doneCol = columns.find((c: any) => c.title === 'Done')?.id
+
+          const isNotDone = (c: any) =>
+            doneCol ? c.column_id !== doneCol : c.status !== 'done'
+
+          const notDone = cards.filter(isNotDone).length
+          const overdue = cards.filter(c => isNotDone(c) && c.due_date && isOverdue(c.due_date)).length
           setStats(prev => ({ ...prev, [b.id]: { total: notDone, overdue } }))
         })
         .catch(() => {})
