@@ -76,7 +76,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
-    const [edgeRenderKey, setEdgeRenderKey] = useState(0)
 
     const safeNodes = Array.isArray(nodes) ? nodes : []
     const safeEdges = Array.isArray(edges) ? edges : []
@@ -91,9 +90,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
 
-    useEffect(() => {
-      setEdgeRenderKey(k => k + 1)
-    }, [transform])
 
     useEffect(() => {
       setNodes(safePropNodes)
@@ -643,7 +639,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 if (!from || !to) return null
                 return (
                   <motion.path
-                    key={`${edge.id}-${edgeRenderKey}`}
+                    key={edge.id}
                     className="mindmap-edge"
                     d={`M${from.x},${from.y} Q${(from.x + to.x) / 2},${
                       (from.y + to.y) / 2 + (to.y > from.y ? 40 : -40)
