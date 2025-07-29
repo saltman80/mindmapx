@@ -173,11 +173,61 @@ export async function createMindmapFromNodes(
       [userId, title.trim(), description.trim() || null]
     )
     const mapId = res.rows[0].id
-    for (const n of nodes) {
+
+    // Build lookup for children by parentId to assign positions
+    type TmpNode = {
+      id: string
+      title: string
+      parentId: string | null
+      x?: number
+      y?: number
+      children: TmpNode[]
+    }
+    const byId = new Map<string, TmpNode>()
+    const roots: TmpNode[] = []
+    for (const raw of nodes) {
+      const id = raw.id || randomUUID()
+      const node: TmpNode = {
+        id,
+        title: raw.title,
+        parentId: raw.parentId ?? null,
+        children: [],
+      }
+      byId.set(id, node)
+    }
+    for (const node of byId.values()) {
+      if (node.parentId && byId.has(node.parentId)) {
+        byId.get(node.parentId)!.children.push(node)
+      } else {
+        roots.push(node)
+      }
+    }
+
+    const queue: Array<{ node: TmpNode; depth: number }> = []
+    roots.forEach(root => {
+      root.x = 0
+      root.y = 0
+      queue.push({ node: root, depth: 0 })
+    })
+
+    while (queue.length > 0) {
+      const { node, depth } = queue.shift()!
+      const children = node.children
+      const angleStep = children.length > 0 ? (2 * Math.PI) / children.length : 0
+      children.forEach((child, idx) => {
+        const angle = idx * angleStep
+        const distance = 200 + depth * 40
+        child.x = Math.round((node.x ?? 0) + Math.cos(angle) * distance)
+        child.y = Math.round((node.y ?? 0) + Math.sin(angle) * distance)
+        queue.push({ node: child, depth: depth + 1 })
+      })
+    }
+
+    for (const node of byId.values()) {
       await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, data)
-         VALUES ($1, $2, $3, $4)`,
-        [n.id || randomUUID(), mapId, n.parentId ?? null, JSON.stringify({ content: n.title })]
+        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description)
+         VALUES ($1, $2, $3, $4, $5, $6, NULL)`,
+        [node.id, mapId, node.parentId, node.x ?? 0, node.y ?? 0, node.title]
       )
     }
     await client.query('COMMIT')
