@@ -42,7 +42,7 @@ export default function TodoCanvas({
   const [selectedBoard, setSelectedBoard] = useState('')
   const [sendingAll, setSendingAll] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [adding, setAdding] = useState(true)
+  const [adding, setAdding] = useState(initialTodos.length === 0)
 
   useEffect(() => {
     if (!list_id) return
@@ -51,12 +51,21 @@ export default function TodoCanvas({
     })
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setTodos(data)
+        if (Array.isArray(data)) {
+          setTodos(data)
+          setAdding(data.length === 0)
+        }
       })
       .catch(err => {
         console.error('Failed to load todos', err)
       })
   }, [list_id])
+
+  useEffect(() => {
+    if (todos.length === 0) {
+      setAdding(true)
+    }
+  }, [todos.length])
 
   const handleCreateTodo = async (title: string) => {
     try {
@@ -69,6 +78,7 @@ export default function TodoCanvas({
       if (!res.ok) throw new Error('Failed to save todo')
       const created: TodoItem = await res.json()
       setTodos(prev => [created, ...prev])
+      setAdding(false)
     } catch (err) {
       console.error(err)
       alert('Failed to create todo')
