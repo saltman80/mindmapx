@@ -297,11 +297,11 @@ export default function InteractiveKanbanBoard({
         description: updatedCard.description,
         status: updatedCard.status,
         priority: updatedCard.priority,
-        due_date: updatedCard.dueDate,
-        assignee_id: updatedCard.assignee,
+        due_date: updatedCard.dueDate || null,
+        assignee_id: updatedCard.assignee || null,
         column_id: laneId,
-        position: pos
-      })
+        position: pos,
+      }),
     })
       .then(() => {
         setLanes(prev =>

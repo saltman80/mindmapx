@@ -32,6 +32,8 @@ export const handler: Handler = async (event) => {
     if (event.httpMethod === 'POST') {
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       const data = JSON.parse(event.body)
+      if (data.due_date === '') data.due_date = null
+      if (data.assignee_id === '') data.assignee_id = null
       const columnId = data.column_id
       const title = (data.title || '').trim()
       if (!columnId || !title) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing column_id or title' }) }
@@ -109,6 +111,8 @@ export const handler: Handler = async (event) => {
     if (event.httpMethod === 'PATCH') {
       if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) }
       const data = JSON.parse(event.body)
+      if (data.due_date === '') data.due_date = null
+      if (data.assignee_id === '') data.assignee_id = null
       const fields: string[] = []
       const values: any[] = []
       let idx = 1
