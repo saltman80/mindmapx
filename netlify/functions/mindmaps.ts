@@ -1,5 +1,6 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
+import { DEFAULT_ROOT_X, DEFAULT_ROOT_Y } from './constants.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 import { randomUUID } from 'crypto'
@@ -205,8 +206,8 @@ export async function createMindmapFromNodes(
 
     const queue: Array<{ node: TmpNode; depth: number }> = []
     roots.forEach(root => {
-      root.x = 0
-      root.y = 0
+      root.x = DEFAULT_ROOT_X
+      root.y = DEFAULT_ROOT_Y
       queue.push({ node: root, depth: 0 })
     })
 
