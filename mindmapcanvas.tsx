@@ -668,7 +668,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => {
-                console.log(`Rendering node ${node.label} at`, node.x, node.y)
+                console.log(`[RENDER] Node ${node.label} - x: ${node.x}, y: ${node.y}`)
                 return (
                   <g
                     key={node.id}
