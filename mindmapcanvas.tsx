@@ -664,10 +664,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                       e.stopPropagation()
                       handleNodeClick(node.id)
                     }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, x: node.x, y: node.y }}
+                    animate={{ opacity: 1, x: node.x, y: node.y }}
                     transition={{ duration: 0.5, delay: i * 0.05 }}
-                    transform={`translate(${node.x}, ${node.y})`}
                   >
                 <circle
                   className="mindmap-node-circle"
