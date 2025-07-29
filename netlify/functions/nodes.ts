@@ -64,20 +64,23 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       const mapId = event.queryStringParameters?.mindmapId
       if (!mapId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'mindmapId required' }) }
       const { rows } = await client.query(
-        `SELECT id, parent_id, x, y, label, description, todo_id, linked_todo_list_id FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
+        `SELECT id, parent_id, x, y, label, description, todo_id, linked_todo_list_id
+         FROM nodes WHERE mindmap_id = $1 ORDER BY created_at`,
         [mapId]
       )
+
       const nodes = rows.map(r => ({
         id: r.id,
         parentId: r.parent_id,
-        x: r.x,
-        y: r.y,
+        x: typeof r.x === 'string' ? parseFloat(r.x) : r.x,
+        y: typeof r.y === 'string' ? parseFloat(r.y) : r.y,
         label: r.label ?? undefined,
         description: r.description ?? undefined,
         todoId: r.todo_id ?? undefined,
         linkedTodoListId: r.linked_todo_list_id ?? undefined,
       }))
-      return { statusCode: 200, headers, body: JSON.stringify(nodes) }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ nodes }) }
     }
 
     if (event.httpMethod === 'POST') {

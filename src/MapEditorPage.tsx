@@ -126,6 +126,10 @@ export default function MapEditorPage(): JSX.Element {
         if (!Array.isArray(data?.nodes) && !Array.isArray(data)) {
           setNodesError('Invalid nodes data')
         }
+        console.log(
+          'Loaded nodes:',
+          validNodes.map(n => ({ id: n.id, x: n.x, y: n.y }))
+        )
         setNodes(validNodes)
       })
       .catch(err => {
