@@ -11,8 +11,14 @@ export const handler: Handler = async (event) => {
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
     }
 
-    const session = await verifySession(token)
-    const userId = session.userId
+    let userId: string
+    try {
+      const session = await verifySession(token)
+      userId = session.userId
+    } catch (err) {
+      console.error('Auth failure in todo-comments.ts:', err)
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
+    }
 
     const client = await getClient()
 
