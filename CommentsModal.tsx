@@ -18,21 +18,25 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
     if (!card || !text.trim()) return
     const todoId = card.todoId || card.id
     const body = { todoId, comment: text.trim() }
-    const res = await fetch('/.netlify/functions/todo-comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(body),
-    })
-    if (res.ok) {
-      const newComment = {
-        comment: body.comment,
-        author: 'You',
-        created_at: new Date().toISOString(),
-      } as any
-      setComments(prev => [...prev, newComment])
-      onAdd(newComment)
-      setText('')
+    try {
+      const res = await fetch('/.netlify/functions/todo-comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      })
+      if (res.ok) {
+        const newComment = {
+          comment: body.comment,
+          author: 'You',
+          created_at: new Date().toISOString(),
+        } as any
+        setComments(prev => [...prev, newComment])
+        onAdd(newComment)
+        setText('')
+      }
+    } catch (err) {
+      console.error('Failed to submit comment:', err)
     }
   }
 
@@ -50,7 +54,18 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
       credentials: 'include',
     })
       .then(res => res.json())
-      .then(setComments)
+      .then(data => {
+        if (Array.isArray(data)) {
+          setComments(data)
+        } else {
+          console.error('Invalid comments response', data)
+          setComments([])
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch comments:', err)
+        setComments([])
+      })
   }, [card?.todoId, card?.id])
 
   useEffect(() => {
