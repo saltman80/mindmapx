@@ -121,12 +121,19 @@ export default function InteractiveKanbanBoard({
   const addLane = () => {
     if (!boardId) return
     const position = lanes.length
+    const untitledCount = lanes.filter(l => l.title?.startsWith('Untitled')).length
+    const title = `Untitled ${untitledCount + 1}`
     authFetch(`${API_BASE}/columns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ board_id: boardId, title: 'New Lane', position })
+      body: JSON.stringify({ board_id: boardId, title, position })
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(err => Promise.reject(err))
+        }
+        return res.json()
+      })
       .then(data => {
         const id = data.id
         setLanes(prev => {
