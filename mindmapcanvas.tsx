@@ -620,8 +620,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           </defs>
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="#fff" />
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#grid-dots)" />
-          <g
-            transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
+          <motion.g
+            animate={{ x: transform.x, y: transform.y, scale: transform.k }}
+            initial={false}
+            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            style={{ originX: 0, originY: 0 }}
           >
             {rootNode && (
               <circle
@@ -700,7 +703,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </motion.g>
                 )
               })}
-          </g>
+          </motion.g>
         </svg>
         {Array.isArray(safeNodes) &&
           safeNodes.length > 0 &&
