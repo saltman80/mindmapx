@@ -655,19 +655,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => {
+                console.log(`Rendering node ${node.label} at`, node.x, node.y)
                 return (
-                  <motion.g
+                  <g
                     key={node.id}
+                    transform={`translate(${node.x}, ${node.y})`}
                     className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
                     data-id={node.id}
                     onPointerDown={e => {
                       e.stopPropagation()
                       handleNodeClick(node.id)
                     }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: i * 0.05 }}
-                    transform={`translate(${node.x}, ${node.y})`}
                   >
                 <circle
                   className="mindmap-node-circle"
@@ -694,9 +692,15 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </text>
               ) : null}
               {selectedId === node.id && null}
-                </motion.g>
+                </g>
                 )
               })}
+            <g transform="translate(500, 500)">
+              <circle r="20" fill="red" />
+              <text textAnchor="middle" dy=".35em" fontSize={14}>
+                TEST
+              </text>
+            </g>
           </motion.g>
         </svg>
         {Array.isArray(safeNodes) &&
