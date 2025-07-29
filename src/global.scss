@@ -3434,6 +3434,12 @@ hr {
   stroke: var(--color-accent);
 }
 
+/* Highlight nodes that have an attached todo list */
+.mindmap-node.has-todo .mindmap-node-circle {
+  fill: #d1fae5;
+  stroke: var(--color-success);
+}
+
 .mindmap-center-glow {
   fill: url(#center-glow);
   pointer-events: none;
