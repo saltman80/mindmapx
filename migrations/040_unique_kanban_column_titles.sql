@@ -20,12 +20,38 @@ FROM duplicates d
 WHERE t.column_id = d.id
   AND d.rn > 1;
 
+WITH duplicates AS (
+  SELECT
+    id,
+    FIRST_VALUE(id) OVER (
+      PARTITION BY board_id, title
+      ORDER BY created_at, id
+    ) AS keep_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY board_id, title
+      ORDER BY created_at, id
+    ) AS rn
+  FROM kanban_columns
+)
 UPDATE kanban_cards c
 SET column_id = d.keep_id
 FROM duplicates d
 WHERE c.column_id = d.id
   AND d.rn > 1;
 
+WITH duplicates AS (
+  SELECT
+    id,
+    FIRST_VALUE(id) OVER (
+      PARTITION BY board_id, title
+      ORDER BY created_at, id
+    ) AS keep_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY board_id, title
+      ORDER BY created_at, id
+    ) AS rn
+  FROM kanban_columns
+)
 DELETE FROM kanban_columns c
 USING duplicates d
 WHERE c.id = d.id
