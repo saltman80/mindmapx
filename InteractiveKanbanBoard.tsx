@@ -490,7 +490,7 @@ function Lane({
   onShowComments,
   onRemoveLane,
 }: LaneProps) {
-  const [tempTitle, setTempTitle] = useState(lane.title)
+  const [tempTitle, setTempTitle] = useState(lane.title || '')
 
   const save = () => {
     onUpdateTitle(lane.id, tempTitle)
@@ -501,7 +501,7 @@ function Lane({
       {provided => (
         <div
           className={`lane kanban-lane ${
-            lane.title.toLowerCase() === 'done' ? 'done' : ''
+            (lane.title || '').toLowerCase() === 'done' ? 'done' : ''
           }`}
           ref={provided.innerRef}
           {...provided.droppableProps}
@@ -516,8 +516,8 @@ function Lane({
             }`}
           />
           <div className="lane-header">
-            {['done','new'].includes(lane.title.toLowerCase()) ? (
-              <h3 className="lane-title">{lane.title}</h3>
+            {['done','new'].includes((lane.title || '').toLowerCase()) ? (
+              <h3 className="lane-title">{lane.title || 'Lane'}</h3>
             ) : (
               <>
                 <input
