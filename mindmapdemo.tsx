@@ -120,22 +120,24 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                       r="25"
                       fill="orange"
                       stroke="var(--color-border)"
-                      initial={{ cx: 0, cy: 0 }}
-                      animate={{ cx: visible ? x : 0, cy: visible ? y : 0 }}
+                      initial={{ cx: startX, cy: startY, opacity: 0 }}
+                      animate={{
+                        cx: visible ? x : startX,
+                        cy: visible ? y : startY,
+                        opacity: visible ? 1 : 0,
+                      }}
                       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
                     />
-                    {visible && (
-                      <motion.text
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        className="node-text"
-                        initial={{ x: 0, y: 0, opacity: 0 }}
-                        animate={{ x, y, opacity: 1 }}
-                        transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
-                      >
-                        {item.text}
-                      </motion.text>
-                    )}
+                    <motion.text
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="node-text"
+                      initial={{ x: startX, y: startY, opacity: 0 }}
+                      animate={{ x: visible ? x : startX, y: visible ? y : startY, opacity: visible ? 1 : 0 }}
+                      transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
+                    >
+                      {item.text}
+                    </motion.text>
                   </g>
                 )
               })}
