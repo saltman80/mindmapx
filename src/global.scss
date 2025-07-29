@@ -32,6 +32,7 @@
   --spacing-2xl: 48px;
   --spacing-3xl: 64px;
   --spacing-4xl: 96px;
+  --mindmap-grid-color: rgba(255, 167, 38, 0.15);
 }
 
 [data-theme='dark'] {
@@ -1106,6 +1107,7 @@ hr {
 
 :root {
   --mindmap-color: rgba(255, 165, 0, 0.4);
+  --mindmap-grid-color: rgba(255, 167, 38, 0.15);
 }
 
 .about-section {
@@ -3432,6 +3434,11 @@ hr {
   stroke: var(--color-accent);
 }
 
+.mindmap-center-glow {
+  fill: url(#center-glow);
+  pointer-events: none;
+}
+
 .mindmap-node text {
   fill: var(--color-text);
   font-family: var(--font-sans);
@@ -3442,7 +3449,7 @@ hr {
   stroke: var(--color-primary);
   stroke-width: 1.5px;
   stroke-linecap: round;
-  opacity: 0.5;
+  stroke-opacity: 0.6;
 }
 
 @keyframes pop-in {
