@@ -308,6 +308,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           .then(nodeId => {
             if (nodeId) {
               replaceNodeId(tempId, nodeId)
+              onAddNode?.({
+                ...newNode,
+                id: nodeId,
+                todoId: null,
+                direction,
+              })
             } else {
               console.error('[MindmapCanvas] Failed to create node', newNode)
             }
