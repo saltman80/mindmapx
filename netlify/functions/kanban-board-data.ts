@@ -102,7 +102,7 @@ export const handler: Handler = async (event) => {
 
     const { rows: cards } = await client.query(
       `SELECT c.id, c.column_id, c.title, c.description, c.status, c.priority,
-              c.due_date, c.assignee_id, c.position
+              c.due_date, c.assignee_id, c.position, c.linked_todo_id
          FROM kanban_cards c
          JOIN kanban_columns col ON c.column_id=col.id
         WHERE col.board_id=$1
