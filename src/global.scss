@@ -3053,6 +3053,7 @@ hr {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .lane-title-input {
@@ -3062,8 +3063,8 @@ hr {
   background: transparent;
   flex: 1;
   min-width: 0;
-  padding: 2px 4px;
-  margin-right: 4px;
+  padding: 2px 24px 2px 4px;
+  margin-right: 0;
 }
 
 .lane-delete {
@@ -3073,6 +3074,10 @@ hr {
   font-size: 18px;
   padding: 2px;
   line-height: 1;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
 }
 
 .lane.done .lane-title-input,
