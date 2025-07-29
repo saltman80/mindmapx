@@ -658,7 +658,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               safeNodes.map((node, i) => (
                 <motion.g
                   key={node.id}
-                  className="mindmap-node"
+                  className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
                   data-id={node.id}
                   onPointerDown={e => {
                     e.stopPropagation()
@@ -671,7 +671,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   <circle
                     className="mindmap-node-circle"
                     r={20 / transform.k}
-                    fill={node.linkedTodoListId ? '#e6ffe6' : undefined}
                     vectorEffect="non-scaling-stroke"
                   />
                 {node.label && (
