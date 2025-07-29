@@ -428,6 +428,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       return map
     }, [Array.isArray(nodes) ? nodes : []])
 
+    const rootNode = useMemo(
+      () => safeNodes.find(n => !n.parentId) || null,
+      [safeNodes]
+    )
+
     console.log('[MindmapCanvas] rendering with nodes:', nodes, 'edges:', edges)
 
     const handlePointerMove = useCallback(
@@ -566,14 +571,27 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               height={DOT_SPACING}
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="1" cy="1" r="1" fill="#ddd" />
+              <circle cx="1" cy="1" r="1" fill="var(--mindmap-grid-color)" />
             </pattern>
+            <radialGradient id="center-glow" r="50%">
+              <stop offset="0%" stopColor="var(--color-primary-light)" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="var(--color-primary-light)" stopOpacity="0" />
+            </radialGradient>
           </defs>
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="#fff" />
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#grid-dots)" />
           <g
             transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}
           >
+            {rootNode && (
+              <circle
+                className="mindmap-center-glow"
+                cx={rootNode.x}
+                cy={rootNode.y}
+                r={40 / transform.k}
+                pointerEvents="none"
+              />
+            )}
             {Array.isArray(safeEdges) &&
               safeEdges.length > 0 &&
               safeEdges.map((edge, i) => {
