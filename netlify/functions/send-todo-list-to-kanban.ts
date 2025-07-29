@@ -43,7 +43,7 @@ export const handler: Handler = async (event) => {
     const newColId = await ensureNewColumn(client, boardId)
     // determine next position for new cards
     let { rows: posRows } = await client.query(
-      'SELECT COALESCE(MAX(position),0)+1 AS pos FROM kanban_cards WHERE column_id=$1',
+      'SELECT COALESCE(MAX(position)+1,0) AS pos FROM kanban_cards WHERE column_id=$1',
       [newColId]
     )
     let nextPos = posRows[0]?.pos ?? 0

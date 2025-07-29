@@ -47,7 +47,7 @@ export const handler: Handler = async (event) => {
 
     // determine next position
     const { rows: posRows } = await client.query(
-      'SELECT COALESCE(MAX(position),0)+1 AS pos FROM kanban_cards WHERE column_id=$1',
+      'SELECT COALESCE(MAX(position)+1,0) AS pos FROM kanban_cards WHERE column_id=$1',
       [newColId]
     )
     const position = posRows[0]?.pos ?? 0
