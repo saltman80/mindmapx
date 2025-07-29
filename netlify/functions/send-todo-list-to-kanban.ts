@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
+import { ensureNewColumn } from './kanban-utils.js'
 
 const headers = {
   'Content-Type': 'application/json',
@@ -38,19 +39,8 @@ export const handler: Handler = async (event) => {
       'SELECT id, title FROM todos WHERE list_id=$1 AND user_id=$2 AND linked_kanban_card_id IS NULL',
       [listId, userId]
     )
-    // ensure New column
-    let { rows: cols } = await client.query(
-      "SELECT id FROM kanban_columns WHERE board_id=$1 AND title='New'",
-      [boardId]
-    )
-    let newColId = cols[0]?.id
-    if (!newColId) {
-      const res = await client.query(
-        'INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,\'New\',0) RETURNING id',
-        [boardId]
-      )
-      newColId = res.rows[0].id
-    }
+    // ensure New column exists
+    const newColId = await ensureNewColumn(client, boardId)
     // determine next position for new cards
     let { rows: posRows } = await client.query(
       'SELECT COALESCE(MAX(position),0)+1 AS pos FROM kanban_cards WHERE column_id=$1',
