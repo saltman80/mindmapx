@@ -3411,6 +3411,51 @@ hr {
   background: var(--color-warning);
 }
 
+/* Mindmap Canvas Styling */
+.mindmap-node {
+  opacity: 0;
+  animation: pop-in 0.5s var(--transition-ease) forwards;
+  cursor: pointer;
+  transform-origin: center;
+}
+
+.mindmap-node-circle {
+  fill: var(--color-primary-light);
+  stroke: var(--color-primary);
+  stroke-width: 2px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: transform 0.2s var(--transition-ease), stroke 0.2s var(--transition-ease);
+}
+
+.mindmap-node:hover .mindmap-node-circle {
+  transform: scale(1.08);
+  stroke: var(--color-accent);
+}
+
+.mindmap-node text {
+  fill: var(--color-text);
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.mindmap-edge {
+  stroke: var(--color-primary);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Generic modal styling used across the app */
 .modal-backdrop {
   position: fixed;
