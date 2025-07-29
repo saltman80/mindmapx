@@ -618,25 +618,27 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             {Array.isArray(safeNodes) &&
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => (
-              <motion.g
+              <g
                 key={node.id}
-                className="mindmap-node"
-                data-id={node.id}
                 transform={`translate(${node.x},${node.y})`}
-                onPointerDown={e => {
-                  e.stopPropagation()
-                  handleNodeClick(node.id)
-                }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
               >
-                <circle
-                  className="mindmap-node-circle"
-                  r={20 / transform.k}
-                  fill={node.linkedTodoListId ? '#e6ffe6' : undefined}
-                  vectorEffect="non-scaling-stroke"
-                />
+                <motion.g
+                  className="mindmap-node"
+                  data-id={node.id}
+                  onPointerDown={e => {
+                    e.stopPropagation()
+                    handleNodeClick(node.id)
+                  }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                >
+                  <circle
+                    className="mindmap-node-circle"
+                    r={20 / transform.k}
+                    fill={node.linkedTodoListId ? '#e6ffe6' : undefined}
+                    vectorEffect="non-scaling-stroke"
+                  />
                 {node.label && (
                   <text
                     textAnchor="middle"
@@ -657,7 +659,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 </text>
               ) : null}
               {selectedId === node.id && null}
-              </motion.g>
+                </motion.g>
+              </g>
             ))}
           </g>
         </svg>
