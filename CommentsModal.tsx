@@ -97,13 +97,21 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
           {comments.map((c, i) => {
             const isMine = c.author === currentUser?.name
             const name = isMine ? 'Me' : c.author || 'Anon'
+
             return (
-              <div key={i} className={`comment-bubble ${isMine ? 'me' : 'other'} fade-item`}>
+              <div
+                key={i}
+                className={`comment-bubble ${isMine ? 'me' : 'other'} fade-item`}
+              >
                 <div className="comment-meta">
                   <span className="comment-author">{name}</span>
-                  <span className="comment-time">{new Date((c as any).created_at || c.createdAt).toLocaleString()}</span>
+                  <span className="comment-time">
+                    {new Date((c as any).created_at || c.createdAt).toLocaleString()}
+                  </span>
                 </div>
-                <div className="comment-body">{highlightMentions((c as any).comment || c.text)}</div>
+                <div className="comment-body">
+                  {highlightMentions((c as any).comment || c.text)}
+                </div>
               </div>
             )
           })
