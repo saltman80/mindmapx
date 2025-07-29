@@ -2,7 +2,7 @@ import type { PoolClient } from 'pg'
 
 export async function ensureNewColumn(client: PoolClient, boardId: string): Promise<string> {
   let { rows } = await client.query(
-    "SELECT id FROM kanban_columns WHERE board_id=$1 AND title='New'",
+    "SELECT id FROM kanban_columns WHERE board_id=$1 AND lower(title)='new'",
     [boardId]
   )
   let newColId = rows[0]?.id as string | undefined
