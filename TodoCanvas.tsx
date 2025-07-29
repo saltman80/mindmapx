@@ -303,15 +303,13 @@ export default function TodoCanvas({
                 disabled={!selectedBoard}
                 onClick={async () => {
                   if (!sendingTodo) return
-                  await fetch('/.netlify/functions/kanban-cards', {
+                  await fetch('/.netlify/functions/send-todo-to-kanban', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({
-                      title: sendingTodo.title,
-                      description: sendingTodo.description,
-                      list_id: selectedBoard,
-                      metadata: { from: 'todo', todo_id: sendingTodo.id },
+                      todoId: sendingTodo.id,
+                      boardId: selectedBoard,
                     }),
                   })
                   setSendingTodo(null)
