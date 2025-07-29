@@ -50,27 +50,28 @@ export default function FaintMindmapBackground({ className = '' }: BgProps): JSX
           const x = 110 * Math.cos(rad)
           const y = 110 * Math.sin(rad)
           return (
-            <g key={i}>
-              <motion.line
+            <motion.g
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <line
                 x1="0"
                 y1="0"
                 x2={x}
                 y2={y}
                 stroke="var(--mindmap-color)"
                 strokeWidth="1.5"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.8 }}
               />
-              <motion.circle
+              <circle
                 r="20"
                 fill="none"
                 stroke="var(--mindmap-color)"
-                initial={{ scale: 0, cx: 0, cy: 0 }}
-                animate={{ scale: 1, cx: x, cy: y }}
-                transition={{ duration: 0.8 }}
+                cx={x}
+                cy={y}
               />
-            </g>
+            </motion.g>
           )
         })}
       </svg>

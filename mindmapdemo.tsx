@@ -111,29 +111,28 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
                     <motion.line
                       x1={startX}
                       y1={startY}
-                      animate={{ x2: visible ? lineX : startX, y2: visible ? lineY : startY }}
+                      x2={lineX}
+                      y2={lineY}
                       stroke="var(--color-border)"
                       strokeWidth="2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: visible ? 1 : 0 }}
                       transition={{ duration: 0.6 }}
                     />
                     <motion.circle
                       r="25"
                       fill="orange"
                       stroke="var(--color-border)"
-                      initial={{ cx: startX, cy: startY, opacity: 0 }}
-                      animate={{
-                        cx: visible ? x : startX,
-                        cy: visible ? y : startY,
-                        opacity: visible ? 1 : 0,
-                      }}
+                      initial={{ cx: x, cy: y, opacity: 0 }}
+                      animate={{ cx: x, cy: y, opacity: visible ? 1 : 0 }}
                       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
                     />
                     <motion.text
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="node-text"
-                      initial={{ x: startX, y: startY, opacity: 0 }}
-                      animate={{ x: visible ? x : startX, y: visible ? y : startY, opacity: visible ? 1 : 0 }}
+                      initial={{ x: x, y: y, opacity: 0 }}
+                      animate={{ x: x, y: y, opacity: visible ? 1 : 0 }}
                       transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
                     >
                       {item.text}
