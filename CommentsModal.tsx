@@ -77,7 +77,8 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
   if (!card) return null
 
   const highlightMentions = (text: string) => {
-    return text.split(/(@[a-zA-Z0-9_-]+)/g).map((part, idx) => {
+    // Split on @mentions and return parts with spans for styling
+    return text.split(/(@[\w-]+)/g).map((part, idx) => {
       if (/^@/.test(part)) {
         return (
           <span key={idx} className="mention">
