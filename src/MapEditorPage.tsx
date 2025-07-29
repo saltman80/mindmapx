@@ -113,11 +113,16 @@ export default function MapEditorPage(): JSX.Element {
           return null
         })
         console.log('[nodes] data:', data)
-        const validNodes = Array.isArray(data?.nodes)
+        const rawNodes = Array.isArray(data?.nodes)
           ? data.nodes
           : Array.isArray(data)
             ? data
             : []
+        const validNodes = rawNodes.map((n: any) => ({
+          ...n,
+          x: typeof n.x === 'string' ? parseFloat(n.x) : n.x ?? 0,
+          y: typeof n.y === 'string' ? parseFloat(n.y) : n.y ?? 0,
+        }))
         if (!Array.isArray(data?.nodes) && !Array.isArray(data)) {
           setNodesError('Invalid nodes data')
         }

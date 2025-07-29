@@ -100,6 +100,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [propEdges])
 
     useEffect(() => {
+      console.log(
+        'Loaded node positions:',
+        safeNodes.map(n => ({ id: n.id, x: n.x, y: n.y }))
+      )
+    }, [safeNodes])
+
+    useEffect(() => {
       onTransformChange?.(transform)
     }, [transform, onTransformChange])
     const [selectedId, setSelectedId] = useState<string | null>(null)
