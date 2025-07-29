@@ -606,7 +606,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               >
                 <circle
                   r={20 / transform.k}
-                  fill="#fff"
+                  fill={node.linkedTodoListId ? '#e6ffe6' : '#fff'}
                   stroke="#000"
                   strokeWidth={2 / transform.k}
                 />
