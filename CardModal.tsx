@@ -204,7 +204,7 @@ export default function CardModal({
                 {card.todoId && (
                   <span>
                     🔗 Linked ToDo:{' '}
-                    <a href={`/todo/${card.todoListId}`}>View</a>
+                    <a href={`/todos/${card.todoListId}`}>View</a>
                   </span>
                 )}
                 {card.mindmapId && (
