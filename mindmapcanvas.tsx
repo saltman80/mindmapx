@@ -669,10 +669,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => {
                 console.log(`[RENDER] Node ${node.label} - x: ${node.x}, y: ${node.y}`)
+                const nx = typeof node.x === 'number' && Number.isFinite(node.x) ? node.x : 0
+                const ny = typeof node.y === 'number' && Number.isFinite(node.y) ? node.y : 0
                 return (
                   <g
                     key={node.id}
-                    transform={`translate(${node.x}, ${node.y})`}
+                    transform={`translate(${nx}, ${ny})`}
                     className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
                     data-id={node.id}
                     onPointerDown={e => {
@@ -682,6 +684,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   >
                 <circle
                   className="mindmap-node-circle"
+                  cx={0}
+                  cy={0}
                   r={20 / transform.k}
                   vectorEffect="non-scaling-stroke"
                 />
