@@ -2478,6 +2478,14 @@ hr {
   cursor: pointer;
 }
 
+.todo-map-link {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  display: block;
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 .add-todo-button-wrapper {
   margin-top: 2rem;
 }

@@ -217,12 +217,12 @@ export default function TodoCanvas({
         <>
           <img src="/assets/logo.png" alt="MindXdo" className="todo-logo" />
           <h1 className="todo-title">{listTitle}</h1>
-          {mindmapId && (
-            <a href={`/maps/${mindmapId}`} className="todo-map-link">
-              View Mindmap
-            </a>
-          )}
         </>
+      )}
+      {mindmapId && (
+        <a href={`/maps/${mindmapId}`} className="todo-map-link">
+          View Mindmap
+        </a>
       )}
       {listDescription && (
         <p className="todo-description">{listDescription}</p>
