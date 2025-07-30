@@ -9,7 +9,6 @@
   },
   "include": [
     "netlify/functions",
-    "cookie.d.ts",
-    "constants.d.ts"
+    "cookie.d.ts"
   ]
 }
