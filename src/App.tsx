@@ -32,6 +32,7 @@ import Header from './header'
 import Footer from './footer'
 import ScrollToTop from './ScrollToTop'
 import SidebarNav from './SidebarNav'
+import ProtectedRoute from './ProtectedRoute'
 
 function AppRoutes() {
   return (
@@ -41,25 +42,25 @@ function AppRoutes() {
       <Route path="/mindmap-demo" element={<MindmapDemo />} />
       <Route path="/todo-demo" element={<TodoDemo />} />
       <Route path="/kanban-demo" element={<Kanban />} />
-      <Route path="/mindmaps" element={<MindmapsPage />} />
-      <Route path="/todos" element={<TodosPage />} />
-      <Route path="/kanban" element={<KanbanBoardsPage />} />
-      <Route path="/kanban/:id" element={<KanbanBoardPage />} />
-      <Route path="/maps/:id" element={<MapEditorPage />} />
-      <Route path="/workspace" element={<ProjectWorkspace />} />
-      <Route path="/todo/:id" element={<TodoDetail />} />
-      <Route path="/todos/:id" element={<TodosCanvasPage />} />
-      <Route path="/todo-canvas" element={<TodoEditorPage />} />
+      <Route path="/mindmaps" element={<ProtectedRoute><MindmapsPage /></ProtectedRoute>} />
+      <Route path="/todos" element={<ProtectedRoute><TodosPage /></ProtectedRoute>} />
+      <Route path="/kanban" element={<ProtectedRoute><KanbanBoardsPage /></ProtectedRoute>} />
+      <Route path="/kanban/:id" element={<ProtectedRoute><KanbanBoardPage /></ProtectedRoute>} />
+      <Route path="/maps/:id" element={<ProtectedRoute><MapEditorPage /></ProtectedRoute>} />
+      <Route path="/workspace" element={<ProtectedRoute><ProjectWorkspace /></ProtectedRoute>} />
+      <Route path="/todo/:id" element={<ProtectedRoute><TodoDetail /></ProtectedRoute>} />
+      <Route path="/todos/:id" element={<ProtectedRoute><TodosCanvasPage /></ProtectedRoute>} />
+      <Route path="/todo-canvas" element={<ProtectedRoute><TodoEditorPage /></ProtectedRoute>} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/set-password" element={<SetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/team-members" element={<TeamMembers />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/billing" element={<BillingPage />} />
-      <Route path="/account" element={<AccountPage />} />
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/team-members" element={<ProtectedRoute><TeamMembers /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
+      <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
       <Route path="/purchase" element={<PurchasePage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="*" element={<NotFound />} />
