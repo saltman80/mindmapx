@@ -17,6 +17,11 @@ export default function SetPasswordPage(): JSX.Element {
   }, [searchParams])
 
   const validate = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Valid email required.')
+      return false
+    }
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.')
       return false
@@ -50,7 +55,8 @@ export default function SetPasswordPage(): JSX.Element {
         setError('Account already exists. Please log in.')
         return
       }
-      setError('Failed to create account.')
+      const data = await res.json().catch(() => null)
+      setError(data?.message || 'Failed to create account.')
     } catch {
       setError('Failed to create account.')
     }

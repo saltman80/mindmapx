@@ -9,8 +9,9 @@ export default function PurchasePage() {
   const handlePurchase = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!email) {
-      setError('Email required')
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Valid email required')
       return
     }
     setLoading(true)
@@ -21,11 +22,11 @@ export default function PurchasePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       })
-      const data = await res.json()
-      if (data.url) {
+      const data = await res.json().catch(() => null)
+      if (res.ok && data?.url) {
         window.location.href = data.url
       } else {
-        setError('Failed to start checkout')
+        setError(data?.message || 'Failed to start checkout')
       }
     } catch {
       setError('Failed to start checkout')
