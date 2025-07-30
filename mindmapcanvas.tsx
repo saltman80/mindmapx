@@ -676,7 +676,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 return (
                   <g
                     key={node.id}
-                    transform={`translate(${nx}, ${ny})`}
                     className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
                     data-id={node.id}
                     onPointerDown={e => {
@@ -686,15 +685,15 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   >
                     <circle
                       className="mindmap-node-circle"
-                      cx={0}
-                      cy={0}
+                      cx={nx}
+                      cy={ny}
                       r={20 / transform.k}
                       vectorEffect="non-scaling-stroke"
                     />
                     {node.label && (
                       <text
-                        x={0}
-                        y={0}
+                        x={nx}
+                        y={ny}
                         textAnchor="middle"
                         dy=".35em"
                         fontSize={14 / transform.k}
@@ -706,8 +705,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                     {todoLists[node.id]?.length ? (
                       <text
                         fontSize={12 / transform.k}
-                        x={14 / transform.k}
-                        y={14 / transform.k}
+                        x={nx + 14 / transform.k}
+                        y={ny + 14 / transform.k}
                       >
                         ✓
                       </text>
