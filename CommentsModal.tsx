@@ -56,7 +56,13 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
     fetch(`/.netlify/functions/todo-comments?todoId=${todoId}`, {
       credentials: 'include',
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text()
+          throw new Error(text || res.statusText)
+        }
+        return res.json()
+      })
       .then(data => {
         if (Array.isArray(data)) {
           setComments(data)
