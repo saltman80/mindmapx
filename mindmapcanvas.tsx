@@ -669,12 +669,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
               safeNodes.length > 0 &&
               safeNodes.map((node, i) => {
                 console.log(`[RENDER] Node ${node.label} - x: ${node.x}, y: ${node.y}`)
-                const nx = typeof node.x === 'number' && Number.isFinite(node.x) ? node.x : 0
-                const ny = typeof node.y === 'number' && Number.isFinite(node.y) ? node.y : 0
+                const nx =
+                  typeof node.x === 'number' && Number.isFinite(node.x) ? node.x : 0
+                const ny =
+                  typeof node.y === 'number' && Number.isFinite(node.y) ? node.y : 0
                 return (
                   <g
                     key={node.id}
-                    transform={`translate(${nx}, ${ny})`}
                     className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
                     data-id={node.id}
                     onPointerDown={e => {
@@ -682,34 +683,36 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                       handleNodeClick(node.id)
                     }}
                   >
-                <circle
-                  className="mindmap-node-circle"
-                  cx={0}
-                  cy={0}
-                  r={20 / transform.k}
-                  vectorEffect="non-scaling-stroke"
-                />
-                {node.label && (
-                  <text
-                    textAnchor="middle"
-                    dy=".35em"
-                    fontSize={14 / transform.k}
-                    pointerEvents="none"
-                  >
-                    {node.label}
-                  </text>
-              )}
-              {todoLists[node.id]?.length ? (
-                <text
-                  fontSize={12 / transform.k}
-                  x={14 / transform.k}
-                  y={14 / transform.k}
-                >
-                  ✓
-                </text>
-              ) : null}
-              {selectedId === node.id && null}
-                </g>
+                    <circle
+                      className="mindmap-node-circle"
+                      cx={nx}
+                      cy={ny}
+                      r={20 / transform.k}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    {node.label && (
+                      <text
+                        x={nx}
+                        y={ny}
+                        textAnchor="middle"
+                        dy=".35em"
+                        fontSize={14 / transform.k}
+                        pointerEvents="none"
+                      >
+                        {node.label}
+                      </text>
+                    )}
+                    {todoLists[node.id]?.length ? (
+                      <text
+                        fontSize={12 / transform.k}
+                        x={nx + 14 / transform.k}
+                        y={ny + 14 / transform.k}
+                      >
+                        ✓
+                      </text>
+                    ) : null}
+                    {selectedId === node.id && null}
+                  </g>
                 )
               })}
             <g transform="translate(500, 500)">
