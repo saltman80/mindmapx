@@ -3838,7 +3838,28 @@ hr {
   .todo-block,
   .todo-add-form,
   .todo-add-wrapper {
-    width: 70%;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .todo-block {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .todo-text {
+    margin-bottom: 0.5rem;
+  }
+
+  .todo-icons {
+    margin-left: 0;
+    align-self: flex-end;
+    margin-top: 0.25rem;
+  }
+
+  .todo-add-form {
+    justify-content: center;
   }
 }
 
