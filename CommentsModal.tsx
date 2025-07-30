@@ -115,7 +115,7 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
                 </div>
               </div>
             )
-          })
+          })}
         </div>
         <div className="comment-input-bar">
           <textarea
