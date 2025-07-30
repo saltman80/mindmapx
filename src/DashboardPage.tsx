@@ -47,17 +47,20 @@ export default function DashboardPage(): JSX.Element {
   const [form, setForm] = useState({ title: '', description: '' })
   const [aiLoading, setAiLoading] = useState(false)
   const [aiUsage, setAiUsage] = useState(0)
+  const [cardsDoneToday, setCardsDoneToday] = useState(0)
+  const [cardsDoneWeek, setCardsDoneWeek] = useState(0)
   const navigate = useNavigate()
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
-      const [mapsRes, listsRes, boardsRes, nodesRes] = await Promise.all([
+      const [mapsRes, listsRes, boardsRes, nodesRes, cardMetricsRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmaps', { credentials: 'include' }),
         authFetch('/.netlify/functions/todo-lists', { credentials: 'include' }),
         authFetch('/.netlify/functions/boards', { credentials: 'include' }),
         authFetch('/.netlify/functions/node', { credentials: 'include' }),
+        authFetch('/.netlify/functions/kanban-card-metrics', { credentials: 'include' }),
       ])
       const mapsJson = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -77,6 +80,11 @@ export default function DashboardPage(): JSX.Element {
       const nodesJson = nodesRes.ok && nodesRes.headers.get('content-type')?.includes('application/json')
         ? await nodesRes.json()
         : []
+      const metricsJson = cardMetricsRes.ok && cardMetricsRes.headers.get('content-type')?.includes('application/json')
+        ? await cardMetricsRes.json()
+        : { doneToday: 0, doneWeek: 0 }
+      const doneToday = Number(metricsJson.doneToday) || 0
+      const doneWeek = Number(metricsJson.doneWeek) || 0
       const nodesList = validateNodes(Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes)
 
       const usageRes = await authFetch('/.netlify/functions/usage', { credentials: 'include' })
@@ -87,6 +95,8 @@ export default function DashboardPage(): JSX.Element {
       setTodoLists(Array.isArray(lists) ? lists : [])
       setBoards(Array.isArray(boardsList) ? boardsList : [])
       setNodes(Array.isArray(nodesList) ? nodesList : [])
+      setCardsDoneToday(doneToday)
+      setCardsDoneWeek(doneWeek)
     } catch (err: any) {
       setError(err.message || 'Failed to load data')
     } finally {
@@ -216,13 +226,16 @@ export default function DashboardPage(): JSX.Element {
 
   const totalTodos = safeTodoLists.reduce((sum, l) => sum + l.todos.length, 0)
 
-  const todoAddedDay = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > dayAgo).length, 0)
-  const todoAddedWeek = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => new Date(t.createdAt || t.created_at || '').getTime() > weekAgo).length, 0)
-  const todoDoneDay = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length, 0)
-  const todoDoneWeek = safeTodoLists.reduce((sum, l) => sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length, 0)
-
-  const boardDay = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > dayAgo).length
-  const boardWeek = safeBoardArray.filter(b => new Date(b.createdAt || b.created_at || '').getTime() > weekAgo).length
+  const todoDoneDay = safeTodoLists.reduce(
+    (sum, l) =>
+      sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > dayAgo).length,
+    0
+  )
+  const todoDoneWeek = safeTodoLists.reduce(
+    (sum, l) =>
+      sum + l.todos.filter(t => t.completed && new Date(t.updatedAt || t.updated_at || '').getTime() > weekAgo).length,
+    0
+  )
 
   const mapTrend = Array.from({ length: 14 }, (_, i) => {
     const start = new Date(now - (13 - i) * oneDay)
@@ -369,12 +382,12 @@ export default function DashboardPage(): JSX.Element {
                 </div>
                 <div className="metric-right metric-detail-grid">
                   <div className="metric-detail">
-                    <span className="label">Today</span>
-                    <span className="value">{boardDay}</span>
+                    <span className="label">Cards Today</span>
+                    <span className="value">{cardsDoneToday}</span>
                   </div>
                   <div className="metric-detail">
-                    <span className="label">Week</span>
-                    <span className="value">{boardWeek}</span>
+                    <span className="label">Cards Week</span>
+                    <span className="value">{cardsDoneWeek}</span>
                   </div>
                 </div>
               </div>
