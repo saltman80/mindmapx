@@ -3,6 +3,8 @@ import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 
+const COMMENT_MAX_LEN = 1000
+
 export const handler: Handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' }
 
@@ -62,8 +64,18 @@ export const handler: Handler = async (event) => {
       }
       console.debug('kanban-card-comments parsed body:', parsed, 'userId:', userId)
       const { cardId, comment } = parsed as { cardId?: string; comment?: string }
-      if (!cardId || !isUuid(cardId) || !comment?.trim()) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
+      const commentText = (comment || '').trim()
+      if (
+        !cardId ||
+        !isUuid(cardId) ||
+        !commentText ||
+        commentText.length > COMMENT_MAX_LEN
+      ) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing or invalid fields' })
+        }
       }
       const check = await client.query('SELECT 1 FROM kanban_cards WHERE id=$1', [cardId])
       if (check.rowCount === 0) {
@@ -74,7 +86,7 @@ export const handler: Handler = async (event) => {
         `INSERT INTO kanban_card_comments (card_id, user_id, comment)
          VALUES ($1, $2, $3)
          RETURNING id, comment, created_at`,
-        [cardId, userId, comment]
+        [cardId, userId, commentText]
       )
       const nameRes = await client.query('SELECT name FROM users WHERE id=$1', [userId])
       const inserted = insert.rows[0]
