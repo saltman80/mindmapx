@@ -9,12 +9,38 @@ export default function ProfilePage(): JSX.Element {
   if (!isAuthenticated) return <p>Please log in to view your profile.</p>
 
   return (
-    <section className="section relative overflow-hidden">
+    <section className="section profile-section relative overflow-hidden">
       <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center profile-page">
-        <h1 className="text-2xl font-semibold mb-4">User Profile</h1>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+        {user?.picture && (
+          <img
+            src={user.picture}
+            alt={`${user.name}'s avatar`}
+            className="profile-avatar"
+          />
+        )}
+        <h1 className="text-2xl font-semibold mb-2">{user?.name}</h1>
+        {user?.email && (
+          <p className="text-sm text-muted mb-4">{user.email}</p>
+        )}
+        <div className="profile-details">
+          {user?.nickname && (
+            <p>
+              <strong>Nickname:</strong> {user.nickname}
+            </p>
+          )}
+          {user?.given_name && (
+            <p>
+              <strong>Given Name:</strong> {user.given_name}
+            </p>
+          )}
+          {user?.family_name && (
+            <p>
+              <strong>Family Name:</strong> {user.family_name}
+            </p>
+          )}
+        </div>
       </div>
     </section>
   )

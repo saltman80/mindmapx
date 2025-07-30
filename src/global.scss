@@ -1278,6 +1278,25 @@ hr {
   margin: 0 auto var(--spacing-lg);
 }
 
+.profile-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto var(--spacing-md);
+}
+
+.profile-details p {
+  margin: 0.25rem 0;
+}
+
 @media (max-width: 1024px) {
   .header__nav {
     display: none;
