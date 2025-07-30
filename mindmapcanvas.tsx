@@ -79,6 +79,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const safeNodes = Array.isArray(nodes) ? nodes : []
     const safeEdges = Array.isArray(edges) ? edges : []
+
+    const uniqueNodes = useMemo(() => {
+      const seen = new Map<string, NodeData>()
+      for (const n of safeNodes) {
+        const key = `${n.label ?? ''}-${n.parentId ?? ''}-${n.x}-${n.y}`
+        if (!seen.has(key)) {
+          seen.set(key, n)
+        }
+      }
+      return Array.from(seen.values())
+    }, [safeNodes])
     const [hasCentered, setHasCentered] = useState(false)
     const [transform, setTransform] = useState<{ x: number; y: number; k: number }>(
       () => initialTransform
@@ -102,9 +113,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     useEffect(() => {
       console.log(
         'Loaded node positions:',
-        safeNodes.map(n => ({ id: n.id, x: n.x, y: n.y }))
+        uniqueNodes.map(n => ({ id: n.id, x: n.x, y: n.y }))
       )
-    }, [safeNodes])
+    }, [uniqueNodes])
 
     useEffect(() => {
       onTransformChange?.(transform)
@@ -214,10 +225,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           console.warn('[handleAddChild] Missing mindmapId')
           return
         }
-        const parent = safeNodes.find(n => n.id === parentId)
-        if (!parent) return
+    const parent = uniqueNodes.find(n => n.id === parentId)
+    if (!parent) return
 
-        const siblings = safeNodes.filter(n => n.parentId === parentId)
+    const siblings = uniqueNodes.filter(n => n.parentId === parentId)
 
         const quadrantOrder: Direction[] = ['tr', 'br', 'bl', 'tl']
         const dirVectors: Record<Direction, { x: number; y: number }> = {
@@ -229,9 +240,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
         const getDepth = (nodeId: string): number => {
           let depth = 0
-          let current = safeNodes.find(n => n.id === nodeId)
+          let current = uniqueNodes.find(n => n.id === nodeId)
           while (current && current.parentId) {
-            current = safeNodes.find(n => n.id === current!.parentId)
+            current = uniqueNodes.find(n => n.id === current!.parentId)
             depth++
           }
           return depth
@@ -239,7 +250,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const getDirection = (node: NodeData): Direction => {
           if (node.direction) return node.direction
           if (!node.parentId) return 'tr'
-          const p = safeNodes.find(n => n.id === node.parentId)
+          const p = uniqueNodes.find(n => n.id === node.parentId)
           if (!p) return 'tr'
           const dx = node.x - p.x
           const dy = node.y - p.y
@@ -321,16 +332,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           .catch(err => {
             console.error('[MindmapCanvas] create node error', err)
           })
-    }, [addNode, safeNodes, mindmapId, createNode, replaceNodeId])
+    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
-      const node = safeNodes.find(n => n.id === id)
+      const node = uniqueNodes.find(n => n.id === id)
       if (!node) return
       setEditingId(id)
       setEditTitle(node.label || '')
       setEditDesc(node.description || '')
-    }, [Array.isArray(nodes) ? nodes : []])
+    }, [uniqueNodes])
 
     const updateNode = useCallback((node: NodeData) => {
       console.log('[MindmapCanvas] updateNode', node)
@@ -350,7 +361,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handleSaveEdit = useCallback(() => {
       console.log('[MindmapCanvas] handleSaveEdit')
       if (!editingId) return
-      const node = safeNodes.find(n => n.id === editingId)
+      const node = uniqueNodes.find(n => n.id === editingId)
       if (!node) return
       const updated = { ...node, label: editTitle, description: editDesc }
       updateNode(updated)
@@ -362,7 +373,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditingId(null)
       setEditTitle('')
       setEditDesc('')
-    }, [editingId, editTitle, editDesc, Array.isArray(nodes) ? nodes : [], updateNode])
+    }, [editingId, editTitle, editDesc, uniqueNodes, updateNode])
 
     const handleDeleteNode = useCallback(
       async (id: string) => {
@@ -478,8 +489,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [Array.isArray(nodes) ? nodes : []])
 
     const rootNode = useMemo(
-      () => safeNodes.find(n => !n.parentId) || null,
-      [safeNodes]
+      () => uniqueNodes.find(n => !n.parentId) || null,
+      [uniqueNodes]
     )
 
     console.log('[MindmapCanvas] rendering with nodes:', nodes, 'edges:', edges)
@@ -596,7 +607,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           touchAction: 'none',
           position: 'relative',
           cursor:
-            safeNodes.length === 0 && safeEdges.length === 0
+            uniqueNodes.length === 0 && safeEdges.length === 0
               ? 'pointer'
               : 'default'
         }}
@@ -665,9 +676,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   />
                 )
               })}
-            {Array.isArray(safeNodes) &&
-              safeNodes.length > 0 &&
-              safeNodes.map((node, i) => {
+            {Array.isArray(uniqueNodes) &&
+              uniqueNodes.length > 0 &&
+              uniqueNodes.map((node, i) => {
                 console.log(`[RENDER] Node ${node.label} - x: ${node.x}, y: ${node.y}`)
                 const nx =
                   typeof node.x === 'number' && Number.isFinite(node.x) ? node.x : 0
@@ -723,9 +734,9 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             </g>
           </motion.g>
         </svg>
-        {Array.isArray(safeNodes) &&
-          safeNodes.length > 0 &&
-          safeNodes.map(node =>
+        {Array.isArray(uniqueNodes) &&
+          uniqueNodes.length > 0 &&
+          uniqueNodes.map(node =>
             selectedId === node.id ? (
               <div
                 key={`toolbox-${node.id}`}
@@ -843,7 +854,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         )}
         {showMiniMap && (
           <MiniMap
-            nodes={safeNodes}
+            nodes={uniqueNodes}
             edges={safeEdges}
             transform={transform}
             onNavigate={(x, y) => {
