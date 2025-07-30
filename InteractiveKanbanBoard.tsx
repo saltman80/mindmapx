@@ -592,10 +592,10 @@ function Lane({
                     {card.todoListId && (
                       <a
                         href={`/todos/${card.todoListId}`}
-                        className="action-button todo-link"
+                        className="todo-link"
                         title="View Todo List"
                       >
-                        🔗
+                        View Todo
                       </a>
                     )}
                   </div>
