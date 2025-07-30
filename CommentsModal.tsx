@@ -16,10 +16,15 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
 
   const submitComment = async () => {
     if (!card || !text.trim()) return
-    const todoId = card.todoId || card.id
-    const body = { todoId, comment: text.trim() }
+    const isTodo = !!card.todoId
+    const endpoint = isTodo
+      ? '/.netlify/functions/todo-comments'
+      : '/.netlify/functions/kanban-card-comments'
+    const body = isTodo
+      ? { todoId: card.todoId, comment: text.trim() }
+      : { cardId: card.id, comment: text.trim() }
     try {
-      const res = await fetch('/.netlify/functions/todo-comments', {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -52,8 +57,12 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
 
   useEffect(() => {
     if (!card) return
-    const todoId = card.todoId || card.id
-    fetch(`/.netlify/functions/todo-comments?todoId=${todoId}`, {
+    const isTodo = !!card.todoId
+    const id = isTodo ? card.todoId : card.id
+    const endpoint = isTodo
+      ? `/.netlify/functions/todo-comments?todoId=${id}`
+      : `/.netlify/functions/kanban-card-comments?cardId=${id}`
+    fetch(endpoint, {
       credentials: 'include',
     })
       .then(async res => {
