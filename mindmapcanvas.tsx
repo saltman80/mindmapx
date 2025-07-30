@@ -726,12 +726,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   </g>
                 )
               })}
-            <g transform="translate(500, 500)">
-              <circle r="20" fill="red" />
-              <text textAnchor="middle" dy=".35em" fontSize={14}>
-                TEST
-              </text>
-            </g>
           </motion.g>
         </svg>
         {Array.isArray(uniqueNodes) &&
