@@ -3433,8 +3433,15 @@ hr {
   stroke: var(--color-accent);
 }
 
-/* Highlight nodes that have an attached todo list */
+/* Highlight nodes with todos */
 .mindmap-node.has-todo .mindmap-node-circle {
+  /* light blue-purple with darker border */
+  fill: #e0e7ff;
+  stroke: #6366f1;
+}
+
+/* Nodes whose todo list is fully complete */
+.mindmap-node.todo-complete .mindmap-node-circle {
   fill: #d1fae5;
   stroke: var(--color-success);
 }
