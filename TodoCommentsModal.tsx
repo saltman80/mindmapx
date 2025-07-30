@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
-import type { Comment } from './CardModal'
+export interface TodoComment {
+  id: string
+  comment: string
+  created_at: string
+  author: string
+}
 import type { TodoItem } from './TodoCanvas'
 
 interface Props {
   todo: TodoItem | null
   onClose: () => void
-  onAdd: (comment: Comment) => void
+  onAdd: (comment: TodoComment) => void
   currentUser?: { name: string }
 }
 
 export default function TodoCommentsModal({ todo, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<TodoComment[]>([])
   const feedRef = useRef<HTMLDivElement>(null)
 
   const submitComment = async () => {

@@ -1,17 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
-import type { Card, Comment } from './CardModal'
+import type { Card } from './CardModal'
+
+export interface KanbanComment {
+  id: string
+  comment: string
+  created_at: string
+  author: string
+}
 
 interface Props {
   card: Card | null
   onClose: () => void
-  onAdd: (comment: Comment) => void
+  onAdd: (comment: KanbanComment) => void
   currentUser?: { name: string }
 }
 
 export default function KanbanCommentsModal({ card, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<KanbanComment[]>([])
   const feedRef = useRef<HTMLDivElement>(null)
 
   const submitComment = async () => {

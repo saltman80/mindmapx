@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import TodoCommentsModal from './TodoCommentsModal'
+import TodoCommentsModal, { TodoComment } from './TodoCommentsModal'
 import TodoModal from './TodoModal'
 import Modal from './modal'
-import type { Comment } from './CardModal'
 
 export interface TodoItem {
   id: string
@@ -11,7 +10,7 @@ export interface TodoItem {
   nodeId?: string
   kanbanId?: string
   assignee?: string
-  comments?: Comment[]
+  comments?: TodoComment[]
 }
 
 export interface TodoCanvasProps {
