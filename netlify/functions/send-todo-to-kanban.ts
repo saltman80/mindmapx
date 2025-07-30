@@ -36,7 +36,7 @@ export const handler: Handler = async (event) => {
   try {
     // get todo
     const { rows: todos } = await client.query(
-      'SELECT id, title FROM todos WHERE id=$1 AND user_id=$2 AND linked_kanban_card_id IS NULL',
+      'SELECT id, title, list_id FROM todos WHERE id=$1 AND user_id=$2 AND linked_kanban_card_id IS NULL',
       [todoId, userId]
     )
     const todo = todos[0]
@@ -68,7 +68,11 @@ export const handler: Handler = async (event) => {
       [todo.id, boardId]
     )
 
-    return { statusCode: 200, headers, body: JSON.stringify({ cardId }) }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ cardId, todoListId: todo.list_id }),
+    }
   } catch (err) {
     console.error('send-todo-to-kanban', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server error' }) }

@@ -48,6 +48,7 @@ export const handler: Handler = async (event) => {
     )
     let nextPos = posRows[0]?.pos ?? 0
 
+    const created: { cardId: string; todoId: string }[] = []
     for (const todo of todos) {
       const cardRes = await client.query(
         `INSERT INTO kanban_cards (column_id, title, position, linked_todo_id)
@@ -55,6 +56,7 @@ export const handler: Handler = async (event) => {
         [newColId, todo.title, nextPos, todo.id]
       )
       const cardId = cardRes.rows[0].id
+      created.push({ cardId, todoId: todo.id })
       nextPos++
       await client.query(
         'UPDATE todos SET linked_kanban_card_id=$1 WHERE id=$2',
@@ -65,7 +67,11 @@ export const handler: Handler = async (event) => {
         [todo.id, boardId]
       )
     }
-    return { statusCode: 200, headers, body: JSON.stringify({ count: todos.length }) }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ count: todos.length, created, todoListId: listId }),
+    }
   } catch (err) {
     console.error('send-todo-list-to-kanban', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Server error' }) }
