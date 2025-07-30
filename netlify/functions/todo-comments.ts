@@ -17,6 +17,9 @@ export const handler: Handler = async (event) => {
     try {
       const session = await verifySession(token)
       userId = session.userId
+      if (!userId || !isUuid(userId)) {
+        throw new Error('Invalid userId')
+      }
     } catch (err) {
       console.error('Auth failure in todo-comments.ts:', err)
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
@@ -29,6 +32,10 @@ export const handler: Handler = async (event) => {
       const todoId = event.queryStringParameters?.todoId
       if (!todoId || !isUuid(todoId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid todoId' }) }
+      }
+      const check = await client.query('SELECT 1 FROM todos WHERE id=$1', [todoId])
+      if (check.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Todo not found' }) }
       }
       console.debug('Fetching comments for todoId:', todoId, 'userId:', userId)
       const res = await client.query(
@@ -43,17 +50,24 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'POST') {
+      if (!event.body) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing request body' }) }
+      }
       let parsed: any
       try {
-        parsed = JSON.parse(event.body || '{}')
+        parsed = JSON.parse(event.body)
       } catch (err) {
         console.error('Invalid JSON in todo-comments body:', event.body, err)
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
       console.debug('todo-comments parsed body:', parsed, 'userId:', userId)
       const { todoId, comment } = parsed as { todoId?: string; comment?: string }
-      if (!todoId || !isUuid(todoId) || !comment) {
+      if (!todoId || !isUuid(todoId) || !comment?.trim()) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
+      }
+      const check = await client.query('SELECT 1 FROM todos WHERE id=$1', [todoId])
+      if (check.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Todo not found' }) }
       }
       console.debug('Inserting comment for todoId:', todoId, 'userId:', userId)
       const insert = await client.query(

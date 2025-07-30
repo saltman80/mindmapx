@@ -16,7 +16,10 @@ export const handler: Handler = async (event) => {
     let userId: string
     try {
       const session = await verifySession(token)
-      userId = (session as any).userId
+      userId = session.userId
+      if (!userId || !isUuid(userId)) {
+        throw new Error('Invalid userId')
+      }
     } catch (err) {
       console.error('Auth failure in kanban-card-comments.ts:', err)
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
@@ -29,6 +32,10 @@ export const handler: Handler = async (event) => {
       const cardId = event.queryStringParameters?.cardId
       if (!cardId || !isUuid(cardId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid cardId' }) }
+      }
+      const check = await client.query('SELECT 1 FROM kanban_cards WHERE id=$1', [cardId])
+      if (check.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Card not found' }) }
       }
       console.debug('Fetching comments for cardId:', cardId, 'userId:', userId)
       const res = await client.query(
@@ -43,17 +50,24 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'POST') {
+      if (!event.body) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing request body' }) }
+      }
       let parsed: any
       try {
-        parsed = JSON.parse(event.body || '{}')
+        parsed = JSON.parse(event.body)
       } catch (err) {
         console.error('Invalid JSON in kanban-card-comments body:', event.body, err)
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
       console.debug('kanban-card-comments parsed body:', parsed, 'userId:', userId)
       const { cardId, comment } = parsed as { cardId?: string; comment?: string }
-      if (!cardId || !isUuid(cardId) || !comment) {
+      if (!cardId || !isUuid(cardId) || !comment?.trim()) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
+      }
+      const check = await client.query('SELECT 1 FROM kanban_cards WHERE id=$1', [cardId])
+      if (check.rowCount === 0) {
+        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Card not found' }) }
       }
       console.debug('Inserting comment for cardId:', cardId, 'userId:', userId)
       const insert = await client.query(
