@@ -12,7 +12,6 @@
   "include": [
     "migrationrunner.ts",
     "netlify/functions/**/*.ts",
-    "netlify/functions/constants.d.ts",
     "cookie.d.ts"
   ]
 }
