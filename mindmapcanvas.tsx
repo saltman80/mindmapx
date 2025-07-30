@@ -28,7 +28,7 @@ interface MindmapCanvasProps {
   edges?: EdgeData[]
   width?: number | string
   height?: number | string
-  onAddNode?: (node: NodeData) => void
+  onAddNode?: (node: NodeData) => Promise<string | undefined> | string | undefined
   onMoveNode?: (node: NodeData) => void
   onUpdateNode?: (node: NodeData) => void
   initialTransform?: { x: number; y: number; k: number }
@@ -335,15 +335,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         })
 
         try {
+          let nodeId: string | undefined
           if (onAddNode) {
-            await onAddNode(newNode)
+            const result = await onAddNode(newNode)
+            if (typeof result === 'string') nodeId = result
           } else {
-            const nodeId = await createNode(newNode)
-            if (nodeId) {
-              replaceNodeId(tempId, nodeId)
-            } else {
-              console.error('[MindmapCanvas] Failed to create node', newNode)
-            }
+            nodeId = await createNode(newNode) || undefined
+          }
+          if (nodeId) {
+            replaceNodeId(tempId, nodeId)
+          } else {
+            console.error('[MindmapCanvas] Failed to create node', newNode)
           }
         } finally {
           creatingNodeRef.current = false

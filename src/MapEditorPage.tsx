@@ -223,8 +223,8 @@ export default function MapEditorPage(): JSX.Element {
 
 
 
-  const handleAddNode = async (node: NodeData) => {
-    if (!id) return
+  const handleAddNode = async (node: NodePayload): Promise<string | undefined> => {
+    if (!id) return undefined
     const payload = { ...node, mindmapId: id }
     console.log('[handleAddNode] payload', payload)
 
@@ -239,8 +239,14 @@ export default function MapEditorPage(): JSX.Element {
 
         if (res.ok) {
           const data = await res.json()
-          setNodes(prev => [...prev, { ...node, id: data.id || node.id }])
-          return
+          const newId = typeof data?.id === 'string' ? data.id : undefined
+          if (newId) {
+            setNodes(prev => [
+              ...(Array.isArray(prev) ? prev : []),
+              { ...node, id: newId },
+            ])
+          }
+          return newId
         }
 
         const err = await res.json().catch(() => ({}))
@@ -264,12 +270,7 @@ export default function MapEditorPage(): JSX.Element {
       }
     }
 
-    // fallback to client-side id so the user can continue working
-    const fallbackId =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : Math.random().toString(36).slice(2)
-    setNodes(prev => [...prev, { ...node, id: node.id || fallbackId }])
+    return undefined
   }
 
 
