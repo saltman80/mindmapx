@@ -9,11 +9,17 @@ export default function SetPasswordPage(): JSX.Element {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [missingEmail, setMissingEmail] = useState(false)
 
   useEffect(() => {
     const fromQuery = searchParams.get('email')
     const stored = localStorage.getItem('emailForPurchase')
-    setEmail(fromQuery || stored || '')
+    const found = fromQuery || stored || ''
+    setEmail(found)
+    if (!found) {
+      setMissingEmail(true)
+    }
   }, [searchParams])
 
   const validate = () => {
@@ -41,6 +47,7 @@ export default function SetPasswordPage(): JSX.Element {
     e.preventDefault()
     setError('')
     if (!validate()) return
+    setLoading(true)
     try {
       const res = await fetch('/.netlify/functions/createAuth0User', {
         method: 'POST',
@@ -56,9 +63,11 @@ export default function SetPasswordPage(): JSX.Element {
         return
       }
       const data = await res.json().catch(() => null)
-      setError(data?.message || 'Failed to create account.')
+      setError(data?.error || data?.message || 'Failed to create account.')
     } catch {
       setError('Failed to create account.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -67,6 +76,11 @@ export default function SetPasswordPage(): JSX.Element {
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <h2 className="text-2xl font-bold mb-6 text-center">Set Password</h2>
+        {missingEmail && (
+          <div className="text-red-600 mb-4">
+            Missing email. Please start your purchase again.
+          </div>
+        )}
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-field">
@@ -91,7 +105,9 @@ export default function SetPasswordPage(): JSX.Element {
               required
             />
           </div>
-          <button type="submit" className="btn w-full">Set Password</button>
+          <button type="submit" className="btn w-full" disabled={loading}>
+            {loading ? 'Setting...' : 'Set Password'}
+          </button>
         </form>
       </div>
     </section>
