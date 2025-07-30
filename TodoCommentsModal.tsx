@@ -1,28 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
-import type { Card, Comment } from './CardModal'
+import type { Comment } from './CardModal'
+import type { TodoItem } from './TodoCanvas'
 
 interface Props {
-  card: Card | null
+  todo: TodoItem | null
   onClose: () => void
   onAdd: (comment: Comment) => void
   currentUser?: { name: string }
 }
 
-export default function CommentsModal({ card, onClose, onAdd, currentUser }: Props) {
+export default function TodoCommentsModal({ todo, onClose, onAdd, currentUser }: Props) {
   const [text, setText] = useState('')
   const [comments, setComments] = useState<Comment[]>([])
   const feedRef = useRef<HTMLDivElement>(null)
 
   const submitComment = async () => {
-    if (!card || !text.trim()) return
-    const isTodo = !!card.todoId
-    const endpoint = isTodo
-      ? '/.netlify/functions/todo-comments'
-      : '/.netlify/functions/kanban-card-comments'
-    const body = isTodo
-      ? { todoId: card.todoId, comment: text.trim() }
-      : { cardId: card.id, comment: text.trim() }
+    if (!todo || !text.trim()) return
+    const endpoint = '/.netlify/functions/todo-comments'
+    const body = { todoId: todo.id, comment: text.trim() }
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -56,12 +52,8 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
   }
 
   useEffect(() => {
-    if (!card) return
-    const isTodo = !!card.todoId
-    const id = isTodo ? card.todoId : card.id
-    const endpoint = isTodo
-      ? `/.netlify/functions/todo-comments?todoId=${id}`
-      : `/.netlify/functions/kanban-card-comments?cardId=${id}`
+    if (!todo) return
+    const endpoint = `/.netlify/functions/todo-comments?todoId=${todo.id}`
     fetch(endpoint, {
       credentials: 'include',
     })
@@ -84,7 +76,7 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
         console.error('Failed to fetch comments:', err)
         setComments([])
       })
-  }, [card?.todoId, card?.id])
+  }, [todo?.id])
 
   useEffect(() => {
     const el = feedRef.current
@@ -92,7 +84,7 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
     el.scrollTop = el.scrollHeight
   }, [comments])
 
-  if (!card) return null
+  if (!todo) return null
 
   const highlightMentions = (text: string) => {
     // Split on @mentions and return parts with spans for styling
@@ -109,9 +101,9 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
   }
 
   return (
-    <Modal isOpen={!!card} onClose={onClose} ariaLabel={`Comments for ${card.title}`}>
+    <Modal isOpen={!!todo} onClose={onClose} ariaLabel={`Comments for ${todo.title}`}>
       <div className="comment-modal">
-        <h2 className="mb-2 text-lg font-semibold">Comments for "{card.title}"</h2>
+        <h2 className="mb-2 text-lg font-semibold">Comments for "{todo.title}"</h2>
         <div className="comment-feed" ref={feedRef}>
           {comments.map((c, i) => {
             const isMine = c.author === currentUser?.name

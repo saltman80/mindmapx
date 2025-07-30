@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import CommentsModal from './CommentsModal'
+import TodoCommentsModal from './TodoCommentsModal'
 import TodoModal from './TodoModal'
 import Modal from './modal'
 import type { Comment } from './CardModal'
@@ -281,8 +281,8 @@ export default function TodoCanvas({
         onClose={() => setEditingTodo(null)}
         onSave={handleModalSave}
       />
-      <CommentsModal
-        card={commentingTodo ? { ...commentingTodo, comments: commentingTodo.comments || [], id: commentingTodo.id, title: commentingTodo.title } : null}
+      <TodoCommentsModal
+        todo={commentingTodo}
         onClose={() => setCommentingTodo(null)}
         onAdd={c => {
           if (commentingTodo) {
