@@ -20,6 +20,7 @@ export interface TodoCanvasProps {
   list_id?: string
   listTitle?: string
   listDescription?: string
+  mindmapId?: string
 }
 
 export default function TodoCanvas({
@@ -29,6 +30,7 @@ export default function TodoCanvas({
   list_id,
   listTitle,
   listDescription,
+  mindmapId,
 }: TodoCanvasProps): JSX.Element {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [newTitle, setNewTitle] = useState('')
@@ -215,6 +217,11 @@ export default function TodoCanvas({
         <>
           <img src="/assets/logo.png" alt="MindXdo" className="todo-logo" />
           <h1 className="todo-title">{listTitle}</h1>
+          {mindmapId && (
+            <a href={`/maps/${mindmapId}`} className="todo-map-link">
+              View Mindmap
+            </a>
+          )}
         </>
       )}
       {listDescription && (
