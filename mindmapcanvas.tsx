@@ -646,6 +646,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     return (
       <div
+        id="mindmap-container"
+        className="mindmap-canvas-wrapper"
         ref={containerRef}
         onPointerDown={e => {
           if ((e.target as HTMLElement).closest('.node-toolbox')) return
@@ -665,6 +667,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         }}
       >
         <svg
+          className="mindmap-canvas"
           ref={svgRef}
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
