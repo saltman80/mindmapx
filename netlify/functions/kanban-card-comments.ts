@@ -42,7 +42,10 @@ export const handler: Handler = async (event) => {
     console.debug('kanban-card-comments raw body:', event.body)
 
     if (event.httpMethod === 'GET') {
-      const cardId = event.queryStringParameters?.cardId
+      const { cardId, todoId } = event.queryStringParameters || {}
+      if (todoId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'todoId not allowed' }) }
+      }
       if (!cardId || !isUuid(cardId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid cardId' }) }
       }
@@ -83,7 +86,10 @@ export const handler: Handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
       console.debug('kanban-card-comments parsed body:', parsed, 'userId:', userId)
-      const { cardId, comment } = parsed as { cardId?: string; comment?: string }
+      const { cardId, comment, todoId } = parsed as { cardId?: string; todoId?: string; comment?: string }
+      if (todoId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'todoId not allowed' }) }
+      }
       const commentText = (comment || '').trim()
       if (
         !cardId ||

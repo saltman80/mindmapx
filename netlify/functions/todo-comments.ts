@@ -42,7 +42,10 @@ export const handler: Handler = async (event) => {
     console.debug('todo-comments raw body:', event.body)
 
     if (event.httpMethod === 'GET') {
-      const todoId = event.queryStringParameters?.todoId
+      const { todoId, cardId } = event.queryStringParameters || {}
+      if (cardId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'cardId not allowed' }) }
+      }
       if (!todoId || !isUuid(todoId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid todoId' }) }
       }
@@ -83,7 +86,10 @@ export const handler: Handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
       }
       console.debug('todo-comments parsed body:', parsed, 'userId:', userId)
-      const { todoId, comment } = parsed as { todoId?: string; comment?: string }
+      const { todoId, comment, cardId } = parsed as { todoId?: string; cardId?: string; comment?: string }
+      if (cardId) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'cardId not allowed' }) }
+      }
       const commentText = (comment || '').trim()
       if (
         !todoId ||
