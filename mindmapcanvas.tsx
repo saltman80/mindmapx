@@ -223,15 +223,22 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [])
 
 
+    const creatingNodeRef = useRef(false)
+
     const handleAddChild = useCallback(
       async (parentId: string) => {
         console.log('[MindmapCanvas] handleAddChild', parentId)
+        if (creatingNodeRef.current) {
+          console.warn('[handleAddChild] Creation in progress, skipping')
+          return
+        }
         if (!mindmapId) {
           console.warn('[handleAddChild] Missing mindmapId')
           return
         }
-    const parent = uniqueNodes.find(n => n.id === parentId)
-    if (!parent) return
+        const parent = uniqueNodes.find(n => n.id === parentId)
+        if (!parent) return
+        creatingNodeRef.current = true
 
     const siblings = uniqueNodes.filter(n => n.parentId === parentId)
 
@@ -305,7 +312,14 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           linkedTodoListId: null,
         }
 
-        console.log('[MindmapCanvas] Posting child node payload:', newNode)
+        console.log(
+          'Creating node:',
+          newNode.label,
+          newNode.parentId,
+          newNode.mindmapId,
+          newNode.x,
+          newNode.y
+        )
 
         const tempId =
           typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -320,24 +334,21 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           direction,
         })
 
-        createNode(newNode)
-          .then(nodeId => {
+        try {
+          if (onAddNode) {
+            await onAddNode(newNode)
+          } else {
+            const nodeId = await createNode(newNode)
             if (nodeId) {
               replaceNodeId(tempId, nodeId)
-              onAddNode?.({
-                ...newNode,
-                id: nodeId,
-                todoId: null,
-                direction,
-              })
             } else {
               console.error('[MindmapCanvas] Failed to create node', newNode)
             }
-          })
-          .catch(err => {
-            console.error('[MindmapCanvas] create node error', err)
-          })
-    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId])
+          }
+        } finally {
+          creatingNodeRef.current = false
+        }
+    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId, onAddNode])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
