@@ -30,6 +30,23 @@ Netlify automatically compiles the TypeScript functions in
 
 Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
 
+## Auth0 + Stripe Workflow
+
+The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
+
+1. **Frontend**
+   - `src/PurchasePage.tsx` collects an email and calls `createCheckoutSession`.
+   - After payment, users land on `set-password.tsx` to create their Auth0 account.
+2. **Netlify Functions**
+   - `createCheckoutSession.ts` creates the Stripe Checkout session.
+   - `handleStripeWebhook.ts` listens for `checkout.session.completed` and records the email.
+   - `createAuth0User.ts` creates the Auth0 user once the password is set.
+   - `secure-function.ts` demonstrates a protected endpoint using `verifyAuth0Token` from `netlify/lib/auth.ts`.
+
+The flow is: `PurchasePage` → `createCheckoutSession` → Stripe Checkout → `handleStripeWebhook` → `set-password` → `createAuth0User` → protected routes.
+
+Environment variables include `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_AUDIENCE`, and `AUTH0_ISSUER`.
+
 ## OpenAI Configuration
 
 Set the following variables in your Netlify environment to enable AI powered features:

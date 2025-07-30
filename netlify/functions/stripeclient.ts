@@ -1,11 +1,15 @@
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2022-11-15'
-})
+const secretKey = process.env.STRIPE_SECRET_KEY
+if (!secretKey) {
+  throw new Error('Missing STRIPE_SECRET_KEY')
+}
+
+export const stripe = new Stripe(secretKey, { apiVersion: '2022-11-15' })
 
 export function verifySignature(payload: string, signature: string) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET as string
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) throw new Error('Missing STRIPE_WEBHOOK_SECRET')
   return stripe.webhooks.constructEvent(payload, signature, secret)
 }
 
