@@ -1,5 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { jsonResponse } from '../lib/response.js'
+import { getClient } from './db-client.js'
+import bcrypt from 'bcrypt'
 
 const DOMAIN = process.env.AUTH0_DOMAIN as string
 const CLIENT_ID = process.env.AUTH0_CLIENT_ID as string
@@ -60,11 +62,20 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       })
     })
 
-    if (userRes.status === 201) {
-      return jsonResponse(201, { success: true })
-    }
-    if (userRes.status === 409) {
-      return jsonResponse(409, { success: false, error: 'User already exists' })
+    if (userRes.status === 201 || userRes.status === 409) {
+      const hash = await bcrypt.hash(password, 10)
+      const client = await getClient()
+      try {
+        await client.query(
+          `INSERT INTO users (email, password_hash, subscription_status, trial_start_date)
+           VALUES ($1,$2,'trialing', now())
+           ON CONFLICT (email) DO NOTHING`,
+          [email.toLowerCase(), hash]
+        )
+      } finally {
+        client.release()
+      }
+      return jsonResponse(userRes.status === 201 ? 201 : 409, { success: true })
     }
     console.error('Auth0 create user error', await userRes.text())
     return jsonResponse(500, { success: false, error: 'Auth0 error' })

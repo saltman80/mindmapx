@@ -76,7 +76,8 @@ export const handler = async (
           ? session.subscription
           : undefined
         const userId = session.metadata?.userId || session.client_reference_id
-        if (customerId && userId) {
+        const email = session.customer_details?.email
+        if (customerId && (userId || email)) {
           if (subscriptionId) {
             const subscription = await stripe.subscriptions.retrieve(subscriptionId)
             await db.query(
@@ -84,22 +85,22 @@ export const handler = async (
                SET stripe_customer_id = $1,
                    stripe_subscription_id = $2,
                    subscription_status = $3,
-                   subscription_current_period_end = to_timestamp($4)
-               WHERE id = $5`,
+                   paid_thru_date = to_timestamp($4)
+               WHERE ${(userId ? 'id = $5' : 'email = $5')}`,
               [
                 customerId,
                 subscription.id,
                 subscription.status,
                 subscription.current_period_end,
-                userId
+                userId || email?.toLowerCase()
               ]
             )
           } else {
             await db.query(
               `UPDATE users
                SET stripe_customer_id = $1
-               WHERE id = $2`,
-              [customerId, userId]
+               WHERE ${(userId ? 'id = $2' : 'email = $2')}`,
+              [customerId, userId || email?.toLowerCase()]
             )
           }
         }
@@ -126,7 +127,7 @@ export const handler = async (
           `UPDATE users
            SET stripe_subscription_id = $1,
                subscription_status = $2,
-               subscription_current_period_end = CASE WHEN $3 IS NOT NULL THEN to_timestamp($3) ELSE NULL END
+               paid_thru_date = CASE WHEN $3 IS NOT NULL THEN to_timestamp($3) ELSE NULL END
            WHERE stripe_customer_id = $4`,
           [
             subscription.id,

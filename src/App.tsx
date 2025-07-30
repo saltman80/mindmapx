@@ -22,6 +22,7 @@ import ResetPassword from '../reset-password'
 import PrivacyPolicy from '../privacypolicy'
 import TermsOfService from '../terms'
 import CheckoutPage from '../checkout'
+import TrialExpired from '../trialexpired'
 import SetPassword from '../set-password'
 
 import LoginPage from './LoginPage'
@@ -63,6 +64,7 @@ function AppRoutes() {
       <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
       <Route path="/purchase" element={<PurchasePage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/trial-expired" element={<TrialExpired />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

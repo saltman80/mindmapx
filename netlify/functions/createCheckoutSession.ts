@@ -39,11 +39,11 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      mode: 'payment',
+      mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${frontendUrl}/set-password`,
       cancel_url: `${frontendUrl}/purchase`,
-      payment_intent_data: { metadata: { email } }
+      customer_email: email
     })
     return jsonResponse(200, { success: true, url: session.url })
   } catch (err) {
