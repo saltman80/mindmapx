@@ -6,7 +6,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd'
 import CardModal, { Card } from './CardModal'
-import CommentsModal from './CommentsModal'
+import KanbanCommentsModal from './KanbanCommentsModal'
 import { authFetch } from './authFetch'
 
 const API_BASE = '/api/kanban'
@@ -458,7 +458,7 @@ export default function InteractiveKanbanBoard({
           if (editing) removeCard(editing.laneId, card.id)
         }}
       />
-      <CommentsModal
+      <KanbanCommentsModal
         card={commenting?.card || null}
         onClose={() => setCommenting(null)}
         onAdd={comment => {
