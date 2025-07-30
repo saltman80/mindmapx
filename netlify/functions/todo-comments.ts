@@ -46,12 +46,17 @@ export const handler: Handler = async (event) => {
         client.release()
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
       }
-      await client.query(
-        `INSERT INTO todo_comments (todo_id, user_id, comment) VALUES ($1, $2, $3)`,
+      const insert = await client.query(
+        `INSERT INTO todo_comments (todo_id, user_id, comment)
+         VALUES ($1, $2, $3)
+         RETURNING id, comment, created_at`,
         [todoId, userId, comment]
       )
+      const nameRes = await client.query('SELECT name FROM users WHERE id=$1', [userId])
       client.release()
-      return { statusCode: 201, headers, body: JSON.stringify({ status: 'ok' }) }
+      const inserted = insert.rows[0]
+      const response = { ...inserted, author: nameRes.rows[0]?.name || 'You' }
+      return { statusCode: 201, headers, body: JSON.stringify(response) }
     }
 
     client.release()
