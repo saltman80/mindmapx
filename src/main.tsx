@@ -8,12 +8,9 @@ import './global.scss'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <Auth0Provider
-      domain={import.meta.env.AUTH0_DOMAIN}
-      clientId={import.meta.env.AUTH0_CLIENT_ID}
-      authorizationParams={{
-        redirect_uri: window.location.origin,
-        audience: import.meta.env.AUTH0_AUDIENCE
-      }}
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      authorizationParams={{ redirect_uri: window.location.origin }}
     >
       <App />
     </Auth0Provider>

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from './useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const mainLinks = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -18,7 +18,7 @@ const accountLinks = [
 ]
 
 export default function SidebarNav(): JSX.Element {
-  const { logout } = useAuth()
+  const { logout: auth0Logout } = useAuth0()
   const navigate = useNavigate()
 
   const [open, setOpen] = useState(() =>
@@ -26,7 +26,7 @@ export default function SidebarNav(): JSX.Element {
   )
 
   const handleSignOut = () => {
-    logout()
+    auth0Logout({ logoutParams: { returnTo: window.location.origin } })
     navigate('/login')
   }
 

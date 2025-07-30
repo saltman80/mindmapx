@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from './useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 import { Drawer } from '../drawer'
 
 const normalizePath = (path: string): string =>
@@ -18,7 +18,12 @@ const Header = (): JSX.Element => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, logout } = useAuth()
+  const {
+    isAuthenticated,
+    user,
+    loginWithRedirect: login,
+    logout: auth0Logout,
+  } = useAuth0()
 
   const marketingItems: NavItem[] = [
     { label: 'Home', route: '/' },
@@ -29,7 +34,7 @@ const Header = (): JSX.Element => {
     { label: 'Purchase', route: '/purchase' },
   ]
 
-  const navItems: NavItem[] = user
+  const navItems: NavItem[] = isAuthenticated
     ? [
         ...marketingItems,
         { label: 'Dashboard', route: '/dashboard' },
@@ -39,7 +44,7 @@ const Header = (): JSX.Element => {
           ? [
               { label: 'Users', route: '/admin/users' },
               { label: 'Payments', route: '/admin/payments' },
-              { label: 'Analytics', route: '/admin/analytics' },
+          { label: 'Analytics', route: '/admin/analytics' },
             ]
           : []),
       ]
@@ -119,7 +124,7 @@ const Header = (): JSX.Element => {
               />
             </Link>
           </div>
-          {user && (
+          {isAuthenticated && (
             <button
               className="header__toggle"
               type="button"
@@ -156,8 +161,8 @@ const Header = (): JSX.Element => {
               ))}
             </ul>
           </nav>
-          <div className={`header__actions${user ? '' : ' header__actions--marketing'}`}>
-          {!user && (
+          <div className={`header__actions${isAuthenticated ? '' : ' header__actions--marketing'}`}> 
+          {!isAuthenticated && (
             <button
               className="header__toggle"
               type="button"
@@ -171,7 +176,7 @@ const Header = (): JSX.Element => {
               <span className="header__toggle-bar" />
             </button>
           )}
-          {user ? (
+          {isAuthenticated ? (
             <div className="header__avatar-container" ref={avatarRef}>
               <button
                 id="profile-menu-button"
@@ -182,9 +187,9 @@ const Header = (): JSX.Element => {
                 aria-expanded={isProfileMenuOpen}
                 aria-controls="profile-menu"
               >
-                {user.avatarUrl ? (
+                {user?.picture ? (
                   <img
-                    src={user.avatarUrl}
+                    src={user.picture}
                     alt={`${user.name}'s avatar`}
                     className="header__avatar-image"
                   />
@@ -215,7 +220,9 @@ const Header = (): JSX.Element => {
                     role="menuitem"
                     className="header__dropdown-item"
                     onClick={() => {
-                      logout()
+                      auth0Logout({
+                        logoutParams: { returnTo: window.location.origin },
+                      })
                       handleNavSelect('/login')
                     }}
                   >
@@ -226,16 +233,15 @@ const Header = (): JSX.Element => {
             </div>
           ) : (
             <>
-              <NavLink
-                to="/login"
+              <button
                 className="header__login-link"
                 onClick={e => {
                   e.preventDefault()
-                  handleNavSelect('/login')
+                  login()
                 }}
               >
                 Login
-              </NavLink>
+              </button>
             </>
           )}
           </div>
