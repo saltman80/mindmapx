@@ -1,5 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { jsonResponse } from '../lib/response.js'
+import { getClient } from './db-client.js'
 
 const DOMAIN = process.env.AUTH0_DOMAIN as string
 const CLIENT_ID = process.env.AUTH0_CLIENT_ID as string
@@ -22,6 +23,20 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!email || !emailRegex.test(email) || !password) {
     return jsonResponse(400, { success: false, error: 'Invalid email or password' })
+  }
+
+  let client
+  try {
+    client = await getClient()
+    const res = await client.query('SELECT has_access FROM user_access WHERE email = $1', [email])
+    if (res.rowCount === 0 || !res.rows[0].has_access) {
+      return jsonResponse(403, { success: false, error: 'No access for this email' })
+    }
+  } catch (err) {
+    console.error('DB error checking access', err)
+    return jsonResponse(500, { success: false, error: 'Internal Server Error' })
+  } finally {
+    client?.release()
   }
 
   if (!DOMAIN || !CLIENT_ID || !CLIENT_SECRET) {
@@ -61,6 +76,14 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     })
 
     if (userRes.status === 201) {
+      const created = await userRes.json()
+      try {
+        const c = await getClient()
+        await c.query('UPDATE user_access SET auth0_id=$1 WHERE email=$2', [created.user_id, email])
+        c.release()
+      } catch (err) {
+        console.error('Failed to update user_access for', email, err)
+      }
       return jsonResponse(201, { success: true })
     }
     if (userRes.status === 409) {

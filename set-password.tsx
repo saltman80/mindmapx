@@ -10,15 +10,11 @@ export default function SetPasswordPage(): JSX.Element {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [missingEmail, setMissingEmail] = useState(false)
 
   useEffect(() => {
     const fromQuery = searchParams.get('email')
-    const stored = localStorage.getItem('emailForPurchase')
-    const found = fromQuery || stored || ''
-    setEmail(found)
-    if (!found) {
-      setMissingEmail(true)
+    if (fromQuery) {
+      setEmail(fromQuery)
     }
   }, [searchParams])
 
@@ -76,13 +72,19 @@ export default function SetPasswordPage(): JSX.Element {
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <h2 className="text-2xl font-bold mb-6 text-center">Set Password</h2>
-        {missingEmail && (
-          <div className="text-red-600 mb-4">
-            Missing email. Please start your purchase again.
-          </div>
-        )}
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} noValidate>
+          <div className="form-field">
+            <label htmlFor="email" className="form-label">Email</label>
+            <input
+              id="email"
+              type="email"
+              className="form-input"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
           <div className="form-field">
             <label htmlFor="password" className="form-label">Password</label>
             <input

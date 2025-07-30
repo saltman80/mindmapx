@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import Stripe from 'stripe'
 import { verifySignature } from './stripeclient.js'
 import { jsonResponse } from '../lib/response.js'
+import { getClient } from './db-client.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
@@ -27,7 +28,18 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     console.warn('Checkout completed but no email found on session')
   } else {
     console.log('Checkout completed for', email)
-    // TODO: persist email for matching on /set-password
+    try {
+      const client = await getClient()
+      await client.query(
+        `INSERT INTO user_access(email, has_access)
+         VALUES($1, true)
+         ON CONFLICT(email) DO UPDATE SET has_access = true`,
+        [email]
+      )
+      client.release()
+    } catch (err) {
+      console.error('Failed to persist access for', email, err)
+    }
   }
 
   return jsonResponse(200, { success: true })

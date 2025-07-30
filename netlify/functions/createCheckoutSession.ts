@@ -16,18 +16,17 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   if (event.httpMethod !== 'POST') {
     return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
   }
-  if (!event.body) {
-    return jsonResponse(400, { success: false, message: 'Missing request body' })
-  }
-  let data: { email?: string }
-  try {
-    data = JSON.parse(event.body)
-  } catch {
-    return jsonResponse(400, { success: false, message: 'Invalid JSON' })
+  let data: { email?: string } = {}
+  if (event.body) {
+    try {
+      data = JSON.parse(event.body)
+    } catch {
+      return jsonResponse(400, { success: false, message: 'Invalid JSON' })
+    }
   }
   const email = typeof data.email === 'string' ? data.email.trim() : ''
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!email || !emailRegex.test(email)) {
+  if (email && !emailRegex.test(email)) {
     return jsonResponse(400, { success: false, message: 'Invalid email' })
   }
   const priceId = process.env.STRIPE_PRICE_ID
@@ -43,7 +42,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${frontendUrl}/set-password`,
       cancel_url: `${frontendUrl}/purchase`,
-      payment_intent_data: { metadata: { email } }
+      ...(email ? { payment_intent_data: { metadata: { email } } } : {})
     })
     return jsonResponse(200, { success: true, url: session.url })
   } catch (err) {
