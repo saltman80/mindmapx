@@ -23,12 +23,14 @@ export const handler: Handler = async (event) => {
     }
 
     client = await getClient()
+    console.debug('kanban-card-comments raw body:', event.body)
 
     if (event.httpMethod === 'GET') {
       const cardId = event.queryStringParameters?.cardId
       if (!cardId || !isUuid(cardId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid cardId' }) }
       }
+      console.debug('Fetching comments for cardId:', cardId, 'userId:', userId)
       const res = await client.query(
         `SELECT c.id, c.comment, c.created_at, u.name AS author
          FROM kanban_card_comments c
@@ -41,10 +43,19 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'POST') {
-      const { cardId, comment } = JSON.parse(event.body || '{}')
+      let parsed: any
+      try {
+        parsed = JSON.parse(event.body || '{}')
+      } catch (err) {
+        console.error('Invalid JSON in kanban-card-comments body:', event.body, err)
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
+      }
+      console.debug('kanban-card-comments parsed body:', parsed, 'userId:', userId)
+      const { cardId, comment } = parsed as { cardId?: string; comment?: string }
       if (!cardId || !isUuid(cardId) || !comment) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
       }
+      console.debug('Inserting comment for cardId:', cardId, 'userId:', userId)
       const insert = await client.query(
         `INSERT INTO kanban_card_comments (card_id, user_id, comment)
          VALUES ($1, $2, $3)

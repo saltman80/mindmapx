@@ -23,12 +23,14 @@ export const handler: Handler = async (event) => {
     }
 
     client = await getClient()
+    console.debug('todo-comments raw body:', event.body)
 
     if (event.httpMethod === 'GET') {
       const todoId = event.queryStringParameters?.todoId
       if (!todoId || !isUuid(todoId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid todoId' }) }
       }
+      console.debug('Fetching comments for todoId:', todoId, 'userId:', userId)
       const res = await client.query(
         `SELECT c.id, c.comment, c.created_at, u.name AS author
          FROM todo_comments c
@@ -41,10 +43,19 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'POST') {
-      const { todoId, comment } = JSON.parse(event.body || '{}')
+      let parsed: any
+      try {
+        parsed = JSON.parse(event.body || '{}')
+      } catch (err) {
+        console.error('Invalid JSON in todo-comments body:', event.body, err)
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }
+      }
+      console.debug('todo-comments parsed body:', parsed, 'userId:', userId)
+      const { todoId, comment } = parsed as { todoId?: string; comment?: string }
       if (!todoId || !isUuid(todoId) || !comment) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
       }
+      console.debug('Inserting comment for todoId:', todoId, 'userId:', userId)
       const insert = await client.query(
         `INSERT INTO todo_comments (todo_id, user_id, comment)
          VALUES ($1, $2, $3)
