@@ -708,7 +708,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 return (
                   <g
                     key={node.id}
-                    className={`mindmap-node${node.linkedTodoListId ? ' has-todo' : ''}`}
+                    className={(() => {
+                      if (!node.linkedTodoListId) return 'mindmap-node'
+                      const list = todoLists[node.id]
+                      const allDone = Array.isArray(list) && list.length > 0 && list.every(t => t.done)
+                      return `mindmap-node ${allDone ? 'todo-complete' : 'has-todo'}`
+                    })()}
                     data-id={node.id}
                     onPointerDown={e => {
                       e.stopPropagation()
