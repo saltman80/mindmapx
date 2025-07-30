@@ -136,6 +136,35 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
   const dragStartRef = useRef({ x: 0, y: 0 })
   const originRef = useRef({ x: 0, y: 0 })
 
+  // Load todos for nodes so completion status can be reflected in the UI
+  useEffect(() => {
+    let active = true
+    const load = async () => {
+      try {
+        const res = await authFetch('/.netlify/functions/todo-lists')
+        const data = await res.json()
+        if (!active || !Array.isArray(data)) return
+        const map: Record<string, { id: string; text: string; done: boolean }[]> = {}
+        data.forEach((list: any) => {
+          if (list.node_id && Array.isArray(list.todos)) {
+            map[list.node_id] = list.todos.map((t: any) => ({
+              id: t.id,
+              text: t.title,
+              done: !!t.completed,
+            }))
+          }
+        })
+        setTodoLists(map)
+      } catch (err) {
+        console.error('[MindmapCanvas] failed to load todo lists', err)
+      }
+    }
+    load()
+    return () => {
+      active = false
+    }
+  }, [mindmapId])
+
   const handleNodeClick = useCallback((id: string) => {
     setSelectedId(prev => (prev === id ? null : id))
   }, [])
@@ -741,7 +770,14 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                         {node.label}
                       </text>
                     )}
-                    {todoLists[node.id]?.length ? (
+                    {(() => {
+                      const list = todoLists[node.id]
+                      return (
+                        Array.isArray(list) &&
+                        list.length > 0 &&
+                        list.every(t => t.done)
+                      )
+                    })() ? (
                       <text
                         fontSize={12 / transform.k}
                         x={nx + 14 / transform.k}
