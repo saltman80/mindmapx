@@ -26,14 +26,17 @@ export default function CommentsModal({ card, onClose, onAdd, currentUser }: Pro
         body: JSON.stringify(body),
       })
       if (res.ok) {
-        const newComment = {
+        const data = await res.json()
+        const newComment = Array.isArray(data) || typeof data !== 'object' ? {
           comment: body.comment,
           author: 'You',
           created_at: new Date().toISOString(),
-        } as any
+        } : data
         setComments(prev => [...prev, newComment])
         onAdd(newComment)
         setText('')
+      } else {
+        console.error('Failed to submit comment:', await res.text())
       }
     } catch (err) {
       console.error('Failed to submit comment:', err)
