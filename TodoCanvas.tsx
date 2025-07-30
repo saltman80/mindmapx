@@ -78,7 +78,6 @@ export default function TodoCanvas({
       if (!res.ok) throw new Error('Failed to save todo')
       const created: TodoItem = await res.json()
       setTodos(prev => [created, ...prev])
-      setAdding(false)
     } catch (err) {
       console.error(err)
       alert('Failed to create todo')
