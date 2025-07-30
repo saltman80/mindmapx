@@ -291,6 +291,14 @@ export default function MapEditorPage(): JSX.Element {
     }).catch(() => {})
   }
 
+  const handleUpdateNode = useCallback((node: NodeData) => {
+    setNodes(prev =>
+      Array.isArray(prev)
+        ? prev.map(n => (n.id === node.id ? { ...n, ...node } : n))
+        : prev
+    )
+  }, [])
+
   const handleTransformChange = useCallback(
     (t: Transform) => {
       setTransform(t)
@@ -320,6 +328,7 @@ export default function MapEditorPage(): JSX.Element {
             edges={Array.isArray(edges) ? edges : []}
             onAddNode={handleAddNode}
             onMoveNode={handleMoveNode}
+            onUpdateNode={handleUpdateNode}
             initialTransform={transform}
             onTransformChange={handleTransformChange}
             showMiniMap

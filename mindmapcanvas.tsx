@@ -30,6 +30,7 @@ interface MindmapCanvasProps {
   height?: number | string
   onAddNode?: (node: NodeData) => void
   onMoveNode?: (node: NodeData) => void
+  onUpdateNode?: (node: NodeData) => void
   initialTransform?: { x: number; y: number; k: number }
   onTransformChange?: (t: { x: number; y: number; k: number }) => void
   showMiniMap?: boolean
@@ -62,6 +63,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       height,
       onAddNode,
       onMoveNode,
+      onUpdateNode,
       initialTransform = { x: 0, y: 0, k: 1 },
       onTransformChange,
       showMiniMap = false,
@@ -83,9 +85,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const uniqueNodes = useMemo(() => {
       const seen = new Map<string, NodeData>()
       for (const n of safeNodes) {
-        const key = `${n.label ?? ''}-${n.parentId ?? ''}-${n.x}-${n.y}`
-        if (!seen.has(key)) {
-          seen.set(key, n)
+        // Use node id to ensure only one entry per node
+        if (!seen.has(n.id)) {
+          seen.set(n.id, n)
+        } else {
+          // merge to keep latest data if duplicates exist
+          seen.set(n.id, { ...seen.get(n.id)!, ...n })
         }
       }
       return Array.from(seen.values())
@@ -343,14 +348,18 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       setEditDesc(node.description || '')
     }, [uniqueNodes])
 
-    const updateNode = useCallback((node: NodeData) => {
-      console.log('[MindmapCanvas] updateNode', node)
-      setNodes(prev =>
-        Array.isArray(prev)
-          ? prev.map(n => (n.id === node.id ? { ...n, ...node } : n))
-          : prev
-      )
-    }, [])
+    const updateNode = useCallback(
+      (node: NodeData) => {
+        console.log('[MindmapCanvas] updateNode', node)
+        setNodes(prev =>
+          Array.isArray(prev)
+            ? prev.map(n => (n.id === node.id ? { ...n, ...node } : n))
+            : prev
+        )
+        onUpdateNode?.(node)
+      },
+      [onUpdateNode]
+    )
 
     const removeNode = useCallback((nodeId: string) => {
       console.log('[MindmapCanvas] removeNode', nodeId)
@@ -365,6 +374,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       if (!node) return
       const updated = { ...node, label: editTitle, description: editDesc }
       updateNode(updated)
+      onUpdateNode?.(updated)
       authFetch(`/.netlify/functions/nodes/${editingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
