@@ -3,11 +3,22 @@ import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 
+const allowedOrigin = process.env.CORS_ORIGIN || '*'
+
 const COMMENT_MAX_LEN = 1000
 
-export const handler: Handler = async (event) => {
-  const headers = { 'Content-Type': 'application/json' }
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': allowedOrigin,
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Credentials': 'true'
+}
 
+export const handler: Handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' }
+  }
   let client
   try {
     const token = extractToken(event)
@@ -52,6 +63,15 @@ export const handler: Handler = async (event) => {
     }
 
     if (event.httpMethod === 'POST') {
+      const contentType =
+        event.headers['content-type'] || event.headers['Content-Type'] || ''
+      if (!contentType.toLowerCase().includes('application/json')) {
+        return {
+          statusCode: 415,
+          headers,
+          body: JSON.stringify({ error: 'Unsupported Media Type' })
+        }
+      }
       if (!event.body) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing request body' }) }
       }
