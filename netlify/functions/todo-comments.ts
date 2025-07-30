@@ -1,10 +1,12 @@
 import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
+import { validate as isUuid } from 'uuid'
 
 export const handler: Handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' }
 
+  let client
   try {
     const token = extractToken(event)
     if (!token) {
@@ -20,13 +22,12 @@ export const handler: Handler = async (event) => {
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Invalid session' }) }
     }
 
-    const client = await getClient()
+    client = await getClient()
 
     if (event.httpMethod === 'GET') {
       const todoId = event.queryStringParameters?.todoId
-      if (!todoId) {
-        client.release()
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing todoId' }) }
+      if (!todoId || !isUuid(todoId)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid todoId' }) }
       }
       const res = await client.query(
         `SELECT c.id, c.comment, c.created_at, u.name AS author
@@ -36,14 +37,12 @@ export const handler: Handler = async (event) => {
          ORDER BY c.created_at ASC`,
         [todoId]
       )
-      client.release()
       return { statusCode: 200, headers, body: JSON.stringify(res.rows) }
     }
 
     if (event.httpMethod === 'POST') {
       const { todoId, comment } = JSON.parse(event.body || '{}')
-      if (!todoId || !comment) {
-        client.release()
+      if (!todoId || !isUuid(todoId) || !comment) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) }
       }
       const insert = await client.query(
@@ -53,16 +52,16 @@ export const handler: Handler = async (event) => {
         [todoId, userId, comment]
       )
       const nameRes = await client.query('SELECT name FROM users WHERE id=$1', [userId])
-      client.release()
       const inserted = insert.rows[0]
       const response = { ...inserted, author: nameRes.rows[0]?.name || 'You' }
       return { statusCode: 201, headers, body: JSON.stringify(response) }
     }
 
-    client.release()
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) }
   } catch (err) {
     console.error('todo-comments error:', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
+  } finally {
+    if (client) client.release()
   }
 }
