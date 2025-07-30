@@ -1,15 +1,20 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 
 export default function SetPasswordPage(): JSX.Element {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const userId = searchParams.get('userId') || ''
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    const fromQuery = searchParams.get('email')
+    const stored = localStorage.getItem('emailForPurchase')
+    setEmail(fromQuery || stored || '')
+  }, [searchParams])
 
   const validate = () => {
     if (password.length < 8) {
@@ -32,16 +37,22 @@ export default function SetPasswordPage(): JSX.Element {
     setError('')
     if (!validate()) return
     try {
-      const res = await fetch('/api/set-password', {
+      const res = await fetch('/.netlify/functions/createAuth0User', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password })
+        body: JSON.stringify({ email, password })
       })
-      if (!res.ok) throw new Error('Failed')
-      setSuccess(true)
-      setTimeout(() => navigate('/login'), 1000)
+      if (res.status === 201) {
+        navigate('/login')
+        return
+      }
+      if (res.status === 409) {
+        setError('Account already exists. Please log in.')
+        return
+      }
+      setError('Failed to create account.')
     } catch {
-      setError('Failed to set password.')
+      setError('Failed to create account.')
     }
   }
 
@@ -50,20 +61,7 @@ export default function SetPasswordPage(): JSX.Element {
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
         <h2 className="text-2xl font-bold mb-6 text-center">Set Password</h2>
-        <div className="mb-md text-left text-sm">
-          <p className="mb-sm">Password requirements:</p>
-          <ul className="list-disc list-inside text-left">
-            <li>At least 8 characters long</li>
-            <li>Contains both uppercase and lowercase letters</li>
-            <li>Includes at least one number</li>
-          </ul>
-        </div>
         {error && <div className="text-red-600 mb-4">{error}</div>}
-        {success && (
-          <div className="text-green-600 mb-4" role="status">
-            Password set! Redirecting to login...
-          </div>
-        )}
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-field">
             <label htmlFor="password" className="form-label">Password</label>
