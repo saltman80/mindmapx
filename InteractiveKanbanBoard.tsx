@@ -103,6 +103,7 @@ export default function InteractiveKanbanBoard({
           comments: [],
           position: c.position,
           todoId: c.linked_todo_id || undefined,
+          todoListId: c.todo_list_id || undefined,
         })
       }
     })
@@ -588,6 +589,15 @@ function Lane({
                     >
                       💬
                     </button>
+                    {card.todoListId && (
+                      <a
+                        href={`/todos/${card.todoListId}`}
+                        className="action-button todo-link"
+                        title="View Todo List"
+                      >
+                        🔗
+                      </a>
+                    )}
                   </div>
                 </div>
               )}
