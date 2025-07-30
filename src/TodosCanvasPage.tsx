@@ -15,6 +15,7 @@ interface TodoList {
   title: string
   description?: string
   todos: TodoItem[]
+  mindmap_id?: string | null
 }
 
 export default function TodosCanvasPage(): JSX.Element {
@@ -49,6 +50,7 @@ export default function TodosCanvasPage(): JSX.Element {
             list_id={id}
             listTitle={list?.title}
             listDescription={list?.description}
+            mindmapId={list?.mindmap_id || undefined}
           />
         )}
       </main>

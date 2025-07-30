@@ -25,7 +25,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const client = await getClient()
     if (event.httpMethod === 'GET') {
       const listsRes = await client.query(
-        `SELECT l.id, l.title, l.node_id, l.created_at, l.updated_at,
+        `SELECT l.id, l.title, l.node_id, n.mindmap_id, l.created_at, l.updated_at,
                 COALESCE(jsonb_agg(jsonb_build_object(
                   'id', t.id,
                   'title', t.title,
@@ -35,9 +35,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
                   'updated_at', t.updated_at
                 )) FILTER (WHERE t.id IS NOT NULL), '[]') AS todos
            FROM todo_lists l
+           LEFT JOIN nodes n ON l.node_id = n.id
            LEFT JOIN todos t ON t.list_id = l.id
           WHERE l.user_id = $1
-          GROUP BY l.id, l.node_id
+          GROUP BY l.id, l.node_id, n.mindmap_id
           ORDER BY l.created_at DESC`,
         [userId]
       )
@@ -77,11 +78,14 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         'INSERT INTO todo_lists (user_id, title, node_id) VALUES ($1,$2,$3) RETURNING id, title, node_id, created_at, updated_at',
         [userId, title, nodeId]
       )
+      let mindmapId: string | null = null
       if (nodeId) {
         await client.query('UPDATE nodes SET linked_todo_list_id=$1 WHERE id=$2', [res.rows[0].id, nodeId])
+        const mRes = await client.query('SELECT mindmap_id FROM nodes WHERE id=$1', [nodeId])
+        mindmapId = mRes.rows[0]?.mindmap_id || null
       }
       client.release()
-      return { statusCode: 201, headers, body: JSON.stringify(res.rows[0]) }
+      return { statusCode: 201, headers, body: JSON.stringify({ ...res.rows[0], mindmap_id: mindmapId }) }
     }
     if (event.httpMethod === 'DELETE') {
       const id = event.queryStringParameters?.id
