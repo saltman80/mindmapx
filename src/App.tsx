@@ -25,6 +25,7 @@ import CheckoutPage from '../checkout'
 import TrialExpired from '../trialexpired'
 import SetPassword from '../set-password'
 import TrialRegister from '../trial-register'
+import PurchaseRegister from '../purchase-register'
 
 import LoginPage from '../login'
 import DashboardPage from './DashboardPage'
@@ -58,6 +59,7 @@ function AppRoutes() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/register" element={<TrialRegister />} />
+      <Route path="/purchase-register" element={<PurchaseRegister />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/team-members" element={<ProtectedRoute><TeamMembers /></ProtectedRoute>} />

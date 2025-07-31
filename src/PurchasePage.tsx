@@ -16,7 +16,7 @@ export default function PurchasePage() {
       const meRes = await fetch('/.netlify/functions/me', { credentials: 'include' })
       const me = await meRes.json().catch(() => null)
       if (!me?.authenticated) {
-        navigate('/register?next=/purchase')
+        navigate('/purchase-register?next=/purchase')
         return
       }
 
