@@ -15,14 +15,19 @@ if (!ISSUER || !AUDIENCE) {
 const jwksIssuer = ISSUER.replace(/\/+$/, '')
 const jwks = createRemoteJWKSet(new URL(`${jwksIssuer}/.well-known/jwks.json`))
 
+function extractBearerToken(request: Request): string | null {
+  const header = request.headers.get('authorization') || ''
+  const match = header.match(/^Bearer\s+(.+)$/i)
+  return match ? match[1].trim() : null
+}
+
 export async function verifyAuth0Token(request: Request) {
-  const auth = request.headers.get('authorization') || ''
-  if (!auth.startsWith('Bearer ')) {
+  const token = extractBearerToken(request)
+  if (!token) {
     const error = new Error('Missing token')
     ;(error as any).statusCode = 401
     throw error
   }
-  const token = auth.slice(7)
   try {
     const { payload } = await jwtVerify(token, jwks, {
       issuer: ISSUER,
