@@ -45,7 +45,7 @@ The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
 
 The flow is: `PurchasePage` → `createCheckoutSession` → Stripe Checkout → `handleStripeWebhook` → `set-password` → `createAuth0User` → protected routes.
 
-Environment variables include `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_AUDIENCE`, and `AUTH0_ISSUER`.
+Environment variables include `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_AUDIENCE`, `AUTH0_ISSUER`, and `VITE_AUTH0_AUDIENCE`.
 
 ## OpenAI Configuration
 
