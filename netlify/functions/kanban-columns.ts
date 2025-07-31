@@ -1,6 +1,6 @@
 import type { Handler } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { requireAuth } from './middleware.js'
+import { requireAuth } from '../lib/auth.js'
 
 const headers = {
   'Content-Type': 'application/json',
@@ -16,7 +16,7 @@ export const handler: Handler = async (event) => {
 
   let userId: string
   try {
-    userId = await requireAuth(event)
+    ;({ userId } = requireAuth(event))
   } catch {
     return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
   }

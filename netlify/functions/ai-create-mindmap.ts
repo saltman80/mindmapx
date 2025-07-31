@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from "@netlify/functions"
 import { generateAIResponse } from './ai-generate.js'
 import { createMindmapFromNodes } from './mindmaps.js'
-import { requireAuth } from './middleware.js'
+import { requireAuth } from '../lib/auth.js'
 import { checkAiLimit, logAiUsage } from "./usage-utils.js"
 import { aiMindmapNodesSchema } from './validationschemas.js'
 
@@ -16,7 +16,7 @@ export const handler = async (
 
   let userId: string
   try {
-    userId = await requireAuth(event)
+    ;({ userId } = requireAuth(event))
   } catch {
     return { statusCode: 401, body: 'Unauthorized' }
   }

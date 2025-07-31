@@ -2,7 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { randomUUID } from 'crypto'
 import { getClient } from './db-client.js'
 import { generateAIResponse } from './ai-generate.js'
-import { requireAuth } from './middleware.js'
+import { requireAuth } from '../lib/auth.js'
 
 import { checkAiLimit, logAiUsage } from "./usage-utils.js"
 export const handler = async (
@@ -16,7 +16,7 @@ export const handler = async (
 
   let userId: string
   try {
-    userId = await requireAuth(event)
+    ;({ userId } = requireAuth(event))
   } catch {
     return { statusCode: 401, body: 'Unauthorized' }
   }

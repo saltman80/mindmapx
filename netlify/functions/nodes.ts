@@ -2,7 +2,7 @@ import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import type { PoolClient } from 'pg'
 import { validate as isUuid } from 'uuid'
-import { requireAuth } from './middleware.js'
+import { requireAuth } from '../lib/auth.js'
 import type { NodePayload } from './types.js'
 import { DEFAULT_ROOT_X, DEFAULT_ROOT_Y } from './constants.js'
 
@@ -52,7 +52,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
 
     let userId: string
     try {
-      userId = await requireAuth(event)
+      ;({ userId } = requireAuth(event))
       if (!isUuid(userId)) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid userId' }) }
       }
