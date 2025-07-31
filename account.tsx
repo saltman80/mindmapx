@@ -53,7 +53,7 @@ export default function AccountPage(): JSX.Element {
     try {
       const token = await getAccessTokenSilently({
         authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE
+          audience: 'https://mindxdo.netlify.app/api'
         }
       })
       const res = await fetch('/.netlify/functions/cancelSubscription', {

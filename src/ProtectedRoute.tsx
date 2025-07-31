@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         try {
           const token = await getAccessTokenSilently({
             authorizationParams: {
-              audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          audience: 'https://mindxdo.netlify.app/api',
               scope: 'openid email'
             }
           })
@@ -46,7 +46,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   if (!isAuthenticated) {
     loginWithRedirect({
       authorizationParams: {
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        audience: 'https://mindxdo.netlify.app/api',
         scope: 'openid profile email',
       },
     })

@@ -239,7 +239,7 @@ const Header = (): JSX.Element => {
                   e.preventDefault()
                   login({
                     authorizationParams: {
-                      audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+                      audience: 'https://mindxdo.netlify.app/api',
                       scope: 'openid profile email',
                     },
                   })
