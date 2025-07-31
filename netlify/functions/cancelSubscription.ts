@@ -9,6 +9,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
   }
   try {
+    console.log(
+      'Incoming Authorization Header:',
+      event.headers.authorization
+    )
     const payload = await verifyAuth0Token(
       new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
         headers: event.headers as any
