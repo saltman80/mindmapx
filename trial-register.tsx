@@ -5,6 +5,7 @@ import FaintMindmapBackground from './FaintMindmapBackground'
 export default function TrialRegister() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -17,6 +18,10 @@ export default function TrialRegister() {
     }
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.')
+      return false
+    }
+    if (password !== confirm) {
+      setError('Passwords do not match.')
       return false
     }
     return true
@@ -76,6 +81,17 @@ export default function TrialRegister() {
               className="form-input"
               value={password}
               onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="confirm" className="form-label">Confirm Password</label>
+            <input
+              id="confirm"
+              type="password"
+              className="form-input"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
               required
             />
           </div>
