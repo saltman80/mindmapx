@@ -2,6 +2,7 @@ import { jwtVerify, createRemoteJWKSet } from 'jose'
 
 const ISSUER_RAW = process.env.AUTH0_ISSUER as string
 const AUDIENCE = process.env.AUTH0_AUDIENCE as string
+const CLIENT_ID = process.env.AUTH0_CLIENT_ID
 
 // Normalize issuer so verification works whether or not the env variable
 // includes a trailing slash.
@@ -35,6 +36,15 @@ export async function verifyAuth0Token(request: Request) {
     })
     return payload
   } catch (err: any) {
+    if (CLIENT_ID) {
+      try {
+        const { payload } = await jwtVerify(token, jwks, {
+          issuer: ISSUER,
+          audience: CLIENT_ID
+        })
+        return payload
+      } catch {}
+    }
     err.statusCode = 401
     throw err
   }
