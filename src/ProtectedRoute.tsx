@@ -44,7 +44,12 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (isLoading || !status) return null
   if (!isAuthenticated) {
-    loginWithRedirect()
+    loginWithRedirect({
+      authorizationParams: {
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        scope: 'openid profile email',
+      },
+    })
     return null
   }
   const now = Date.now()
