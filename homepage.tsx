@@ -296,7 +296,7 @@ const Homepage: React.FC = (): JSX.Element => {
           transition={{ duration: 0.6 }}
         >
           <h2>Vision Plan</h2>
-          <p className="price">$6.95 / month</p>
+          <p className="price">$7.95 / month</p>
           <ul>
             <li>Mind maps</li>
             <li>Todos</li>
