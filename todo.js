@@ -1,5 +1,5 @@
 const client = createClient({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.NETLIFY_DATABASE_URL
 })
 
 const jsonHeaders = {

@@ -2,12 +2,12 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { randomBytes, createHmac } from 'crypto'
 import { getClient } from './db-client.js'
 const {
-  DATABASE_URL,
+  NETLIFY_DATABASE_URL,
   FRONTEND_URL,
   RESET_TOKEN_SECRET
 } = process.env
 
-if (!DATABASE_URL) throw new Error('Missing DATABASE_URL')
+if (!NETLIFY_DATABASE_URL) throw new Error('Missing NETLIFY_DATABASE_URL')
 if (!FRONTEND_URL) throw new Error('Missing FRONTEND_URL')
 if (!RESET_TOKEN_SECRET) throw new Error('Missing RESET_TOKEN_SECRET')
 
