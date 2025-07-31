@@ -7,24 +7,14 @@
 [build.environment]
   NODE_VERSION = "22"
   NODE_ENV = "production"
-  AUTH0_AUDIENCE = "https://mindxdo.netlify.app/api"
-  AUTH0_ISSUER = "https://dev-8s7m3hg5gjlugoxd.us.auth0.com/"
 
 [context.production.environment]
-  AUTH0_AUDIENCE = "https://mindxdo.netlify.app/api"
-  AUTH0_ISSUER = "https://dev-8s7m3hg5gjlugoxd.us.auth0.com/"
 
 [context.deploy-preview.environment]
-  AUTH0_AUDIENCE = "https://mindxdo.netlify.app/api"
-  AUTH0_ISSUER = "https://dev-8s7m3hg5gjlugoxd.us.auth0.com/"
 
 [context.branch-deploy.environment]
-  AUTH0_AUDIENCE = "https://mindxdo.netlify.app/api"
-  AUTH0_ISSUER = "https://dev-8s7m3hg5gjlugoxd.us.auth0.com/"
 
 [context.dev.environment]
-  AUTH0_AUDIENCE = "https://mindxdo.netlify.app/api"
-  AUTH0_ISSUER = "https://dev-8s7m3hg5gjlugoxd.us.auth0.com/"
 
 [[redirects]]
   from = "/api/maps/:id"
