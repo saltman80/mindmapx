@@ -1,11 +1,9 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
-import { jwtVerify, createRemoteJWKSet } from 'jose'
+import { verifyAuth0Token } from '../lib/auth.js'
 
 const ISSUER = process.env.AUTH0_ISSUER!.replace(/\/+$/, '') + '/'
-const AUDIENCE = process.env.AUTH0_AUDIENCE!
-const jwks = createRemoteJWKSet(new URL(`${ISSUER}.well-known/jwks.json`))
 
 function extractBearerToken(headers: { [key: string]: string | undefined }): string | null {
   const authHeader = headers.authorization || headers.Authorization
@@ -15,14 +13,11 @@ function extractBearerToken(headers: { [key: string]: string | undefined }): str
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
     const token = extractBearerToken(event.headers as any)
-    if (!token) {
-      return jsonResponse(401, { success: false, message: 'Missing token' })
-    }
-
-    const { payload } = await jwtVerify(token, jwks, {
-      issuer: ISSUER,
-      audience: [AUDIENCE, process.env.AUTH0_CLIENT_ID!],
-    })
+    const payload = await verifyAuth0Token(
+      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
+        headers: event.headers as any
+      })
+    )
 
     let email = payload.email as string | undefined
     if (!email) {
