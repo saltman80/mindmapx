@@ -1,15 +1,48 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { verifyAuth0Token } from '../lib/auth.js'
+import jwt from 'jsonwebtoken'
+import jwksClient from 'jwks-rsa'
 import { jsonResponse } from '../lib/response.js'
 
-export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
-  try {
-    const payload = await verifyAuth0Token(
-      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
-        headers: event.headers as any
-      })
+const client = jwksClient({
+  jwksUri: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/.well-known/jwks.json'
+})
+
+function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
+  client.getSigningKey(header.kid as string, (err, key) => {
+    if (err) return callback(err, undefined)
+    const signingKey = key.getPublicKey()
+    callback(null, signingKey)
+  })
+}
+
+const verifyToken = (token: string) =>
+  new Promise<jwt.JwtPayload>((resolve, reject) => {
+    jwt.verify(
+      token,
+      getKey,
+      {
+        algorithms: ['RS256'],
+        audience: 'https://mindxdo.netlify.app/api',
+        issuer: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/'
+      },
+      (err, decoded) => {
+        if (err) return reject(err)
+        resolve(decoded as jwt.JwtPayload)
+      }
     )
+  })
+
+export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
+  const authHeader = event.headers.authorization || ''
+  const token = authHeader.replace('Bearer ', '')
+
+  if (!token) {
+    return jsonResponse(401, { success: false, message: 'Missing token' })
+  }
+
+  try {
+    const payload = await verifyToken(token)
     let email = payload.email as string | undefined
     if (!email) {
       const headerEmail = event.headers['x-user-email'] || event.headers['X-User-Email']
