@@ -42,8 +42,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
   }
 
-  const client = await getClient()
+  let client
   try {
+    client = await getClient()
     const { rows } = await client.query(
       'SELECT id, email, name, role FROM users WHERE id = $1',
       [session.userId]
@@ -68,7 +69,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       body: JSON.stringify({ error: 'Internal server error' })
     }
   } finally {
-    client.release()
+    if (client) {
+      client.release()
+    }
   }
 }
 
