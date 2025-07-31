@@ -15,7 +15,7 @@ const LoginPage = () => {
     login({
       authorizationParams: {
         screen_hint: 'signup',
-        audience: 'https://mindxdo.netlify.app/api',
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         scope: 'openid profile email',
       },
     })
@@ -56,7 +56,7 @@ const LoginPage = () => {
             onClick={() =>
               login({
                 authorizationParams: {
-                  audience: 'https://mindxdo.netlify.app/api',
+                  audience: import.meta.env.VITE_AUTH0_AUDIENCE,
                   scope: 'openid profile email',
                 },
               })

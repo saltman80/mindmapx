@@ -237,9 +237,9 @@ const Header = (): JSX.Element => {
                 className="header__login-link"
                 onClick={e => {
                   e.preventDefault()
-                  login({
+                 login({
                     authorizationParams: {
-                      audience: 'https://mindxdo.netlify.app/api',
+                      audience: import.meta.env.VITE_AUTH0_AUDIENCE,
                       scope: 'openid profile email',
                     },
                   })
