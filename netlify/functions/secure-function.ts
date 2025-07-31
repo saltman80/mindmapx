@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { verifyAuth0Token } from '../lib/auth.js'
+import { requireAuth } from '../lib/auth.js'
 import { jsonResponse } from '../lib/response.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -8,11 +8,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       'Incoming Authorization Header:',
       event.headers.authorization
     )
-    await verifyAuth0Token(
-      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
-        headers: event.headers as any
-      })
-    )
+    requireAuth(event)
     return jsonResponse(200, { success: true, data: 'protected content' })
   } catch (err: any) {
     return jsonResponse(err.statusCode || 401, { success: false, message: 'Unauthorized' })

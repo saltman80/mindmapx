@@ -42,7 +42,7 @@ The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
    - `getCheckoutSession.ts` fetches the Stripe session email after checkout.
    - `handleStripeWebhook.ts` listens for `checkout.session.completed` and `customer.subscription.deleted` to keep user records in sync with Stripe.
    - `createAuth0User.ts` creates the Auth0 user once the password is set.
-   - `secure-function.ts` demonstrates a protected endpoint using `verifyAuth0Token` from `netlify/lib/auth.ts`.
+   - `secure-function.ts` demonstrates a protected endpoint using `requireAuth` from `netlify/lib/auth.ts`.
 
 The flow is: `PurchasePage` → `createCheckoutSession` → Stripe Checkout → `handleStripeWebhook` → `set-password` → `createAuth0User` → protected routes.
 
@@ -64,12 +64,6 @@ Netlify functions:
    ```
    Ensure the header exists, begins with `Bearer`, and matches the token you
    inspected in step&nbsp;1.
-3. **Check issuer and audience in `verifyAuth0Token()`**
-   ```ts
-   audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-   issuer: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/'
-   ```
-   A typo in either value will cause a 401 response.
 4. **Retrieve the access token before API calls**
    ```ts
    const token = await getAccessTokenSilently({

@@ -1,5 +1,5 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
-import { verifyAuth0Token } from '../lib/auth.js'
+import { requireAuth } from '../lib/auth.js'
 import { getClient } from './db-client.js'
 import { stripe } from './stripeclient.js'
 import { jsonResponse } from '../lib/response.js'
@@ -13,12 +13,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       'Incoming Authorization Header:',
       event.headers.authorization
     )
-    const payload = await verifyAuth0Token(
-      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
-        headers: event.headers as any
-      })
-    )
-    const email = payload.email as string
+    const { email } = requireAuth(event)
     const client = await getClient()
     try {
       const { rows } = await client.query(
