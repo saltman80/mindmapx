@@ -24,31 +24,33 @@ afterEach(() => {
   }
 })
 
+const required = ['NETLIFY_DATABASE_URL', 'JWT_SECRET', 'OPENROUTER_API_KEY']
+
 test('throws if no database URL provided', () => {
   delete process.env.NETLIFY_DATABASE_URL
   process.env.JWT_SECRET = 'secret'
   process.env.OPENROUTER_API_KEY = 'key'
-  expect(() => validateEnv()).toThrow('Missing NETLIFY_DATABASE_URL')
+  expect(() => validateEnv(required)).toThrow('Missing required environment variables: NETLIFY_DATABASE_URL')
 })
 
 test('throws if JWT_SECRET missing', () => {
   process.env.NETLIFY_DATABASE_URL = 'postgres://host/db'
   delete process.env.JWT_SECRET
   process.env.OPENROUTER_API_KEY = 'key'
-  expect(() => validateEnv()).toThrow('Missing JWT_SECRET')
+  expect(() => validateEnv(required)).toThrow('Missing required environment variables: JWT_SECRET')
 })
 
 test('throws if OPENROUTER_API_KEY missing', () => {
   process.env.NETLIFY_DATABASE_URL = 'postgres://host/db'
   process.env.JWT_SECRET = 'secret'
   delete process.env.OPENROUTER_API_KEY
-  expect(() => validateEnv()).toThrow('Missing OPENROUTER_API_KEY')
+  expect(() => validateEnv(required)).toThrow('Missing required environment variables: OPENROUTER_API_KEY')
 })
 
 test('accepts NETLIFY_DATABASE_URL', () => {
   process.env.NETLIFY_DATABASE_URL = 'postgres://host/db'
   process.env.JWT_SECRET = 'secret'
   process.env.OPENROUTER_API_KEY = 'key'
-  expect(() => validateEnv()).not.toThrow()
+  expect(() => validateEnv(required)).not.toThrow()
 })
 
