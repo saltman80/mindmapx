@@ -9,7 +9,11 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
   }
   try {
-    const payload = await verifyAuth0Token(new Request('http://localhost', { headers: event.headers as any }))
+    const payload = await verifyAuth0Token(
+      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
+        headers: event.headers as any
+      })
+    )
     const email = payload.email as string
     const client = await getClient()
     try {

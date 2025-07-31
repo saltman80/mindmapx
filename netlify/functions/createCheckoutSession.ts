@@ -22,7 +22,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     console.error('Missing STRIPE_PRICE_ID env var')
     return jsonResponse(500, { success: false, message: 'Configuration error' })
   }
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8888'
+  const frontendUrl = process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
