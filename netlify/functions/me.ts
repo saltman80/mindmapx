@@ -1,6 +1,13 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import { extractToken, verifySession } from './auth.js'
+import cookie from 'cookie'
+import jwt from 'jsonwebtoken'
+
+const { JWT_SECRET } = process.env
+if (!JWT_SECRET) {
+  console.error('❌ Missing JWT_SECRET')
+  throw new Error('JWT_SECRET environment variable not set')
+}
 
 const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const CORS_HEADERS = {
@@ -22,55 +29,59 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
   }
 
-  const token = extractToken(event)
-  if (!token) {
-    return {
-      statusCode: 200,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authenticated: false })
-    }
-  }
-
-  let session
   try {
-    session = await verifySession(token)
-  } catch {
-    return {
-      statusCode: 200,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authenticated: false })
-    }
-  }
+    const cookies = cookie.parse(event.headers.cookie || '')
+    const token = cookies.token || cookies.session
 
-  let client
-  try {
-    client = await getClient()
-    const { rows } = await client.query(
-      'SELECT id, email, name, role FROM users WHERE id = $1',
-      [session.userId]
-    )
-    if (rows.length === 0) {
+    if (!token) {
+      console.warn('⚠️ No token provided in cookies')
       return {
-        statusCode: 404,
+        statusCode: 401,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'User not found' })
+        body: JSON.stringify({ error: 'Unauthorized: missing token' })
       }
     }
-    return {
-      statusCode: 200,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authenticated: true, user: rows[0] })
+
+    const payload = jwt.verify(token, JWT_SECRET) as { userId: string }
+    console.log('✅ Verified token payload:', payload)
+
+    let client
+    try {
+      client = await getClient()
+      const { rows } = await client.query(
+        'SELECT id, email, name, role FROM users WHERE id = $1',
+        [payload.userId]
+      )
+      if (rows.length === 0) {
+        return {
+          statusCode: 404,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'User not found' })
+        }
+      }
+      return {
+        statusCode: 200,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authenticated: true, user: rows[0] })
+      }
+    } catch (err) {
+      console.error('me endpoint error:', err)
+      return {
+        statusCode: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Internal server error' })
+      }
+    } finally {
+      if (client) {
+        client.release()
+      }
     }
-  } catch (err) {
-    console.error('me endpoint error:', err)
+  } catch (err: any) {
+    console.error('❌ Token verification failed:', err.message)
     return {
-      statusCode: 500,
+      statusCode: 401,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' })
-    }
-  } finally {
-    if (client) {
-      client.release()
+      body: JSON.stringify({ error: 'Unauthorized' })
     }
   }
 }
