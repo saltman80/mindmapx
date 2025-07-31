@@ -25,9 +25,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   const token = extractToken(event)
   if (!token) {
     return {
-      statusCode: 401,
+      statusCode: 200,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Unauthorized' })
+      body: JSON.stringify({ authenticated: false })
     }
   }
 
@@ -36,9 +36,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     session = await verifySession(token)
   } catch {
     return {
-      statusCode: 401,
+      statusCode: 200,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Invalid token' })
+      body: JSON.stringify({ authenticated: false })
     }
   }
 
@@ -58,7 +58,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     return {
       statusCode: 200,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user: rows[0] })
+      body: JSON.stringify({ authenticated: true, user: rows[0] })
     }
   } catch (err) {
     console.error('me endpoint error:', err)

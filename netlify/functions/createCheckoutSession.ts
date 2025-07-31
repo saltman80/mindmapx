@@ -18,18 +18,24 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID
-  if (!priceId) {
-    console.error('Missing STRIPE_PRICE_ID env var')
-    return jsonResponse(500, { success: false, message: 'Configuration error' })
-  }
-
-  const { userId, email } = requireAuth(event)
-
-  const frontendUrl =
-    process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
-
   try {
+    const priceId = process.env.STRIPE_PRICE_ID
+    if (!priceId) {
+      console.error('Missing STRIPE_PRICE_ID env var')
+      return jsonResponse(500, { success: false, message: 'Configuration error' })
+    }
+
+    let user
+    try {
+      user = requireAuth(event)
+    } catch {
+      return jsonResponse(401, { success: false, message: 'Unauthorized' })
+    }
+    const { userId, email } = user
+
+    const frontendUrl =
+      process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
@@ -41,7 +47,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     })
     return jsonResponse(200, { success: true, url: session.url })
   } catch (err) {
-    console.error('Error creating Stripe checkout session', err)
+    console.error('createCheckoutSession error', err)
     return jsonResponse(500, { success: false, message: 'Internal Server Error' })
   }
 }

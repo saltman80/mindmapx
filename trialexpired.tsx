@@ -1,15 +1,25 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
+import { authFetch } from './authFetch'
 
 export default function TrialExpired(): JSX.Element {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const startCheckout = async () => {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/.netlify/functions/createCheckoutSession', {
+      const meRes = await fetch('/.netlify/functions/me', { credentials: 'include' })
+      const me = await meRes.json().catch(() => null)
+      if (!me?.authenticated) {
+        navigate('/register?next=/trial-expired')
+        return
+      }
+
+      const res = await authFetch('/.netlify/functions/createCheckoutSession', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })

@@ -1,16 +1,25 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import { authFetch } from '../authFetch'
 
 export default function PurchasePage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const handlePurchase = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
+      const meRes = await fetch('/.netlify/functions/me', { credentials: 'include' })
+      const me = await meRes.json().catch(() => null)
+      if (!me?.authenticated) {
+        navigate('/register?next=/purchase')
+        return
+      }
+
       const res = await authFetch('/.netlify/functions/createCheckoutSession', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
