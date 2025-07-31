@@ -1,15 +1,15 @@
 import OpenAI from 'openai'
 import type { ChatCompletionCreateParams } from 'openai/resources/chat/completions'
 
-const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-4o-mini'
-const DEFAULT_TEMPERATURE = parseFloat(process.env.OPENAI_DEFAULT_TEMPERATURE ?? '0.7')
-const DEFAULT_MAX_TOKENS = parseInt(process.env.OPENAI_DEFAULT_MAX_TOKENS ?? '256', 10)
+const DEFAULT_MODEL = process.env.OPENROUTER_DEFAULT_MODEL ?? 'gpt-4o-mini'
+const DEFAULT_TEMPERATURE = 0.7
+const DEFAULT_MAX_TOKENS = 256
 
 let openaiInstance: OpenAI | null = null
 function getOpenAI(): OpenAI {
   if (openaiInstance) return openaiInstance
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) throw new Error('Missing OPENAI_API_KEY environment variable')
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable')
   openaiInstance = new OpenAI({ apiKey })
   return openaiInstance
 }
