@@ -116,11 +116,6 @@ const LoginPage = (): JSX.Element => {
       <MindmapArm side="right" />
       <FaintMindmapBackground />
       <div className="form-card text-center login-form">
-        <img
-          src="./assets/hero-collaboration.png"
-          alt="Login"
-          className="login-icon banner-image"
-        />
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
       {submitError && (
         <div role="alert" aria-live="assertive" className="text-red-600 mb-4">
