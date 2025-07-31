@@ -19,7 +19,8 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         try {
           const token = await getAccessTokenSilently({
             authorizationParams: {
-              audience: import.meta.env.VITE_AUTH0_AUDIENCE
+              audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+              scope: 'openid email'
             }
           })
           const res = await fetch('/.netlify/functions/user-status', {
