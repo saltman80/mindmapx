@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
 import { Drawer } from '../drawer'
 
 const normalizePath = (path: string): string =>
@@ -18,13 +17,15 @@ const Header = (): JSX.Element => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const {
-    isAuthenticated,
-    user,
-    loginWithRedirect: login,
-    logout: auth0Logout,
-  } = useAuth0()
+  const [user, setUser] = useState<{ name?: string; email?: string; role?: string; picture?: string } | null>(null)
+  const isAuthenticated = !!user
 
+  useEffect(() => {
+    fetch('/.netlify/functions/me', { credentials: 'include' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => setUser(data?.user || null))
+      .catch(() => setUser(null))
+  }, [])
   const marketingItems: NavItem[] = [
     { label: 'Home', route: '/' },
     { label: 'About', route: '/about' },
@@ -220,9 +221,7 @@ const Header = (): JSX.Element => {
                     role="menuitem"
                     className="header__dropdown-item"
                     onClick={() => {
-                      auth0Logout({
-                        logoutParams: { returnTo: window.location.origin },
-                      })
+                      document.cookie = 'session=; Max-Age=0; Path=/'
                       handleNavSelect('/login')
                     }}
                   >
@@ -237,12 +236,7 @@ const Header = (): JSX.Element => {
                 className="header__login-link"
                 onClick={e => {
                   e.preventDefault()
-                 login({
-                    authorizationParams: {
-                      audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-                      scope: 'openid profile email',
-                    },
-                  })
+                  navigate('/login')
                 }}
               >
                 Login

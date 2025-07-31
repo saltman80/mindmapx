@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
 import {
@@ -17,7 +16,6 @@ interface Usage {
 }
 
 export default function AccountPage(): JSX.Element {
-  const { getAccessTokenSilently } = useAuth0()
   const [usage, setUsage] = useState<Usage>({
     mindmaps: 0,
     todoLists: 0,
@@ -51,14 +49,9 @@ export default function AccountPage(): JSX.Element {
     setError(null)
     setMsg(null)
     try {
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE
-        }
-      })
       const res = await fetch('/.netlify/functions/cancelSubscription', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       })
       if (!res.ok) throw new Error('Failed to cancel subscription')
       setMsg('Subscription canceled')
