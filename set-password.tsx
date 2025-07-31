@@ -70,7 +70,7 @@ export default function SetPasswordPage(): JSX.Element {
     if (!validate()) return
     setLoading(true)
     try {
-      const res = await fetch('/.netlify/functions/createAuth0User', {
+      const res = await fetch('/.netlify/functions/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

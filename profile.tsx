@@ -1,12 +1,23 @@
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useState, useEffect } from 'react'
 
 export default function ProfilePage(): JSX.Element {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const [user, setUser] = useState<{ name?: string; email?: string; picture?: string } | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (isLoading) return <p>Loading...</p>
-  if (!isAuthenticated) return <p>Please log in to view your profile.</p>
+  useEffect(() => {
+    fetch('/.netlify/functions/me', { credentials: 'include' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        setUser(data?.user || null)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading...</p>
+  if (!user) return <p>Please log in to view your profile.</p>
 
   return (
     <section className="section profile-section relative overflow-hidden">

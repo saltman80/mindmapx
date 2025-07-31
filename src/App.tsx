@@ -26,7 +26,7 @@ import TrialExpired from '../trialexpired'
 import SetPassword from '../set-password'
 import TrialRegister from '../trial-register'
 
-import LoginPage from './LoginPage'
+import LoginPage from '../login'
 import DashboardPage from './DashboardPage'
 import PurchasePage from './PurchasePage'
 import NotFound from './NotFound'

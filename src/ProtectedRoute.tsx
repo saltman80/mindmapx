@@ -1,5 +1,4 @@
 import { ReactNode, useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import { useNavigate } from 'react-router-dom'
 
 interface Status {
@@ -9,49 +8,33 @@ interface Status {
 }
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, loginWithRedirect, isLoading, getAccessTokenSilently, user } = useAuth0()
   const navigate = useNavigate()
   const [status, setStatus] = useState<Status | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-      const check = async () => {
-        if (!isAuthenticated) return
-        try {
-          const token = await getAccessTokenSilently({
-            authorizationParams: {
-              audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-              scope: 'openid profile email'
-            }
-          })
-          const res = await fetch('/.netlify/functions/user-status', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...(user?.email ? { 'X-User-Email': user.email } : {})
-            }
-          })
-        if (res.ok) {
-          const json = await res.json()
-          setStatus(json.data as Status)
-        } else {
-          setStatus(null)
+    const check = async () => {
+      try {
+        const res = await fetch('/.netlify/functions/user-status', {
+          credentials: 'include'
+        })
+        if (!res.ok) {
+          navigate('/login')
+          return
         }
+        const json = await res.json()
+        setStatus(json.data as Status)
       } catch {
-        setStatus(null)
+        navigate('/login')
+      } finally {
+        setLoading(false)
       }
     }
     check()
-  }, [isAuthenticated, getAccessTokenSilently])
+  }, [navigate])
 
-  if (isLoading || !status) return null
-  if (!isAuthenticated) {
-    loginWithRedirect({
-      authorizationParams: {
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        scope: 'openid profile email',
-      },
-    })
-    return null
-  }
+  if (loading || !status) return null
+
   const now = Date.now()
   if (
     (status.subscription_status === 'trialing' &&

@@ -30,47 +30,6 @@ Netlify automatically compiles the TypeScript functions in
 
 Pushing changes to the `main` branch triggers a Netlify production build that deploys the `dist` directory and the functions in `netlify/functions`.
 
-## Auth0 + Stripe Workflow
-
-The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
-
-1. **Frontend**
-   - `src/PurchasePage.tsx` shows a purchase button and calls `createCheckoutSession`.
-   - After payment, users land on `set-password.tsx` to create their Auth0 account. The email is looked up from the Stripe session.
-2. **Netlify Functions**
-   - `createCheckoutSession.ts` creates the Stripe Checkout session.
-   - `getCheckoutSession.ts` fetches the Stripe session email after checkout.
-   - `handleStripeWebhook.ts` listens for `checkout.session.completed` and `customer.subscription.deleted` to keep user records in sync with Stripe.
-   - `createAuth0User.ts` creates the Auth0 user once the password is set.
-   - `secure-function.ts` demonstrates a protected endpoint using `requireAuth` from `netlify/lib/auth.ts`.
-
-The flow is: `PurchasePage` → `createCheckoutSession` → Stripe Checkout → `handleStripeWebhook` → `set-password` → `createAuth0User` → protected routes.
-
-Environment variables include `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_AUDIENCE`, `AUTH0_ISSUER`, and `VITE_AUTH0_AUDIENCE`.
-
-## Auth0 Debug Checklist
-
-Use this checklist to troubleshoot `401 Unauthorized` errors when calling your
-Netlify functions:
-
-1. **Verify the token's audience**
-   - Paste the access token into [jwt.io](https://jwt.io/) and confirm the
-     `aud` field equals `https://mindxdo.netlify.app/api`.
-   - If it doesn't, pass `audience: import.meta.env.VITE_AUTH0_AUDIENCE` when
-     calling `getAccessTokenSilently()` or configuring `Auth0Provider`.
-2. **Log the Authorization header**
-   ```ts
-   console.log('Incoming Authorization Header:', event.headers.authorization)
-   ```
-   Ensure the header exists, begins with `Bearer`, and matches the token you
-   inspected in step&nbsp;1.
-4. **Retrieve the access token before API calls**
-   ```ts
-   const token = await getAccessTokenSilently({
-     audience: import.meta.env.VITE_AUTH0_AUDIENCE
-   })
-   ```
-   Only call your API after the token is retrieved.
 
 ## OpenAI Configuration
 
