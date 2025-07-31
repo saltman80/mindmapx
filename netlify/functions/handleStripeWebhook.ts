@@ -36,7 +36,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
           subStatus = sub.status
         } catch (err) {
           console.error('Failed to fetch subscription', err)
+          paidThru = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
         }
+      } else {
+        paidThru = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
       }
 
       if (!customerId || (!userId && !email)) {
@@ -57,6 +60,42 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         )
       } finally {
         client.release()
+      }
+      break
+    }
+    case 'invoice.payment_failed': {
+      const invoice = stripeEvent.data.object as Stripe.Invoice
+      const subId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
+      if (!subId) break
+
+      const client = await getClient()
+      try {
+        await client.query(
+          `UPDATE users SET subscription_status = 'expired' WHERE stripe_subscription_id = $1`,
+          [subId]
+        )
+      } finally {
+        client.release()
+      }
+      break
+    }
+    case 'invoice.paid': {
+      const invoice = stripeEvent.data.object as Stripe.Invoice
+      const subId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
+      if (!subId) break
+      try {
+        const sub = await stripe.subscriptions.retrieve(subId)
+        const client = await getClient()
+        try {
+          await client.query(
+            `UPDATE users SET subscription_status = $1, paid_thru_date = to_timestamp($2) WHERE stripe_subscription_id = $3`,
+            [sub.status, sub.current_period_end, sub.id]
+          )
+        } finally {
+          client.release()
+        }
+      } catch (err) {
+        console.error('Failed to update invoice.paid', err)
       }
       break
     }
