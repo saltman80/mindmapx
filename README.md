@@ -35,10 +35,11 @@ Pushing changes to the `main` branch triggers a Netlify production build that de
 The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
 
 1. **Frontend**
-   - `src/PurchasePage.tsx` collects an email and calls `createCheckoutSession`.
-   - After payment, users land on `set-password.tsx` to create their Auth0 account.
+   - `src/PurchasePage.tsx` shows a purchase button and calls `createCheckoutSession`.
+   - After payment, users land on `set-password.tsx` to create their Auth0 account. The email is looked up from the Stripe session.
 2. **Netlify Functions**
    - `createCheckoutSession.ts` creates the Stripe Checkout session.
+   - `getCheckoutSession.ts` fetches the Stripe session email after checkout.
    - `handleStripeWebhook.ts` listens for `checkout.session.completed` and records the email.
    - `createAuth0User.ts` creates the Auth0 user once the password is set.
    - `secure-function.ts` demonstrates a protected endpoint using `verifyAuth0Token` from `netlify/lib/auth.ts`.

@@ -13,12 +13,33 @@ export default function SetPasswordPage(): JSX.Element {
   const [missingEmail, setMissingEmail] = useState(false)
 
   useEffect(() => {
+    const sessionId = searchParams.get('session_id')
     const fromQuery = searchParams.get('email')
     const stored = localStorage.getItem('emailForPurchase')
-    const found = fromQuery || stored || ''
-    setEmail(found)
-    if (!found) {
-      setMissingEmail(true)
+
+    if (sessionId) {
+      fetch(`/.netlify/functions/getCheckoutSession?session_id=${sessionId}`)
+        .then(res => res.json().catch(() => null))
+        .then(data => {
+          const found = data?.email || fromQuery || stored || ''
+          setEmail(found)
+          if (!found) {
+            setMissingEmail(true)
+          }
+        })
+        .catch(() => {
+          const fallback = fromQuery || stored || ''
+          setEmail(fallback)
+          if (!fallback) {
+            setMissingEmail(true)
+          }
+        })
+    } else {
+      const found = fromQuery || stored || ''
+      setEmail(found)
+      if (!found) {
+        setMissingEmail(true)
+      }
     }
   }, [searchParams])
 
