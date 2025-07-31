@@ -26,20 +26,18 @@ export default function MindmapArm({ side = 'left' }: { side?: 'left' | 'right' 
         y2="50"
         stroke="var(--mindmap-color)"
         strokeWidth="6"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
+        animate={inView ? { pathLength: 1 } : { pathLength: 0 }}
+        transition={{ duration: 4, delay: 0.5 }}
       />
       <motion.circle
-        cx={endX}
+        cx={startX}
         cy="50"
         r="30"
         fill="none"
         stroke="var(--mindmap-color)"
         strokeWidth="6"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
+        animate={inView ? { scale: 1, cx: endX } : { scale: 0, cx: startX }}
+        transition={{ duration: 4, delay: 0.5 }}
       />
     </motion.svg>
   )
