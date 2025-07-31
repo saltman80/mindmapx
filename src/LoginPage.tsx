@@ -48,6 +48,10 @@ const LoginPage = () => {
               {error.message}
             </p>
           )}
+          <div className="mb-4">
+            <p className="mb-2 font-semibold">Free 3-Day Trial</p>
+            <a href="/register" className="btn w-full">Start Free Trial</a>
+          </div>
           <button className="btn w-full mb-4" onClick={signup}>
             Signup
           </button>
