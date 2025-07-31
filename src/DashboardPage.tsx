@@ -7,7 +7,7 @@ import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import Sparkline from './Sparkline'
 import DashboardTile, { DashboardItem } from './DashboardTile'
-import { LIMIT_MINDMAPS, LIMIT_TODO_LISTS, LIMIT_KANBAN_BOARDS, TOTAL_AI_LIMIT } from "./constants"
+import { LIMIT_MINDMAPS, LIMIT_TODO_LISTS, LIMIT_KANBAN_BOARDS, LIMIT_AI_MONTHLY } from "./constants"
 import {
   MapItem,
   BoardItem,
@@ -159,6 +159,10 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    if (aiUsage >= LIMIT_AI_MONTHLY) {
+      alert('AI automation limit reached')
+      return
+    }
     setAiLoading(true)
     try {
       if (createType === 'map') {
@@ -402,6 +406,8 @@ export default function DashboardPage(): JSX.Element {
                   if (maps.length < LIMIT_MINDMAPS) {
                     setCreateType('map')
                     setShowModal(true)
+                  } else {
+                    alert('Mindmap limit reached')
                   }
                 }}
               />
@@ -415,6 +421,8 @@ export default function DashboardPage(): JSX.Element {
                   if (todoLists.length < LIMIT_TODO_LISTS) {
                     setCreateType('todo')
                     setShowModal(true)
+                  } else {
+                    alert('Todo list limit reached')
                   }
                 }}
               />
@@ -427,6 +435,8 @@ export default function DashboardPage(): JSX.Element {
                   if (boards.length < LIMIT_KANBAN_BOARDS) {
                     setCreateType('board')
                     setShowModal(true)
+                  } else {
+                    alert('Kanban board limit reached')
                   }
                 }}
               />

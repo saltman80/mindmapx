@@ -5,7 +5,7 @@ import {
   LIMIT_MINDMAPS,
   LIMIT_TODO_LISTS,
   LIMIT_KANBAN_BOARDS,
-  TOTAL_AI_LIMIT,
+  LIMIT_AI_MONTHLY,
 } from './src/constants'
 
 interface Usage {
@@ -105,7 +105,7 @@ export default function AccountPage(): JSX.Element {
             <tr>
               <td className="metric-label">AI Automations</td>
               <td className="metric-value">
-                {usage.aiUsage}/{TOTAL_AI_LIMIT} this month
+                {usage.aiUsage}/{LIMIT_AI_MONTHLY} this month
               </td>
             </tr>
           </tbody>
