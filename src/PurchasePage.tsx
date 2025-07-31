@@ -33,7 +33,7 @@ export default function PurchasePage() {
       <FaintMindmapBackground />
       <div className="container text-center">
         <h1 className="mb-md">Build Your Vision</h1>
-        <p className="total-charge">$4.95 per month</p>
+        <p className="total-charge">$7.95 per month</p>
         <form onSubmit={handlePurchase} className="purchase-form mb-lg">
           {error && <p className="mb-md text-error">{error}</p>}
           <button type="submit" className="btn" disabled={loading}>
