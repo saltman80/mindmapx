@@ -4,6 +4,10 @@ import { jsonResponse } from '../lib/response.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
+    console.log(
+      'Incoming Authorization Header:',
+      event.headers.authorization
+    )
     await verifyAuth0Token(
       new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
         headers: event.headers as any
