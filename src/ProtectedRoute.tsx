@@ -14,13 +14,17 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status | null>(null)
 
   useEffect(() => {
-    const check = async () => {
-      if (!isAuthenticated) return
-      try {
-        const token = await getAccessTokenSilently()
-        const res = await fetch('/.netlify/functions/user-status', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+      const check = async () => {
+        if (!isAuthenticated) return
+        try {
+          const token = await getAccessTokenSilently({
+            authorizationParams: {
+              audience: import.meta.env.VITE_AUTH0_AUDIENCE
+            }
+          })
+          const res = await fetch('/.netlify/functions/user-status', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
         if (res.ok) {
           const json = await res.json()
           setStatus(json.data as Status)

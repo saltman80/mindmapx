@@ -51,7 +51,11 @@ export default function AccountPage(): JSX.Element {
     setError(null)
     setMsg(null)
     try {
-      const token = await getAccessTokenSilently()
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE
+        }
+      })
       const res = await fetch('/.netlify/functions/cancelSubscription', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
