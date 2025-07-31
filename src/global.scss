@@ -1297,6 +1297,11 @@ hr {
   margin: 0.25rem 0;
 }
 
+.profile-details strong {
+  display: inline-block;
+  width: 140px;
+}
+
 @media (max-width: 1024px) {
   .header__nav {
     display: none;
