@@ -6,7 +6,9 @@ import { jsonResponse } from '../lib/response.js'
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
     const payload = await verifyAuth0Token(
-      new Request('http://localhost', { headers: event.headers as any })
+      new Request(process.env.SITE_URL || 'https://mindxdo.netlify.app', {
+        headers: event.headers as any
+      })
     )
     let email = payload.email as string | undefined
     if (!email) {
