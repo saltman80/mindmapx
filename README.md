@@ -56,7 +56,7 @@ Netlify functions:
 1. **Verify the token's audience**
    - Paste the access token into [jwt.io](https://jwt.io/) and confirm the
      `aud` field equals `https://mindxdo.netlify.app/api`.
-   - If it doesn't, pass `audience: "https://mindxdo.netlify.app/api"` when
+   - If it doesn't, pass `audience: import.meta.env.VITE_AUTH0_AUDIENCE` when
      calling `getAccessTokenSilently()` or configuring `Auth0Provider`.
 2. **Log the Authorization header**
    ```ts
@@ -66,14 +66,14 @@ Netlify functions:
    inspected in step&nbsp;1.
 3. **Check issuer and audience in `verifyAuth0Token()`**
    ```ts
-   audience: 'https://mindxdo.netlify.app/api',
+   audience: import.meta.env.VITE_AUTH0_AUDIENCE,
    issuer: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/'
    ```
    A typo in either value will cause a 401 response.
 4. **Retrieve the access token before API calls**
    ```ts
    const token = await getAccessTokenSilently({
-     audience: 'https://mindxdo.netlify.app/api'
+     audience: import.meta.env.VITE_AUTH0_AUDIENCE
    })
    ```
    Only call your API after the token is retrieved.

@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         authorizationParams={{
           redirect_uri: `${window.location.origin}/dashboard`,
           scope: 'openid profile email',
-          audience: 'https://mindxdo.netlify.app/api'
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE
         }}
       >
         <App />
