@@ -5,7 +5,7 @@ import React, {
   ChangeEvent,
   FormEvent
 } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
 
@@ -163,6 +163,12 @@ const LoginPage = (): JSX.Element => {
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+      <div className="trial-info mt-md">
+        <p className="mb-2">New here? Start a free 3-Day Trial.</p>
+        <Link to="/register" className="btn-secondary w-full">
+          Start Free Trial
+        </Link>
+      </div>
       </div>
     </section>
   )

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import FaintMindmapBackground from '../FaintMindmapBackground'
+import { authFetch } from '../authFetch'
 
 export default function PurchasePage() {
   const [error, setError] = useState('')
@@ -10,7 +11,7 @@ export default function PurchasePage() {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch('/.netlify/functions/createCheckoutSession', {
+      const res = await authFetch('/.netlify/functions/createCheckoutSession', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
