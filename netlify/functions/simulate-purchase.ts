@@ -32,7 +32,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const userId = userRes.rows[0].id as string
     await client.query(
       'INSERT INTO payments (user_id, amount, currency, payment_provider, provider_payment_id, status) VALUES ($1,$2,$3,$4,$5,$6)',
-      [userId, 695, 'USD', 'simulated', randomUUID(), 'completed']
+      [userId, 795, 'USD', 'simulated', randomUUID(), 'completed']
     )
     return { statusCode: 200, body: JSON.stringify({ userId }) }
   } catch (err) {
