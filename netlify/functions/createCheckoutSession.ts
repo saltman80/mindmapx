@@ -1,6 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { stripe } from './stripeclient.js'
 import { jsonResponse } from '../lib/response.js'
+import { requireAuth } from '../lib/auth.js'
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -22,15 +23,21 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     console.error('Missing STRIPE_PRICE_ID env var')
     return jsonResponse(500, { success: false, message: 'Configuration error' })
   }
-  const frontendUrl = process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
+
+  const { userId, email } = requireAuth(event)
+
+  const frontendUrl =
+    process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
+
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${frontendUrl}/set-password?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/purchase`,
-      metadata: {}
+      success_url: `${frontendUrl}/dashboard?checkoutSuccess=true`,
+      cancel_url: `${frontendUrl}/upgrade-required`,
+      customer_email: email,
+      client_reference_id: userId,
+      metadata: { userId, email }
     })
     return jsonResponse(200, { success: true, url: session.url })
   } catch (err) {
