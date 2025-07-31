@@ -1,6 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { stripe } from './stripeclient.js'
 import { jsonResponse } from '../lib/response.js'
+import { verifyAuth0Token } from '../lib/auth.js'
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -16,19 +17,18 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   if (event.httpMethod !== 'POST') {
     return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
   }
-  if (!event.body) {
-    return jsonResponse(400, { success: false, message: 'Missing request body' })
-  }
-  let data: { email?: string }
+  let payload
   try {
-    data = JSON.parse(event.body)
-  } catch {
-    return jsonResponse(400, { success: false, message: 'Invalid JSON' })
+    payload = await verifyAuth0Token(
+      new Request('http://localhost', { headers: event.headers as any })
+    )
+  } catch (err: any) {
+    return jsonResponse(err.statusCode || 401, { success: false, message: 'Unauthorized' })
   }
-  const email = typeof data.email === 'string' ? data.email.trim() : ''
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!email || !emailRegex.test(email)) {
-    return jsonResponse(400, { success: false, message: 'Invalid email' })
+  const email = (payload.email as string) || ''
+  const userId = payload.sub as string
+  if (!email) {
+    return jsonResponse(400, { success: false, message: 'Missing email' })
   }
   const priceId = process.env.STRIPE_PRICE_ID
   if (!priceId) {
@@ -43,7 +43,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${frontendUrl}/set-password`,
       cancel_url: `${frontendUrl}/purchase`,
-      customer_email: email
+      customer_email: email,
+      client_reference_id: userId,
+      metadata: { userId, email }
     })
     return jsonResponse(200, { success: true, url: session.url })
   } catch (err) {

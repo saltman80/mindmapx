@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
 import {
@@ -16,12 +17,16 @@ interface Usage {
 }
 
 export default function AccountPage(): JSX.Element {
+  const { getAccessTokenSilently } = useAuth0()
   const [usage, setUsage] = useState<Usage>({
     mindmaps: 0,
     todoLists: 0,
     boards: 0,
     aiUsage: 0,
   })
+  const [msg, setMsg] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -41,6 +46,25 @@ export default function AccountPage(): JSX.Element {
     return () => controller.abort()
   }, [])
 
+  const handleCancel = async () => {
+    setLoading(true)
+    setError(null)
+    setMsg(null)
+    try {
+      const token = await getAccessTokenSilently()
+      const res = await fetch('/.netlify/functions/cancelSubscription', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Failed to cancel subscription')
+      setMsg('Subscription canceled')
+    } catch (err: any) {
+      setError(err.message || 'Error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section className="section section--one-col relative overflow-hidden">
       <MindmapArm side="right" />
@@ -48,10 +72,16 @@ export default function AccountPage(): JSX.Element {
       <div className="form-card text-center space-y-4">
         <h1 className="text-2xl font-semibold mb-4">Account Settings</h1>
         <p>Manage your account preferences here.</p>
-        <p>
-          Status: <strong>Active</strong>
-        </p>
-        <button className="bg-red-600 text-white px-4 py-2 rounded">Cancel Account</button>
+        {msg && <div className="text-green-600">{msg}</div>}
+        {error && <div className="text-red-600">{error}</div>}
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={loading}
+          className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          Cancel Subscription
+        </button>
       </div>
       <div className="form-card limit-tile">
         <h2 className="text-xl font-semibold mb-2 text-center">Usage Limits</h2>

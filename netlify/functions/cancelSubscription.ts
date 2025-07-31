@@ -20,10 +20,15 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       if (rows.length === 0 || !rows[0].stripe_subscription_id) {
         return jsonResponse(404, { success: false, message: 'Subscription not found' })
       }
-      await stripe.subscriptions.update(rows[0].stripe_subscription_id, { cancel_at_period_end: true })
+      const subscription = await stripe.subscriptions.update(rows[0].stripe_subscription_id, {
+        cancel_at_period_end: true
+      })
       await client.query(
-        'UPDATE users SET subscription_status = $1 WHERE email = $2',
-        ['canceled', email.toLowerCase()]
+        `UPDATE users
+         SET subscription_status = $1,
+             paid_thru_date = to_timestamp($2)
+         WHERE email = $3`,
+        ['canceled', subscription.current_period_end, email.toLowerCase()]
       )
       return jsonResponse(200, { success: true })
     } finally {

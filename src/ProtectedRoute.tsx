@@ -41,9 +41,11 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   }
   const now = Date.now()
   if (
-    (status.subscription_status === 'trialing' && status.trial_start_date &&
+    (status.subscription_status === 'trialing' &&
+      status.trial_start_date &&
       now < new Date(status.trial_start_date).getTime() + 3 * 24 * 60 * 60 * 1000) ||
-    (status.subscription_status === 'active' && status.paid_thru_date &&
+    ((status.subscription_status === 'active' || status.subscription_status === 'canceled') &&
+      status.paid_thru_date &&
       now < new Date(status.paid_thru_date).getTime())
   ) {
     return <>{children}</>
