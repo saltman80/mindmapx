@@ -1,13 +1,19 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose'
 
-const ISSUER = process.env.AUTH0_ISSUER as string
+const ISSUER_RAW = process.env.AUTH0_ISSUER as string
 const AUDIENCE = process.env.AUTH0_AUDIENCE as string
+
+// Normalize issuer so verification works whether or not the env variable
+// includes a trailing slash.
+const ISSUER = ISSUER_RAW.replace(/\/+$/, '') + '/'
 
 if (!ISSUER || !AUDIENCE) {
   throw new Error('Missing Auth0 issuer or audience')
 }
 
-const jwks = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`))
+// Remove the trailing slash when constructing the JWKS URL
+const jwksIssuer = ISSUER.replace(/\/+$/, '')
+const jwks = createRemoteJWKSet(new URL(`${jwksIssuer}/.well-known/jwks.json`))
 
 export async function verifyAuth0Token(request: Request) {
   const auth = request.headers.get('authorization') || ''
