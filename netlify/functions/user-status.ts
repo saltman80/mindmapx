@@ -8,7 +8,13 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const payload = await verifyAuth0Token(
       new Request('http://localhost', { headers: event.headers as any })
     )
-    const email = payload.email as string
+    let email = payload.email as string | undefined
+    if (!email) {
+      const headerEmail = event.headers['x-user-email'] || event.headers['X-User-Email']
+      if (headerEmail && typeof headerEmail === 'string') {
+        email = headerEmail
+      }
+    }
     if (!email) {
       return jsonResponse(400, { success: false, message: 'Missing email' })
     }

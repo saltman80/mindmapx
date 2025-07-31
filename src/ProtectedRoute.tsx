@@ -9,7 +9,7 @@ interface Status {
 }
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, loginWithRedirect, isLoading, getAccessTokenSilently } = useAuth0()
+  const { isAuthenticated, loginWithRedirect, isLoading, getAccessTokenSilently, user } = useAuth0()
   const navigate = useNavigate()
   const [status, setStatus] = useState<Status | null>(null)
 
@@ -24,7 +24,10 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
             }
           })
           const res = await fetch('/.netlify/functions/user-status', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: {
+              Authorization: `Bearer ${token}`,
+              ...(user?.email ? { 'X-User-Email': user.email } : {})
+            }
           })
         if (res.ok) {
           const json = await res.json()
