@@ -40,7 +40,7 @@ The purchase flow uses Auth0 for authentication and Stripe Checkout for payment.
 2. **Netlify Functions**
    - `createCheckoutSession.ts` creates the Stripe Checkout session.
    - `getCheckoutSession.ts` fetches the Stripe session email after checkout.
-   - `handleStripeWebhook.ts` listens for `checkout.session.completed` and records the email.
+   - `handleStripeWebhook.ts` listens for `checkout.session.completed` and `customer.subscription.deleted` to keep user records in sync with Stripe.
    - `createAuth0User.ts` creates the Auth0 user once the password is set.
    - `secure-function.ts` demonstrates a protected endpoint using `verifyAuth0Token` from `netlify/lib/auth.ts`.
 
