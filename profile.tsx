@@ -40,6 +40,22 @@ export default function ProfilePage(): JSX.Element {
               <strong>Family Name:</strong> {user.family_name}
             </p>
           )}
+          {user?.email_verified !== undefined && (
+            <p>
+              <strong>Email Verified:</strong> {user.email_verified ? 'Yes' : 'No'}
+            </p>
+          )}
+          {user?.updated_at && (
+            <p>
+              <strong>Last Updated:</strong>{' '}
+              {new Date(user.updated_at).toLocaleDateString()}
+            </p>
+          )}
+          {user?.sub && (
+            <p>
+              <strong>User ID:</strong> {user.sub}
+            </p>
+          )}
         </div>
       </div>
     </section>
