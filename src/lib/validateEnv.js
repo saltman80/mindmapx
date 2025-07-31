@@ -1,6 +1,6 @@
 export function validateEnv() {
-  const { NETLIFY_DATABASE_URL, DATABASE_URL, JWT_SECRET, OPENROUTER_API_KEY } = process.env
-  if (!NETLIFY_DATABASE_URL && !DATABASE_URL) {
+  const { NETLIFY_DATABASE_URL, JWT_SECRET, OPENROUTER_API_KEY } = process.env
+  if (!NETLIFY_DATABASE_URL) {
     throw new Error('Missing NETLIFY_DATABASE_URL')
   }
   if (!JWT_SECRET) {

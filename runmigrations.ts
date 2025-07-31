@@ -276,7 +276,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 async function seedAdminUser() {
   const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
-  const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS || '10', 10)
+  const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10)
 
   console.info(
     `seeding admin user using ${ADMIN_EMAIL && ADMIN_PASSWORD ? 'provided credentials' : 'no credentials'}`

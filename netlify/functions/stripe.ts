@@ -13,9 +13,9 @@ if (!webhookSecret) {
   throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable.')
 }
 
-const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL
+const connectionString = process.env.NETLIFY_DATABASE_URL
 if (!connectionString) {
-  throw new Error('Missing DATABASE_URL or NEON_DATABASE_URL environment variable.')
+  throw new Error('Missing NETLIFY_DATABASE_URL environment variable.')
 }
 
 declare global {

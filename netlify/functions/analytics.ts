@@ -2,9 +2,9 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { extractToken, verifySession } from './auth.js'
 
-const { DATABASE_URL } = process.env
-if (!DATABASE_URL) {
-  throw new Error('Missing environment variable: DATABASE_URL')
+const { NETLIFY_DATABASE_URL } = process.env
+if (!NETLIFY_DATABASE_URL) {
+  throw new Error('Missing environment variable: NETLIFY_DATABASE_URL')
 }
 
 

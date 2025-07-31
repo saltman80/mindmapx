@@ -4,15 +4,21 @@ import { z, ZodError } from 'zod'
 import bcrypt from 'bcrypt'
 import { createSession } from './auth.js'
 
-const { DATABASE_URL: LOCAL_DB, NETLIFY_DATABASE_URL, SALT_ROUNDS = '10' } = process.env
-const DATABASE_URL = LOCAL_DB || NETLIFY_DATABASE_URL
-if (!DATABASE_URL) {
-  console.error('Missing DATABASE_URL')
-  throw new Error('Missing required environment variables')
+const {
+  NETLIFY_DATABASE_URL,
+  BCRYPT_SALT_ROUNDS = '10',
+  JWT_SECRET,
+  SESSION_EXPIRY_HOURS = '24',
+} = process.env
+
+if (!NETLIFY_DATABASE_URL) {
+  throw new Error('Missing NETLIFY_DATABASE_URL')
 }
-console.info(
-  `register using ${LOCAL_DB ? 'DATABASE_URL' : 'NETLIFY_DATABASE_URL'} connection`
-)
+if (!JWT_SECRET) {
+  throw new Error('Missing JWT_SECRET')
+}
+
+const DATABASE_URL = NETLIFY_DATABASE_URL
 
 const registerSchema = z.object({
   email: z.string().email().transform((s: string) => s.trim().toLowerCase()),
@@ -90,7 +96,7 @@ export const handler = async (
         body: JSON.stringify({ error: 'Email already registered' }),
       }
     }
-    const passwordHash = await bcrypt.hash(password, parseInt(SALT_ROUNDS))
+    const passwordHash = await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS))
     const result = await client.query(
       `INSERT INTO users (email, password_hash, name, subscription_status, trial_start_date)
        VALUES ($1, $2, $3, 'trialing', now())
@@ -99,17 +105,10 @@ export const handler = async (
     )
     const user = result.rows[0]
     const token = await createSession(user.id)
-    const cookieParts = [
-      `session=${token}`,
-      'HttpOnly',
-      'Path=/',
-      'SameSite=Strict',
-      'Secure'
-    ]
     return {
       statusCode: 201,
-      headers: { ...corsHeaders, 'Set-Cookie': cookieParts.join('; ') },
-      body: JSON.stringify({ success: true, user }),
+      headers: corsHeaders,
+      body: JSON.stringify({ success: true, user, token }),
     }
   } catch (error) {
     console.error('Registration error:', error)
