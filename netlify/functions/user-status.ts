@@ -24,9 +24,28 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       audience: [AUDIENCE, process.env.AUTH0_CLIENT_ID!],
     })
 
-    const email = payload.email as string | undefined
+    let email = payload.email as string | undefined
     if (!email) {
-      return jsonResponse(400, { success: false, message: 'Missing email in token' })
+      try {
+        const infoRes = await fetch(`${ISSUER}userinfo`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (infoRes.ok) {
+          const info = (await infoRes.json()) as { email?: string }
+          email = info.email
+        }
+      } catch {
+        /* ignore userinfo fetch errors */
+      }
+    }
+
+    const headerEmail = (event.headers['x-user-email'] || event.headers['X-User-Email']) as string | undefined
+    if (!email) {
+      email = headerEmail
+    }
+
+    if (!email) {
+      return jsonResponse(400, { success: false, message: 'Missing email' })
     }
 
     const client = await getClient()
