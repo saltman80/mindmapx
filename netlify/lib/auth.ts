@@ -8,11 +8,7 @@ function extractBearerToken(headers: { [key: string]: string | undefined }): str
 
 export function requireAuth(event: HandlerEvent): { userId: string; email: string } {
   const token = extractBearerToken(event.headers as any)
-  if (!token) {
-    const error = new Error('Missing token')
-    ;(error as any).statusCode = 401
-    throw error
-  }
+  if (!token) throw new Error('Missing token')
   const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string }
   return payload
 }

@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { generateAIResponse } from './ai-generate.js'
-import { requireAuth } from './middleware.js'
+import { requireAuth } from '../lib/auth.js'
 
 import { checkAiLimit, logAiUsage } from "./usage-utils.js"
 export const handler = async (
@@ -13,7 +13,7 @@ export const handler = async (
   if (!event.body) return { statusCode: 400, body: 'Missing body' }
 
   try {
-    const userId = await requireAuth(event)
+    const { userId } = requireAuth(event)
     if (!(await checkAiLimit(userId))) {
       return { statusCode: 429, body: 'AI limit reached' }
     }
