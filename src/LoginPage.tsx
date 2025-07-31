@@ -11,7 +11,14 @@ const LoginPage = () => {
     error,
   } = useAuth0()
 
-  const signup = () => login({ authorizationParams: { screen_hint: 'signup' } })
+  const signup = () =>
+    login({
+      authorizationParams: {
+        screen_hint: 'signup',
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        scope: 'openid profile email',
+      },
+    })
   const logout = () =>
     auth0Logout({ logoutParams: { returnTo: window.location.origin } })
 
@@ -44,7 +51,17 @@ const LoginPage = () => {
           <button className="btn w-full mb-4" onClick={signup}>
             Signup
           </button>
-          <button className="btn w-full" onClick={login}>
+          <button
+            className="btn w-full"
+            onClick={() =>
+              login({
+                authorizationParams: {
+                  audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+                  scope: 'openid profile email',
+                },
+              })
+            }
+          >
             Login
           </button>
         </div>
