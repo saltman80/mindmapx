@@ -92,7 +92,9 @@ export const handler = async (
     }
     const passwordHash = await bcrypt.hash(password, parseInt(SALT_ROUNDS))
     const result = await client.query(
-      'INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name',
+      `INSERT INTO users (email, password_hash, name, subscription_status, trial_start_date)
+       VALUES ($1, $2, $3, 'trialing', now())
+       RETURNING id, email, name, subscription_status, trial_start_date`,
       [email, passwordHash, name || null]
     )
     const user = result.rows[0]

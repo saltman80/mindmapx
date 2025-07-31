@@ -30,7 +30,27 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         return jsonResponse(200, { success: true, data: insert.rows[0] })
       }
 
-      return jsonResponse(200, { success: true, data: rows[0] })
+      const user = rows[0]
+      const now = Date.now()
+      let status = user.subscription_status
+      if (user.paid_thru_date && new Date(user.paid_thru_date).getTime() > now) {
+        status = 'active'
+      } else if (
+        user.trial_start_date &&
+        new Date(user.trial_start_date).getTime() + 3 * 24 * 60 * 60 * 1000 < now
+      ) {
+        status = 'expired'
+      }
+
+      if (status !== user.subscription_status) {
+        const update = await client.query(
+          `UPDATE users SET subscription_status = $1 WHERE email = $2 RETURNING subscription_status, trial_start_date, paid_thru_date`,
+          [status, userEmail.toLowerCase()]
+        )
+        return jsonResponse(200, { success: true, data: update.rows[0] })
+      }
+
+      return jsonResponse(200, { success: true, data: user })
     } finally {
       client.release()
     }
