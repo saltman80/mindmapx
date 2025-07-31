@@ -1,60 +1,34 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import jwt from 'jsonwebtoken'
-import jwksClient from 'jwks-rsa'
 import { jsonResponse } from '../lib/response.js'
+import { jwtVerify, createRemoteJWKSet } from 'jose'
 
-const client = jwksClient({
-  jwksUri: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/.well-known/jwks.json'
-})
+const ISSUER = process.env.AUTH0_ISSUER!.replace(/\/+$/, '') + '/'
+const AUDIENCE = process.env.AUTH0_AUDIENCE!
+const jwks = createRemoteJWKSet(new URL(`${ISSUER}.well-known/jwks.json`))
 
-function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
-  client.getSigningKey(header.kid as string, (err, key) => {
-    if (err || !key) {
-      return callback(err || new Error('Signing key not found'), undefined)
-    }
-    const signingKey = key.getPublicKey()
-    callback(null, signingKey)
-  })
+function extractBearerToken(headers: { [key: string]: string | undefined }): string | null {
+  const authHeader = headers.authorization || headers.Authorization
+  return authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
 }
 
-const verifyToken = (token: string) =>
-  new Promise<jwt.JwtPayload>((resolve, reject) => {
-    jwt.verify(
-      token,
-      getKey,
-      {
-        algorithms: ['RS256'],
-        audience: 'https://mindxdo.netlify.app/api',
-        issuer: 'https://dev-8s7m3hg5gjlugoxd.us.auth0.com/'
-      },
-      (err, decoded) => {
-        if (err) return reject(err)
-        resolve(decoded as jwt.JwtPayload)
-      }
-    )
-  })
-
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
-  const authHeader = event.headers.authorization || ''
-  const token = authHeader.replace('Bearer ', '')
-
-  if (!token) {
-    return jsonResponse(401, { success: false, message: 'Missing token' })
-  }
-
   try {
-    const payload = await verifyToken(token)
-    let email = payload.email as string | undefined
-    if (!email) {
-      const headerEmail = event.headers['x-user-email'] || event.headers['X-User-Email']
-      if (headerEmail && typeof headerEmail === 'string') {
-        email = headerEmail
-      }
+    const token = extractBearerToken(event.headers as any)
+    if (!token) {
+      return jsonResponse(401, { success: false, message: 'Missing token' })
     }
+
+    const { payload } = await jwtVerify(token, jwks, {
+      issuer: ISSUER,
+      audience: [AUDIENCE, process.env.AUTH0_CLIENT_ID!],
+    })
+
+    const email = payload.email as string | undefined
     if (!email) {
-      return jsonResponse(400, { success: false, message: 'Missing email' })
+      return jsonResponse(400, { success: false, message: 'Missing email in token' })
     }
+
     const client = await getClient()
     try {
       const { rows } = await client.query(
@@ -70,14 +44,14 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         )
         return jsonResponse(200, { success: true, data: insert.rows[0] })
       }
+
       return jsonResponse(200, { success: true, data: rows[0] })
     } finally {
       client.release()
     }
+
   } catch (err: any) {
-    return jsonResponse(err.statusCode || 401, {
-      success: false,
-      message: 'Unauthorized'
-    })
+    console.error('Auth error:', err)
+    return jsonResponse(err.statusCode || 401, { success: false, message: 'Unauthorized' })
   }
 }
