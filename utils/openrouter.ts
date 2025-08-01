@@ -1,5 +1,4 @@
-
-export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3): Promise<string> {
+export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3): Promise<string | null> {
   const url = 'https://openrouter.ai/api/v1/chat/completions'
   const headers = {
     'Content-Type': 'application/json',
@@ -22,12 +21,11 @@ export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3):
       })
       const data = await response.json()
       const content = data?.choices?.[0]?.message?.content
-      if (!content) throw new Error('No content in response')
-      return content
+      if (content) return content
     } catch (error) {
-      console.warn(`❌ OpenRouter retry ${i + 1} failed:`, error)
-      if (i === maxRetries - 1) throw new Error('OpenRouter failed after 3 attempts.')
+      console.warn(`OpenRouter retry ${i + 1} failed`, error)
     }
   }
-  throw new Error('OpenRouter failed')
+
+  return null
 }

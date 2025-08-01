@@ -46,21 +46,19 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
     setLoading(true)
     setError(null)
     const prompt = buildKanbanPrompt(topic)
-    for (let i = 0; i < 3; i++) {
-      try {
-        const response = await callOpenRouterWithRetries(prompt)
-        const parsed = JSON.parse(response)
-        const validated = kanbanSchema.parse(parsed)
-        const built = buildKanbanFromJSON(validated)
-        onGenerate(built)
-        setLoading(false)
-        return
-      } catch (err) {
-        console.warn('Kanban generation failed', err)
-        if (i === 2) setError('Failed to generate kanban data')
-      }
+    try {
+      const response = await callOpenRouterWithRetries(prompt)
+      if (!response) throw new Error('No response')
+      const parsed = JSON.parse(response)
+      const validated = kanbanSchema.parse(parsed)
+      const built = buildKanbanFromJSON(validated)
+      onGenerate(built)
+    } catch (err) {
+      console.warn('Kanban generation failed', err)
+      setError('Failed to generate kanban data')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
