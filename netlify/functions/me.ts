@@ -10,6 +10,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true'
 }
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
 async function columnExists(
   client: PoolClient,
@@ -49,7 +50,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const { email, userId, role } = await verifySession(token)
     console.log('✅ Verified token payload:', { email, userId, role })
 
-    if (role === 'admin') {
+    if (role === 'admin' || (ADMIN_EMAIL && email === ADMIN_EMAIL)) {
       return {
         statusCode: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },

@@ -13,7 +13,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const payload = await verifySession(token)
     const userEmail = payload.email?.toLowerCase()
 
-    if (payload.role === 'admin') {
+    const adminEmail = process.env.ADMIN_EMAIL
+    if (payload.role === 'admin' || (adminEmail && payload.email === adminEmail)) {
       return jsonResponse(200, {
         success: true,
         data: {
