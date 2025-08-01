@@ -3,6 +3,7 @@ import { getClient } from './db-client.js'
 import cookie from 'cookie'
 import jwt from 'jsonwebtoken'
 import type { PoolClient } from 'pg'
+import { validate as isUuid } from 'uuid'
 
 const { JWT_SECRET } = process.env
 if (!JWT_SECRET) {
@@ -57,9 +58,25 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
 
     const payload = jwt.verify(token, JWT_SECRET) as {
       userId: string
+      email?: string
       role?: string
     }
     console.log('✅ Verified token payload:', payload)
+
+    if (!isUuid(payload.userId)) {
+      return {
+        statusCode: 200,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          authenticated: true,
+          user: {
+            id: payload.userId,
+            email: payload.email,
+            role: payload.role
+          }
+        })
+      }
+    }
 
     let client
     try {
