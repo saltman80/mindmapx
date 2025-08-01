@@ -8,7 +8,6 @@ import React, {
 import { useNavigate, Link } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
-import { useUser } from './src/lib/UserContext'
 
 interface LoginFormValues {
   email: string
@@ -22,7 +21,6 @@ const LoginPage = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const abortControllerRef = useRef<AbortController | null>(null)
-  const { fetchUser } = useUser()
 
   useEffect(() => {
     return () => {
@@ -102,9 +100,8 @@ const LoginPage = (): JSX.Element => {
       })
       .then(data => {
         if (data?.success) {
-          return fetchUser().then(() => {
-            navigate('/dashboard')
-          })
+          navigate('/dashboard')
+          return
         }
         throw new Error('Login failed')
       })
