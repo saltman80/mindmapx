@@ -1,17 +1,29 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
-import { requireAuth } from '../lib/auth.js'
-
-const { ADMIN_EMAIL } = process.env
+import { extractToken, verifySession } from './auth.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
-    const payload = requireAuth(event)
-    const qs = event.queryStringParameters || {}
+    const token = extractToken(event)
+    if (!token) {
+      return jsonResponse(401, { success: false, message: 'Unauthorized' })
+    }
 
-    const userEmail =
-      ADMIN_EMAIL && payload.email === ADMIN_EMAIL ? qs.email || payload.email : payload.email
+    const payload = await verifySession(token)
+    const userEmail = payload.email?.toLowerCase()
+
+    if (payload.role === 'admin') {
+      return jsonResponse(200, {
+        success: true,
+        data: {
+          subscription_status: 'active',
+          trial_start_date: null,
+          paid_thru_date: null,
+          role: 'admin'
+        }
+      })
+    }
 
     if (!userEmail) {
       return jsonResponse(400, { success: false, message: 'Missing email' })
@@ -21,14 +33,14 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     try {
       const { rows } = await client.query(
         'SELECT subscription_status, trial_start_date, paid_thru_date FROM users WHERE email = $1',
-        [userEmail.toLowerCase()]
+        [userEmail]
       )
       if (rows.length === 0) {
         const insert = await client.query(
           `INSERT INTO users (email, subscription_status, trial_start_date)
            VALUES ($1, 'trialing', now())
            RETURNING subscription_status, trial_start_date, paid_thru_date`,
-          [userEmail.toLowerCase()]
+          [userEmail]
         )
         return jsonResponse(200, { success: true, data: insert.rows[0] })
       }
@@ -48,7 +60,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       if (status !== user.subscription_status) {
         const update = await client.query(
           `UPDATE users SET subscription_status = $1 WHERE email = $2 RETURNING subscription_status, trial_start_date, paid_thru_date`,
-          [status, userEmail.toLowerCase()]
+          [status, userEmail]
         )
         return jsonResponse(200, { success: true, data: update.rows[0] })
       }

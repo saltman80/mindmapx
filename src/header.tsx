@@ -21,6 +21,8 @@ const Header = (): JSX.Element => {
   const isAuthenticated = !!user
 
   useEffect(() => {
+    const hasSession = /(?:^|;\s*)(session|token)=/.test(document.cookie)
+    if (!hasSession) return
     fetch('/.netlify/functions/me', { credentials: 'include' })
       .then(res => (res.ok ? res.json() : null))
       .then(data => setUser(data?.user || null))

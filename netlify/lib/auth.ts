@@ -12,11 +12,11 @@ function extractTokenFromCookies(headers: { [key: string]: string | undefined })
   return cookies.session || cookies.token || null
 }
 
-export function requireAuth(event: HandlerEvent): { userId: string; email: string } {
+export function requireAuth(event: HandlerEvent): { userId: string; email: string; role?: string } {
   const cookieToken = extractTokenFromCookies(event.headers as any)
   const bearerToken = extractBearerToken(event.headers as any)
   const token = bearerToken || cookieToken
   if (!token) throw new Error('Missing token')
-  const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string }
+  const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string; role?: string }
   return payload
 }

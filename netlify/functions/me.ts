@@ -1,9 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
-import cookie from 'cookie'
 import type { PoolClient } from 'pg'
-import { validate as isUuid } from 'uuid'
-import { verifySession } from './auth.js'
+import { verifySession, extractToken } from './auth.js'
 
 const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const CORS_HEADERS = {
@@ -38,11 +36,9 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
   }
 
   try {
-    const cookies = cookie.parse(event.headers.cookie || '')
-    const token = cookies.token || cookies.session
-
+    const token = extractToken(event)
     if (!token) {
-      console.warn('⚠️ No token provided in cookies')
+      console.warn('⚠️ No token provided')
       return {
         statusCode: 401,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
@@ -53,7 +49,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const payload = await verifySession(token)
     console.log('✅ Verified token payload:', payload)
 
-    if (!isUuid(payload.userId)) {
+    if (payload.role === 'admin') {
       return {
         statusCode: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
@@ -62,7 +58,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
           user: {
             id: payload.userId,
             email: payload.email,
-            role: payload.role
+            role: 'admin'
           }
         })
       }
@@ -80,8 +76,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       if (hasRole) fields.push('role')
 
       const { rows } = await client.query(
-        `SELECT ${fields.join(', ')} FROM users WHERE id = $1`,
-        [payload.userId]
+        `SELECT ${fields.join(', ')} FROM users WHERE email = $1`,
+        [payload.email?.toLowerCase()]
       )
       if (rows.length === 0) {
         return {
