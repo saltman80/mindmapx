@@ -20,20 +20,17 @@ const cardSchema = z.object({
 })
 
 const kanbanSchema = z.object({
-  New: z.array(cardSchema),
-  'In Progress': z.array(cardSchema),
-  Done: z.array(cardSchema),
-}).refine(data => {
-  const total = data.New.length + data['In Progress'].length + data.Done.length
-  return total <= 20
-}, 'Too many cards')
+  New: z.array(cardSchema).max(20),
+  'In Progress': z.array(cardSchema).length(0),
+  Done: z.array(cardSchema).length(0),
+})
 
 export function buildKanbanFromJSON(data: KanbanColumns): KanbanColumns {
   return data
 }
 
 function buildKanbanPrompt(topic: string): string {
-  return `Generate a JSON array of 20 kanban cards for ${topic}. Each should include a title and description. Group them into 3 columns: New, In Progress, Done.`
+  return `Generate a JSON array of up to 20 kanban cards for ${topic}. Each should include a title and description. Group them into 1 column: New. Cards should only go into New column. Return only valid JSON.`
 }
 
 interface AIButtonProps {
