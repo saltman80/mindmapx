@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { getClient } from './netlify/functions/db-client.js'
 
 async function runMigrations() {
@@ -13,9 +14,20 @@ async function runMigrations() {
     );
   `)
 
+  const migrationsDir = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../migrations'
+  )
+
+  if (!fs.existsSync(migrationsDir)) {
+    console.warn(`Migrations directory not found at ${migrationsDir}`)
+    await client.release()
+    return
+  }
+
   // Load and sort migration files
   const files = fs
-    .readdirSync('migrations')
+    .readdirSync(migrationsDir)
     .filter(f => f.endsWith('.sql'))
     .sort()
 
@@ -26,7 +38,7 @@ async function runMigrations() {
       continue
     }
 
-    const sql = fs.readFileSync(path.join('migrations', file), 'utf8')
+    const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8')
     try {
       await client.query('BEGIN')
       await client.query(sql)

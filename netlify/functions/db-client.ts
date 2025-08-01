@@ -19,6 +19,16 @@ export const pool = new PgPool({
 let migrationPromise: Promise<void> | null = null
 
 async function runMigrations() {
+  const migrationsDir = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../../../migrations'
+  )
+
+  if (!fs.existsSync(migrationsDir)) {
+    console.warn(`Migrations directory not found at ${migrationsDir}`)
+    return
+  }
+
   const client = await pool.connect()
   try {
     await client.query(`
@@ -28,10 +38,6 @@ async function runMigrations() {
       );
     `)
 
-    const migrationsDir = path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../../migrations'
-    )
     const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort()
 
     for (const file of files) {
