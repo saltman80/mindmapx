@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import { authFetch } from './authFetch'
-import { useUser } from '@/lib/UserContext'
+import { useUser } from './src/lib/UserContext'
 
 export default function TrialExpired(): JSX.Element {
   const [loading, setLoading] = useState(false)

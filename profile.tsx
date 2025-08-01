@@ -1,6 +1,6 @@
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
-import { useUser } from '@/lib/UserContext'
+import { useUser } from './src/lib/UserContext'
 
 export default function ProfilePage(): JSX.Element {
   const { user } = useUser()
