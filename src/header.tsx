@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { Drawer } from '../drawer'
+import { useUser } from './lib/UserContext'
 
 const normalizePath = (path: string): string =>
   path.replace(/\/+$/, '') || '/'
@@ -17,17 +18,8 @@ const Header = (): JSX.Element => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const [user, setUser] = useState<{ name?: string; email?: string; role?: string; picture?: string } | null>(null)
+  const { user } = useUser()
   const isAuthenticated = !!user
-
-  useEffect(() => {
-    const hasSession = /(?:^|;\s*)(session|token)=/.test(document.cookie)
-    if (!hasSession) return
-    fetch('/.netlify/functions/me', { credentials: 'include' })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => setUser(data?.user || null))
-      .catch(() => setUser(null))
-  }, [])
   const marketingItems: NavItem[] = [
     { label: 'Home', route: '/' },
     { label: 'About', route: '/about' },
