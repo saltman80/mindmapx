@@ -7,15 +7,11 @@ const { ADMIN_EMAIL } = process.env
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
-    const { email: authEmail } = requireAuth(event)
+    const payload = requireAuth(event)
     const qs = event.queryStringParameters || {}
 
-    let userEmail: string | undefined
-    if (ADMIN_EMAIL && authEmail === ADMIN_EMAIL) {
-      userEmail = qs.email || authEmail
-    } else {
-      userEmail = authEmail
-    }
+    const userEmail =
+      ADMIN_EMAIL && payload.email === ADMIN_EMAIL ? qs.email || payload.email : payload.email
 
     if (!userEmail) {
       return jsonResponse(400, { success: false, message: 'Missing email' })
