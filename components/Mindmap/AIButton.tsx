@@ -1,24 +1,13 @@
 import { useState } from 'react'
-import { z } from 'zod'
 import LoadingSpinner from '../../loadingspinner'
 import { callOpenRouterWithRetries } from '../../utils/openrouter'
+import { getMonthlyUsage, trackAIUsage } from '../../lib/ai/usage'
+import { useUser } from '../../src/lib/UserContext'
 
 export interface MindmapNode {
   title: string
   children?: MindmapNode[]
 }
-
-const mindmapNodeSchema: z.ZodType<MindmapNode> = z.lazy(() =>
-  z.object({
-    title: z.string(),
-    children: z.array(mindmapNodeSchema).min(2).max(3).optional(),
-  }),
-)
-
-const mindmapSchema = z.object({
-  title: z.string(),
-  children: z.array(mindmapNodeSchema).max(8).optional(),
-})
 
 export function buildMindmapFromJSON(data: MindmapNode): MindmapNode {
   return data
@@ -35,27 +24,44 @@ interface AIButtonProps {
 
 export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Element {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { user } = useUser()
 
   const handleClick = async () => {
-    setLoading(true)
-    setError(null)
-    const prompt = buildMindmapPrompt(topic)
-    for (let i = 0; i < 3; i++) {
-      try {
-        const response = await callOpenRouterWithRetries(prompt)
-        const parsed = JSON.parse(response)
-        const validated = mindmapSchema.parse(parsed)
-        const built = buildMindmapFromJSON(validated)
-        onGenerate(built)
-        setLoading(false)
-        return
-      } catch (err) {
-        console.warn('Mindmap generation failed', err)
-        if (i === 2) setError('Failed to generate mind map')
-      }
+    if (!user?.id) {
+      alert('You must be logged in to use AI features.')
+      return
     }
-    setLoading(false)
+
+    setLoading(true)
+    try {
+      const usage = await getMonthlyUsage(user.id, 'mindmap')
+      if (usage >= 25) {
+        alert("You've reached your 25 AI mindmap limit this month.")
+        return
+      }
+
+      const prompt = buildMindmapPrompt(topic)
+      const response = await callOpenRouterWithRetries(prompt)
+      if (!response) {
+        alert('AI failed to generate a mindmap after 3 attempts.')
+        return
+      }
+
+      let parsed: any
+      try {
+        parsed = JSON.parse(response)
+        if (!parsed || !parsed.children) throw new Error('Invalid JSON')
+      } catch {
+        alert('AI returned an invalid mindmap format.')
+        return
+      }
+
+      await trackAIUsage(user.id, 'mindmap')
+      const built = buildMindmapFromJSON(parsed)
+      onGenerate(built)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -63,7 +69,6 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
       <button className="btn-primary" onClick={handleClick} disabled={loading}>
         {loading ? <LoadingSpinner size={16} /> : 'Create with AI'}
       </button>
-      {error && <div className="error-text">{error}</div>}
     </div>
   )
 }

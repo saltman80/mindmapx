@@ -30,21 +30,19 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
     setLoading(true)
     setError(null)
     const prompt = buildTodosPrompt(topic)
-    for (let i = 0; i < 3; i++) {
-      try {
-        const response = await callOpenRouterWithRetries(prompt)
-        const parsed = JSON.parse(response)
-        const validated = todosSchema.parse(parsed)
-        const built = buildTodosFromJSON(validated)
-        onGenerate(built)
-        setLoading(false)
-        return
-      } catch (err) {
-        console.warn('Todo generation failed', err)
-        if (i === 2) setError('Failed to generate todos')
-      }
+    try {
+      const response = await callOpenRouterWithRetries(prompt)
+      if (!response) throw new Error('No response')
+      const parsed = JSON.parse(response)
+      const validated = todosSchema.parse(parsed)
+      const built = buildTodosFromJSON(validated)
+      onGenerate(built)
+    } catch (err) {
+      console.warn('Todo generation failed', err)
+      setError('Failed to generate todos')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
