@@ -1,22 +1,9 @@
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
-import { useState, useEffect } from 'react'
+import { useUser } from '@/lib/UserContext'
 
 export default function ProfilePage(): JSX.Element {
-  const [user, setUser] = useState<{ name?: string; email?: string; picture?: string } | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch('/.netlify/functions/me', { credentials: 'include' })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => {
-        setUser(data?.user || null)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
-  }, [])
-
-  if (loading) return <p>Loading...</p>
+  const { user } = useUser()
   if (!user) return <p>Please log in to view your profile.</p>
 
   return (

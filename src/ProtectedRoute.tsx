@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useUser } from './lib/UserContext'
+import { isAdmin } from './lib/isAdmin'
 
 interface Status {
   subscription_status: string
@@ -41,7 +42,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
           return
         }
 
-        if (user.role === 'admin') {
+        if (isAdmin(user)) {
           setStatus({
             subscription_status: 'active',
             trial_start_date: null,
@@ -68,7 +69,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
     check()
   }, [])
 
-  if (user?.role === 'admin') {
+  if (isAdmin(user)) {
     return <>{children}</>
   }
 
