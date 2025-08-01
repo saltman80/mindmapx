@@ -23,12 +23,23 @@ export interface MindmapNode {
   y?: number
 }
 
-export function buildMindmapFromJSON(data: MindmapNode): MindmapNode {
-  return data
+export function buildMindmapFromJSON(data: MindmapNode, mapId: string): MindmapNode {
+  function clone(node: MindmapNode): MindmapNode {
+    return {
+      id: node.id,
+      title: node.title,
+      parentId: node.parentId,
+      mapId,
+      x: node.x,
+      y: node.y,
+      children: Array.isArray(node.children) ? node.children.map(clone) : undefined,
+    }
+  }
+  return clone(data)
 }
 
-function buildMindmapPrompt(_topic: string): string {
-  return `Create a valid JSON mindmap structure with:
+function buildMindmapPrompt(topic: string): string {
+  return `Create a valid JSON mindmap structure about "${topic}" with:
 - One root node titled "My Mindmap".
 - Up to 8 child nodes connected to the root.
 - Each child node may have 2–3 subnodes.
@@ -56,13 +67,6 @@ function validateMindmapTree(root: any): asserts root is MindmapNode {
     }
   }
   walk(root, null)
-}
-
-function replaceMapId(node: MindmapNode, mapId: string): void {
-  node.mapId = mapId
-  if (Array.isArray(node.children)) {
-    for (const child of node.children) replaceMapId(child, mapId)
-  }
 }
 
 function assignPositions(root: MindmapNode): void {
@@ -178,7 +182,6 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
       }
 
       const mapId = await createNewMindmap('AI Generated Map')
-      replaceMapId(rootNode, mapId)
       assignPositions(rootNode)
       const allNodes = flattenMindmapTree(rootNode, mapId)
       const idMap = new Map<string, string>()
@@ -187,7 +190,7 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
       }
 
       await trackAIUsage(user.id, 'mindmap')
-      onGenerate(buildMindmapFromJSON(rootNode))
+      onGenerate(buildMindmapFromJSON(rootNode, mapId))
     } catch (err: any) {
       console.error(err)
       alert(err?.message || 'Mindmap generation failed')
