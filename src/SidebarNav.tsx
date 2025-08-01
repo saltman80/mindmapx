@@ -20,7 +20,7 @@ const accountLinks = [
 
 export default function SidebarNav(): JSX.Element {
   const navigate = useNavigate()
-  const { user, setUser } = useUser()
+  const { setUser } = useUser()
 
   const [open, setOpen] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth > 768 : true
@@ -38,18 +38,16 @@ export default function SidebarNav(): JSX.Element {
 
   const handleUpgrade = async () => {
     try {
-      const res = await authFetch('/.netlify/functions/create-checkout-session', {
+      const res = await authFetch('/.netlify/functions/createCheckoutSession', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email })
+        headers: { 'Content-Type': 'application/json' }
       })
-      if (!res.ok) return
-      const { url } = await res.json()
-      if (url) {
-        window.location.assign(url)
+      const data = await res.json().catch(() => null)
+      if (res.ok && data?.url) {
+        window.location.href = data.url as string
       }
     } catch {
-      // ignore errors
+      /* ignore */
     }
   }
 
