@@ -60,11 +60,18 @@ export const handler = async (
 
     const { email, password } = body as any
 
-    if (!email || !password) {
+    // Basic validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (
+      typeof email !== 'string' ||
+      !emailRegex.test(email) ||
+      typeof password !== 'string' ||
+      password.length === 0
+    ) {
       return {
         statusCode: 400,
         headers: corsHeaders,
-        body: JSON.stringify({ error: 'Missing email or password' }),
+        body: JSON.stringify({ error: 'Missing or invalid email or password' }),
       }
     }
 
@@ -86,15 +93,16 @@ export const handler = async (
         password,
         parseInt(BCRYPT_SALT_ROUNDS)
       )
-      await client.query(
-        `INSERT INTO users (email, password_hash, subscription_status, trial_start_date, paid_thru_date)
-       VALUES ($1, $2, 'trialing', now(), NULL)`,
+      const insertResult = await client.query(
+        `INSERT INTO users (email, password_hash, role, created_at, updated_at, trial_start_date, subscription_status)
+       VALUES ($1, $2, 'user', now(), now(), now(), 'trialing')
+       RETURNING id`,
         [email, passwordHash]
       )
       return {
         statusCode: 201,
         headers: corsHeaders,
-        body: JSON.stringify({ success: true }),
+        body: JSON.stringify({ success: true, id: insertResult.rows[0].id }),
       }
     } finally {
       client.release()
