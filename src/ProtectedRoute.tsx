@@ -11,7 +11,7 @@ interface Status {
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { setUser } = useUser()
+  const { user, setUser } = useUser()
   const [status, setStatus] = useState<Status | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -67,6 +67,10 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
     }
     check()
   }, [])
+
+  if (user?.role === 'admin') {
+    return <>{children}</>
+  }
 
   if (loading || !status) return null
 
