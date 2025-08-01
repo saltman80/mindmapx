@@ -7,6 +7,8 @@ import { pool } from './db-client.js'
 
 export interface SessionPayload {
   userId: string
+  email?: string
+  role?: string
   sessionStart?: number
   iat?: number
   exp?: number
@@ -30,8 +32,10 @@ function verifyJwt(token: string): SessionPayload {
 }
 
 // Generate a JWT and store its hash in the database
-export async function createSession(userId: string): Promise<string> {
-  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: `${SESSION_EXPIRY_HOURS}h` })
+export async function createSession(userId: string, email: string, role: string = 'user'): Promise<string> {
+  const token = jwt.sign({ userId, email, role }, JWT_SECRET, {
+    expiresIn: `${SESSION_EXPIRY_HOURS}h`
+  })
   const tokenHash = createHash('sha256').update(token).digest('hex')
   const expiresAt = new Date(Date.now() + SESSION_EXPIRY_HOURS * 60 * 60 * 1000)
   const client = await pool.connect()
@@ -46,34 +50,57 @@ export async function createSession(userId: string): Promise<string> {
   return token
 }
 
-export async function authenticateUser(email: string, password: string): Promise<{ userId: string }> {
+export async function authenticateUser(email: string, password: string): Promise<{ userId: string; role: string }> {
   const client = await pool.connect()
   try {
     const result = await client.query(
-      'SELECT id, password_hash FROM users WHERE email = $1',
+      'SELECT id, password_hash, role FROM users WHERE email = $1',
       [email.toLowerCase().trim()]
     )
     if (result.rows.length === 0) {
       throw new Error('User not found')
     }
-    const user = result.rows[0] as { id: string; password_hash: string }
+    const user = result.rows[0] as { id: string; password_hash: string; role: string }
     const isValid = await bcrypt.compare(password, user.password_hash)
     if (!isValid) {
       throw new Error('Invalid password')
     }
-    return { userId: user.id }
+    return { userId: user.id, role: user.role }
   } finally {
     client.release()
   }
 }
 
 export async function login(email: string, password: string): Promise<string> {
-  const { userId } = await authenticateUser(email, password)
-  return createSession(userId)
+  const adminEmail = process.env.ADMIN_EMAIL
+  const adminPassword = process.env.ADMIN_PASSWORD
+
+  if (adminEmail && adminPassword && email === adminEmail) {
+    if (password !== adminPassword) {
+      throw new Error('Invalid password')
+    }
+    return jwt.sign({ userId: 'admin', email: adminEmail, role: 'admin' }, JWT_SECRET, {
+      expiresIn: `${SESSION_EXPIRY_HOURS}h`
+    })
+  }
+
+  const { userId, role } = await authenticateUser(email, password)
+  return createSession(userId, email, role)
 }
 
 export async function verifySession(token: string): Promise<SessionPayload> {
   const payload = verifyJwt(token)
+  const adminEmail = process.env.ADMIN_EMAIL
+  if (adminEmail && payload.email === adminEmail) {
+    return {
+      userId: payload.userId,
+      email: payload.email,
+      role: payload.role,
+      sessionStart: payload.sessionStart,
+      iat: payload.iat,
+      exp: payload.exp
+    }
+  }
   const tokenHash = createHash('sha256').update(token).digest('hex')
   const client = await pool.connect()
   try {
@@ -84,7 +111,14 @@ export async function verifySession(token: string): Promise<SessionPayload> {
     if (rows.length === 0) {
       throw new Error('Session not found or expired')
     }
-    return { userId: rows[0].user_id, sessionStart: payload.sessionStart, iat: payload.iat, exp: payload.exp }
+    return {
+      userId: rows[0].user_id,
+      email: payload.email,
+      role: payload.role,
+      sessionStart: payload.sessionStart,
+      iat: payload.iat,
+      exp: payload.exp
+    }
   } finally {
     client.release()
   }
