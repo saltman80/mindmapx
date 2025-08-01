@@ -42,7 +42,7 @@ async function runMigrations() {
 
     for (const file of files) {
       const already = await client.query('SELECT 1 FROM schema_migrations WHERE version = $1', [file])
-      if (already.rowCount > 0) continue
+      if (already.rowCount !== null && already.rowCount > 0) continue
 
       const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8')
       try {
