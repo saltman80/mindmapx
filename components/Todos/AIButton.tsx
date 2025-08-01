@@ -14,7 +14,7 @@ export function buildTodosFromJSON(data: TodoItem[]): TodoItem[] {
 }
 
 function buildTodosPrompt(topic: string): string {
-  return `Create a JSON list of up to 20 todo items for ${topic}. Each item should have a title.`
+  return `Create a JSON list of up to 20 todo items for ${topic}. Each item should have a title. Return only valid JSON.`
 }
 
 interface AIButtonProps {
