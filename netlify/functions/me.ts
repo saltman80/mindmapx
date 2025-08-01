@@ -1,15 +1,9 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import cookie from 'cookie'
-import jwt from 'jsonwebtoken'
 import type { PoolClient } from 'pg'
 import { validate as isUuid } from 'uuid'
-
-const { JWT_SECRET } = process.env
-if (!JWT_SECRET) {
-  console.error('❌ Missing JWT_SECRET')
-  throw new Error('JWT_SECRET environment variable not set')
-}
+import { verifySession } from './auth.js'
 
 const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const CORS_HEADERS = {
@@ -56,11 +50,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       }
     }
 
-    const payload = jwt.verify(token, JWT_SECRET) as {
-      userId: string
-      email?: string
-      role?: string
-    }
+    const payload = await verifySession(token)
     console.log('✅ Verified token payload:', payload)
 
     if (!isUuid(payload.userId)) {

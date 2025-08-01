@@ -3,24 +3,18 @@ import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
 import { requireAuth } from '../lib/auth.js'
 
-const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
+const { ADMIN_EMAIL } = process.env
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
-    let userEmail: string | undefined
-
+    const { email: authEmail } = requireAuth(event)
     const qs = event.queryStringParameters || {}
-    if (
-      ADMIN_EMAIL &&
-      ADMIN_PASSWORD &&
-      qs.email === ADMIN_EMAIL &&
-      qs.password === ADMIN_PASSWORD
-    ) {
-      userEmail = ADMIN_EMAIL
+
+    let userEmail: string | undefined
+    if (ADMIN_EMAIL && authEmail === ADMIN_EMAIL) {
+      userEmail = qs.email || authEmail
     } else {
-      const { email } = requireAuth(event)
-      const headerEmail = (event.headers['x-user-email'] || event.headers['X-User-Email']) as string | undefined
-      userEmail = email || headerEmail
+      userEmail = authEmail
     }
 
     if (!userEmail) {
