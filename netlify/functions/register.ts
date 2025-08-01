@@ -87,8 +87,8 @@ export const handler = async (
         parseInt(BCRYPT_SALT_ROUNDS)
       )
       await client.query(
-        `INSERT INTO users (email, password_hash, subscription_status, trial_start_date)
-       VALUES ($1, $2, 'trialing', now())`,
+        `INSERT INTO users (email, password_hash, subscription_status, trial_start_date, paid_thru_date)
+       VALUES ($1, $2, 'trialing', now(), NULL)`,
         [email, passwordHash]
       )
       return {
