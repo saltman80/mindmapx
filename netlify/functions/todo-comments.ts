@@ -55,7 +55,7 @@ export const handler: Handler = async (event) => {
       }
       console.debug('Fetching comments for todoId:', todoId, 'userId:', userId)
       const res = await client.query(
-        `SELECT c.id, c.comment, c.created_at, u.name AS author
+        `SELECT c.id, c.comment, c.created_at, u.email AS author
          FROM todo_comments c
          JOIN users u ON c.user_id = u.id
          WHERE c.todo_id = $1
@@ -114,9 +114,9 @@ export const handler: Handler = async (event) => {
          RETURNING id, comment, created_at`,
         [todoId, userId, commentText]
       )
-      const nameRes = await client.query('SELECT name FROM users WHERE id=$1', [userId])
+      const emailRes = await client.query('SELECT email FROM users WHERE id=$1', [userId])
       const inserted = insert.rows[0]
-      const response = { ...inserted, author: nameRes.rows[0]?.name || 'You' }
+      const response = { ...inserted, author: emailRes.rows[0]?.email || 'You' }
       return { statusCode: 201, headers, body: JSON.stringify(response) }
     }
 

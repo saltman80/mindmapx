@@ -12,7 +12,7 @@ interface Props {
   todo: TodoItem | null
   onClose: () => void
   onAdd: (comment: TodoComment) => void
-  currentUser?: { name: string }
+  currentUser?: { email: string }
 }
 
 export default function TodoCommentsModal({ todo, onClose, onAdd, currentUser }: Props) {
@@ -111,7 +111,7 @@ export default function TodoCommentsModal({ todo, onClose, onAdd, currentUser }:
         <h2 className="mb-2 text-lg font-semibold">Comments for "{todo.title}"</h2>
         <div className="comment-feed" ref={feedRef}>
           {comments.map((c, i) => {
-            const isMine = c.author === currentUser?.name
+            const isMine = c.author === currentUser?.email
             const name = isMine ? 'Me' : c.author || 'Anon'
 
             return (
