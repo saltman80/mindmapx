@@ -227,6 +227,7 @@ const Header = (): JSX.Element => {
           ) : (
             <>
               <button
+                type="button"
                 className="header__login-link"
                 onClick={e => {
                   e.preventDefault()

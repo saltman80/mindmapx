@@ -19,9 +19,15 @@ const DesktopMenu = (): JSX.Element => (
         </li>
       ))}
     </ul>
-    <a href="/login" className="desktop-menu__login">
+    <button
+      type="button"
+      className="desktop-menu__login"
+      onClick={() => {
+        window.location.href = '/login'
+      }}
+    >
       Login
-    </a>
+    </button>
   </nav>
 )
 
@@ -115,9 +121,16 @@ const MobileMenu = (): JSX.Element => {
               </li>
             ))}
           </ul>
-          <a href="/login" className="mobile-menu__login" onClick={toggleMenu}>
+          <button
+            type="button"
+            className="mobile-menu__login"
+            onClick={() => {
+              toggleMenu()
+              window.location.href = '/login'
+            }}
+          >
             Login
-          </a>
+          </button>
           <button
             type="button"
             className="mobile-menu__close"

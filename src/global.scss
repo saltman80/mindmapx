@@ -771,6 +771,12 @@ hr {
   gap: 15px;
 }
 
+@media (max-width: 1024px) {
+  .header__actions--marketing {
+    gap: 30px;
+  }
+}
+
 
 .header__nav-list {
   display: flex;
