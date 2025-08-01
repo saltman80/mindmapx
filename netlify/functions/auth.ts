@@ -5,8 +5,6 @@ import cookie from 'cookie'
 import { createHash } from 'crypto'
 import { pool } from './db-client.js'
 
-const ADMIN_ID = '00000000-0000-0000-0000-000000000000'
-
 export interface SessionPayload {
   userId: string
   email?: string
@@ -78,15 +76,24 @@ export async function login(email: string, password: string): Promise<string> {
   const adminPassword = process.env.ADMIN_PASSWORD
 
   if (adminEmail && adminPassword && email === adminEmail) {
-    if (password !== adminPassword) {
-      throw new Error('Invalid password')
+    const client = await pool.connect()
+    try {
+      const { rows } = await client.query(
+        'SELECT id, email, role FROM users WHERE email = $1',
+        [adminEmail]
+      )
+      if (rows.length === 0) {
+        throw new Error('Admin account not found')
+      }
+      const admin = rows[0] as { id: string; email: string; role: string | null }
+      if (password !== adminPassword) {
+        throw new Error('Invalid password')
+      }
+      const role = admin.role || 'admin'
+      return createSession(admin.id, admin.email, role)
+    } finally {
+      client.release()
     }
-    // Admin login skips session tracking and directly issues a JWT
-    return jwt.sign(
-      { userId: ADMIN_ID, email: adminEmail, role: 'admin' },
-      JWT_SECRET,
-      { expiresIn: `${SESSION_EXPIRY_HOURS}h` }
-    )
   }
 
   const { userId, role } = await authenticateUser(email, password)
@@ -95,23 +102,6 @@ export async function login(email: string, password: string): Promise<string> {
 
 export async function verifySession(token: string): Promise<SessionPayload> {
   const payload = verifyJwt(token)
-  const adminEmail = process.env.ADMIN_EMAIL
-
-  if (
-    payload.role === 'admin' ||
-    payload.userId === ADMIN_ID ||
-    (adminEmail && payload.email === adminEmail)
-  ) {
-    return {
-      userId: payload.userId || ADMIN_ID,
-      email: payload.email || adminEmail,
-      role: 'admin',
-      sessionStart: payload.sessionStart,
-      iat: payload.iat,
-      exp: payload.exp,
-    }
-  }
-
   const tokenHash = createHash('sha256').update(token).digest('hex')
   const client = await pool.connect()
   try {
