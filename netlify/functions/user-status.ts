@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
 import { extractToken, verifySession } from './auth.js'
+import { isAdmin } from '../lib/isAdmin.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
@@ -11,10 +12,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     }
 
     const payload = await verifySession(token)
-    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase()
-    const userEmail = payload.email?.toLowerCase()
 
-    if (payload.role === 'admin' || (adminEmail && userEmail === adminEmail)) {
+    if (isAdmin(payload)) {
       return jsonResponse(200, {
         success: true,
         data: {
@@ -25,6 +24,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       })
     }
 
+    const userEmail = payload.email?.toLowerCase()
     if (!userEmail) {
       return jsonResponse(400, { success: false, message: 'Missing email' })
     }

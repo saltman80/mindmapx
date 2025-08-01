@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { Drawer } from '../drawer'
 import { useUser } from './lib/UserContext'
+import { isAdmin } from './lib/isAdmin'
 
 const normalizePath = (path: string): string =>
   path.replace(/\/+$/, '') || '/'
@@ -36,11 +37,11 @@ const Header = (): JSX.Element => {
         { label: 'Dashboard', route: '/dashboard' },
         { label: 'Mindmaps', route: '/mindmaps' },
         { label: 'Todos', route: '/todos' },
-        ...(user.role === 'admin'
+        ...(isAdmin(user)
           ? [
               { label: 'Users', route: '/admin/users' },
               { label: 'Payments', route: '/admin/payments' },
-          { label: 'Analytics', route: '/admin/analytics' },
+              { label: 'Analytics', route: '/admin/analytics' },
             ]
           : []),
       ]

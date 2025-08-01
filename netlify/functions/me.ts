@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import type { PoolClient } from 'pg'
 import { verifySession, extractToken } from './auth.js'
+import { isAdmin } from '../lib/isAdmin.js'
 
 const allowedOrigin = process.env.CORS_ORIGIN || '*'
 const CORS_HEADERS = {
@@ -10,7 +11,6 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true'
 }
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
 async function columnExists(
   client: PoolClient,
@@ -50,7 +50,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const { email, userId, role } = await verifySession(token)
     console.log('✅ Verified token payload:', { email, userId, role })
 
-    if (role === 'admin' || (ADMIN_EMAIL && email === ADMIN_EMAIL)) {
+    if (isAdmin({ email, role })) {
       return {
         statusCode: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
