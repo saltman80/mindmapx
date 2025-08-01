@@ -46,18 +46,18 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       }
     }
 
-    const payload = await verifySession(token)
-    console.log('✅ Verified token payload:', payload)
+    const { email, userId, role } = await verifySession(token)
+    console.log('✅ Verified token payload:', { email, userId, role })
 
-    if (payload.role === 'admin') {
+    if (role === 'admin') {
       return {
         statusCode: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           authenticated: true,
           user: {
-            id: payload.userId,
-            email: payload.email,
+            id: userId,
+            email: email,
             role: 'admin'
           }
         })
@@ -77,7 +77,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
 
       const { rows } = await client.query(
         `SELECT ${fields.join(', ')} FROM users WHERE email = $1`,
-        [payload.email?.toLowerCase()]
+        [email?.toLowerCase()]
       )
       if (rows.length === 0) {
         return {
@@ -88,8 +88,8 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       }
 
       const user = rows[0] as any
-      if (!hasRole && payload.role) {
-        user.role = payload.role
+      if (!hasRole && role) {
+        user.role = role
       }
 
       return {

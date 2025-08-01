@@ -8,6 +8,7 @@ import React, {
 import { useNavigate, Link } from 'react-router-dom'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
+import { useUser } from './src/lib/UserContext'
 
 interface LoginFormValues {
   email: string
@@ -21,6 +22,7 @@ const LoginPage = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const abortControllerRef = useRef<AbortController | null>(null)
+  const { fetchUser } = useUser()
 
   useEffect(() => {
     return () => {
@@ -98,9 +100,7 @@ const LoginPage = (): JSX.Element => {
           throw new Error('Failed to parse server response')
         }
       })
-      .then(() =>
-        fetch('/.netlify/functions/me', { credentials: 'include' }).catch(() => null)
-      )
+      .then(fetchUser)
       .then(() => {
         navigate('/dashboard')
       })

@@ -3,8 +3,6 @@ import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
 import { extractToken, verifySession } from './auth.js'
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase()
-
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
     const token = extractToken(event)
@@ -15,7 +13,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const payload = await verifySession(token)
     const userEmail = payload.email?.toLowerCase()
 
-    if (payload.role === 'admin' || userEmail === ADMIN_EMAIL) {
+    if (payload.role === 'admin') {
       return jsonResponse(200, {
         success: true,
         data: {
@@ -33,6 +31,12 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
 
     const client = await getClient()
     try {
+      await client.query(`
+        ALTER TABLE users
+          ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'trialing',
+          ADD COLUMN IF NOT EXISTS trial_start_date TIMESTAMPTZ DEFAULT now(),
+          ADD COLUMN IF NOT EXISTS paid_thru_date TIMESTAMPTZ
+      `)
       const { rows } = await client.query(
         'SELECT subscription_status, trial_start_date, paid_thru_date FROM users WHERE email = $1',
         [userEmail]
