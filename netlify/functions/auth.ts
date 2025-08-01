@@ -5,6 +5,8 @@ import cookie from 'cookie'
 import { createHash } from 'crypto'
 import { pool } from './db-client.js'
 
+const ADMIN_ID = '00000000-0000-0000-0000-000000000000'
+
 export interface SessionPayload {
   userId: string
   email?: string
@@ -79,8 +81,8 @@ export async function login(email: string, password: string): Promise<string> {
     if (password !== adminPassword) {
       throw new Error('Invalid password')
     }
-    // Admin sessions are created like regular user sessions
-    return createSession('admin', adminEmail, 'admin')
+    // Admin sessions are created like regular user sessions with a fixed UUID
+    return createSession(ADMIN_ID, adminEmail, 'admin')
   }
 
   const { userId, role } = await authenticateUser(email, password)

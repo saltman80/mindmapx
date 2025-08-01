@@ -3,6 +3,8 @@ import { getClient } from './db-client.js'
 import { jsonResponse } from '../lib/response.js'
 import { extractToken, verifySession } from './auth.js'
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase()
+
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
     const token = extractToken(event)
@@ -13,7 +15,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const payload = await verifySession(token)
     const userEmail = payload.email?.toLowerCase()
 
-    if (payload.role === 'admin') {
+    if (payload.role === 'admin' || userEmail === ADMIN_EMAIL) {
       return jsonResponse(200, {
         success: true,
         data: {
