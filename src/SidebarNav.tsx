@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useUser } from './lib/UserContext'
+import { authFetch } from '../authFetch'
 
 const mainLinks = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -19,17 +20,36 @@ const accountLinks = [
 
 export default function SidebarNav(): JSX.Element {
   const navigate = useNavigate()
-  const { setUser } = useUser()
+  const { user, setUser } = useUser()
 
   const [open, setOpen] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth > 768 : true
   )
+
+  const [isTrial, setIsTrial] = useState(false)
 
   const handleSignOut = () => {
     document.cookie = 'token=; Max-Age=0; path=/'
     document.cookie = 'session=; Max-Age=0; path=/'
     setUser(null)
     navigate('/login')
+  }
+
+  const handleUpgrade = async () => {
+    try {
+      const res = await authFetch('/.netlify/functions/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user?.email })
+      })
+      if (!res.ok) return
+      const { url } = await res.json()
+      if (url) {
+        window.location.assign(url)
+      }
+    } catch {
+      // ignore errors
+    }
   }
 
   const DESKTOP_WIDTH = 200
@@ -59,6 +79,26 @@ export default function SidebarNav(): JSX.Element {
       document.body.classList.remove('sidebar-open')
     }
   }, [open])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const loadStatus = async () => {
+      try {
+        const res = await authFetch('/.netlify/functions/user-status', {
+          signal: controller.signal
+        })
+        if (!res.ok) return
+        const json = await res.json()
+        if (json?.data?.subscription_status === 'trialing') {
+          setIsTrial(true)
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    loadStatus()
+    return () => controller.abort()
+  }, [])
 
   const sidebarVariants = {
     open: { x: 0 },
@@ -106,6 +146,13 @@ export default function SidebarNav(): JSX.Element {
               </NavLink>
             </li>
           ))}
+          {isTrial && (
+            <li>
+              <button type="button" className="upgrade-btn" onClick={handleUpgrade}>
+                Upgrade
+              </button>
+            </li>
+          )}
           <li>
             <button type="button" className="signout-btn" onClick={handleSignOut}>
               Sign Out
