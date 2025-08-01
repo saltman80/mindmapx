@@ -32,7 +32,7 @@ function verifyJwt(token: string): SessionPayload {
 }
 
 // Generate a JWT and store its hash in the database
-export async function createSession(userId: string, email: string, role: string = 'user'): Promise<string> {
+async function createSession(userId: string, email: string, role: string = 'user'): Promise<string> {
   const token = jwt.sign({ userId, email, role }, JWT_SECRET, {
     expiresIn: `${SESSION_EXPIRY_HOURS}h`
   })
