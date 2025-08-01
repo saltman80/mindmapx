@@ -19,10 +19,14 @@ export const pool = new PgPool({
 let migrationPromise: Promise<void> | null = null
 
 async function runMigrations() {
-  const migrationsDir = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '../../../migrations'
-  )
+  let migrationsDir: string
+  try {
+    const moduleDir = path.dirname(fileURLToPath(import.meta.url))
+    migrationsDir = path.join(moduleDir, '../../../migrations')
+  } catch {
+    // Fallback when import.meta.url is unavailable (e.g. bundled CommonJS)
+    migrationsDir = path.join(process.cwd(), 'migrations')
+  }
 
   if (!fs.existsSync(migrationsDir)) {
     console.warn(`Migrations directory not found at ${migrationsDir}`)
