@@ -14,6 +14,12 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const check = async () => {
+      const hasSession = /(?:^|;\s*)(session|token)=/.test(document.cookie)
+      if (!hasSession) {
+        navigate('/login')
+        setLoading(false)
+        return
+      }
       try {
         const res = await fetch('/.netlify/functions/user-status', {
           credentials: 'include'

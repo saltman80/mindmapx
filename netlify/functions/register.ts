@@ -1,7 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 
 // Database connection is handled in db-client.ts
 
@@ -20,18 +19,12 @@ export const handler = async (
   try {
     const {
       NETLIFY_DATABASE_URL,
-      JWT_SECRET,
       BCRYPT_SALT_ROUNDS = '10',
-      SESSION_EXPIRY_HOURS = '24',
     } = process.env
 
     if (!NETLIFY_DATABASE_URL) {
       console.error('❌ Missing NETLIFY_DATABASE_URL')
       throw new Error('Missing NETLIFY_DATABASE_URL')
-    }
-    if (!JWT_SECRET) {
-      console.error('❌ Missing JWT_SECRET')
-      throw new Error('Missing JWT_SECRET')
     }
     if (event.httpMethod === 'OPTIONS') {
       return {
@@ -93,22 +86,15 @@ export const handler = async (
         password,
         parseInt(BCRYPT_SALT_ROUNDS)
       )
-      const result = await client.query(
+      await client.query(
         `INSERT INTO users (email, password_hash, subscription_status, trial_start_date)
-       VALUES ($1, $2, 'trialing', now())
-       RETURNING id`,
+       VALUES ($1, $2, 'trialing', now())`,
         [email, passwordHash]
-      )
-      const newUserId = result.rows[0].id
-      const token = jwt.sign(
-        { userId: newUserId },
-        JWT_SECRET as string,
-        { expiresIn: `${SESSION_EXPIRY_HOURS}h` }
       )
       return {
         statusCode: 201,
         headers: corsHeaders,
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ success: true }),
       }
     } finally {
       client.release()

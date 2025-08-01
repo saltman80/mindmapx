@@ -98,6 +98,9 @@ const LoginPage = (): JSX.Element => {
           throw new Error('Failed to parse server response')
         }
       })
+      .then(() =>
+        fetch('/.netlify/functions/me', { credentials: 'include' }).catch(() => null)
+      )
       .then(() => {
         navigate('/dashboard')
       })
