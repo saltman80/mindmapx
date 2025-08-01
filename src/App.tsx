@@ -36,6 +36,7 @@ import Footer from './footer'
 import ScrollToTop from './ScrollToTop'
 import SidebarNav from './SidebarNav'
 import ProtectedRoute from './ProtectedRoute'
+import UpgradeRequired from '../upgrade-required'
 
 function AppRoutes() {
   return (
@@ -68,6 +69,7 @@ function AppRoutes() {
       <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
       <Route path="/purchase" element={<PurchasePage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/upgrade-required" element={<UpgradeRequired />} />
       <Route path="/trial-expired" element={<TrialExpired />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
