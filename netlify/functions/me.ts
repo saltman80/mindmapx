@@ -2,6 +2,7 @@ import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import cookie from 'cookie'
 import jwt from 'jsonwebtoken'
+import type { PoolClient } from 'pg'
 
 const { JWT_SECRET } = process.env
 if (!JWT_SECRET) {
@@ -15,6 +16,18 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true'
+}
+
+async function columnExists(
+  client: PoolClient,
+  table: string,
+  column: string
+): Promise<boolean> {
+  const res = await client.query(
+    'SELECT 1 FROM information_schema.columns WHERE table_name=$1 AND column_name=$2',
+    [table, column]
+  )
+  return typeof res.rowCount === 'number' && res.rowCount > 0
 }
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -48,8 +61,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     let client
     try {
       client = await getClient()
+      const hasName = await columnExists(client, 'users', 'name')
+      const fields = hasName ? 'id, email, name, role' : 'id, email, role'
       const { rows } = await client.query(
-        'SELECT id, email, name, role FROM users WHERE id = $1',
+        `SELECT ${fields} FROM users WHERE id = $1`,
         [payload.userId]
       )
       if (rows.length === 0) {
