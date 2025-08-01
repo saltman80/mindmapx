@@ -5,6 +5,10 @@ import { getClient } from './netlify/functions/db-client.js'
 
 async function runMigrations() {
   const client = await getClient()
+  console.log(
+    '\uD83D\uDD27 Running migrations against DB:',
+    (client as any).connectionParameters.database
+  )
 
   // Create migrations table if missing
   await client.query(`
@@ -14,7 +18,7 @@ async function runMigrations() {
     );
   `)
 
-  const migrationsDir = path.join(
+  const migrationsDir = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
     '../migrations'
   )
