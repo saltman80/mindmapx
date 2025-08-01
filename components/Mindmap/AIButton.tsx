@@ -42,7 +42,7 @@ function buildMindmapPrompt(topic: string): string {
   return `Create a valid JSON mindmap structure about "${topic}" with:
 - One root node titled "My Mindmap".
 - Up to 8 child nodes connected to the root.
-- Each child node may have 2–3 subnodes.
+- Each child node may have 1–3 subnodes.
 
 Each node must include: id, title, parentId (null for root), and mapId = "TEMP_MAP_ID".
 
@@ -51,7 +51,7 @@ Return only valid JSON in tree format.`
 
 function validateMindmapTree(root: any): asserts root is MindmapNode {
   const ids = new Set<string>()
-  function walk(node: any, expectedParent: string | null): void {
+  function walk(node: any, expectedParent: string | null, depth: number): void {
     if (!node || typeof node !== 'object') throw new Error('Node must be object')
     const { id, title, parentId, mapId, children } = node
     if (typeof id !== 'string' || typeof title !== 'string') throw new Error('Missing fields')
@@ -63,10 +63,12 @@ function validateMindmapTree(root: any): asserts root is MindmapNode {
     ids.add(id)
     if (children != null) {
       if (!Array.isArray(children)) throw new Error('Children must be array')
-      for (const child of children) walk(child, id)
+      if (depth === 0 && children.length > 8) throw new Error('Too many root children')
+      if (depth === 1 && children.length > 3) throw new Error('Too many subnodes')
+      for (const child of children) walk(child, id, depth + 1)
     }
   }
-  walk(root, null)
+  walk(root, null, 0)
 }
 
 function assignPositions(root: MindmapNode): void {
