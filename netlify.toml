@@ -8,6 +8,9 @@
   NODE_VERSION = "22"
   NODE_ENV = "production"
 
+[functions]
+  included_files = ["migrations/**"]
+
 [context.production.environment]
 
 [context.deploy-preview.environment]
