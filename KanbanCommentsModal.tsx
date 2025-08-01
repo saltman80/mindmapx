@@ -13,7 +13,7 @@ interface Props {
   card: Card | null
   onClose: () => void
   onAdd: (comment: KanbanComment) => void
-  currentUser?: { name: string }
+  currentUser?: { email: string }
 }
 
 export default function KanbanCommentsModal({ card, onClose, onAdd, currentUser }: Props) {
@@ -112,7 +112,7 @@ export default function KanbanCommentsModal({ card, onClose, onAdd, currentUser 
         <h2 className="mb-2 text-lg font-semibold">Comments for "{card.title}"</h2>
         <div className="comment-feed" ref={feedRef}>
           {comments.map((c, i) => {
-            const isMine = c.author === currentUser?.name
+            const isMine = c.author === currentUser?.email
             const name = isMine ? 'Me' : c.author || 'Anon'
 
             return (

@@ -54,14 +54,14 @@ export const handler: Handler = async (event) => {
         return { statusCode: 404, headers, body: JSON.stringify({ error: 'Card not found' }) }
       }
       console.debug('Fetching comments for cardId:', cardId, 'userId:', userId)
-      const res = await client.query(
-        `SELECT c.id, c.comment, c.created_at, u.name AS author
-         FROM kanban_card_comments c
-         JOIN users u ON c.user_id = u.id
-         WHERE c.card_id = $1
-         ORDER BY c.created_at ASC`,
-        [cardId]
-      )
+        const res = await client.query(
+          `SELECT c.id, c.comment, c.created_at, u.email AS author
+           FROM kanban_card_comments c
+           JOIN users u ON c.user_id = u.id
+           WHERE c.card_id = $1
+           ORDER BY c.created_at ASC`,
+          [cardId]
+        )
       return { statusCode: 200, headers, body: JSON.stringify(res.rows) }
     }
 
@@ -114,9 +114,9 @@ export const handler: Handler = async (event) => {
          RETURNING id, comment, created_at`,
         [cardId, userId, commentText]
       )
-      const nameRes = await client.query('SELECT name FROM users WHERE id=$1', [userId])
+      const emailRes = await client.query('SELECT email FROM users WHERE id=$1', [userId])
       const inserted = insert.rows[0]
-      const response = { ...inserted, author: nameRes.rows[0]?.name || 'You' }
+      const response = { ...inserted, author: emailRes.rows[0]?.email || 'You' }
       return { statusCode: 201, headers, body: JSON.stringify(response) }
     }
 
