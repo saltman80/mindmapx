@@ -100,9 +100,13 @@ const LoginPage = (): JSX.Element => {
           throw new Error('Failed to parse server response')
         }
       })
-      .then(fetchUser)
-      .then(() => {
-        navigate('/dashboard')
+      .then(data => {
+        if (data?.success) {
+          return fetchUser().then(() => {
+            navigate('/dashboard')
+          })
+        }
+        throw new Error('Login failed')
       })
       .catch(err => {
         if ((err as any).name !== 'AbortError') {
