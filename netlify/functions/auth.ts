@@ -81,8 +81,12 @@ export async function login(email: string, password: string): Promise<string> {
     if (password !== adminPassword) {
       throw new Error('Invalid password')
     }
-    // Admin sessions are created like regular user sessions with a fixed UUID
-    return createSession(ADMIN_ID, adminEmail, 'admin')
+    // Admin login skips session tracking and directly issues a JWT
+    return jwt.sign(
+      { userId: ADMIN_ID, email: adminEmail, role: 'admin' },
+      JWT_SECRET,
+      { expiresIn: `${SESSION_EXPIRY_HOURS}h` }
+    )
   }
 
   const { userId, role } = await authenticateUser(email, password)
@@ -91,6 +95,23 @@ export async function login(email: string, password: string): Promise<string> {
 
 export async function verifySession(token: string): Promise<SessionPayload> {
   const payload = verifyJwt(token)
+  const adminEmail = process.env.ADMIN_EMAIL
+
+  if (
+    payload.role === 'admin' ||
+    payload.userId === ADMIN_ID ||
+    (adminEmail && payload.email === adminEmail)
+  ) {
+    return {
+      userId: payload.userId || ADMIN_ID,
+      email: payload.email || adminEmail,
+      role: 'admin',
+      sessionStart: payload.sessionStart,
+      iat: payload.iat,
+      exp: payload.exp,
+    }
+  }
+
   const tokenHash = createHash('sha256').update(token).digest('hex')
   const client = await pool.connect()
   try {
