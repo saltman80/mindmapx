@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { z } from 'zod'
 import LoadingSpinner from '../../loadingspinner'
 import { callOpenRouterWithRetries } from '../../utils/openrouter'
+import { getMonthlyUsage, trackAIUsage } from '../../lib/ai/usage'
+import { useUser } from '../../src/lib/UserContext'
 
 export interface KanbanCard {
   title: string
@@ -14,23 +15,12 @@ export interface KanbanColumns {
   Done: KanbanCard[]
 }
 
-const cardSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-})
-
-const kanbanSchema = z.object({
-  New: z.array(cardSchema).max(20),
-  'In Progress': z.array(cardSchema).length(0),
-  Done: z.array(cardSchema).length(0),
-})
-
-export function buildKanbanFromJSON(data: KanbanColumns): KanbanColumns {
-  return data
+function buildKanbanPrompt(topic: string): string {
+  return `Generate a JSON array of up to 20 kanban cards about "${topic}". Each card should have a title and description. Return only valid JSON.`
 }
 
-function buildKanbanPrompt(topic: string): string {
-  return `Generate a JSON array of up to 20 kanban cards for ${topic}. Each should include a title and description. Group them into 1 column: New. Cards should only go into New column. Return only valid JSON.`
+function buildKanbanFromCards(cards: KanbanCard[]): KanbanColumns {
+  return { New: cards, 'In Progress': [], Done: [] }
 }
 
 interface AIButtonProps {
@@ -40,22 +30,48 @@ interface AIButtonProps {
 
 export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Element {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { user } = useUser()
 
   const handleClick = async () => {
+    if (!user?.id) {
+      alert('You must be logged in to use AI features.')
+      return
+    }
+
     setLoading(true)
-    setError(null)
-    const prompt = buildKanbanPrompt(topic)
     try {
-      const response = await callOpenRouterWithRetries(prompt)
-      if (!response) throw new Error('No response')
-      const parsed = JSON.parse(response)
-      const validated = kanbanSchema.parse(parsed)
-      const built = buildKanbanFromJSON(validated)
+      const usage = await getMonthlyUsage(user.id, 'kanban')
+      if (usage >= 25) {
+        alert("You’ve reached your 25 AI kanban creations this month.")
+        return
+      }
+
+      const prompt = buildKanbanPrompt(topic)
+      let cards: KanbanCard[] | null = null
+      for (let i = 0; i < 3 && !cards; i++) {
+        const response = await callOpenRouterWithRetries(prompt)
+        if (!response) break
+        try {
+          const parsed = JSON.parse(response)
+          if (!Array.isArray(parsed)) throw new Error('Invalid JSON array')
+          const valid = parsed.filter(
+            (c: any) => typeof c.title === 'string' && typeof c.description === 'string'
+          )
+          if (valid.length === 0) throw new Error('No valid cards found')
+          cards = valid
+        } catch (err) {
+          if (i === 2) alert('AI returned an invalid Kanban card format.')
+        }
+      }
+
+      if (!cards) {
+        alert('AI failed to generate kanban cards after 3 attempts.')
+        return
+      }
+
+      await trackAIUsage(user.id, 'kanban')
+      const built = buildKanbanFromCards(cards)
       onGenerate(built)
-    } catch (err) {
-      console.warn('Kanban generation failed', err)
-      setError('Failed to generate kanban data')
     } finally {
       setLoading(false)
     }
@@ -66,7 +82,6 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
       <button className="btn-primary" onClick={handleClick} disabled={loading}>
         {loading ? <LoadingSpinner size={16} /> : 'Create with AI'}
       </button>
-      {error && <div className="error-text">{error}</div>}
     </div>
   )
 }
