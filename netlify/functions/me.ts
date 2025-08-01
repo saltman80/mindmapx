@@ -55,16 +55,25 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       }
     }
 
-    const payload = jwt.verify(token, JWT_SECRET) as { userId: string }
+    const payload = jwt.verify(token, JWT_SECRET) as {
+      userId: string
+      role?: string
+    }
     console.log('✅ Verified token payload:', payload)
 
     let client
     try {
       client = await getClient()
+
       const hasName = await columnExists(client, 'users', 'name')
-      const fields = hasName ? 'id, email, name, role' : 'id, email, role'
+      const hasRole = await columnExists(client, 'users', 'role')
+
+      const fields = ['id', 'email']
+      if (hasName) fields.push('name')
+      if (hasRole) fields.push('role')
+
       const { rows } = await client.query(
-        `SELECT ${fields} FROM users WHERE id = $1`,
+        `SELECT ${fields.join(', ')} FROM users WHERE id = $1`,
         [payload.userId]
       )
       if (rows.length === 0) {
@@ -74,10 +83,16 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
           body: JSON.stringify({ error: 'User not found' })
         }
       }
+
+      const user = rows[0] as any
+      if (!hasRole && payload.role) {
+        user.role = payload.role
+      }
+
       return {
         statusCode: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authenticated: true, user: rows[0] })
+        body: JSON.stringify({ authenticated: true, user })
       }
     } catch (err) {
       console.error('me endpoint error:', err)
