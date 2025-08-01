@@ -27,6 +27,7 @@ export default function SidebarNav(): JSX.Element {
   )
 
   const [isTrial, setIsTrial] = useState(false)
+  const [trialDay, setTrialDay] = useState<number | null>(null)
 
   const handleSignOut = () => {
     document.cookie = 'token=; Max-Age=0; path=/'
@@ -91,6 +92,12 @@ export default function SidebarNav(): JSX.Element {
         const json = await res.json()
         if (json?.data?.subscription_status === 'trialing') {
           setIsTrial(true)
+          if (json.data.trial_start_date) {
+            const start = new Date(json.data.trial_start_date).getTime()
+            const day =
+              Math.floor((Date.now() - start) / (24 * 60 * 60 * 1000)) + 1
+            setTrialDay(day)
+          }
         }
       } catch {
         /* ignore */
@@ -147,7 +154,10 @@ export default function SidebarNav(): JSX.Element {
             </li>
           ))}
           {isTrial && (
-            <li>
+            <li className="upgrade-section">
+              {trialDay !== null && (
+                <span className="trial-day">Trial Day {trialDay}</span>
+              )}
               <button type="button" className="upgrade-btn" onClick={handleUpgrade}>
                 Upgrade
               </button>

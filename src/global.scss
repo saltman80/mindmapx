@@ -1639,7 +1639,7 @@ hr {
   text-align: center;
   padding: var(--spacing-sm) var(--spacing-md);
   border: 2px solid var(--color-warning);
-  border-radius: 4px;
+  border-radius: 9999px;
   background: none;
   color: var(--color-warning);
   margin-bottom: var(--spacing-sm);
@@ -1648,6 +1648,14 @@ hr {
 .app-sidebar .upgrade-btn:hover {
   background-color: var(--color-warning);
   color: var(--color-text-inverse);
+}
+
+.app-sidebar .trial-day {
+  display: block;
+  text-align: center;
+  color: var(--color-warning);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
 }
 
 .app-sidebar .signout-btn {
