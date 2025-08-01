@@ -21,7 +21,8 @@ export default function TrialExpired(): JSX.Element {
 
       const res = await authFetch('/.netlify/functions/createCheckoutSession', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
       })
       const data = await res.json().catch(() => null)
       if (res.ok && data?.url) {
@@ -40,11 +41,15 @@ export default function TrialExpired(): JSX.Element {
     <section className="section text-center relative overflow-hidden">
       <FaintMindmapBackground />
       <div className="form-card">
-        <h1 className="text-2xl font-bold mb-4">Trial Expired</h1>
-        <p className="mb-4">Your trial has ended. Purchase to continue using the app.</p>
+        <h1 className="text-2xl font-bold mb-4">Access Required</h1>
+        <p className="mb-4">
+          Your trial has ended. To keep using the app you need to purchase monthly
+          access.
+        </p>
+        {user?.email && <p className="mb-4">Signed in as {user.email}</p>}
         {error && <p className="text-error mb-2">{error}</p>}
         <button onClick={startCheckout} className="btn" disabled={loading}>
-          {loading ? 'Processing...' : 'Purchase'}
+          {loading ? 'Redirecting…' : 'Purchase Monthly Access'}
         </button>
       </div>
     </section>
