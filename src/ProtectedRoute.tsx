@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from './lib/UserContext'
 
 interface Status {
   subscription_status: string
@@ -9,18 +10,23 @@ interface Status {
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const { setUser } = useUser()
   const [status, setStatus] = useState<Status | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const check = async () => {
-      const hasSession = /(?:^|;\s*)(session|token)=/.test(document.cookie)
-      if (!hasSession) {
-        navigate('/login')
-        setLoading(false)
-        return
-      }
       try {
+        const meRes = await fetch('/.netlify/functions/me', {
+          credentials: 'include'
+        })
+        if (!meRes.ok) {
+          navigate('/login')
+          return
+        }
+        const meData = await meRes.json().catch(() => null)
+        setUser(meData?.user || null)
+
         const res = await fetch('/.netlify/functions/user-status', {
           credentials: 'include'
         })
@@ -37,7 +43,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
       }
     }
     check()
-  }, [navigate])
+  }, [navigate, setUser])
 
   if (loading || !status) return null
 
