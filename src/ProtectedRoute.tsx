@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useUser } from './lib/UserContext'
 
 interface Status {
@@ -10,40 +10,63 @@ interface Status {
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { setUser } = useUser()
   const [status, setStatus] = useState<Status | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let hasNavigated = false
+    const navigateLogin = () => {
+      if (!hasNavigated && location.pathname !== '/login') {
+        hasNavigated = true
+        navigate('/login')
+      }
+    }
+
     const check = async () => {
       try {
         const meRes = await fetch('/.netlify/functions/me', {
           credentials: 'include'
         })
         if (!meRes.ok) {
-          navigate('/login')
+          navigateLogin()
           return
         }
         const meData = await meRes.json().catch(() => null)
-        setUser(meData?.user || null)
+        const user = meData?.user || null
+        setUser(user)
+        if (!user) {
+          navigateLogin()
+          return
+        }
+
+        if (user.role === 'admin') {
+          setStatus({
+            subscription_status: 'active',
+            trial_start_date: null,
+            paid_thru_date: null
+          })
+          return
+        }
 
         const res = await fetch('/.netlify/functions/user-status', {
           credentials: 'include'
         })
         if (!res.ok) {
-          navigate('/login')
+          navigateLogin()
           return
         }
         const json = await res.json()
         setStatus(json.data as Status)
       } catch {
-        navigate('/login')
+        navigateLogin()
       } finally {
         setLoading(false)
       }
     }
     check()
-  }, [navigate, setUser])
+  }, [])
 
   if (loading || !status) return null
 
@@ -58,6 +81,8 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   ) {
     return <>{children}</>
   }
-  navigate('/trial-expired')
+  if (location.pathname !== '/trial-expired') {
+    navigate('/trial-expired')
+  }
   return null
 }

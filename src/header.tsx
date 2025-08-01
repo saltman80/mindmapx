@@ -18,14 +18,7 @@ const Header = (): JSX.Element => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, fetchUser } = useUser()
-  const [checking, setChecking] = useState(true)
-
-  useEffect(() => {
-    fetchUser().finally(() => setChecking(false))
-  }, [fetchUser])
-
-  if (checking) return null
+  const { user } = useUser()
 
   const isAuthenticated = !!user
   const marketingItems: NavItem[] = [

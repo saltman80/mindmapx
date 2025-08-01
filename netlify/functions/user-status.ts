@@ -20,8 +20,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         data: {
           subscription_status: 'active',
           trial_start_date: null,
-          paid_thru_date: null,
-          role: 'admin'
+          paid_thru_date: null
         }
       })
     }
