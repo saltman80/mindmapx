@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { z, ZodError } from 'zod'
-import { login as createLogin } from './auth.js'
+import { login } from './auth.js'
 
 const loginSchema = z.object({
   email: z.string().email().transform((s: string) => s.trim().toLowerCase()),
@@ -107,7 +107,7 @@ export const handler = async (
   failedLoginAttempts.set(ip, recent)
 
   try {
-    const token = await createLogin(email, password)
+    const token = await login(email, password)
     failedLoginAttempts.delete(ip)
     const cookieParts = [
       `session=${token}`,

@@ -1,9 +1,8 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { pool, getClient } from './netlify/functions/db-client.js'
+import { pool } from './netlify/functions/db-client.js'
 import fs from 'fs'
-import bcrypt from 'bcrypt'
 
 // Execute migration files as a single statement so that dollar quoted
 // blocks (e.g. in PL/pgSQL functions) are not split incorrectly.
@@ -258,11 +257,6 @@ export async function runMigrations(): Promise<void> {
   } finally {
     try { await client.query('SELECT pg_advisory_unlock($1)', [LOCK_KEY]) } catch {}
     client.release()
-    try {
-      await seedAdminUser()
-    } catch (err) {
-      console.error('Admin user seeding failed:', err)
-    }
     await pool.end()
   }
 }
@@ -272,36 +266,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.error('Migration failed:', err)
     process.exit(1)
   })
-}
-
-async function seedAdminUser() {
-  const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
-  const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10)
-
-  console.info(
-    `seeding admin user using ${ADMIN_EMAIL && ADMIN_PASSWORD ? 'provided credentials' : 'no credentials'}`
-  )
-
-  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
-    console.log('Skipping admin user seed: ADMIN_EMAIL or ADMIN_PASSWORD missing')
-    return
-  }
-
-  const db = await getClient()
-  const existing = await db.query('SELECT id FROM users WHERE email = $1', [ADMIN_EMAIL])
-  if (existing.rows.length > 0) {
-    console.log(`Admin user already exists: ${ADMIN_EMAIL}`)
-    db.release()
-    return
-  }
-
-  const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS)
-  await db.query(
-    `INSERT INTO users (email, password_hash, role, created_at, updated_at)
-     VALUES ($1, $2, $3, NOW(), NOW())`,
-    [ADMIN_EMAIL, passwordHash, 'admin']
-  )
-  db.release()
-
-  console.log(`✅ Admin user seeded: ${ADMIN_EMAIL}`)
 }
