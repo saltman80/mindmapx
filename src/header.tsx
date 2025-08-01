@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useUser()
+  const { user, setUser } = useUser()
 
   const isAuthenticated = !!user
   const marketingItems: NavItem[] = [
@@ -217,7 +217,9 @@ const Header = (): JSX.Element => {
                     role="menuitem"
                     className="header__dropdown-item"
                     onClick={() => {
-                      document.cookie = 'session=; Max-Age=0; Path=/'
+                      document.cookie = 'token=; Max-Age=0; path=/'
+                      document.cookie = 'session=; Max-Age=0; path=/'
+                      setUser(null)
                       handleNavSelect('/login')
                     }}
                   >

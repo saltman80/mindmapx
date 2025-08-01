@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useUser } from './lib/UserContext'
 
 const mainLinks = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -18,13 +19,16 @@ const accountLinks = [
 
 export default function SidebarNav(): JSX.Element {
   const navigate = useNavigate()
+  const { setUser } = useUser()
 
   const [open, setOpen] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth > 768 : true
   )
 
   const handleSignOut = () => {
-    document.cookie = 'session=; Max-Age=0; Path=/'
+    document.cookie = 'token=; Max-Age=0; path=/'
+    document.cookie = 'session=; Max-Age=0; path=/'
+    setUser(null)
     navigate('/login')
   }
 
