@@ -490,13 +490,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       async (node: NodeData) => {
         if (!node) return
         const title = node.label || 'Todo List'
+        const description = node.description || ''
         setAiLoading(true)
         try {
-          const prompt = [title, node.description].filter(Boolean).join('\n\n')
           const res = await authFetch('/.netlify/functions/ai-create-todo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, prompt })
+            body: JSON.stringify({ title, description })
           })
           if (!res.ok) throw new Error('AI create failed')
           const list = await res.json()
