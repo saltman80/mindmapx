@@ -102,7 +102,7 @@ export default function TodosPage(): JSX.Element {
       const res = await fetch('/api/ai-create-todo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: form.description || form.title })
+        body: JSON.stringify({ title: form.title, prompt: form.description || form.title })
       })
       const json = await res.json()
       if (json?.id) {
