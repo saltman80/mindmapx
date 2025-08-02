@@ -14,7 +14,6 @@ import type { NodeData, EdgeData, Direction } from './mindmapTypes'
 import { authFetch } from './authFetch'
 import { assignPositions, LayoutNode } from './components/Mindmap/layout'
 import TodoCreateModeModal from './TodoCreateModeModal'
-import LoadingSpinner from './loadingspinner'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -168,6 +167,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
     const [createTodoNode, setCreateTodoNode] = useState<NodeData | null>(null)
     const [aiLoading, setAiLoading] = useState(false)
+    const [aiMessage, setAiMessage] = useState('Generating Todo List with AI...')
+    const [aiError, setAiError] = useState<string | null>(null)
+    const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const aiNodeRef = useRef<NodeData | null>(null)
+
+    useEffect(() => {
+      return () => {
+        if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+      }
+    }, [])
     const modeRef = useRef<'canvas' | null>(null)
     const dragStartRef = useRef({ x: 0, y: 0 })
     const originRef = useRef({ x: 0, y: 0 })
@@ -489,9 +498,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const handleTodoCreateAI = useCallback(
       async (node: NodeData) => {
         if (!node) return
+        aiNodeRef.current = node
         const title = node.label || 'Todo List'
         const description = node.description || ''
+        setAiMessage('Generating Todo List with AI...')
+        setAiError(null)
         setAiLoading(true)
+        if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+        aiTimeoutRef.current = setTimeout(() => {
+          setAiMessage('Almost done...')
+        }, 5000)
         try {
           const res = await authFetch('/.netlify/functions/ai-create-todo', {
             method: 'POST',
@@ -507,11 +523,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             body: JSON.stringify({ linkedTodoListId: list.id })
           }).catch(() => {})
           navigate(`/todos/${list.id}`)
+          setAiLoading(false)
         } catch (err) {
           console.error('AI todo create failed', err)
-          alert('AI failed to create todo list')
-        } finally {
+          setAiError('Something went wrong while generating your list. Please try again.')
           setAiLoading(false)
+        } finally {
+          if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
         }
       },
       [navigate, updateNode]
@@ -964,10 +982,37 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             </div>
           </div>
         )}
-        {aiLoading && (
-          <div className="modal-overlay">
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <LoadingSpinner />
+        {(aiLoading || aiError) && (
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              if (aiError) setAiError(null)
+            }}
+          >
+            <div
+              className="modal flex items-center space-x-3 p-6 rounded-lg bg-white shadow-md max-w-md mx-auto"
+              onClick={e => e.stopPropagation()}
+            >
+              {aiLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-primary-500" />
+                  <p className="text-gray-700 font-medium">{aiMessage}</p>
+                </>
+              ) : (
+                <div className="text-center">
+                  <p className="text-red-500 mb-4">{aiError}</p>
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      if (aiNodeRef.current) {
+                        handleTodoCreateAI(aiNodeRef.current)
+                      }
+                    }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
