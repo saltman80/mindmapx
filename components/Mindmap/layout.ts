@@ -21,12 +21,9 @@ export function assignPositions(root: LayoutNode): void {
   const RADIUS_STEP = 100
   const SUBNODE_ARC = Math.PI / 2 // 90° fan for sub-nodes
 
-  // Center of the canvas
-  const CENTER_X = 400
-  const CENTER_Y = 300
-
-  root.x = CENTER_X
-  root.y = CENTER_Y
+  // place root at the origin – the canvas can translate it later
+  root.x = 0
+  root.y = 0
   root.angle = 0
 
   const queue: Array<{ node: LayoutNode; depth: number }> = [
@@ -45,8 +42,8 @@ export function assignPositions(root: LayoutNode): void {
       children.forEach((child, idx) => {
         const angle = angleStep * idx
         child.angle = angle
-        child.x = Math.round(CENTER_X + Math.cos(angle) * ROOT_RADIUS)
-        child.y = Math.round(CENTER_Y + Math.sin(angle) * ROOT_RADIUS)
+        child.x = Math.round(Math.cos(angle) * ROOT_RADIUS)
+        child.y = Math.round(Math.sin(angle) * ROOT_RADIUS)
         queue.push({ node: child, depth: depth + 1 })
       })
       continue

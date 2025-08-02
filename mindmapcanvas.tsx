@@ -132,7 +132,14 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
-      setNodes(safePropNodes)
+      setNodes(() => {
+        const root = buildLayoutTree(safePropNodes)
+        if (root) {
+          assignPositions(root)
+          return flattenLayoutTree(root)
+        }
+        return safePropNodes
+      })
     }, [propNodes])
 
     useEffect(() => {
