@@ -205,21 +205,16 @@ export async function createMindmapFromNodes(
         roots.push(node)
       }
     }
-    const MIN_SIBLING_GAP = 100
-    const BASE_RADIUS = 200
-    const RADIUS_STEP = 75
-    const MAX_RADIUS = 350
+    const ROOT_RADIUS = 200
+    const RADIUS_STEP = 100
+    const SUBNODE_ARC = Math.PI / 2 // 90° fan
 
-    const estimateLabelWidth = (label: string | undefined | null): number => {
-      if (!label) return 0
-      return label.length * 8
-    }
-
-    const queue: Array<{ node: TmpNode; depth: number }> = []
+    const queue: Array<{ node: TmpNode & { angle?: number }; depth: number }> = []
     roots.forEach(root => {
       root.x = DEFAULT_ROOT_X
       root.y = DEFAULT_ROOT_Y
-      queue.push({ node: root, depth: 0 })
+      ;(root as any).angle = 0
+      queue.push({ node: root as TmpNode & { angle?: number }, depth: 0 })
     })
 
     while (queue.length > 0) {
@@ -228,49 +223,29 @@ export async function createMindmapFromNodes(
       const total = children.length
       if (total === 0) continue
 
-      const baseRadius = Math.min(
-        MAX_RADIUS,
-        BASE_RADIUS + Math.max(0, depth - 1) * RADIUS_STEP
-      )
-      const isRoot = !node.parentId
-
-      let arc = isRoot ? Math.PI * 2 : Math.PI / 2
-      let angleStep = total > 1 ? arc / (total - 1) : 0
-
-      const maxLabelWidth = Math.max(
-        ...children.map(c => estimateLabelWidth(c.title))
-      )
-      const minGap = Math.max(MIN_SIBLING_GAP, maxLabelWidth + 20)
-      const minAngleForGap = 2 * Math.asin(minGap / (2 * baseRadius))
-      if (total > 1 && angleStep < minAngleForGap) {
-        const maxArc = isRoot ? Math.PI * 2 : Math.PI
-        arc = Math.min(maxArc, minAngleForGap * (total - 1))
-        angleStep = arc / (total - 1)
+      if (depth === 0) {
+        const angleStep = (Math.PI * 2) / total
+        children.forEach((child, idx) => {
+          const angle = angleStep * idx
+          ;(child as any).angle = angle
+          child.x = Math.round((node.x ?? 0) + Math.cos(angle) * ROOT_RADIUS)
+          child.y = Math.round((node.y ?? 0) + Math.sin(angle) * ROOT_RADIUS)
+          queue.push({ node: child as TmpNode & { angle?: number }, depth: depth + 1 })
+        })
+        continue
       }
 
-      const radius = Math.max(
-        baseRadius,
-        total > 1 ? minGap / (2 * Math.sin(angleStep / 2)) : baseRadius
-      )
-
-      const parentAngle = isRoot
-        ? 0
-        : (() => {
-            const parent = node.parentId ? byId.get(node.parentId) : null
-            if (!parent) return 0
-            return Math.atan2(
-              (node.y ?? 0) - (parent.y ?? 0),
-              (node.x ?? 0) - (parent.x ?? 0)
-            )
-          })()
-
-      const startAngle = total > 1 ? parentAngle - arc / 2 : parentAngle
+      const baseAngle = node.angle ?? 0
+      const angleStep = total > 1 ? SUBNODE_ARC / (total - 1) : 0
+      const start = baseAngle - SUBNODE_ARC / 2
+      const radius = ROOT_RADIUS + depth * RADIUS_STEP
 
       children.forEach((child, idx) => {
-        const angle = startAngle + angleStep * idx
+        const angle = start + angleStep * idx
+        ;(child as any).angle = angle
         child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
         child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
-        queue.push({ node: child, depth: depth + 1 })
+        queue.push({ node: child as TmpNode & { angle?: number }, depth: depth + 1 })
       })
     }
 

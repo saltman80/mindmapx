@@ -19,20 +19,6 @@ const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
 const TOOL_OFFSET_Y = -40
-// Radial layout constants
-// Base distance for first-level children
-const BASE_RADIUS = 200
-// Additional distance added for deeper levels
-const RADIUS_STEP = 75
-// Maximum distance regardless of depth
-const MAX_RADIUS = 350
-// Minimum spacing between sibling nodes to avoid label overlap
-const MIN_SIBLING_GAP = 100
-
-const estimateLabelWidth = (label: string | undefined | null): number => {
-  if (!label) return 0
-  return label.length * 8 // rough estimate: 8px per character
-}
 
 function buildLayoutTree(nodes: NodeData[]): LayoutNode | null {
   const map = new Map<string, LayoutNode>()
@@ -307,32 +293,44 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const handleAddChild = useCallback(
       async (parentId: string) => {
-        console.log('[MindmapCanvas] handleAddChild', parentId)
-        if (creatingNodeRef.current) {
-          console.warn('[handleAddChild] Creation in progress, skipping')
-          return
-        }
-        if (!mindmapId) {
-          console.warn('[handleAddChild] Missing mindmapId')
-          return
-        }
+        if (creatingNodeRef.current) return
+        if (!mindmapId) return
         const parent = uniqueNodes.find(n => n.id === parentId)
         if (!parent) return
         creatingNodeRef.current = true
 
-        const siblings = uniqueNodes.filter(n => n.parentId === parentId)
         const newLabel = `Child of ${parent.label || 'Node'}`
+        const tempId =
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2)
 
-        const getDepth = (nodeId: string): number => {
-          let depth = 0
-          let current = uniqueNodes.find(n => n.id === nodeId)
-          while (current && current.parentId) {
-            current = uniqueNodes.find(n => n.id === current!.parentId)
-            depth++
-          }
-          return depth
+        const draft: NodeData = {
+          id: tempId,
+          parentId: parent.id,
+          label: newLabel,
+          description: '',
+          x: 0,
+          y: 0,
+          todoId: null,
+          linkedTodoListId: null,
         }
 
+        // Compute layout including the new node
+        const updated = [...uniqueNodes, draft]
+        const root = buildLayoutTree(updated)
+        let positioned = updated
+        if (root) {
+          assignPositions(root)
+          positioned = flattenLayoutTree(root)
+        }
+
+        // Determine direction based on final position
+        const placed = positioned.find(n => n.id === tempId)!
+        const angle = Math.atan2(
+          (placed.y ?? 0) - (parent.y ?? 0),
+          (placed.x ?? 0) - (parent.x ?? 0)
+        )
         const angleToDirection = (a: number): Direction => {
           const t = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
           if (t >= 0 && t < Math.PI / 2) return 'tr'
@@ -340,133 +338,49 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           if (t >= Math.PI && t < (3 * Math.PI) / 2) return 'bl'
           return 'tl'
         }
+        placed.direction = angleToDirection(angle)
 
-        // Determine depth-based radius and fan layout
-        const depth = getDepth(parent.id) + 1
-        const baseRadius = Math.min(
-          MAX_RADIUS,
-          BASE_RADIUS + Math.max(0, depth - 2) * RADIUS_STEP
-        )
-        const isRoot = !parent.parentId
-        const total = siblings.length + 1
+        setNodes(positioned)
 
-        // Estimate minimum gap based on widest label
-        const labels = siblings.map(s => s.label || '')
-        labels.push(newLabel)
-        const maxLabelWidth = Math.max(
-          ...labels.map(l => estimateLabelWidth(l))
-        )
-        const minGap = Math.max(MIN_SIBLING_GAP, maxLabelWidth + 20)
-
-        // Base arc: full circle for root, narrow wedge otherwise
-        let arc = isRoot ? Math.PI * 2 : Math.PI / 2
-        let angleStep = total > 1 ? arc / (total - 1) : 0
-
-        // Minimum angle needed to maintain sibling gap at base radius
-        const minAngleForGap = 2 * Math.asin(minGap / (2 * baseRadius))
-
-        // Widen arc if siblings would overlap
-        if (total > 1 && angleStep < minAngleForGap) {
-          const maxArc = isRoot ? Math.PI * 2 : Math.PI
-          arc = Math.min(maxArc, minAngleForGap * (total - 1))
-          angleStep = arc / (total - 1)
-        }
-
-        // Increase radius if widening arc isn't enough
-        const radius = Math.max(
-          baseRadius,
-          total > 1 ? minGap / (2 * Math.sin(angleStep / 2)) : baseRadius
-        )
-
-        const parentAngle = isRoot
-          ? 0
-          : (() => {
-              const grand = parent.parentId
-                ? uniqueNodes.find(n => n.id === parent.parentId)
-                : null
-              if (!grand) return 0
-              return Math.atan2(parent.y - grand.y, parent.x - grand.x)
-            })()
-
-        const startAngle = total > 1 ? parentAngle - arc / 2 : parentAngle
-
-        // Reposition existing siblings for even distribution
-        const updates: { id: string; x: number; y: number }[] = []
-        siblings.forEach((s, i) => {
-          const a = startAngle + angleStep * i
-          const x = Math.round(parent.x + Math.cos(a) * radius)
-          const y = Math.round(parent.y + Math.sin(a) * radius)
-          updates.push({ id: s.id, x, y })
+        setEdges(prev => {
+          const exists = prev.some(e => e.from === parentId && e.to === tempId)
+          if (exists) return prev
+          const edgeId =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2)
+          return [...prev, { id: edgeId, from: parentId, to: tempId }]
         })
 
-        if (updates.length) {
-          setNodes(prev =>
-            prev.map(n => {
-              const u = updates.find(u => u.id === n.id)
-              return u ? { ...n, x: u.x, y: u.y } : n
-            })
-          )
-          updates.forEach(u => {
-            const node = siblings.find(s => s.id === u.id)
-            if (node) onMoveNode?.({ ...node, x: u.x, y: u.y })
-          })
-        }
-
-        const angle = startAngle + angleStep * siblings.length
-
-        const newX = Math.round(parent.x + Math.cos(angle) * radius)
-        const newY = Math.round(parent.y + Math.sin(angle) * radius)
-        const direction = angleToDirection(angle)
-
-        const newNode: NodePayload = {
+        const payload: NodePayload = {
           mindmapId,
-          x: newX,
-          y: newY,
+          x: placed.x,
+          y: placed.y,
           label: newLabel,
           description: '',
-          parentId: parent.id || null,
+          parentId: parent.id,
           linkedTodoListId: null,
         }
-
-        console.log(
-          'Creating node:',
-          newNode.label,
-          newNode.parentId,
-          newNode.mindmapId,
-          newNode.x,
-          newNode.y
-        )
-
-        const tempId =
-          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-            ? crypto.randomUUID()
-            : Math.random().toString(36).slice(2)
-
-        addNode({
-          ...newNode,
-          id: tempId,
-          todoId: null,
-          linkedTodoListId: null,
-          direction,
-        })
 
         try {
           let nodeId: string | undefined
           if (onAddNode) {
-            const result = await onAddNode(newNode)
+            const result = await onAddNode(payload)
             if (typeof result === 'string') nodeId = result
           } else {
-            nodeId = (await createNode(newNode)) || undefined
+            nodeId = (await createNode(payload)) || undefined
           }
           if (nodeId) {
             replaceNodeId(tempId, nodeId)
           } else {
-            console.error('[MindmapCanvas] Failed to create node', newNode)
+            console.error('[MindmapCanvas] Failed to create node', payload)
           }
         } finally {
           creatingNodeRef.current = false
         }
-    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId, onAddNode, onMoveNode])
+      },
+      [uniqueNodes, mindmapId, onAddNode, createNode, replaceNodeId]
+    )
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
