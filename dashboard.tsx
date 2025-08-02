@@ -128,7 +128,7 @@ export default function DashboardPage(): JSX.Element {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ title: form.title, prompt: form.description || form.title }),
+          body: JSON.stringify({ title: form.title, description: form.description }),
         })
       }
       setShowModal(false)

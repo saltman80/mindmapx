@@ -25,18 +25,22 @@ export const handler = async (
 
   let data: any
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }
-  const { prompt, title } = data
+  const { title, description = '' } = data
   if (typeof title !== 'string' || !title.trim()) {
     return { statusCode: 400, body: 'Invalid title' }
   }
-  if (!prompt || typeof prompt !== 'string') {
-    return { statusCode: 400, body: 'Invalid prompt' }
-  }
   const listTitle = title.trim()
+
+  const userPrompt = [
+    `Title: ${listTitle}`,
+    description && typeof description === 'string' ? `Description: ${description.trim()}` : ''
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   try {
     const content = await generateAIResponse(
-      prompt,
+      userPrompt,
       'Generate a JSON array of todo items. Limit to 20 items, each with a title and note field. Respond only with JSON without code fences or quotes.\nExample:\n[{"title":"Sample","note":"Details"}]'
     )
     let todosRaw: unknown
