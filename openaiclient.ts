@@ -1,7 +1,8 @@
 import OpenAI from 'openai'
 import type { ChatCompletionCreateParams } from 'openai/resources/chat/completions'
 
-const DEFAULT_MODEL = process.env.OPENROUTER_DEFAULT_MODEL ?? 'gpt-4o-mini'
+const DEFAULT_MODEL =
+  process.env.OPENROUTER_DEFAULT_MODEL ?? 'openai/gpt-4o-mini'
 const DEFAULT_TEMPERATURE = 0.7
 const DEFAULT_MAX_TOKENS = 256
 
@@ -10,7 +11,14 @@ function getOpenAI(): OpenAI {
   if (openaiInstance) return openaiInstance
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable')
-  openaiInstance = new OpenAI({ apiKey })
+  openaiInstance = new OpenAI({
+    apiKey,
+    baseURL: 'https://openrouter.ai/api/v1',
+    defaultHeaders: {
+      'HTTP-Referer': 'https://mindx.do',
+      'X-Title': 'MindXdo',
+    },
+  })
   return openaiInstance
 }
 
