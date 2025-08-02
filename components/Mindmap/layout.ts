@@ -10,9 +10,14 @@ export interface LayoutNode {
 }
 
 export function assignPositions(root: LayoutNode): void {
-  const ROOT_RADIUS = 100
-  const SUBNODE_RADIUS = 100
-  const SUBNODE_ARC = Math.PI / 2 // 90° fan for sub-nodes
+  // Distance of first layer of children from root
+  const ROOT_RADIUS = 150
+  // Additional distance for each successive layer of first-level children
+  const ROOT_LAYER_GAP = 150
+  // Sub-nodes hug their parent a bit closer
+  const SUBNODE_RADIUS = 80
+  // Tighter fan for sub-nodes so they cluster in the same direction
+  const SUBNODE_ARC = Math.PI / 3 // 60° fan for sub-nodes
   const MIN_NODE_GAP = 120
   const COLLISION_STEP = 50
 
@@ -32,11 +37,18 @@ export function assignPositions(root: LayoutNode): void {
     if (total === 0) continue
 
     if (depth === 0) {
-      const angleStep = (2 * Math.PI) / total
+      // Distribute first-level children across quadrants and layers
+      const quadrants = [
+        -3 * Math.PI / 4, // top-left
+        -1 * Math.PI / 4, // top-right
+        3 * Math.PI / 4, // bottom-left
+        Math.PI / 4, // bottom-right
+      ]
       children.forEach((child, idx) => {
-        let angle = angleStep * idx
-        angle += (Math.random() - 0.5) * 0.2
-        let radius = ROOT_RADIUS + Math.random() * 15
+        const quadrantIndex = idx % quadrants.length
+        const layer = Math.floor(idx / quadrants.length)
+        const angle = quadrants[quadrantIndex]
+        const radius = ROOT_RADIUS + layer * ROOT_LAYER_GAP
         child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
         child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
         child.angle = angle
@@ -58,8 +70,9 @@ export function assignPositions(root: LayoutNode): void {
 
     children.forEach((child, idx) => {
       let angle = start + angleStep * idx
-      angle += (Math.random() - 0.5) * 0.2
-      let radius = SUBNODE_RADIUS + Math.random() * 15
+      // Small random jitter to avoid identical coordinates
+      angle += (Math.random() - 0.5) * 0.1
+      const radius = SUBNODE_RADIUS + idx * 20
       child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
       child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
       child.angle = angle
