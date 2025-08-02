@@ -101,7 +101,7 @@ export async function runMigrations(): Promise<void> {
       CREATE TABLE IF NOT EXISTS nodes (
         id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         mindmap_id  UUID NOT NULL REFERENCES mindmaps(id),
-        parent_id   UUID REFERENCES nodes(id),
+        parent_id   UUID REFERENCES nodes(id) ON DELETE CASCADE,
         x           DOUBLE PRECISION DEFAULT 0,
         y           DOUBLE PRECISION DEFAULT 0,
         label       TEXT,
