@@ -28,6 +28,7 @@ const RADIUS_STEP = 75
 const MAX_RADIUS = 350
 // Minimum spacing between sibling nodes to avoid label overlap
 const MIN_SIBLING_GAP = 100
+const FADE_DURATION = 300
 
 const estimateLabelWidth = (label: string | undefined | null): number => {
   if (!label) return 0
@@ -116,6 +117,8 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
+    const [isFading, setIsFading] = useState(false)
+    const layoutTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const safeNodes = Array.isArray(nodes) ? nodes : []
     const safeEdges = Array.isArray(edges) ? edges : []
@@ -143,6 +146,12 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     }, [initialTransform])
     const svgRef = useRef<SVGSVGElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+      return () => {
+        if (layoutTimeoutRef.current) clearTimeout(layoutTimeoutRef.current)
+      }
+    }, [])
 
 
     useEffect(() => {
@@ -217,26 +226,31 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const addNode = useCallback(
       (node: NodeData) => {
         console.log('[MindmapCanvas] addNode', node)
-        setNodes(prev => {
-          const updated = [...prev, node]
-          const root = buildLayoutTree(updated)
-          if (root) {
-            assignPositions(root)
-            return flattenLayoutTree(root)
+        setIsFading(true)
+        if (layoutTimeoutRef.current) clearTimeout(layoutTimeoutRef.current)
+        layoutTimeoutRef.current = setTimeout(() => {
+          setNodes(prev => {
+            const updated = [...prev, node]
+            const root = buildLayoutTree(updated)
+            if (root) {
+              assignPositions(root)
+              return flattenLayoutTree(root)
+            }
+            return updated
+          })
+          if (
+            node.parentId &&
+            !safeEdges.some(e => e.from === node.parentId && e.to === node.id)
+          ) {
+            const edgeId =
+              typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                ? crypto.randomUUID()
+                : Math.random().toString(36).slice(2)
+            const edge: EdgeData = { id: edgeId, from: node.parentId, to: node.id }
+            setEdges(prev => [...prev, edge])
           }
-          return updated
-        })
-        if (
-          node.parentId &&
-          !safeEdges.some(e => e.from === node.parentId && e.to === node.id)
-        ) {
-          const edgeId =
-            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-              ? crypto.randomUUID()
-              : Math.random().toString(36).slice(2)
-          const edge: EdgeData = { id: edgeId, from: node.parentId, to: node.id }
-          setEdges(prev => [...prev, edge])
-        }
+          setIsFading(false)
+        }, FADE_DURATION)
       },
       [safeEdges]
     )
@@ -783,9 +797,19 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="#fff" />
           <rect width={CANVAS_SIZE} height={CANVAS_SIZE} fill="url(#grid-dots)" />
           <motion.g
-            animate={{ x: transform.x, y: transform.y, scale: transform.k }}
+            animate={{
+              x: transform.x,
+              y: transform.y,
+              scale: transform.k,
+              opacity: isFading ? 0 : 1,
+            }}
             initial={false}
-            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            transition={{
+              type: 'spring',
+              stiffness: 100,
+              damping: 20,
+              opacity: { duration: FADE_DURATION / 1000 },
+            }}
             style={{ originX: 0, originY: 0 }}
           >
             {rootNode && (
