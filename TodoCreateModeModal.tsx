@@ -26,7 +26,7 @@ export default function TodoCreateModeModal({ isOpen, nodeTitle, nodeDescription
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Create Todo List">
       <div className="modal-container card-modal fancy-modal" style={{ minWidth: '300px' }}>
         <h2 className="mb-4 text-lg font-semibold">Create Todo List</h2>
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-4 mb-4">
           <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium">Title</label>
             <input
@@ -37,7 +37,7 @@ export default function TodoCreateModeModal({ isOpen, nodeTitle, nodeDescription
               placeholder="Title"
             />
           </div>
-          <div className="flex flex-col space-y-1 mt-4">
+          <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium">Description</label>
             <textarea
               className="w-full p-2 border rounded resize-none h-24"
