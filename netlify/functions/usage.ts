@@ -1,7 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from './db-client.js'
 import { requireAuth } from '../lib/auth.js'
-import { TOTAL_AI_LIMIT } from './limits.js'
+import { getAiLimit } from './usage-utils.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   if (event.httpMethod !== 'GET') {
@@ -26,6 +26,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       [userId]
     )
     const r = rows[0]
+    const { limit } = await getAiLimit(userId)
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -34,7 +35,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         todoLists: Number(r.todo_lists),
         boards: Number(r.boards),
         aiUsage: Number(r.ai_usage),
-        aiLimit: TOTAL_AI_LIMIT
+        aiLimit: limit
       })
     }
   } catch (err) {

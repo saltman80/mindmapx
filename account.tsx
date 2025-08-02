@@ -22,6 +22,7 @@ export default function AccountPage(): JSX.Element {
     boards: 0,
     aiUsage: 0,
   })
+  const [aiLimit, setAiLimit] = useState(LIMIT_AI_MONTHLY)
   const [msg, setMsg] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +39,7 @@ export default function AccountPage(): JSX.Element {
             boards: Number(data.boards) || 0,
             aiUsage: Number(data.aiUsage) || 0,
           })
+          setAiLimit(Number(data.aiLimit) || LIMIT_AI_MONTHLY)
         }
       })
       .catch(() => {})
@@ -105,7 +107,7 @@ export default function AccountPage(): JSX.Element {
             <tr>
               <td className="metric-label">AI Automations</td>
               <td className="metric-value">
-                {usage.aiUsage}/{LIMIT_AI_MONTHLY} this month
+                {usage.aiUsage}/{aiLimit} this month
               </td>
             </tr>
           </tbody>
