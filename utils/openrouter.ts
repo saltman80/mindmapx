@@ -3,12 +3,12 @@ export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3):
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-    'HTTP-Referer': 'https://mindxdo.netlify.app',
+    'HTTP-Referer': 'https://mindx.do',
     'X-Title': 'MindXdo',
   }
 
   const body = {
-    model: process.env.OPENROUTER_DEFAULT_MODEL,
+    model: process.env.OPENROUTER_DEFAULT_MODEL ?? 'openai/gpt-4o-mini',
     messages: [{ role: 'user', content: prompt }],
   }
 

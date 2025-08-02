@@ -37,7 +37,7 @@ Set the following variables in your Netlify environment to enable AI powered fea
 
 ```
 OPENROUTER_API_KEY=your-openrouter-key
-OPENROUTER_DEFAULT_MODEL=gpt-4o-mini
+OPENROUTER_DEFAULT_MODEL=openai/gpt-4o-mini
 ```
 
 These are used by serverless functions to generate mind maps and todo lists.

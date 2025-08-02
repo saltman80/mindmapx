@@ -3,10 +3,14 @@ import type { ChatCompletionMessageParam } from "openai/resources/chat/completio
 
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1"
+  baseURL: "https://openrouter.ai/api/v1",
+  defaultHeaders: {
+    "HTTP-Referer": "https://mindx.do",
+    "X-Title": "MindXdo"
+  }
 })
 
-const MODEL = "openai/gpt-4o-mini"
+const MODEL = process.env.OPENROUTER_DEFAULT_MODEL ?? "openai/gpt-4o-mini"
 
 export async function generateAIResponse(prompt: string, systemPrompt?: string) {
   const messages: ChatCompletionMessageParam[] = []
