@@ -3,24 +3,25 @@ export interface LayoutNode {
   parentId: string | null
   x?: number
   y?: number
+  /** Directional angle from root used for clustering */
+  angle?: number
+  label?: string | null
   children?: LayoutNode[]
 }
 
 export function assignPositions(root: LayoutNode): void {
-  const MIN_SIBLING_GAP = 100
-  const BASE_RADIUS = 150
-  const RADIUS_STEP = 30
-  const MIN_RADIUS = 80
-  const MIN_NODE_GAP = 70
+  const ROOT_RADIUS = 100
+  const SUBNODE_RADIUS = 100
+  const SUBNODE_ARC = Math.PI / 2 // 90° fan for sub-nodes
+  const MIN_NODE_GAP = 120
   const COLLISION_STEP = 50
-  const SUBNODE_SPACING = 70
 
-  const byId = new Map<string, LayoutNode>()
   const placed: LayoutNode[] = []
   const queue: Array<{ node: LayoutNode; depth: number }> = []
+
   root.x = 400
   root.y = 300
-  byId.set(root.id, root)
+  root.angle = 0
   placed.push(root)
   queue.push({ node: root, depth: 0 })
 
@@ -31,58 +32,47 @@ export function assignPositions(root: LayoutNode): void {
     if (total === 0) continue
 
     if (depth === 0) {
-      const baseRadius = Math.max(
-        MIN_RADIUS,
-        BASE_RADIUS - Math.max(0, depth - 1) * RADIUS_STEP
-      )
-
-      const parentAngle = 0
-      let arc = Math.PI * 2
-      let angleStep = total > 1 ? arc / (total - 1) : 0
-
-      const minAngleForGap = 2 * Math.asin(MIN_SIBLING_GAP / (2 * baseRadius))
-      if (total > 1 && angleStep < minAngleForGap) {
-        const maxArc = Math.PI * 2
-        arc = Math.min(maxArc, minAngleForGap * (total - 1))
-        angleStep = arc / (total - 1)
-      }
-
-      const radius = Math.max(
-        baseRadius,
-        total > 1
-          ? MIN_SIBLING_GAP / (2 * Math.sin(angleStep / 2))
-          : baseRadius
-      )
-
-      const startAngle = total > 1 ? parentAngle - arc / 2 : parentAngle
-
+      const angleStep = (2 * Math.PI) / total
       children.forEach((child, idx) => {
-        const angle = startAngle + angleStep * idx
+        let angle = angleStep * idx
+        angle += (Math.random() - 0.5) * 0.2
+        let radius = ROOT_RADIUS + Math.random() * 15
         child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
         child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
-        resolveCollision(child, placed, MIN_NODE_GAP, COLLISION_STEP)
+        child.angle = angle
+        const gap = Math.max(
+          MIN_NODE_GAP,
+          estimateLabelWidth(child.label) + 20
+        )
+        resolveCollision(child, placed, gap, COLLISION_STEP)
         placed.push(child)
-        byId.set(child.id, child)
         queue.push({ node: child, depth: depth + 1 })
       })
       continue
     }
 
-    const parent = node.parentId ? byId.get(node.parentId) : null
-    const angle = parent
-      ? Math.atan2((node.y ?? 0) - (parent.y ?? 0), (node.x ?? 0) - (parent.x ?? 0))
-      : 0
+    const baseAngle = node.angle ?? 0
+    const arc = SUBNODE_ARC
+    const angleStep = total > 1 ? arc / (total - 1) : 0
+    const start = baseAngle - arc / 2
 
     children.forEach((child, idx) => {
-      const distance = SUBNODE_SPACING * (idx + 1)
-      child.x = Math.round((node.x ?? 0) + Math.cos(angle) * distance)
-      child.y = Math.round((node.y ?? 0) + Math.sin(angle) * distance)
-      resolveCollision(child, placed, MIN_NODE_GAP, COLLISION_STEP)
+      let angle = start + angleStep * idx
+      angle += (Math.random() - 0.5) * 0.2
+      let radius = SUBNODE_RADIUS + Math.random() * 15
+      child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
+      child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
+      child.angle = angle
+      const gap = Math.max(MIN_NODE_GAP, estimateLabelWidth(child.label) + 20)
+      resolveCollision(child, placed, gap, COLLISION_STEP)
       placed.push(child)
-      byId.set(child.id, child)
       queue.push({ node: child, depth: depth + 1 })
     })
   }
+}
+
+function estimateLabelWidth(label?: string | null): number {
+  return label ? label.length * 8 : 0
 }
 
 function resolveCollision(
