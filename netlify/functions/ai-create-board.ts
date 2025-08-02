@@ -42,6 +42,14 @@ export const handler = async (
     )
     const boardId = res.rows[0].id
 
+    const coreCols = ['New', 'In-Progress', 'Review', 'Done']
+    for (let i = 0; i < coreCols.length; i++) {
+      await client.query(
+        'INSERT INTO kanban_columns (board_id, title, position) VALUES ($1,$2,$3)',
+        [boardId, coreCols[i], i]
+      )
+    }
+
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
       try {
         const aiText = await generateAIResponse(

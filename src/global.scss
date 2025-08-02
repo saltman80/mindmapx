@@ -2613,6 +2613,13 @@ hr {
   transition: background-color 0.2s ease;
 }
 
+.kanban-card .kanban-title {
+  font-size: 14px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 .kanban-card.past-due {
   background-color: #ffe5e5;
 }
