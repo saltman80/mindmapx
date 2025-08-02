@@ -242,11 +242,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     )
 
     const replaceNodeId = useCallback((tempId: string, newId: string) => {
-      setNodes(prev =>
-        Array.isArray(prev)
-          ? prev.map(n => (n.id === tempId ? { ...n, id: newId } : n))
-          : prev
-      )
+      setNodes(prev => {
+        if (!Array.isArray(prev)) return prev
+        const mapped = prev.map(n => (n.id === tempId ? { ...n, id: newId } : n))
+        const root = buildLayoutTree(mapped)
+        if (root) {
+          assignPositions(root)
+          return flattenLayoutTree(root)
+        }
+        return mapped
+      })
       setEdges(prev =>
         Array.isArray(prev)
           ? prev.map(e => ({
