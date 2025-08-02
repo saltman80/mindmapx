@@ -158,23 +158,23 @@ export default function MapEditorPage(): JSX.Element {
       const rootX = 400
       const rootY = 300
 
-      const generalNode: NodePayload = {
+      const rootNode: NodePayload = {
         x: rootX,
         y: rootY,
-        label: 'General',
-        description: '',
+        label: mindmap.title,
+        description: mindmap.description || '',
         parentId: null,
         mindmapId: mindmap.id,
         linkedTodoListId: null,
       }
 
-      console.log('[MapEditorPage] auto root node payload', generalNode)
+      console.log('[MapEditorPage] auto root node payload', rootNode)
 
       fetch('/.netlify/functions/nodes', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(generalNode)
+        body: JSON.stringify(rootNode)
       })
         .then(async res => {
           if (!res.ok) throw new Error(`Failed: ${res.status}`)
@@ -184,7 +184,7 @@ export default function MapEditorPage(): JSX.Element {
           // Immediately show the new root node so the canvas is not empty
           const id = typeof data?.id === 'string' ? data.id : undefined
           if (id) {
-            setNodes([{ ...generalNode, id }])
+            setNodes([{ ...rootNode, id }])
           } else {
             // Fallback: refetch nodes if response is unexpected
             setReloadFlag(p => p + 1)
