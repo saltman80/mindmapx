@@ -531,8 +531,10 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         setHasCentered(true)
         const { clientWidth, clientHeight } = containerRef.current
         const root = nodes.find(n => !n.parentId) ?? nodes[0]
-        const centerX = root.x
-        const centerY = root.y
+        const centerX =
+          typeof root?.x === 'number' && Number.isFinite(root.x) ? root.x : 0
+        const centerY =
+          typeof root?.y === 'number' && Number.isFinite(root.y) ? root.y : 0
         setTransform(prev => ({
           x: clientWidth / 2 - centerX * prev.k,
           y: clientHeight / 2 - centerY * prev.k,
