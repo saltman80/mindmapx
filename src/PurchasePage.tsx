@@ -62,7 +62,7 @@ export default function PurchasePage() {
           <div>Kanban Boards</div>
           <div className="feature-limit">10</div>
           <div>AI Automations</div>
-          <div className="feature-limit">25 per month</div>
+          <div className="feature-limit">100 per month</div>
         </div>
         <p className="mb-xs">+ Coming soon team members</p>
         <p className="text-muted">Upgrades available in app</p>

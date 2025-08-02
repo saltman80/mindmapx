@@ -47,6 +47,7 @@ export default function DashboardPage(): JSX.Element {
   const [form, setForm] = useState({ title: '', description: '' })
   const [aiLoading, setAiLoading] = useState(false)
   const [aiUsage, setAiUsage] = useState(0)
+  const [aiLimit, setAiLimit] = useState(LIMIT_AI_MONTHLY)
   const [cardsDoneToday, setCardsDoneToday] = useState(0)
   const [cardsDoneWeek, setCardsDoneWeek] = useState(0)
   const navigate = useNavigate()
@@ -90,6 +91,7 @@ export default function DashboardPage(): JSX.Element {
       const usageRes = await authFetch('/.netlify/functions/usage', { credentials: 'include' })
       const usageJson = usageRes.ok ? await usageRes.json() : { aiUsage: 0 }
       setAiUsage(Number(usageJson.aiUsage) || 0)
+      setAiLimit(Number(usageJson.aiLimit) || LIMIT_AI_MONTHLY)
 
       setMaps(Array.isArray(mapsList) ? mapsList : [])
       setTodoLists(Array.isArray(lists) ? lists : [])
@@ -159,7 +161,7 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
-    if (aiUsage >= LIMIT_AI_MONTHLY) {
+    if (aiUsage >= aiLimit) {
       alert('AI automation limit reached')
       return
     }

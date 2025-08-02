@@ -143,9 +143,9 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
 
     setLoading(true)
     try {
-      const usage = await getMonthlyUsage(user.id, 'mindmap')
-      if (usage >= 25) {
-        alert("You've hit your monthly AI limit for mindmaps.")
+      const { usage, limit } = await getMonthlyUsage(user.id, 'mindmap')
+      if (usage >= limit) {
+        alert(`You've hit your monthly AI limit of ${limit} mindmaps.`)
         return
       }
 

@@ -29,9 +29,9 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
 
     setLoading(true)
     try {
-      const usage = await getMonthlyUsage(user.id, 'todo')
-      if (usage >= 25) {
-        alert("You’ve reached your 25 AI todo list creations this month.")
+      const { usage, limit } = await getMonthlyUsage(user.id, 'todo')
+      if (usage >= limit) {
+        alert(`You’ve reached your ${limit} AI todo list creations this month.`)
         return
       }
 

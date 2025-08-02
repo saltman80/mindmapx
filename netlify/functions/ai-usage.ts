@@ -1,6 +1,7 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { requireAuth } from '../lib/auth.js'
 import { trackAIUsage, getMonthlyUsage } from '../lib/ai/usage.js'
+import { getAiLimit } from './usage-utils.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   let userId: string
@@ -27,10 +28,11 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
 
   if (event.httpMethod === 'GET') {
     const usage = await getMonthlyUsage(userId, typeParam)
+    const { limit } = await getAiLimit(userId)
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usage }),
+      body: JSON.stringify({ usage, aiLimit: limit }),
     }
   }
 

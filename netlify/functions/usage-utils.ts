@@ -1,5 +1,10 @@
 import { getClient } from './db-client.js'
-import { TOTAL_AI_LIMIT } from './limits.js'
+import {
+  LIMIT_AI_MONTHLY,
+  LIMIT_AI_TRIAL,
+  TOTAL_AI_LIMIT,
+  TOTAL_AI_TRIAL_LIMIT,
+} from './limits.js'
 
 export async function logAiUsage(userId: string): Promise<void> {
   const client = await getClient()
@@ -29,7 +34,24 @@ export async function aiUsageThisMonth(userId: string): Promise<number> {
   }
 }
 
+export async function getAiLimit(userId: string): Promise<{ limit: number; total: number }> {
+  const client = await getClient()
+  try {
+    const { rows } = await client.query(
+      'SELECT subscription_status FROM users WHERE id = $1',
+      [userId]
+    )
+    const status = rows[0]?.subscription_status
+    const limit = status === 'trialing' ? LIMIT_AI_TRIAL : LIMIT_AI_MONTHLY
+    const total = status === 'trialing' ? TOTAL_AI_TRIAL_LIMIT : TOTAL_AI_LIMIT
+    return { limit, total }
+  } finally {
+    client.release()
+  }
+}
+
 export async function checkAiLimit(userId: string): Promise<boolean> {
+  const { total } = await getAiLimit(userId)
   const count = await aiUsageThisMonth(userId)
-  return count < TOTAL_AI_LIMIT
+  return count < total
 }
