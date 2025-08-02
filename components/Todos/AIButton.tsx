@@ -8,16 +8,18 @@ export interface TodoItem {
   title: string
 }
 
-function buildTodosPrompt(topic: string): string {
-  return `Create a JSON array of up to 20 todo items related to "${topic}". Each item should include a title. Return only valid JSON without code fences or quotes.`
+function buildTodosPrompt(title: string, description = ''): string {
+  const desc = description.trim()
+  return `Create a JSON array of up to 20 actionable todo items that form a plan to accomplish "${title}".${desc ? ` Use the description "${desc}" to guide and refine the tasks.` : ''} Each item should include a title. Return only valid JSON without code fences or extra text.`
 }
 
 interface AIButtonProps {
-  topic: string
+  title: string
+  description?: string
   onGenerate: (data: TodoItem[]) => void
 }
 
-export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Element {
+export default function AIButton({ title, description = '', onGenerate }: AIButtonProps): JSX.Element {
   const [loading, setLoading] = useState(false)
   const { user } = useUser()
 
@@ -35,7 +37,7 @@ export default function AIButton({ topic, onGenerate }: AIButtonProps): JSX.Elem
         return
       }
 
-      const prompt = buildTodosPrompt(topic)
+      const prompt = buildTodosPrompt(title, description)
       const response = await callOpenRouterWithRetries(prompt)
       if (!response) {
         alert('AI failed to generate a todo list after 3 attempts.')
