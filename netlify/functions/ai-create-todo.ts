@@ -25,7 +25,7 @@ export const handler = async (
 
   let data: any
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }
-  const { title, description = '' } = data
+  const { title, description = '', nodeId = null } = data
   if (typeof title !== 'string' || !title.trim()) {
     return { statusCode: 400, body: 'Invalid title' }
   }
@@ -51,10 +51,14 @@ export const handler = async (
     try {
       await client.query('BEGIN')
       const listRes = await client.query(
-        'INSERT INTO todo_lists (user_id, title) VALUES ($1,$2) RETURNING id',
-        [userId, listTitle]
+        'INSERT INTO todo_lists (user_id, title, node_id) VALUES ($1,$2,$3) RETURNING id',
+        [userId, listTitle, nodeId]
       )
       const listId = listRes.rows[0].id
+
+      if (nodeId) {
+        await client.query('UPDATE nodes SET linked_todo_list_id=$1 WHERE id=$2', [listId, nodeId])
+      }
 
       for (const item of todos) {
         const todoTitle = typeof (item as any).title === 'string' ? (item as any).title : null
@@ -65,11 +69,16 @@ export const handler = async (
           [userId, todoTitle, note, listId]
         )
       }
+      let mindmapId: string | null = null
+      if (nodeId) {
+        const mRes = await client.query('SELECT mindmap_id FROM nodes WHERE id=$1', [nodeId])
+        mindmapId = mRes.rows[0]?.mindmap_id || null
+      }
       await client.query('COMMIT')
       return {
         statusCode: 201,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: listId })
+        body: JSON.stringify({ id: listId, mindmap_id: mindmapId })
       }
     } catch (err) {
       await client.query('ROLLBACK')
