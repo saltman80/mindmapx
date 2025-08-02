@@ -205,27 +205,14 @@ export async function createMindmapFromNodes(
         roots.push(node)
       }
     }
-    type Direction = 'tr' | 'br' | 'bl' | 'tl'
-    const directionAngles: Record<Direction, number> = {
-      tr: -Math.PI / 4,
-      br: Math.PI / 4,
-      bl: (3 * Math.PI) / 4,
-      tl: (-3 * Math.PI) / 4,
-    }
     const MIN_SIBLING_GAP = 100
-    const BASE_DISTANCE = 200
-    const DISTANCE_STEP = 150
+    const BASE_RADIUS = 200
+    const RADIUS_STEP = 75
+    const MAX_RADIUS = 350
 
-    const getDirection = (node: TmpNode): Direction => {
-      if (!node.parentId) return 'tr'
-      const parent = byId.get(node.parentId)
-      if (!parent) return 'tr'
-      const dx = (node.x ?? 0) - (parent.x ?? 0)
-      const dy = (node.y ?? 0) - (parent.y ?? 0)
-      if (dx >= 0 && dy <= 0) return 'tr'
-      if (dx >= 0 && dy > 0) return 'br'
-      if (dx < 0 && dy > 0) return 'bl'
-      return 'tl'
+    const estimateLabelWidth = (label: string | undefined | null): number => {
+      if (!label) return 0
+      return label.length * 8
     }
 
     const queue: Array<{ node: TmpNode; depth: number }> = []
@@ -241,29 +228,46 @@ export async function createMindmapFromNodes(
       const total = children.length
       if (total === 0) continue
 
-      const baseRadius = BASE_DISTANCE + depth * DISTANCE_STEP
+      const baseRadius = Math.min(
+        MAX_RADIUS,
+        BASE_RADIUS + Math.max(0, depth - 1) * RADIUS_STEP
+      )
       const isRoot = !node.parentId
-      const baseArc = isRoot ? Math.PI * 2 : Math.PI
-      let arc = baseArc
-      let angleStep = arc / total
 
-      const minAngleForGap = 2 * Math.asin(MIN_SIBLING_GAP / (2 * baseRadius))
-      if (angleStep < minAngleForGap) {
-        const maxArc = isRoot ? Math.PI * 2 : (Math.PI * 3) / 2
-        arc = Math.min(maxArc, minAngleForGap * total)
-        angleStep = arc / total
+      let arc = isRoot ? Math.PI * 2 : Math.PI / 2
+      let angleStep = total > 1 ? arc / (total - 1) : 0
+
+      const maxLabelWidth = Math.max(
+        ...children.map(c => estimateLabelWidth(c.title))
+      )
+      const minGap = Math.max(MIN_SIBLING_GAP, maxLabelWidth + 20)
+      const minAngleForGap = 2 * Math.asin(minGap / (2 * baseRadius))
+      if (total > 1 && angleStep < minAngleForGap) {
+        const maxArc = isRoot ? Math.PI * 2 : Math.PI
+        arc = Math.min(maxArc, minAngleForGap * (total - 1))
+        angleStep = arc / (total - 1)
       }
 
       const radius = Math.max(
         baseRadius,
-        MIN_SIBLING_GAP / (2 * Math.sin(angleStep / 2))
+        total > 1 ? minGap / (2 * Math.sin(angleStep / 2)) : baseRadius
       )
 
-      const centerAngle = isRoot ? 0 : directionAngles[getDirection(node)]
-      const startAngle = centerAngle - arc / 2
+      const parentAngle = isRoot
+        ? 0
+        : (() => {
+            const parent = node.parentId ? byId.get(node.parentId) : null
+            if (!parent) return 0
+            return Math.atan2(
+              (node.y ?? 0) - (parent.y ?? 0),
+              (node.x ?? 0) - (parent.x ?? 0)
+            )
+          })()
+
+      const startAngle = total > 1 ? parentAngle - arc / 2 : parentAngle
 
       children.forEach((child, idx) => {
-        const angle = startAngle + angleStep * (idx + 0.5)
+        const angle = startAngle + angleStep * idx
         child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
         child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
         queue.push({ node: child, depth: depth + 1 })

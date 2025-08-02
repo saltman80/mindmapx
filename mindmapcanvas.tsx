@@ -20,10 +20,19 @@ const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
 const TOOL_OFFSET_Y = -40
 // Radial layout constants
-// Distance of children from their parent grows with depth
-const LEVEL_DISTANCE = 150
+// Base distance for first-level children
+const BASE_RADIUS = 200
+// Additional distance added for deeper levels
+const RADIUS_STEP = 75
+// Maximum distance regardless of depth
+const MAX_RADIUS = 350
 // Minimum spacing between sibling nodes to avoid label overlap
 const MIN_SIBLING_GAP = 100
+
+const estimateLabelWidth = (label: string | undefined | null): number => {
+  if (!label) return 0
+  return label.length * 8 // rough estimate: 8px per character
+}
 
 function buildLayoutTree(nodes: NodeData[]): LayoutNode | null {
   const map = new Map<string, LayoutNode>()
@@ -307,6 +316,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         creatingNodeRef.current = true
 
         const siblings = uniqueNodes.filter(n => n.parentId === parentId)
+        const newLabel = `Child of ${parent.label || 'Node'}`
 
         const getDepth = (nodeId: string): number => {
           let depth = 0
@@ -318,24 +328,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           return depth
         }
 
-        const getDirection = (node: NodeData): Direction => {
-          if (!node.parentId) return 'tr'
-          const p = uniqueNodes.find(n => n.id === node.parentId)
-          if (!p) return 'tr'
-          const dx = node.x - p.x
-          const dy = node.y - p.y
-          if (dx >= 0 && dy <= 0) return 'tr'
-          if (dx >= 0 && dy > 0) return 'br'
-          if (dx < 0 && dy > 0) return 'bl'
-          return 'tl'
-        }
-
-        const directionAngles: Record<Direction, number> = {
-          tr: -Math.PI / 4,
-          br: Math.PI / 4,
-          bl: (3 * Math.PI) / 4,
-          tl: (-3 * Math.PI) / 4,
-        }
         const angleToDirection = (a: number): Direction => {
           const t = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
           if (t >= 0 && t < Math.PI / 2) return 'tr'
@@ -346,38 +338,57 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
         // Determine depth-based radius and fan layout
         const depth = getDepth(parent.id) + 1
-        const baseRadius = LEVEL_DISTANCE * depth
+        const baseRadius = Math.min(
+          MAX_RADIUS,
+          BASE_RADIUS + Math.max(0, depth - 2) * RADIUS_STEP
+        )
         const isRoot = !parent.parentId
         const total = siblings.length + 1
 
-        // Base arc: full circle for root, 180° fan otherwise
-        const baseArc = isRoot ? Math.PI * 2 : Math.PI
-        let arc = baseArc
-        let angleStep = arc / total
+        // Estimate minimum gap based on widest label
+        const labels = siblings.map(s => s.label || '')
+        labels.push(newLabel)
+        const maxLabelWidth = Math.max(
+          ...labels.map(l => estimateLabelWidth(l))
+        )
+        const minGap = Math.max(MIN_SIBLING_GAP, maxLabelWidth + 20)
+
+        // Base arc: full circle for root, narrow wedge otherwise
+        let arc = isRoot ? Math.PI * 2 : Math.PI / 2
+        let angleStep = total > 1 ? arc / (total - 1) : 0
 
         // Minimum angle needed to maintain sibling gap at base radius
-        const minAngleForGap = 2 * Math.asin(MIN_SIBLING_GAP / (2 * baseRadius))
+        const minAngleForGap = 2 * Math.asin(minGap / (2 * baseRadius))
 
         // Widen arc if siblings would overlap
-        if (angleStep < minAngleForGap) {
-          const maxArc = isRoot ? Math.PI * 2 : (Math.PI * 3) / 2
-          arc = Math.min(maxArc, minAngleForGap * total)
-          angleStep = arc / total
+        if (total > 1 && angleStep < minAngleForGap) {
+          const maxArc = isRoot ? Math.PI * 2 : Math.PI
+          arc = Math.min(maxArc, minAngleForGap * (total - 1))
+          angleStep = arc / (total - 1)
         }
 
         // Increase radius if widening arc isn't enough
         const radius = Math.max(
           baseRadius,
-          MIN_SIBLING_GAP / (2 * Math.sin(angleStep / 2))
+          total > 1 ? minGap / (2 * Math.sin(angleStep / 2)) : baseRadius
         )
 
-        const centerAngle = isRoot ? 0 : directionAngles[getDirection(parent)]
-        const startAngle = centerAngle - arc / 2
+        const parentAngle = isRoot
+          ? 0
+          : (() => {
+              const grand = parent.parentId
+                ? uniqueNodes.find(n => n.id === parent.parentId)
+                : null
+              if (!grand) return 0
+              return Math.atan2(parent.y - grand.y, parent.x - grand.x)
+            })()
+
+        const startAngle = total > 1 ? parentAngle - arc / 2 : parentAngle
 
         // Reposition existing siblings for even distribution
         const updates: { id: string; x: number; y: number }[] = []
         siblings.forEach((s, i) => {
-          const a = startAngle + angleStep * (i + 0.5)
+          const a = startAngle + angleStep * i
           const x = Math.round(parent.x + Math.cos(a) * radius)
           const y = Math.round(parent.y + Math.sin(a) * radius)
           updates.push({ id: s.id, x, y })
@@ -396,7 +407,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           })
         }
 
-        const angle = startAngle + angleStep * (siblings.length + 0.5)
+        const angle = startAngle + angleStep * siblings.length
 
         const newX = Math.round(parent.x + Math.cos(angle) * radius)
         const newY = Math.round(parent.y + Math.sin(angle) * radius)
@@ -406,7 +417,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           mindmapId,
           x: newX,
           y: newY,
-          label: `Child of ${parent.label || 'Node'}`,
+          label: newLabel,
           description: '',
           parentId: parent.id || null,
           linkedTodoListId: null,
