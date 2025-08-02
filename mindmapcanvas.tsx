@@ -5,8 +5,7 @@ import {
   useCallback,
   useImperativeHandle,
   useMemo,
-  useEffect,
-  useLayoutEffect
+  useEffect
 } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -522,24 +521,23 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       [pan, addNode, updateNode, removeNode]
     )
 
-    useLayoutEffect(() => {
-      const container = containerRef.current
+    useEffect(() => {
       if (
         Array.isArray(nodes) &&
         nodes.length > 0 &&
         !hasCentered &&
-        container
+        containerRef.current
       ) {
-        const { clientWidth, clientHeight } = container
+        setHasCentered(true)
+        const { clientWidth, clientHeight } = containerRef.current
         const root = nodes.find(n => !n.parentId) ?? nodes[0]
-        const centerX = root.x ?? 0
-        const centerY = root.y ?? 0
+        const centerX = root.x
+        const centerY = root.y
         setTransform(prev => ({
           x: clientWidth / 2 - centerX * prev.k,
           y: clientHeight / 2 - centerY * prev.k,
           k: prev.k,
         }))
-        setHasCentered(true)
       }
     }, [nodes, hasCentered, transform.k])
 
