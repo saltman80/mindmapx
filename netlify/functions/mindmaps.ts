@@ -206,8 +206,9 @@ export async function createMindmapFromNodes(
       }
     }
     const ROOT_RADIUS = 200
-    const RADIUS_STEP = 100
-    const SUBNODE_ARC = Math.PI / 2 // 90° fan
+    const SUBNODE_ARC = (20 * Math.PI) / 180 // 20° fan
+    const SUBNODE_DISTANCE = 70
+    const SUBNODE_JITTER = 50
 
     const queue: Array<{ node: TmpNode & { angle?: number }; depth: number }> = []
     roots.forEach(root => {
@@ -238,13 +239,13 @@ export async function createMindmapFromNodes(
       const baseAngle = node.angle ?? 0
       const angleStep = total > 1 ? SUBNODE_ARC / (total - 1) : 0
       const start = baseAngle - SUBNODE_ARC / 2
-      const radius = ROOT_RADIUS + depth * RADIUS_STEP
 
       children.forEach((child, idx) => {
         const angle = start + angleStep * idx
+        const distance = SUBNODE_DISTANCE + Math.random() * SUBNODE_JITTER
         ;(child as any).angle = angle
-        child.x = Math.round((node.x ?? 0) + Math.cos(angle) * radius)
-        child.y = Math.round((node.y ?? 0) + Math.sin(angle) * radius)
+        child.x = Math.round((node.x ?? 0) + Math.cos(angle) * distance)
+        child.y = Math.round((node.y ?? 0) + Math.sin(angle) * distance)
         queue.push({ node: child as TmpNode & { angle?: number }, depth: depth + 1 })
       })
     }
