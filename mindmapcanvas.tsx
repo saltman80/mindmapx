@@ -18,10 +18,11 @@ const GRID_SIZE = 500
 const CANVAS_SIZE = DOT_SPACING * GRID_SIZE
 const TOOL_OFFSET_X = 0
 const TOOL_OFFSET_Y = -40
-// Increase node spacing to reduce overlap
-const CHILD_BASE_DISTANCE = 120
-const CHILD_DEPTH_INCREMENT = 24
-const CHILD_DISTANCE_INCREMENT = 90
+// Radial layout constants
+// Distance of children from their parent grows with depth
+const LEVEL_DISTANCE = 150
+// Minimum spacing between sibling nodes to avoid label overlap
+const MIN_SIBLING_GAP = 100
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -269,15 +270,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         if (!parent) return
         creatingNodeRef.current = true
 
-    const siblings = uniqueNodes.filter(n => n.parentId === parentId)
-
-        const quadrantOrder: Direction[] = ['tr', 'br', 'bl', 'tl']
-        const dirVectors: Record<Direction, { x: number; y: number }> = {
-          tr: { x: 1, y: -1 },
-          br: { x: 1, y: 1 },
-          bl: { x: -1, y: 1 },
-          tl: { x: -1, y: -1 },
-        }
+        const siblings = uniqueNodes.filter(n => n.parentId === parentId)
 
         const getDepth = (nodeId: string): number => {
           let depth = 0
@@ -288,48 +281,50 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           }
           return depth
         }
+
         const getDirection = (node: NodeData): Direction => {
-          if (node.direction) return node.direction
           if (!node.parentId) return 'tr'
           const p = uniqueNodes.find(n => n.id === node.parentId)
           if (!p) return 'tr'
           const dx = node.x - p.x
           const dy = node.y - p.y
           if (dx >= 0 && dy <= 0) return 'tr'
-          if (dx >= 0 && dy >= 0) return 'br'
-          if (dx <= 0 && dy >= 0) return 'bl'
+          if (dx >= 0 && dy > 0) return 'br'
+          if (dx < 0 && dy > 0) return 'bl'
           return 'tl'
         }
 
-        let direction: Direction
-        if (!parent.parentId) {
-          direction = quadrantOrder[siblings.length % 4]
-        } else {
-          direction = getDirection(parent)
+        const directionAngles: Record<Direction, number> = {
+          tr: -Math.PI / 4,
+          br: Math.PI / 4,
+          bl: (3 * Math.PI) / 4,
+          tl: (-3 * Math.PI) / 4,
+        }
+        const angleToDirection = (a: number): Direction => {
+          const t = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
+          if (t >= 0 && t < Math.PI / 2) return 'tr'
+          if (t >= Math.PI / 2 && t < Math.PI) return 'br'
+          if (t >= Math.PI && t < (3 * Math.PI) / 2) return 'bl'
+          return 'tl'
         }
 
-        const siblingsInDir = siblings.filter(s => getDirection(s) === direction)
-        const index = siblingsInDir.length
-        const depth = getDepth(parent.id)
-        const baseDistance = CHILD_BASE_DISTANCE + depth * CHILD_DEPTH_INCREMENT
-        const distance = baseDistance + index * CHILD_DISTANCE_INCREMENT
-        const centerAngle = Math.atan2(dirVectors[direction].y, dirVectors[direction].x)
-        const angleStep = Math.PI / 10 // ~18deg spread between siblings
-        let angleOffset = 0
-        if (index > 0) {
-          const step = Math.ceil(index / 2)
-          angleOffset = (index % 2 ? 1 : -1) * step * angleStep
-        }
-        const finalAngle = centerAngle + angleOffset
-        const rand = () => (Math.random() - 0.5) * 20 // ±10px jitter
+        const depth = getDepth(parent.id) + 1
+        const baseRadius = LEVEL_DISTANCE * depth
+        const isRoot = !parent.parentId
+        const total = siblings.length + 1
+        const arc = isRoot ? Math.PI * 2 : (Math.PI * 2) / 3
+        const angleStep = arc / total
+        const radius = Math.max(
+          baseRadius,
+          MIN_SIBLING_GAP / (2 * Math.sin(angleStep / 2))
+        )
+        const centerAngle = isRoot ? 0 : directionAngles[getDirection(parent)]
+        const startAngle = centerAngle - arc / 2
+        const angle = startAngle + angleStep * siblings.length + angleStep / 2
 
-        // Round coordinates to integers to avoid DB errors on numeric types
-        const newX = Math.round(
-          parent.x + Math.cos(finalAngle) * distance + rand()
-        )
-        const newY = Math.round(
-          parent.y + Math.sin(finalAngle) * distance + rand()
-        )
+        const newX = Math.round(parent.x + Math.cos(angle) * radius)
+        const newY = Math.round(parent.y + Math.sin(angle) * radius)
+        const direction = angleToDirection(angle)
 
         const newNode: NodePayload = {
           mindmapId,
@@ -369,7 +364,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             const result = await onAddNode(newNode)
             if (typeof result === 'string') nodeId = result
           } else {
-            nodeId = await createNode(newNode) || undefined
+            nodeId = (await createNode(newNode)) || undefined
           }
           if (nodeId) {
             replaceNodeId(tempId, nodeId)
