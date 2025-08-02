@@ -26,8 +26,13 @@ export const handler = async (
   let data: any
   try { data = JSON.parse(event.body) } catch { return { statusCode: 400, body: 'Invalid JSON' } }
   const { prompt, title } = data
-  if (!prompt || typeof prompt !== 'string') return { statusCode: 400, body: 'Invalid prompt' }
-  const listTitle = typeof title === 'string' && title.trim() ? title.trim() : prompt.trim()
+  if (typeof title !== 'string' || !title.trim()) {
+    return { statusCode: 400, body: 'Invalid title' }
+  }
+  if (!prompt || typeof prompt !== 'string') {
+    return { statusCode: 400, body: 'Invalid prompt' }
+  }
+  const listTitle = title.trim()
 
   try {
     const content = await generateAIResponse(
