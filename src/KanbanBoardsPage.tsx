@@ -86,7 +86,11 @@ export default function KanbanBoardsPage(): JSX.Element {
       const res = await fetch('/api/ai-create-board', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: form.title, description: form.description })
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          prompt: form.description || form.title,
+        })
       })
       const json = await res.json()
       setShowModal(false)

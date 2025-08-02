@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto'
 import { getClient } from './db-client.js'
 import { generateAIResponse } from './ai-generate.js'
 import { requireAuth } from '../lib/auth.js'
+import { ensureNewColumn } from './kanban-utils.js'
 
 import { checkAiLimit, logAiUsage } from "./usage-utils.js"
 export const handler = async (
@@ -43,9 +44,41 @@ export const handler = async (
 
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
       try {
-        await generateAIResponse(
+        const aiText = await generateAIResponse(
           `Generate a kanban board JSON from: "${prompt}". Limit to 40 cards total. There must be a column titled New that contains all generated cards. Respond only with JSON without code fences or quotes.\nExample:\n{"columns":[{"title":"New","cards":[{"title":"Sample"}]}]}`
         )
+
+        let cards: any[] = []
+        try {
+          const parsed = JSON.parse(aiText)
+          if (Array.isArray(parsed?.columns)) {
+            const newCol = parsed.columns.find((c: any) => typeof c.title === 'string' && c.title.toLowerCase() === 'new')
+            if (newCol && Array.isArray(newCol.cards)) cards = newCol.cards
+          } else if (Array.isArray(parsed?.cards)) {
+            cards = parsed.cards
+          }
+        } catch (err) {
+          console.error('Failed to parse AI response', err)
+        }
+
+        if (cards.length > 0) {
+          const newColId = await ensureNewColumn(client, boardId)
+          const { rows: posRows } = await client.query(
+            'SELECT COALESCE(MAX(position)+1,0) AS pos FROM kanban_cards WHERE column_id=$1',
+            [newColId]
+          )
+          let position = posRows[0]?.pos ?? 0
+          for (const card of cards) {
+            const title = typeof card.title === 'string' ? card.title.trim() : ''
+            if (!title) continue
+            const desc = typeof card.description === 'string' ? card.description : null
+            await client.query(
+              'INSERT INTO kanban_cards (column_id, title, description, position) VALUES ($1,$2,$3,$4)',
+              [newColId, title, desc, position]
+            )
+            position++
+          }
+        }
       } catch (err) {
         console.error('AI error:', err)
       }
