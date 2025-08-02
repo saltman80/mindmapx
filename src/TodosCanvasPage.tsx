@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import TodoCanvas from '../TodoCanvas'
 import { authFetch } from '../authFetch'
 
@@ -20,6 +20,7 @@ interface TodoList {
 
 export default function TodosCanvasPage(): JSX.Element {
   const { id } = useParams<{ id: string }>()
+  const location = useLocation()
   const [list, setList] = useState<TodoList | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,7 +51,7 @@ export default function TodosCanvasPage(): JSX.Element {
             list_id={id}
             listTitle={list?.title}
             listDescription={list?.description}
-            mindmapId={list?.mindmap_id || undefined}
+            mindmapId={list?.mindmap_id || (location.state as any)?.mindmapId || undefined}
           />
         )}
       </main>
