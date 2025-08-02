@@ -229,9 +229,24 @@ export async function createMindmapFromNodes(
     const allNodes = Array.from(byId.values())
     const values: any[] = []
     const placeholders: string[] = []
+
+    // Determine if the nodes table has a non-nullable "content" column
+    const contentCheck = await client.query(
+      `SELECT 1 FROM information_schema.columns WHERE table_name = 'nodes' AND column_name = 'content'`
+    )
+    const hasContentColumn = (contentCheck.rowCount ?? 0) > 0
+
     allNodes.forEach((node, idx) => {
-      const base = idx * 7
-      placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7})`)
+      const base = idx * (hasContentColumn ? 8 : 7)
+      const cols = [
+        `$${base + 1}`,
+        `$${base + 2}`,
+        `$${base + 3}`,
+        `$${base + 4}`,
+        `$${base + 5}`,
+        `$${base + 6}`,
+        `$${base + 7}`
+      ]
       values.push(
         node.id,
         mapId,
@@ -241,11 +256,16 @@ export async function createMindmapFromNodes(
         node.title,
         node.description ?? null
       )
+      if (hasContentColumn) {
+        cols.push(`$${base + 8}`)
+        values.push(node.title)
+      }
+      placeholders.push(`(${cols.join(', ')})`)
     })
 
     if (placeholders.length > 0) {
       await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description) VALUES ${placeholders.join(',')}`,
+        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description${hasContentColumn ? ', content' : ''}) VALUES ${placeholders.join(',')}`,
         values
       )
     }
