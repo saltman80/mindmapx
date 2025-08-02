@@ -522,7 +522,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ linkedTodoListId: list.id })
           }).catch(() => {})
-          navigate(`/todos/${list.id}`)
+          navigate(`/todos/${list.id}`, { state: { mindmapId: list.mindmap_id } })
           setAiLoading(false)
         } catch (err) {
           console.error('AI todo create failed', err)
