@@ -155,8 +155,8 @@ export default function MapEditorPage(): JSX.Element {
     if (loaded && Array.isArray(nodes) && nodes.length === 0 && !firstNodeCreated && mindmap?.id) {
       setFirstNodeCreated(true)
 
-      const rootX = 400
-      const rootY = 300
+      const rootX = 0
+      const rootY = 0
 
       const rootNode: NodePayload = {
         x: rootX,
