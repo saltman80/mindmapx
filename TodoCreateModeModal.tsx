@@ -26,42 +26,45 @@ export default function TodoCreateModeModal({ isOpen, nodeTitle, nodeDescription
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Create Todo List">
       <div className="modal-container card-modal fancy-modal" style={{ minWidth: '300px' }}>
         <h2 className="mb-4 text-lg font-semibold">Create Todo List</h2>
-        <div className="flex flex-col gap-4 mb-4">
-          <div className="flex flex-col">
-            <span className="text-sm mb-1">Title</span>
+        <div className="flex flex-col">
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium">Title</label>
             <input
               type="text"
-              className="input"
+              className="w-full p-2 border rounded"
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="Title"
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm mb-1">Description</span>
+          <div className="flex flex-col space-y-1 mt-4">
+            <label className="text-sm font-medium">Description</label>
             <textarea
-              className="textarea"
+              className="w-full p-2 border rounded resize-none h-24"
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Description (optional)"
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2.5">
+        <div className="flex justify-between items-center mt-6 space-x-3">
           <button
-            className="btn-primary"
+            className="bg-orange-500 text-white px-4 py-2 rounded flex items-center"
             onClick={() => onSelect('quick', title, description)}
           >
             📝 Quick Create
           </button>
           <button
-            className="btn-ai"
+            className="bg-gradient-to-r from-purple-500 to-green-400 text-white px-4 py-2 rounded flex items-center"
             onClick={() => onSelect('ai', title, description)}
             disabled={disableAI}
           >
             ✨ Create with AI
           </button>
-          <button className="btn-cancel" onClick={onClose}>
+          <button
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded"
+            onClick={onClose}
+          >
             Cancel
           </button>
         </div>
