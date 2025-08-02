@@ -9,7 +9,7 @@ export interface TodoItem {
 }
 
 function buildTodosPrompt(topic: string): string {
-  return `Create a JSON array of up to 20 todo items related to "${topic}". Each item should include a title. Return only valid JSON.`
+  return `Create a JSON array of up to 20 todo items related to "${topic}". Each item should include a title. Return only valid JSON without code fences or quotes.`
 }
 
 interface AIButtonProps {

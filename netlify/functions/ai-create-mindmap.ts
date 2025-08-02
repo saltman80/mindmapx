@@ -67,7 +67,7 @@ Example:
   ]
 }
 
-Return only valid JSON.`
+Return only valid JSON without code fences or quotes.`
 
   type TreeNode = { title: string; description?: string; children?: TreeNode[] }
 

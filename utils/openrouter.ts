@@ -1,4 +1,7 @@
-export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3): Promise<string | null> {
+export async function callOpenRouterWithRetries(
+  prompt: string,
+  maxRetries = 3
+): Promise<string | null> {
   const url = 'https://openrouter.ai/api/v1/chat/completions'
   const headers = {
     'Content-Type': 'application/json',
@@ -9,7 +12,13 @@ export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3):
 
   const body = {
     model: process.env.OPENROUTER_DEFAULT_MODEL ?? 'openai/gpt-4o-mini',
-    messages: [{ role: 'user', content: prompt }],
+    messages: [
+      {
+        role: 'system',
+        content: 'Return JSON without markdown code fences or surrounding quotes.'
+      },
+      { role: 'user', content: prompt }
+    ],
   }
 
   for (let i = 0; i < maxRetries; i++) {
@@ -20,8 +29,31 @@ export async function callOpenRouterWithRetries(prompt: string, maxRetries = 3):
         body: JSON.stringify(body),
       })
       const data = await response.json()
-      const content = data?.choices?.[0]?.message?.content
-      if (content) return content
+      let content = data?.choices?.[0]?.message?.content
+      if (typeof content === 'string') {
+        content = content.trim()
+        if (content.startsWith('```')) {
+          content = content
+            .replace(/^```(?:json)?\s*/i, '')
+            .replace(/\s*```$/, '')
+        }
+        content = content.replace(/^['"]|['"]$/g, '').trim()
+        const braceStart = content.indexOf('{')
+        const bracketStart = content.indexOf('[')
+        let start = -1
+        let end = -1
+        if (braceStart !== -1 && (braceStart < bracketStart || bracketStart === -1)) {
+          start = braceStart
+          end = content.lastIndexOf('}')
+        } else if (bracketStart !== -1) {
+          start = bracketStart
+          end = content.lastIndexOf(']')
+        }
+        if (start !== -1 && end !== -1) {
+          content = content.slice(start, end + 1)
+        }
+        return content
+      }
     } catch (error) {
       console.warn(`OpenRouter retry ${i + 1} failed`, error)
     }

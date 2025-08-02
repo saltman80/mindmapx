@@ -16,7 +16,7 @@ export interface KanbanColumns {
 }
 
 function buildKanbanPrompt(topic: string): string {
-  return `Generate a JSON array of up to 20 kanban cards about "${topic}". Each card should have a title and description. Return only valid JSON.`
+  return `Generate a JSON array of up to 20 kanban cards about "${topic}". Each card should have a title and description. Return only valid JSON without code fences or quotes.`
 }
 
 function buildKanbanFromCards(cards: KanbanCard[]): KanbanColumns {

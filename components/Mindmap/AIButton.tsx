@@ -46,7 +46,7 @@ function buildMindmapPrompt(topic: string): string {
 
 Each node must include: id, title, parentId (null for root), and mapId = "TEMP_MAP_ID".
 
-Return only valid JSON in tree format.`
+Return only valid JSON in tree format without code fences or quotes.`
 }
 
 function validateMindmapTree(root: any): asserts root is MindmapNode {

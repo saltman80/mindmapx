@@ -44,7 +44,7 @@ export const handler = async (
     if (prompt && typeof prompt === 'string' && prompt.trim()) {
       try {
         await generateAIResponse(
-          `Generate a kanban board JSON from: "${prompt}". Limit to 40 cards total. There must be a column titled New that contains all generated cards. Respond only with JSON.\nExample:\n{"columns":[{"title":"New","cards":[{"title":"Sample"}]}]}`
+          `Generate a kanban board JSON from: "${prompt}". Limit to 40 cards total. There must be a column titled New that contains all generated cards. Respond only with JSON without code fences or quotes.\nExample:\n{"columns":[{"title":"New","cards":[{"title":"Sample"}]}]}`
         )
       } catch (err) {
         console.error('AI error:', err)
