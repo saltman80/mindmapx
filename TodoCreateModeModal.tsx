@@ -25,23 +25,29 @@ export default function TodoCreateModeModal({ isOpen, nodeTitle, nodeDescription
   return (
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Create Todo List">
       <div className="modal-container card-modal fancy-modal" style={{ minWidth: '300px' }}>
-        <h2 className="mb-2 text-lg font-semibold">Create Todo List</h2>
-        <div className="flex flex-col gap-2">
-          <input
-            type="text"
-            className="input"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="Title"
-          />
-          <textarea
-            className="textarea"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder="Description (optional)"
-          />
+        <h2 className="mb-4 text-lg font-semibold">Create Todo List</h2>
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex flex-col">
+            <span className="text-sm mb-1">Title</span>
+            <input
+              type="text"
+              className="input"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Title"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm mb-1">Description</span>
+            <textarea
+              className="textarea"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Description (optional)"
+            />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 mt-4">
+        <div className="flex justify-end gap-2.5">
           <button
             className="btn-primary"
             onClick={() => onSelect('quick', title, description)}
@@ -53,7 +59,7 @@ export default function TodoCreateModeModal({ isOpen, nodeTitle, nodeDescription
             onClick={() => onSelect('ai', title, description)}
             disabled={disableAI}
           >
-            Create with AI
+            ✨ Create with AI
           </button>
           <button className="btn-cancel" onClick={onClose}>
             Cancel
