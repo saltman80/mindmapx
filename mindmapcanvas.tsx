@@ -13,6 +13,9 @@ import MiniMap from './MiniMap'
 import type { NodeData, EdgeData, Direction } from './mindmapTypes'
 import { authFetch } from './authFetch'
 import { assignPositions, LayoutNode } from './components/Mindmap/layout'
+import TodoCreateModeModal from './TodoCreateModeModal'
+import LoadingSpinner from './loadingspinner'
+import { callOpenRouterWithRetries } from './utils/openrouter'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -158,15 +161,17 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
       onTransformChange?.(transform)
     }, [transform, onTransformChange])
     const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editTitle, setEditTitle] = useState('')
-  const [editDesc, setEditDesc] = useState('')
-  const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
-  const [newTask, setNewTask] = useState('')
-  const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
-  const modeRef = useRef<'canvas' | null>(null)
-  const dragStartRef = useRef({ x: 0, y: 0 })
-  const originRef = useRef({ x: 0, y: 0 })
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editTitle, setEditTitle] = useState('')
+    const [editDesc, setEditDesc] = useState('')
+    const [todoNodeId, setTodoNodeId] = useState<string | null>(null)
+    const [newTask, setNewTask] = useState('')
+    const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
+    const [createTodoNode, setCreateTodoNode] = useState<NodeData | null>(null)
+    const [aiLoading, setAiLoading] = useState(false)
+    const modeRef = useRef<'canvas' | null>(null)
+    const dragStartRef = useRef({ x: 0, y: 0 })
+    const originRef = useRef({ x: 0, y: 0 })
 
   // Load todos for nodes so completion status can be reflected in the UI
   useEffect(() => {
@@ -480,6 +485,65 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         }
       },
       [navigate, updateNode]
+    )
+
+    const handleTodoCreateAI = useCallback(
+      async (node: NodeData) => {
+        if (!node) return
+        const title = node.label || 'Todo List'
+        setAiLoading(true)
+        try {
+          const prompt =
+            `Create a JSON array of 8-12 todo items for the following topic:\n` +
+            `Title: "${title}"\n` +
+            `Description: "${node.description || ''}"\n\n` +
+            `Return valid JSON, where each item is an object with a 'title' field.`
+          const response = await callOpenRouterWithRetries(prompt)
+          let items: { title: string }[] | null = null
+          if (response) {
+            try {
+              const parsed = JSON.parse(response)
+              if (Array.isArray(parsed)) {
+                items = parsed.filter((i: any) => typeof i.title === 'string')
+              }
+            } catch {
+              items = null
+            }
+          }
+          if (!items || items.length === 0) {
+            alert('AI failed to generate todos. Creating empty list.')
+            await handleTodoClick(node)
+            return
+          }
+          const res = await authFetch('/.netlify/functions/todo-lists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, nodeId: node.id }),
+          })
+          if (!res.ok) throw new Error('create failed')
+          const list = await res.json()
+          updateNode({ ...node, linkedTodoListId: list.id })
+          authFetch(`/.netlify/functions/nodes/${node.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ linkedTodoListId: list.id }),
+          }).catch(() => {})
+          for (const item of items) {
+            await authFetch('/.netlify/functions/todos', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title: item.title, list_id: list.id }),
+            })
+          }
+          navigate(`/todos/${list.id}`)
+        } catch (err) {
+          console.error('AI todo create failed', err)
+          alert('AI failed to create todo list')
+        } finally {
+          setAiLoading(false)
+        }
+      },
+      [navigate, updateNode, handleTodoClick]
     )
 
     const handleAddTask = useCallback(() => {
@@ -874,7 +938,11 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                   onClick={e => {
                     e.stopPropagation()
                     setSelectedId(null)
-                    handleTodoClick(node)
+                    if (node.linkedTodoListId) {
+                      handleTodoClick(node)
+                    } else {
+                      setCreateTodoNode(node)
+                    }
                   }}
                 >
                   {node.linkedTodoListId ? '📋' : '✅'}
@@ -883,6 +951,24 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             ) : null
           )}
 
+        {createTodoNode && (
+          <TodoCreateModeModal
+            isOpen={!!createTodoNode}
+            nodeTitle={createTodoNode.label || ''}
+            nodeDescription={createTodoNode.description || ''}
+            onSelect={async option => {
+              const node = createTodoNode
+              setCreateTodoNode(null)
+              if (!node) return
+              if (option === 'quick') {
+                await handleTodoClick(node)
+              } else {
+                await handleTodoCreateAI(node)
+              }
+            }}
+            onClose={() => setCreateTodoNode(null)}
+          />
+        )}
         {/* Add-child modal removed for auto-placement workflow */}
         {editingId && (
           <div className="modal-overlay" onClick={() => setEditingId(null)}>
@@ -902,6 +988,13 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
                 />
                 <button className="btn-primary" onClick={handleSaveEdit}>Save</button>
               </div>
+            </div>
+          </div>
+        )}
+        {aiLoading && (
+          <div className="modal-overlay">
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <LoadingSpinner />
             </div>
           </div>
         )}
