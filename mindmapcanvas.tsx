@@ -167,7 +167,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const [todoLists, setTodoLists] = useState<Record<string, { id: string; text: string; done: boolean }[]>>({})
     const [createTodoNode, setCreateTodoNode] = useState<NodeData | null>(null)
     const [aiLoading, setAiLoading] = useState(false)
-    const [aiMessage, setAiMessage] = useState('Generating Todo List with AI...')
+    const [aiMessage, setAiMessage] = useState('Generating Todo List...')
     const [aiError, setAiError] = useState<string | null>(null)
     const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const aiNodeRef = useRef<NodeData | null>(null)
@@ -501,7 +501,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         aiNodeRef.current = node
         const title = node.label || 'Todo List'
         const description = node.description || ''
-        setAiMessage('Generating Todo List with AI...')
+        setAiMessage('Generating Todo List...')
         setAiError(null)
         setAiLoading(true)
         if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
@@ -990,7 +990,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             }}
           >
             <div
-              className="modal flex items-center space-x-3 p-6 rounded-lg bg-white shadow-md max-w-md mx-auto"
+              className="modal flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-white shadow-md max-w-md mx-auto"
               onClick={e => e.stopPropagation()}
             >
               {aiLoading ? (
