@@ -496,7 +496,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           const res = await authFetch('/.netlify/functions/ai-create-todo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, description })
+            body: JSON.stringify({ title, description, nodeId: node.id })
           })
           if (!res.ok) throw new Error('AI create failed')
           const list = await res.json()
