@@ -15,8 +15,15 @@ const MODEL = process.env.OPENROUTER_DEFAULT_MODEL ?? "openai/gpt-4o-mini"
 export async function generateAIResponse(prompt: string, systemPrompt?: string) {
   const messages: ChatCompletionMessageParam[] = []
 
+  const baseSystem =
+    "Return JSON without markdown code fences or surrounding quotes."
   if (systemPrompt) {
-    messages.push({ role: "system", content: systemPrompt } as ChatCompletionMessageParam)
+    messages.push({
+      role: "system",
+      content: `${baseSystem}\n${systemPrompt}`
+    } as ChatCompletionMessageParam)
+  } else {
+    messages.push({ role: "system", content: baseSystem } as ChatCompletionMessageParam)
   }
 
   messages.push({ role: "user", content: prompt } as ChatCompletionMessageParam)
@@ -27,5 +34,32 @@ export async function generateAIResponse(prompt: string, systemPrompt?: string) 
     max_tokens: 1000
   })
 
-  return completion.choices[0].message.content as string
+  let content = (completion.choices[0].message.content || "").trim()
+
+  if (content.startsWith("```")) {
+    content = content
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "")
+  }
+
+  content = content.replace(/^['"]|['"]$/g, "").trim()
+
+  const braceStart = content.indexOf("{")
+  const bracketStart = content.indexOf("[")
+  let start = -1
+  let end = -1
+
+  if (braceStart !== -1 && (braceStart < bracketStart || bracketStart === -1)) {
+    start = braceStart
+    end = content.lastIndexOf("}")
+  } else if (bracketStart !== -1) {
+    start = bracketStart
+    end = content.lastIndexOf("]")
+  }
+
+  if (start !== -1 && end !== -1) {
+    content = content.slice(start, end + 1)
+  }
+
+  return content
 }

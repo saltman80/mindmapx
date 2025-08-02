@@ -30,7 +30,7 @@ export const handler = async (
   try {
     const content = await generateAIResponse(
       prompt,
-      'Generate a JSON array of todo items. Limit to 20 items, each with a title and note field. Respond only with JSON.\nExample:\n[{"title":"Sample","note":"Details"}]'
+      'Generate a JSON array of todo items. Limit to 20 items, each with a title and note field. Respond only with JSON without code fences or quotes.\nExample:\n[{"title":"Sample","note":"Details"}]'
     )
     let todos: unknown
     try { todos = JSON.parse(content) } catch { todos = [] }
