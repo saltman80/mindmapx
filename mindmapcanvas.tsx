@@ -927,14 +927,16 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             isOpen={!!createTodoNode}
             nodeTitle={createTodoNode.label || ''}
             nodeDescription={createTodoNode.description || ''}
-            onSelect={async option => {
+            onSelect={async (option, title, description) => {
               const node = createTodoNode
               setCreateTodoNode(null)
               if (!node) return
+              const updatedNode = { ...node, label: title, description }
+              updateNode(updatedNode)
               if (option === 'quick') {
-                await handleTodoClick(node)
+                await handleTodoClick(updatedNode)
               } else {
-                await handleTodoCreateAI(node)
+                await handleTodoCreateAI(updatedNode)
               }
             }}
             onClose={() => setCreateTodoNode(null)}
