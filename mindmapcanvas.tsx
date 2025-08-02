@@ -947,7 +947,6 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
             nodeDescription={createTodoNode.description || ''}
             onSelect={async (option, title, description) => {
               const node = createTodoNode
-              setCreateTodoNode(null)
               if (!node) return
               const updatedNode = { ...node, label: title, description }
               updateNode(updatedNode)
