@@ -12,10 +12,10 @@ export const mapInputSchema = z.object({
   }),
 })
 
-export const aiMindmapNodeSchema = z.object({
-  id: z.string().uuid().optional(),
-  title: z.string(),
-  parentId: z.string().uuid().nullable().optional()
-})
-
-export const aiMindmapNodesSchema = z.array(aiMindmapNodeSchema)
+export const aiMindmapTreeSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    title: z.string(),
+    description: z.string().optional().default(''),
+    children: z.array(aiMindmapTreeSchema).optional().default([]),
+  })
+)

@@ -3,7 +3,8 @@ import { generateAIResponse } from './ai-generate.js'
 import { createMindmapFromNodes } from './mindmaps.js'
 import { requireAuth } from '../lib/auth.js'
 import { checkAiLimit, logAiUsage } from "./usage-utils.js"
-import { aiMindmapNodesSchema } from './validationschemas.js'
+import { aiMindmapTreeSchema } from './validationschemas.js'
+import { randomUUID } from 'crypto'
 
 export const handler = async (
   event: HandlerEvent,
@@ -33,19 +34,71 @@ export const handler = async (
   if (typeof title !== 'string' || !title.trim()) return { statusCode: 400, body: 'Invalid title' }
   if (!description) return { statusCode: 400, body: 'Missing description' }
 
-  const prompt = `Generate a mindmap as JSON from: "${description}". Limit to 40 nodes or fewer and include one root node with child and sub nodes. Each node should have fields id (uuid), title, and parentId (uuid or null). Return only valid JSON.\nExample:\n[{"id":"uuid","title":"Root","parentId":null},{"id":"uuid","title":"Child","parentId":"root-uuid"}]`
+  const systemPrompt =
+    'You are an AI that generates useful and structured mindmaps with a core concept and branching child nodes.'
+  const userPrompt = `Create a JSON structure for a mind map.
 
-  let nodes: any[] = []
+Topic:
+- Title: "${title}"
+- Description: "${description}"
+
+Instructions:
+- Use the title and description as the root node (core concept).
+- Add up to 8 child nodes, each with a title and description.
+- Each child may contain 2–3 subnodes.
+- Nest nodes using "children" arrays.
+- Each node should only include: title, description, and children.
+
+Example:
+{
+  "title": "Core Concept",
+  "description": "Overview of the concept",
+  "children": [
+    {
+      "title": "Child Node",
+      "description": "Details about this aspect",
+      "children": [
+        {
+          "title": "Subnode",
+          "description": "Further explanation"
+        }
+      ]
+    }
+  ]
+}
+
+Return only valid JSON.`
+
+  type TreeNode = { title: string; description?: string; children?: TreeNode[] }
+
+  let flatNodes: Array<{ id: string; title: string; description?: string; parentId: string | null }> = []
+
   try {
-    const content = await generateAIResponse(prompt)
-    nodes = aiMindmapNodesSchema.parse(JSON.parse(content))
+    const content = await generateAIResponse(userPrompt, systemPrompt)
+    const tree = aiMindmapTreeSchema.parse(JSON.parse(content)) as TreeNode
+    tree.title = title
+    tree.description = description
+
+    const traverse = (node: TreeNode, parentId: string | null) => {
+      const id = randomUUID()
+      flatNodes.push({ id, title: node.title, description: node.description, parentId })
+      for (const child of node.children || []) {
+        traverse(child, id)
+      }
+    }
+
+    traverse(tree, null)
   } catch (err) {
     console.error('AI parse failed:', err)
-    nodes = []
+  }
+
+  if (flatNodes.length === 0) {
+    const id = randomUUID()
+    flatNodes.push({ id, title, description, parentId: null })
   }
 
   try {
-    const mindmapId = await createMindmapFromNodes(userId, title, description, nodes)
+    const mindmapId = await createMindmapFromNodes(userId, title, description, flatNodes)
     return {
       statusCode: 200,
       body: JSON.stringify({ mindmapId })

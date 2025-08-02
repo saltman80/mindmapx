@@ -156,7 +156,7 @@ export async function createMindmapFromNodes(
   userId: string,
   title: string,
   description: string,
-  nodes: Array<{ id?: string; title: string; parentId?: string | null }>
+  nodes: Array<{ id?: string; title: string; description?: string | null; parentId?: string | null }>
 ): Promise<string> {
   const client = await getClient()
   try {
@@ -179,6 +179,7 @@ export async function createMindmapFromNodes(
     type TmpNode = {
       id: string
       title: string
+      description?: string | null
       parentId: string | null
       x?: number
       y?: number
@@ -191,6 +192,7 @@ export async function createMindmapFromNodes(
       const node: TmpNode = {
         id,
         title: raw.title,
+        description: raw.description ?? null,
         parentId: raw.parentId ?? null,
         children: [],
       }
@@ -224,11 +226,27 @@ export async function createMindmapFromNodes(
       })
     }
 
-    for (const node of byId.values()) {
+    const allNodes = Array.from(byId.values())
+    const values: any[] = []
+    const placeholders: string[] = []
+    allNodes.forEach((node, idx) => {
+      const base = idx * 7
+      placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7})`)
+      values.push(
+        node.id,
+        mapId,
+        node.parentId,
+        node.x ?? 0,
+        node.y ?? 0,
+        node.title,
+        node.description ?? null
+      )
+    })
+
+    if (placeholders.length > 0) {
       await client.query(
-        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description)
-         VALUES ($1, $2, $3, $4, $5, $6, NULL)`,
-        [node.id, mapId, node.parentId, node.x ?? 0, node.y ?? 0, node.title]
+        `INSERT INTO nodes(id, mindmap_id, parent_id, x, y, label, description) VALUES ${placeholders.join(',')}`,
+        values
       )
     }
     await client.query('COMMIT')
