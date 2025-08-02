@@ -15,7 +15,6 @@ import { authFetch } from './authFetch'
 import { assignPositions, LayoutNode } from './components/Mindmap/layout'
 import TodoCreateModeModal from './TodoCreateModeModal'
 import LoadingSpinner from './loadingspinner'
-import { callOpenRouterWithRetries } from './utils/openrouter'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -493,48 +492,20 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         const title = node.label || 'Todo List'
         setAiLoading(true)
         try {
-          const prompt =
-            `Create a JSON array of 8-12 todo items for the following topic:\n` +
-            `Title: "${title}"\n` +
-            `Description: "${node.description || ''}"\n\n` +
-            `Return valid JSON, where each item is an object with a 'title' field.`
-          const response = await callOpenRouterWithRetries(prompt)
-          let items: { title: string }[] | null = null
-          if (response) {
-            try {
-              const parsed = JSON.parse(response)
-              if (Array.isArray(parsed)) {
-                items = parsed.filter((i: any) => typeof i.title === 'string')
-              }
-            } catch {
-              items = null
-            }
-          }
-          if (!items || items.length === 0) {
-            alert('AI failed to generate todos. Creating empty list.')
-            await handleTodoClick(node)
-            return
-          }
-          const res = await authFetch('/.netlify/functions/todo-lists', {
+          const prompt = [title, node.description].filter(Boolean).join('\n\n')
+          const res = await authFetch('/.netlify/functions/ai-create-todo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, nodeId: node.id }),
+            body: JSON.stringify({ title, prompt })
           })
-          if (!res.ok) throw new Error('create failed')
+          if (!res.ok) throw new Error('AI create failed')
           const list = await res.json()
           updateNode({ ...node, linkedTodoListId: list.id })
           authFetch(`/.netlify/functions/nodes/${node.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ linkedTodoListId: list.id }),
+            body: JSON.stringify({ linkedTodoListId: list.id })
           }).catch(() => {})
-          for (const item of items) {
-            await authFetch('/.netlify/functions/todos', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ title: item.title, list_id: list.id }),
-            })
-          }
           navigate(`/todos/${list.id}`)
         } catch (err) {
           console.error('AI todo create failed', err)
@@ -543,7 +514,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           setAiLoading(false)
         }
       },
-      [navigate, updateNode, handleTodoClick]
+      [navigate, updateNode]
     )
 
     const handleAddTask = useCallback(() => {
