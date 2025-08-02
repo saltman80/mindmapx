@@ -4,6 +4,7 @@ import MindmapCanvas from './MindmapCanvas'
 import type { NodeData, NodePayload, EdgeData } from '../mindmapTypes'
 import { authFetch } from '../authFetch'
 import LoadingSpinner from '../loadingspinner'
+import { DEFAULT_ROOT_X, DEFAULT_ROOT_Y } from '../netlify/functions/constants.ts'
 
 interface Mindmap {
   id: string
@@ -33,6 +34,7 @@ export default function MapEditorPage(): JSX.Element {
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 })
   const [loaded, setLoaded] = useState(false)
   const [firstNodeCreated, setFirstNodeCreated] = useState(false)
+  const [hasCentered, setHasCentered] = useState(false)
 
   const handleReload = useCallback(() => setReloadFlag(p => p + 1), [])
 
@@ -155,8 +157,8 @@ export default function MapEditorPage(): JSX.Element {
     if (loaded && Array.isArray(nodes) && nodes.length === 0 && !firstNodeCreated && mindmap?.id) {
       setFirstNodeCreated(true)
 
-      const rootX = 0
-      const rootY = 0
+      const rootX = DEFAULT_ROOT_X
+      const rootY = DEFAULT_ROOT_Y
 
       const rootNode: NodePayload = {
         x: rootX,
@@ -193,6 +195,23 @@ export default function MapEditorPage(): JSX.Element {
         .catch(err => console.error('[AutoCreateNode] Failed:', err))
     }
   }, [loaded, nodes])
+
+  useEffect(() => {
+    if (!hasCentered && Array.isArray(nodes) && nodes.length > 0) {
+      const root = nodes.find(n => !n.parentId) || nodes[0]
+      const centerX = typeof root.x === 'number' ? root.x : 0
+      const centerY = typeof root.y === 'number' ? root.y : 0
+      const container = document.querySelector('.main-area') as HTMLElement | null
+      const viewWidth = container?.clientWidth ?? window.innerWidth
+      const viewHeight = container?.clientHeight ?? window.innerHeight
+      setTransform(prev => ({
+        ...prev,
+        x: viewWidth / 2 - centerX * prev.k,
+        y: viewHeight / 2 - centerY * prev.k,
+      }))
+      setHasCentered(true)
+    }
+  }, [nodes, hasCentered])
 
   const safeNodes = Array.isArray(nodes) ? nodes : []
 
