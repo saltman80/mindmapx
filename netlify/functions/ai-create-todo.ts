@@ -41,7 +41,7 @@ export const handler = async (
   try {
     const content = await generateAIResponse(
       userPrompt,
-      'Generate a JSON array of todo items. Limit to 20 items, each with a title and note field. Respond only with JSON without code fences or quotes.\nExample:\n[{"title":"Sample","note":"Details"}]'
+      'Generate a JSON array of todo items that form a plan to accomplish the provided title. Use the description to refine and guide the tasks. Limit to 20 items, each with a title and note field. Respond only with JSON without code fences or quotes.\nExample:\n[{"title":"Sample","note":"Details"}]'
     )
     let todosRaw: unknown
     try { todosRaw = JSON.parse(content) } catch { todosRaw = [] }
