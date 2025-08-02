@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import MiniMap from './MiniMap'
 import type { NodeData, EdgeData, Direction } from './mindmapTypes'
 import { authFetch } from './authFetch'
+import { assignPositions, LayoutNode } from './components/Mindmap/layout'
 
 const DOT_SPACING = 50
 const GRID_SIZE = 500
@@ -23,6 +24,33 @@ const TOOL_OFFSET_Y = -40
 const LEVEL_DISTANCE = 150
 // Minimum spacing between sibling nodes to avoid label overlap
 const MIN_SIBLING_GAP = 100
+
+function buildLayoutTree(nodes: NodeData[]): LayoutNode | null {
+  const map = new Map<string, LayoutNode>()
+  nodes.forEach(n => {
+    map.set(n.id, { ...n, parentId: n.parentId ?? null, children: [] })
+  })
+  let root: LayoutNode | null = null
+  map.forEach(node => {
+    if (node.parentId && map.has(node.parentId)) {
+      map.get(node.parentId)!.children!.push(node)
+    } else {
+      root = node
+    }
+  })
+  return root
+}
+
+function flattenLayoutTree(root: LayoutNode): NodeData[] {
+  const result: NodeData[] = []
+  const traverse = (n: LayoutNode) => {
+    const { children, ...rest } = n
+    result.push(rest as NodeData)
+    if (children) children.forEach(traverse)
+  }
+  traverse(root)
+  return result
+}
 
 interface MindmapCanvasProps {
   nodes?: NodeData[]
@@ -180,7 +208,15 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const addNode = useCallback(
       (node: NodeData) => {
         console.log('[MindmapCanvas] addNode', node)
-        setNodes(prev => [...prev, node])
+        setNodes(prev => {
+          const updated = [...prev, node]
+          const root = buildLayoutTree(updated)
+          if (root) {
+            assignPositions(root)
+            return flattenLayoutTree(root)
+          }
+          return updated
+        })
         if (
           node.parentId &&
           !safeEdges.some(e => e.from === node.parentId && e.to === node.id)
