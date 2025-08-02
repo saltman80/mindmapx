@@ -100,7 +100,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
 
     const navigate = useNavigate()
 
-    const [nodes, setNodes] = useState<NodeData[]>(() => safePropNodes)
+    const [nodes, setNodes] = useState<NodeData[]>([])
     const [edges, setEdges] = useState<EdgeData[]>(() => safePropEdges)
     // Track fade state removed to simplify node addition experience
 
@@ -132,6 +132,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
+      setHasCentered(false)
       setNodes(() => {
         const root = buildLayoutTree(safePropNodes)
         if (root) {
