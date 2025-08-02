@@ -308,19 +308,59 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
           return 'tl'
         }
 
+        // Determine depth-based radius and fan layout
         const depth = getDepth(parent.id) + 1
         const baseRadius = LEVEL_DISTANCE * depth
         const isRoot = !parent.parentId
         const total = siblings.length + 1
-        const arc = isRoot ? Math.PI * 2 : (Math.PI * 2) / 3
-        const angleStep = arc / total
+
+        // Base arc: full circle for root, 180° fan otherwise
+        const baseArc = isRoot ? Math.PI * 2 : Math.PI
+        let arc = baseArc
+        let angleStep = arc / total
+
+        // Minimum angle needed to maintain sibling gap at base radius
+        const minAngleForGap = 2 * Math.asin(MIN_SIBLING_GAP / (2 * baseRadius))
+
+        // Widen arc if siblings would overlap
+        if (angleStep < minAngleForGap) {
+          const maxArc = isRoot ? Math.PI * 2 : (Math.PI * 3) / 2
+          arc = Math.min(maxArc, minAngleForGap * total)
+          angleStep = arc / total
+        }
+
+        // Increase radius if widening arc isn't enough
         const radius = Math.max(
           baseRadius,
           MIN_SIBLING_GAP / (2 * Math.sin(angleStep / 2))
         )
+
         const centerAngle = isRoot ? 0 : directionAngles[getDirection(parent)]
         const startAngle = centerAngle - arc / 2
-        const angle = startAngle + angleStep * siblings.length + angleStep / 2
+
+        // Reposition existing siblings for even distribution
+        const updates: { id: string; x: number; y: number }[] = []
+        siblings.forEach((s, i) => {
+          const a = startAngle + angleStep * (i + 0.5)
+          const x = Math.round(parent.x + Math.cos(a) * radius)
+          const y = Math.round(parent.y + Math.sin(a) * radius)
+          updates.push({ id: s.id, x, y })
+        })
+
+        if (updates.length) {
+          setNodes(prev =>
+            prev.map(n => {
+              const u = updates.find(u => u.id === n.id)
+              return u ? { ...n, x: u.x, y: u.y } : n
+            })
+          )
+          updates.forEach(u => {
+            const node = siblings.find(s => s.id === u.id)
+            if (node) onMoveNode?.({ ...node, x: u.x, y: u.y })
+          })
+        }
+
+        const angle = startAngle + angleStep * (siblings.length + 0.5)
 
         const newX = Math.round(parent.x + Math.cos(angle) * radius)
         const newY = Math.round(parent.y + Math.sin(angle) * radius)
@@ -374,7 +414,7 @@ const MindmapCanvas = forwardRef<MindmapCanvasHandle, MindmapCanvasProps>(
         } finally {
           creatingNodeRef.current = false
         }
-    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId, onAddNode])
+    }, [addNode, uniqueNodes, mindmapId, createNode, replaceNodeId, onAddNode, onMoveNode])
 
     const openEditModal = useCallback((id: string) => {
       console.log('[MindmapCanvas] openEditModal', id)
