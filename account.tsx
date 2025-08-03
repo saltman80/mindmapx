@@ -6,6 +6,9 @@ import {
   LIMIT_TODO_LISTS,
   LIMIT_KANBAN_BOARDS,
   LIMIT_AI_MONTHLY,
+  LIMIT_MINDMAPS_TRIAL,
+  LIMIT_TODO_LISTS_TRIAL,
+  LIMIT_KANBAN_BOARDS_TRIAL,
 } from './src/constants'
 
 interface Usage {
@@ -23,16 +26,25 @@ export default function AccountPage(): JSX.Element {
     aiUsage: 0,
   })
   const [aiLimit, setAiLimit] = useState(LIMIT_AI_MONTHLY)
+  const [isTrial, setIsTrial] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const mindmapLimit = isTrial ? LIMIT_MINDMAPS_TRIAL : LIMIT_MINDMAPS
+  const todoLimit = isTrial ? LIMIT_TODO_LISTS_TRIAL : LIMIT_TODO_LISTS
+  const boardLimit = isTrial ? LIMIT_KANBAN_BOARDS_TRIAL : LIMIT_KANBAN_BOARDS
+
   useEffect(() => {
     const controller = new AbortController()
-    fetch('/api/usage', { credentials: 'include', signal: controller.signal })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => {
-        if (data) {
+    ;(async () => {
+      try {
+        const [usageRes, statusRes] = await Promise.all([
+          fetch('/api/usage', { credentials: 'include', signal: controller.signal }),
+          fetch('/api/user-status', { credentials: 'include', signal: controller.signal })
+        ])
+        if (usageRes.ok) {
+          const data = await usageRes.json()
           setUsage({
             mindmaps: Number(data.mindmaps) || 0,
             todoLists: Number(data.todoLists) || 0,
@@ -41,8 +53,14 @@ export default function AccountPage(): JSX.Element {
           })
           setAiLimit(Number(data.aiLimit) || LIMIT_AI_MONTHLY)
         }
-      })
-      .catch(() => {})
+        if (statusRes.ok) {
+          const status = await statusRes.json()
+          if (status?.data?.subscription_status === 'trialing') {
+            setIsTrial(true)
+          }
+        }
+      } catch {}
+    })()
     return () => controller.abort()
   }, [])
 
@@ -89,19 +107,19 @@ export default function AccountPage(): JSX.Element {
             <tr>
               <td className="metric-label">Mindmaps</td>
               <td className="metric-value">
-                {usage.mindmaps}/{LIMIT_MINDMAPS}
+                {usage.mindmaps}/{mindmapLimit}
               </td>
             </tr>
             <tr>
               <td className="metric-label">Todo Lists</td>
               <td className="metric-value">
-                {usage.todoLists}/{LIMIT_TODO_LISTS}
+                {usage.todoLists}/{todoLimit}
               </td>
             </tr>
             <tr>
               <td className="metric-label">Kanban Boards</td>
               <td className="metric-value">
-                {usage.boards}/{LIMIT_KANBAN_BOARDS}
+                {usage.boards}/{boardLimit}
               </td>
             </tr>
             <tr>
@@ -112,6 +130,11 @@ export default function AccountPage(): JSX.Element {
             </tr>
           </tbody>
         </table>
+        <div className="text-center text-red-600 space-y-1 mt-4">
+          {usage.mindmaps >= mindmapLimit && <p>Mindmap limit reached</p>}
+          {usage.todoLists >= todoLimit && <p>Todo list limit reached</p>}
+          {usage.boards >= boardLimit && <p>Kanban board limit reached</p>}
+        </div>
       </div>
     </section>
   )

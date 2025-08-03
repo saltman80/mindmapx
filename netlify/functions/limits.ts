@@ -1,6 +1,9 @@
 export const LIMIT_MINDMAPS = 10
 export const LIMIT_TODO_LISTS = 100
 export const LIMIT_KANBAN_BOARDS = 10
+export const LIMIT_MINDMAPS_TRIAL = 2
+export const LIMIT_TODO_LISTS_TRIAL = 5
+export const LIMIT_KANBAN_BOARDS_TRIAL = 1
 // Expose a monthly limit of 100 AI automations but keep a
 // server-side buffer of 5 extra attempts. Trial users are
 // restricted to 10 automations during the trial period.

@@ -5,7 +5,7 @@ import { extractToken, verifySession } from './auth.js'
 import { validate as isUuid } from 'uuid'
 import { randomUUID } from 'crypto'
 import { ZodError } from 'zod'
-import { LIMIT_MINDMAPS } from "./limits.js"
+import { LIMIT_MINDMAPS, LIMIT_MINDMAPS_TRIAL } from "./limits.js"
 import { mapInputSchema } from './validationschemas.js'
 
 export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -61,11 +61,13 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }
       }
 
+      const { rows: userRows } = await client.query('SELECT subscription_status FROM users WHERE id = $1', [userId])
+      const mapLimit = userRows[0]?.subscription_status === 'trialing' ? LIMIT_MINDMAPS_TRIAL : LIMIT_MINDMAPS
       const countRes = await client.query(
         'SELECT COUNT(*) FROM mindmaps WHERE user_id = $1',
         [userId]
       )
-      if (Number(countRes.rows[0].count) >= LIMIT_MINDMAPS) {
+      if (Number(countRes.rows[0].count) >= mapLimit) {
         client.release()
         return { statusCode: 403, headers, body: JSON.stringify({ error: 'Mindmap limit reached' }) }
       }
@@ -160,11 +162,13 @@ export async function createMindmapFromNodes(
 ): Promise<string> {
   const client = await getClient()
   try {
+    const { rows: userRows } = await client.query('SELECT subscription_status FROM users WHERE id = $1', [userId])
+    const mapLimit = userRows[0]?.subscription_status === 'trialing' ? LIMIT_MINDMAPS_TRIAL : LIMIT_MINDMAPS
     const { rows } = await client.query(
       'SELECT COUNT(*) FROM mindmaps WHERE user_id = $1',
       [userId]
     )
-    if (Number(rows[0].count) >= LIMIT_MINDMAPS) {
+    if (Number(rows[0].count) >= mapLimit) {
       throw new Error('Mindmap limit reached')
     }
     await client.query('BEGIN')

@@ -1,6 +1,6 @@
 import type { HandlerEvent, HandlerContext } from '@netlify/functions'
 import { getClient } from "./db-client.js"
-import { LIMIT_TODO_LISTS } from "./limits.js"
+import { LIMIT_TODO_LISTS, LIMIT_TODO_LISTS_TRIAL } from "./limits.js"
 import { extractToken, verifySession } from './auth.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
@@ -69,8 +69,10 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid title' }) }
       }
       const nodeId = data.nodeId || null
+      const { rows: userRows } = await client.query('SELECT subscription_status FROM users WHERE id = $1', [userId])
+      const listLimit = userRows[0]?.subscription_status === 'trialing' ? LIMIT_TODO_LISTS_TRIAL : LIMIT_TODO_LISTS
       const countRes = await client.query('SELECT COUNT(*) FROM todo_lists WHERE user_id = $1', [userId])
-      if (Number(countRes.rows[0].count) >= LIMIT_TODO_LISTS) {
+      if (Number(countRes.rows[0].count) >= listLimit) {
         client.release()
         return { statusCode: 403, headers, body: JSON.stringify({ error: 'Todo list limit reached' }) }
       }
