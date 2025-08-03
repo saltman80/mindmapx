@@ -1,3 +1,5 @@
+import AdminNav from './src/AdminNav'
+
 export default function UsersPage(): JSX.Element {
   const [users, setUsers] = useState<User[]>([])
   const [page, setPage] = useState<number>(1)
@@ -133,6 +135,7 @@ export default function UsersPage(): JSX.Element {
   return (
     <div>
       <h1>Users</h1>
+      <AdminNav />
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"

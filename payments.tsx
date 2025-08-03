@@ -1,3 +1,5 @@
+import AdminNav from './src/AdminNav'
+
 const paymentSchema = z.object({
   id: z.string(),
   user_id: z.string(),
@@ -82,6 +84,7 @@ const PaymentsPage: React.FC = () => {
   return (
     <div className="payments-page">
       <h1>Payments</h1>
+      <AdminNav />
       {error && <div className="error">{error}</div>}
       {loading ? (
         <div>Loading payments...</div>
