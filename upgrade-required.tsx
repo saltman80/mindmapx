@@ -23,7 +23,7 @@ export default function UpgradeRequired(): JSX.Element {
           transition={{ duration: 0.6 }}
           className="about-hero-inner"
         >
-          <h1 className="marketing-text-large">Upgrade Required</h1>
+          <h1 className="marketing-text-large">Purchase MindXdo</h1>
           <p className="section-subtext">
             Using MindXdo allows you to build your vision map and connect the dots to your
             todo and task list to bring the map to life. Humans are visual people and using
