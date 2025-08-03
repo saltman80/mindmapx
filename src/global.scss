@@ -2545,7 +2545,7 @@ hr {
 }
 
 .todo-list {
-  width: min(600px, 80%);
+  width: min(700px, 80%);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -2616,6 +2616,7 @@ hr {
 }
 
 .todo-item {
+  width: min(700px, 80%);
   display: flex;
   align-items: center;
   padding: 1rem;
@@ -3828,7 +3829,7 @@ hr {
 }
 
 .todo-block {
-  width: min(600px, 80%);
+  width: min(700px, 80%);
   margin: 0 auto 0.5rem;
   display: flex;
   align-items: center;
