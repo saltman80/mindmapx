@@ -37,6 +37,9 @@ import ScrollToTop from './ScrollToTop'
 import SidebarNav from './SidebarNav'
 import ProtectedRoute from './ProtectedRoute'
 import UpgradeRequired from '../upgrade-required'
+import UsersPage from '../users'
+import PaymentsPage from '../payments'
+import AnalyticsPage from '../analytics'
 
 function AppRoutes() {
   return (
@@ -67,6 +70,9 @@ function AppRoutes() {
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
       <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
+      <Route path="/admin/payments" element={<ProtectedRoute><PaymentsPage /></ProtectedRoute>} />
+      <Route path="/admin/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
       <Route path="/purchase" element={<PurchasePage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/upgrade-required" element={<UpgradeRequired />} />
@@ -88,7 +94,8 @@ function AppLayout() {
     '/billing',
     '/account',
     '/maps',
-    '/todo-canvas'
+    '/todo-canvas',
+    '/admin'
   ]
   const isDashboard = dashboardPaths.some(path =>
     location.pathname === path || location.pathname.startsWith(path + '/')
