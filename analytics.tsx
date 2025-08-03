@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { authFetch } from './authFetch'
+import AdminNav from './src/AdminNav'
 
 const formatDateInput = (date: Date): string => {
   const year = date.getFullYear()
@@ -114,6 +115,7 @@ export default function AnalyticsPage(): JSX.Element {
   return (
     <div className="analytics-page">
       <h1>Analytics</h1>
+      <AdminNav />
       <div className="analytics-controls">
         <label>
           Start Date:
