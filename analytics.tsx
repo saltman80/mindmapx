@@ -14,12 +14,29 @@ interface AnalyticsPoint {
   aiProcesses: number
 }
 
+interface AnalyticsTotals {
+  kanbans: number
+  todoLists: number
+  todos: number
+  mindmaps: number
+  nodes: number
+  aiProcesses: number
+}
+
 export default function AnalyticsPage(): JSX.Element {
   const { user } = useUser()
   if (!isAdmin(user)) {
     return <p>Forbidden</p>
   }
   const [data, setData] = useState<AnalyticsPoint[]>([])
+  const [totals, setTotals] = useState<AnalyticsTotals>({
+    kanbans: 0,
+    todoLists: 0,
+    todos: 0,
+    mindmaps: 0,
+    nodes: 0,
+    aiProcesses: 0,
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,6 +54,7 @@ export default function AnalyticsPage(): JSX.Element {
       })
       .then(json => {
         setData(json.data as AnalyticsPoint[])
+        setTotals(json.totals as AnalyticsTotals)
       })
       .catch(err => {
         if (err.name !== 'AbortError') {
@@ -55,17 +73,6 @@ export default function AnalyticsPage(): JSX.Element {
     nodes: data.map(d => d.nodes),
     aiProcesses: data.map(d => d.aiProcesses),
   }
-
-  const latest =
-    data[data.length - 1] || ({
-      day: '',
-      kanbans: 0,
-      todoLists: 0,
-      todos: 0,
-      mindmaps: 0,
-      nodes: 0,
-      aiProcesses: 0,
-    } as AnalyticsPoint)
 
   const metrics: { key: keyof typeof series; label: string }[] = [
     { key: 'kanbans', label: 'Kanban Boards' },
@@ -87,8 +94,8 @@ export default function AnalyticsPage(): JSX.Element {
           {metrics.map(m => (
             <div key={m.key} className="analytic-tile">
               <h2>{m.label}</h2>
-              <p className="tile-value">{latest[m.key]}</p>
-              <Sparkline data={series[m.key]} />
+              <p className="tile-value">{totals[m.key]}</p>
+              <Sparkline data={series[m.key]} height={60} showArea />
             </div>
           ))}
         </div>
