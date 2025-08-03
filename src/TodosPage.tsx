@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import LoadingSkeleton from '../loadingskeleton'
+import { checkLimit } from './lib/checkLimit'
 
 interface TodoItem {
   id: string
@@ -53,6 +54,8 @@ export default function TodosPage(): JSX.Element {
     e.preventDefault()
     const title = form.title.trim()
     if (!title) return
+    const ok = await checkLimit('todo')
+    if (!ok) return
     const res = await fetch('/.netlify/functions/todo-lists', {
       method: 'POST',
       credentials: 'include',
@@ -97,6 +100,8 @@ export default function TodosPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    const ok = await checkLimit('todo')
+    if (!ok) return
     setAiLoading(true)
     try {
       const res = await fetch('/api/ai-create-todo', {
