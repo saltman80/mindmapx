@@ -4035,3 +4035,59 @@ hr {
     margin: 0;
   }
 }
+
+/* Admin Users Table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.users-table th,
+.users-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+.users-table thead {
+  background: var(--color-primary-light);
+  color: #333;
+}
+
+.users-table tbody tr:nth-child(even) {
+  background: #fff7e6;
+}
+
+/* Analytics page */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 700px) {
+  .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.analytic-tile {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.analytic-tile h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.tile-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 1rem;
+}

@@ -56,6 +56,26 @@ export default function AnalyticsPage(): JSX.Element {
     aiProcesses: data.map(d => d.aiProcesses),
   }
 
+  const latest =
+    data[data.length - 1] || ({
+      day: '',
+      kanbans: 0,
+      todoLists: 0,
+      todos: 0,
+      mindmaps: 0,
+      nodes: 0,
+      aiProcesses: 0,
+    } as AnalyticsPoint)
+
+  const metrics: { key: keyof typeof series; label: string }[] = [
+    { key: 'kanbans', label: 'Kanban Boards' },
+    { key: 'todoLists', label: 'Todo Lists' },
+    { key: 'todos', label: 'Todos' },
+    { key: 'mindmaps', label: 'Mindmaps' },
+    { key: 'nodes', label: 'Nodes' },
+    { key: 'aiProcesses', label: 'AI Processes' },
+  ]
+
   return (
     <div className="analytics-page">
       <AdminNav />
@@ -64,30 +84,13 @@ export default function AnalyticsPage(): JSX.Element {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && (
         <div className="analytics-grid">
-          <div>
-            <h2>Kanban Boards</h2>
-            <Sparkline data={series.kanbans} />
-          </div>
-          <div>
-            <h2>Todo Lists</h2>
-            <Sparkline data={series.todoLists} />
-          </div>
-          <div>
-            <h2>Todos</h2>
-            <Sparkline data={series.todos} />
-          </div>
-          <div>
-            <h2>Mindmaps</h2>
-            <Sparkline data={series.mindmaps} />
-          </div>
-          <div>
-            <h2>Nodes</h2>
-            <Sparkline data={series.nodes} />
-          </div>
-          <div>
-            <h2>AI Processes</h2>
-            <Sparkline data={series.aiProcesses} />
-          </div>
+          {metrics.map(m => (
+            <div key={m.key} className="analytic-tile">
+              <h2>{m.label}</h2>
+              <p className="tile-value">{latest[m.key]}</p>
+              <Sparkline data={series[m.key]} />
+            </div>
+          ))}
         </div>
       )}
     </div>
