@@ -6,7 +6,6 @@ import { authFetch } from './authFetch'
 
 interface User {
   id: string
-  name: string | null
   email: string
   role: string
   created_at: string
@@ -54,7 +53,6 @@ export default function UsersPage(): JSX.Element {
         <table className="users-table">
           <thead>
             <tr>
-              <th>Name</th>
               <th>Email</th>
               <th>Role</th>
               <th>Date Joined</th>
@@ -64,7 +62,6 @@ export default function UsersPage(): JSX.Element {
             {users.length > 0 ? (
               users.map(u => (
                 <tr key={u.id}>
-                  <td>{u.name || ''}</td>
                   <td>{u.email}</td>
                   <td>{u.role}</td>
                   <td>{new Date(u.created_at).toLocaleDateString()}</td>
@@ -72,7 +69,7 @@ export default function UsersPage(): JSX.Element {
               ))
             ) : (
               <tr>
-                <td colSpan={4}>No users found.</td>
+                <td colSpan={3}>No users found.</td>
               </tr>
             )}
           </tbody>
