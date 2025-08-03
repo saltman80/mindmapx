@@ -101,8 +101,8 @@ const PaymentsPage: React.FC = () => {
 
   return (
     <div className="payments-page">
-      <h1>Payments</h1>
       <AdminNav />
+      <h1>Payments</h1>
       {error && <div className="error">{error}</div>}
       {loading ? (
         <div>Loading payments...</div>

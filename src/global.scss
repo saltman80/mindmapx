@@ -392,6 +392,34 @@ hr {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Admin navigation */
+.admin-nav {
+  margin-bottom: var(--spacing-md);
+}
+
+.admin-nav-list {
+  display: flex;
+  gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-nav-link {
+  color: var(--color-text);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  transition: background-color var(--transition-duration) var(--transition-ease),
+    color var(--transition-duration) var(--transition-ease);
+  font-weight: 500;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link-active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-bg);
+}
+
 .layout-menu-button {
   display: none;
 }
