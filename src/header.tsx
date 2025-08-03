@@ -219,8 +219,11 @@ const Header = (): JSX.Element => {
                     onClick={() => {
                       document.cookie = 'token=; Max-Age=0; path=/'
                       document.cookie = 'session=; Max-Age=0; path=/'
+                      sessionStorage.clear()
                       setUser(null)
-                      handleNavSelect('/login')
+                      setProfileMenuOpen(false)
+                      setMenuOpen(false)
+                      navigate('/login', { replace: true })
                     }}
                   >
                     Sign Out

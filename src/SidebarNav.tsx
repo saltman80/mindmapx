@@ -39,8 +39,9 @@ export default function SidebarNav(): JSX.Element {
   const handleSignOut = () => {
     document.cookie = 'token=; Max-Age=0; path=/'
     document.cookie = 'session=; Max-Age=0; path=/'
+    sessionStorage.clear()
     setUser(null)
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
   const handleUpgrade = async () => {
