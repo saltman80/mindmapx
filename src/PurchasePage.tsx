@@ -42,7 +42,7 @@ export default function PurchasePage() {
     <section className="section relative overflow-x-visible">
       <FaintMindmapBackground />
       <div className="container text-center">
-        <h1 className="mb-md">Upgrade Required</h1>
+        <h1 className="mb-md">Purchase MindXdo</h1>
         <p className="mb-md">
           To continue using MindMapX you need to purchase a monthly subscription.
         </p>
