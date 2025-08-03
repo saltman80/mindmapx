@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import AdminNav from './src/AdminNav'
 import { useUser } from './src/lib/UserContext'
 import { isAdmin } from './src/lib/isAdmin'
+import { authFetch } from './authFetch'
 
 interface User {
   id: string
   name: string | null
   email: string
   role: string
-  status: string | null
   created_at: string
 }
 
@@ -24,8 +24,7 @@ export default function UsersPage(): JSX.Element {
   useEffect(() => {
     const controller = new AbortController()
     setLoading(true)
-    fetch('/api/users?skip=0&limit=100', {
-      credentials: 'include',
+    authFetch('/api/users?skip=0&limit=100', {
       signal: controller.signal,
     })
       .then(res => {
@@ -33,7 +32,8 @@ export default function UsersPage(): JSX.Element {
         return res.json()
       })
       .then(json => {
-        setUsers(json.data as User[])
+        const data = Array.isArray(json.data) ? (json.data as User[]) : []
+        setUsers(data)
       })
       .catch(err => {
         if (err.name !== 'AbortError') {
@@ -46,8 +46,8 @@ export default function UsersPage(): JSX.Element {
 
   return (
     <div className="admin-users-page">
-      <h1>Users</h1>
       <AdminNav />
+      <h1>Users</h1>
       {loading && <p>Loading users...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && (
@@ -57,7 +57,6 @@ export default function UsersPage(): JSX.Element {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Status</th>
               <th>Date Joined</th>
             </tr>
           </thead>
@@ -68,13 +67,12 @@ export default function UsersPage(): JSX.Element {
                   <td>{u.name || ''}</td>
                   <td>{u.email}</td>
                   <td>{u.role}</td>
-                  <td>{u.status || ''}</td>
                   <td>{new Date(u.created_at).toLocaleDateString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5}>No users found.</td>
+                <td colSpan={4}>No users found.</td>
               </tr>
             )}
           </tbody>

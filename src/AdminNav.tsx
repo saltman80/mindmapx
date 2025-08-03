@@ -9,12 +9,14 @@ const adminLinks = [
 export default function AdminNav(): JSX.Element {
   return (
     <nav className="admin-nav" aria-label="Admin navigation">
-      <ul>
+      <ul className="admin-nav-list">
         {adminLinks.map(link => (
           <li key={link.to}>
             <NavLink
               to={link.to}
-              className={({ isActive }) => (isActive ? 'active' : undefined)}
+              className={({ isActive }) =>
+                `admin-nav-link${isActive ? ' admin-nav-link-active' : ''}`
+              }
             >
               {link.label}
             </NavLink>

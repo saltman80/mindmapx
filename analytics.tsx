@@ -58,8 +58,8 @@ export default function AnalyticsPage(): JSX.Element {
 
   return (
     <div className="analytics-page">
-      <h1>Analytics</h1>
       <AdminNav />
+      <h1>Analytics</h1>
       {loading && <p>Loading analytics...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && (
