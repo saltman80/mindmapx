@@ -1,4 +1,18 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { z } from 'zod'
 import AdminNav from './src/AdminNav'
+import { useUser } from './src/lib/UserContext'
+import { isAdmin } from './src/lib/isAdmin'
+
+interface Payment {
+  id: string
+  userId: string
+  amount: number
+  currency: string
+  status: string
+  createdAt: string
+}
 
 const paymentSchema = z.object({
   id: z.string(),
@@ -47,6 +61,10 @@ async function fetchPayments({
 }
 
 const PaymentsPage: React.FC = () => {
+  const { user } = useUser()
+  if (!isAdmin(user)) {
+    return <p>Forbidden</p>
+  }
   const navigate = useNavigate()
   const [payments, setPayments] = useState<Payment[]>([])
   const [hasNext, setHasNext] = useState(false)
@@ -106,3 +124,41 @@ const PaymentsPage: React.FC = () => {
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.userId}</td>
+                  <td>
+                    {p.amount.toFixed(2)} {p.currency.toUpperCase()}
+                  </td>
+                  <td>{p.status}</td>
+                  <td>{new Date(p.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <button onClick={() => handleViewDetails(p.id)}>View</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6}>No payments found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
+      <div className="pagination">
+        <button
+          onClick={() => setPage(p => Math.max(1, p - 1))}
+          disabled={page === 1 || loading}
+        >
+          Previous
+        </button>
+        <span style={{ margin: '0 8px' }}>Page {page}</span>
+        <button
+          onClick={() => setPage(p => (hasNext ? p + 1 : p))}
+          disabled={!hasNext || loading}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default PaymentsPage
