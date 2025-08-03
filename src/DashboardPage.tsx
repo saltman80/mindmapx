@@ -7,7 +7,7 @@ import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
 import Sparkline from './Sparkline'
 import DashboardTile, { DashboardItem } from './DashboardTile'
-import { LIMIT_MINDMAPS, LIMIT_TODO_LISTS, LIMIT_KANBAN_BOARDS, LIMIT_AI_MONTHLY } from "./constants"
+import { LIMIT_MINDMAPS, LIMIT_TODO_LISTS, LIMIT_KANBAN_BOARDS, LIMIT_AI_MONTHLY, LIMIT_MINDMAPS_TRIAL, LIMIT_TODO_LISTS_TRIAL, LIMIT_KANBAN_BOARDS_TRIAL } from "./constants"
 import {
   MapItem,
   BoardItem,
@@ -50,18 +50,25 @@ export default function DashboardPage(): JSX.Element {
   const [aiLimit, setAiLimit] = useState(LIMIT_AI_MONTHLY)
   const [cardsDoneToday, setCardsDoneToday] = useState(0)
   const [cardsDoneWeek, setCardsDoneWeek] = useState(0)
+  const [isTrial, setIsTrial] = useState(false)
   const navigate = useNavigate()
+
+  const mindmapLimit = isTrial ? LIMIT_MINDMAPS_TRIAL : LIMIT_MINDMAPS
+  const todoLimit = isTrial ? LIMIT_TODO_LISTS_TRIAL : LIMIT_TODO_LISTS
+  const boardLimit = isTrial ? LIMIT_KANBAN_BOARDS_TRIAL : LIMIT_KANBAN_BOARDS
 
   const fetchData = async (): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
-      const [mapsRes, listsRes, boardsRes, nodesRes, cardMetricsRes] = await Promise.all([
+      const [mapsRes, listsRes, boardsRes, nodesRes, cardMetricsRes, statusRes, usageRes] = await Promise.all([
         authFetch('/.netlify/functions/mindmaps', { credentials: 'include' }),
         authFetch('/.netlify/functions/todo-lists', { credentials: 'include' }),
         authFetch('/.netlify/functions/boards', { credentials: 'include' }),
         authFetch('/.netlify/functions/node', { credentials: 'include' }),
         authFetch('/.netlify/functions/kanban-card-metrics', { credentials: 'include' }),
+        authFetch('/.netlify/functions/user-status', { credentials: 'include' }),
+        authFetch('/.netlify/functions/usage', { credentials: 'include' }),
       ])
       const mapsJson = mapsRes.ok && mapsRes.headers.get('content-type')?.includes('application/json')
         ? await mapsRes.json()
@@ -84,14 +91,19 @@ export default function DashboardPage(): JSX.Element {
       const metricsJson = cardMetricsRes.ok && cardMetricsRes.headers.get('content-type')?.includes('application/json')
         ? await cardMetricsRes.json()
         : { doneToday: 0, doneWeek: 0 }
+      const statusJson = statusRes.ok && statusRes.headers.get('content-type')?.includes('application/json')
+        ? await statusRes.json()
+        : null
+      const usageJson = usageRes.ok && usageRes.headers.get('content-type')?.includes('application/json')
+        ? await usageRes.json()
+        : { aiUsage: 0, aiLimit: LIMIT_AI_MONTHLY }
       const doneToday = Number(metricsJson.doneToday) || 0
       const doneWeek = Number(metricsJson.doneWeek) || 0
       const nodesList = validateNodes(Array.isArray(nodesJson) ? nodesJson : nodesJson.nodes)
 
-      const usageRes = await authFetch('/.netlify/functions/usage', { credentials: 'include' })
-      const usageJson = usageRes.ok ? await usageRes.json() : { aiUsage: 0 }
       setAiUsage(Number(usageJson.aiUsage) || 0)
       setAiLimit(Number(usageJson.aiLimit) || LIMIT_AI_MONTHLY)
+      setIsTrial(statusJson?.data?.subscription_status === 'trialing')
 
       setMaps(Array.isArray(mapsList) ? mapsList : [])
       setTodoLists(Array.isArray(lists) ? lists : [])
@@ -405,7 +417,7 @@ export default function DashboardPage(): JSX.Element {
                 items={mapItems}
                 moreLink="/mindmaps"
                 onCreate={() => {
-                  if (maps.length < LIMIT_MINDMAPS) {
+                  if (maps.length < mindmapLimit) {
                     setCreateType('map')
                     setShowModal(true)
                   } else {
@@ -420,7 +432,7 @@ export default function DashboardPage(): JSX.Element {
                 listClassName="dashboard-list-preview"
                 moreLink="/todos"
                 onCreate={() => {
-                  if (todoLists.length < LIMIT_TODO_LISTS) {
+                  if (todoLists.length < todoLimit) {
                     setCreateType('todo')
                     setShowModal(true)
                   } else {
@@ -434,7 +446,7 @@ export default function DashboardPage(): JSX.Element {
                 items={boardItems}
                 moreLink="/kanban"
                 onCreate={() => {
-                  if (boards.length < LIMIT_KANBAN_BOARDS) {
+                  if (boards.length < boardLimit) {
                     setCreateType('board')
                     setShowModal(true)
                   } else {
