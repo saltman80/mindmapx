@@ -142,6 +142,23 @@ export default function TodoCanvas({
     }
   }
 
+  const handleDeleteTodo = async (id: string) => {
+    if (!confirm('Delete this todo?')) return
+    try {
+      const res = await fetch(`/.netlify/functions/todoid/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Failed to delete todo')
+      setTodos(prev => prev.filter(t => t.id !== id))
+      if (editingTodo?.id === id) setEditingTodo(null)
+      if (commentingTodo?.id === id) setCommentingTodo(null)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to delete todo')
+    }
+  }
+
   const openSendAllDialog = async () => {
     setSendingAll(true)
     try {
@@ -206,6 +223,9 @@ export default function TodoCanvas({
         </button>
         <button className="circle-icon" onClick={() => openKanbanSendDialog(t)}>
           <span role="img" aria-label="Send">➡</span>
+        </button>
+        <button className="circle-icon" onClick={() => handleDeleteTodo(t.id)}>
+          <span role="img" aria-label="Delete">🗑️</span>
         </button>
       </div>
     </div>
