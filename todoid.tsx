@@ -227,8 +227,19 @@ export default function TodoPage({ mindmapId }: TodoPageProps) {
                   >
                     Edit
                   </button>
-                  <button onClick={() => handleTodoDelete(todo.id)} style={{ marginLeft: '8px' }}>
-                    Delete
+                  <button
+                    onClick={() => handleTodoDelete(todo.id)}
+                    style={{
+                      marginLeft: '8px',
+                      background: 'none',
+                      border: 'none',
+                      color: 'red',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                    aria-label="Delete todo"
+                  >
+                    ✕
                   </button>
                 </>
               )}

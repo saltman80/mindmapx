@@ -202,7 +202,7 @@ export default function TodosPage(): JSX.Element {
                     <ul className="todo-items">
                       {list.todos.map(t => (
                         <li key={t.id} className="todo-item">
-                          {t.title}{' '}
+                          <span style={{ flexGrow: 1 }}>{t.title}</span>
                           <a
                             href="#"
                             className="tile-link delete-link"
@@ -210,8 +210,10 @@ export default function TodosPage(): JSX.Element {
                               e.preventDefault()
                               handleDeleteTodo(t.id)
                             }}
+                            aria-label="Delete todo"
+                            style={{ fontWeight: 'bold' }}
                           >
-                            Delete
+                            &times;
                           </a>
                         </li>
                       ))}
