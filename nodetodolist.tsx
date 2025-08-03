@@ -225,8 +225,19 @@ const NodeTodoList: FC<NodeTodoListProps> = ({ nodeId }) => {
                   >
                     Edit
                   </button>
-                  <button onClick={() => handleDeleteTodo(todo.id)} disabled={isDeleting}>
-                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  <button
+                    onClick={() => handleDeleteTodo(todo.id)}
+                    disabled={isDeleting}
+                    aria-label="Delete todo"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'red',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isDeleting ? '…' : '✕'}
                   </button>
                 </>
               )}
