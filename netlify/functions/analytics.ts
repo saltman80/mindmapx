@@ -78,8 +78,23 @@ export const handler = async (
       `,
       [startDate.toISOString(), endDate.toISOString()]
     )
+    const { rows: totalRows } = await client.query(
+      `
+      SELECT
+        (SELECT COUNT(*) FROM kanban_boards) AS "kanbans",
+        (SELECT COUNT(*) FROM todo_lists) AS "todoLists",
+        (SELECT COUNT(*) FROM todos) AS "todos",
+        (SELECT COUNT(*) FROM mindmaps) AS "mindmaps",
+        (SELECT COUNT(*) FROM nodes) AS "nodes",
+        (SELECT COUNT(*) FROM ai_usage) AS "aiProcesses"
+      `
+    )
 
-    return { statusCode: 200, headers, body: JSON.stringify({ data: rows }) }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ data: rows, totals: totalRows[0] }),
+    }
   } catch (err) {
     console.error('analytics error', err)
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal Server Error' }) }
