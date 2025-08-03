@@ -6,6 +6,7 @@ import LoadingSkeleton from './loadingskeleton'
 import FaintMindmapBackground from './FaintMindmapBackground'
 import MindmapArm from './MindmapArm'
 import Sparkline from './src/Sparkline'
+import { checkLimit } from './src/lib/checkLimit'
 
 interface MapItem {
   id: string
@@ -78,6 +79,9 @@ export default function DashboardPage(): JSX.Element {
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
+    const resource = createType === 'map' ? 'mindmap' : 'todo'
+    const ok = await checkLimit(resource)
+    if (!ok) return
     try {
       if (createType === 'map') {
         await fetch('/.netlify/functions/mindmaps', {
@@ -107,6 +111,9 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    const resource = createType === 'map' ? 'mindmap' : 'todo'
+    const ok = await checkLimit(resource)
+    if (!ok) return
     try {
       if (createType === 'map') {
         await fetch('/.netlify/functions/ai-create-mindmap', {

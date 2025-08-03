@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
+import { checkLimit } from './lib/checkLimit'
 
 interface BoardItem {
   id: string
@@ -53,6 +54,8 @@ export default function KanbanBoardsPage(): JSX.Element {
 
   const handleSave = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
+    const ok = await checkLimit('board')
+    if (!ok) return
     try {
       const res = await authFetch('/.netlify/functions/kanban-boards', {
         method: 'POST',
@@ -81,6 +84,8 @@ export default function KanbanBoardsPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    const ok = await checkLimit('board')
+    if (!ok) return
     setAiLoading(true)
     try {
       const res = await fetch('/api/ai-create-board', {

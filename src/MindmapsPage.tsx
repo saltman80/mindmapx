@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import LoadingSkeleton from '../loadingskeleton'
 import FaintMindmapBackground from '../FaintMindmapBackground'
 import MindmapArm from '../MindmapArm'
+import { checkLimit } from './lib/checkLimit'
 
 interface MapItem {
   id: string
@@ -63,6 +64,8 @@ export default function MindmapsPage(): JSX.Element {
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
+    const ok = await checkLimit('mindmap')
+    if (!ok) return
     try {
       const res = await fetch('/.netlify/functions/mindmaps', {
         method: 'POST',
@@ -86,6 +89,8 @@ export default function MindmapsPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    const ok = await checkLimit('mindmap')
+    if (!ok) return
     setAiLoading(true)
     try {
       const res = await fetch('/api/ai-create-mindmap', {

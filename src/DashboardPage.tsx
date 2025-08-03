@@ -16,6 +16,7 @@ import {
   validateBoards,
   validateNodes,
 } from './apiValidators'
+import { checkLimit } from './lib/checkLimit'
 
 interface TodoItem {
   id: string
@@ -123,6 +124,9 @@ export default function DashboardPage(): JSX.Element {
 
   const handleCreate = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
+    const resource = createType === 'map' ? 'mindmap' : createType === 'todo' ? 'todo' : 'board'
+    const ok = await checkLimit(resource)
+    if (!ok) return
     try {
       if (createType === 'map') {
         const res = await fetch('/.netlify/functions/mindmaps', {
@@ -173,6 +177,9 @@ export default function DashboardPage(): JSX.Element {
   }
 
   const handleAiCreate = async (): Promise<void> => {
+    const resource = createType === 'map' ? 'mindmap' : createType === 'todo' ? 'todo' : 'board'
+    const ok = await checkLimit(resource)
+    if (!ok) return
     if (aiUsage >= aiLimit) {
       alert('AI automation limit reached')
       return
