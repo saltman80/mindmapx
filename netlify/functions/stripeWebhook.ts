@@ -5,6 +5,9 @@ import { jsonResponse } from '../lib/response.js'
 import { getClient } from './db-client.js'
 
 export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
+  if (event.httpMethod !== 'POST') {
+    return jsonResponse(405, { success: false, message: 'Method Not Allowed' })
+  }
   const signature = event.headers['stripe-signature'] || event.headers['Stripe-Signature']
   if (!signature) {
     return jsonResponse(400, { success: false, message: 'Missing Stripe signature' })
