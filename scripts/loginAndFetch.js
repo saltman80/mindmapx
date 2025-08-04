@@ -1,4 +1,4 @@
-const baseUrl = process.env.API_BASE_URL || 'https://mindxdo.netlify.app';
+const baseUrl = process.env.API_BASE_URL || 'https://mindxdo.com';
 const email = process.env.EMAIL;
 const password = process.env.PASSWORD;
 

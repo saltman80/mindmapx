@@ -34,7 +34,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
     const { userId, email } = user
 
     const frontendUrl =
-      process.env.FRONTEND_URL || 'https://mindxdo.netlify.app'
+      process.env.FRONTEND_URL || 'https://mindxdo.com'
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
