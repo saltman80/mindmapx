@@ -80,6 +80,6 @@ and optionally set the base URL of your deployed site:
 ```bash
 EMAIL=you@example.com \
 PASSWORD=yourpassword \
-API_BASE_URL=https://your-site.netlify.app \
+API_BASE_URL=https://mindxdo.com \
 node scripts/loginAndFetch.js
 ```
