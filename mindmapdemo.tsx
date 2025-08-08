@@ -208,8 +208,15 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
             </div>
           </section>
 
-          <section className="about-section reveal">
+          <section
+            className="about-section reveal section-bg-alt"
+            style={{ borderTop: '1px solid var(--color-border)', padding: 'var(--spacing-xl) var(--spacing-lg)' }}
+          >
             <MindmapArm side="left" />
+            <img
+              src="./assets/marketing_square_lightbulb_team.png"
+              alt="Illustration of AI transforming ideas into action"
+            />
             <div>
               <motion.h2
                 className="marketing-text-large"
@@ -220,8 +227,10 @@ export default function MindmapDemo({ compact = false }: MindmapDemoProps): JSX.
               >
                 Vision Meets Action
               </motion.h2>
-              <p className="section-subtext">
-                Use AI or manual tools to expand ideas into tasks and track them on your planning board.
+              <p className="section-subtext" style={{ lineHeight: 1.6 }}>
+                Use the power of AI or manual tools to transform your big ideas into detailed, trackable tasks.<br />
+                Every step from concept to completion stays clear, connected, and actionable — so you and your team always know what’s next.<br />
+                Map your ideas, build your plan, and watch your vision come to life.
               </p>
             </div>
           </section>
