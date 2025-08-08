@@ -281,6 +281,17 @@ $spacers: (
   }
 }
 
+.btn-blue {
+  background-color: blue;
+  border-color: blue;
+  color: var(--color-text-inverse);
+  &:hover {
+    background-color: darkblue;
+    border-color: darkblue;
+    color: var(--color-text-inverse);
+  }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }

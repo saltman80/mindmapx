@@ -104,7 +104,7 @@ const Homepage: React.FC = (): JSX.Element => {
           <p>
             Mindmaps connect todos to boards, turning ideas into executed vision.
           </p>
-          <Link to="/purchase" className="btn">
+          <Link to="/purchase" className="btn btn-blue">
             Get Started
           </Link>
         </motion.div>
